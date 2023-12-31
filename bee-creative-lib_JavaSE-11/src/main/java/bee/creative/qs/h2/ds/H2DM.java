@@ -27,7 +27,7 @@ public class H2DM implements DM {
 
 	public H2DM(H2DS parent) {
 		this(parent, parent.store().newNode());
-		parent.models().add(this.context);
+		parent.modelsAsNodes().add(this.context);
 	}
 
 	@Override
@@ -114,7 +114,7 @@ public class H2DM implements DM {
 		this.installInstances(DL.IDENT_IsLink, this.linkMap.values());
 	}
 
-	/** Diese Methode übernimmt Änderungen an {@link DE#idents()} auf die internen Puffer zur Beschleunigung von {@link #getLink(String)} und
+	/** Diese Methode übernimmt Änderungen an {@link DE#identsAsNodes()} auf die internen Puffer zur Beschleunigung von {@link #getLink(String)} und
 	 * {@link #getType(String)}. Wenn das {@link DL Datenfeld} zu {@link DL#IDENT_IsLinkWithIdent} nicht verwendet wird, wird das Datenmodell initialisiert. Wenn
 	 * essentielle Datenfelder oder Datentypen nicht ermittelt werden können, wird eine Ausnahme ausgelöst. */
 	public void invalidateIdents() {
@@ -140,7 +140,7 @@ public class H2DM implements DM {
 		return new H2DT(this, this.context.owner.asQN(node));
 	}
 
-	/** Diese Methode liefert den unter dem gegebenen {@link DL#identsAsStrings() Erkennungstextwert} in der {@link #linkMap} hinterlegten {@link DL Datentyp} und
+	/** Diese Methode liefert den unter dem gegebenen {@link DL#idents() Erkennungstextwert} in der {@link #linkMap} hinterlegten {@link DL Datentyp} und
 	 * {@link HashMap2#install(Object, Getter) erzeugt} diesen bei Bedarf, sofern {@code ident} nicht {@code null} ist. Andernfalls wird {@code null}
 	 * geliefert. */
 	protected H2DL installLink(String ident) {

@@ -19,12 +19,12 @@ public interface DS {
 	 * @return Graphspeicher. */
 	QS store();
 
-	default Set2<QN> models() {
-		return this.installSet(DM.IDENT_IsModel);
+	default Set2<DM> models() {
+		return this.modelsAsNodes().translate(this.modelTrans());
 	}
-
-	default Set2<DM> modelsAsModels() {
-		return this.models().translate(this.modelTrans());
+	
+	default Set2<QN> modelsAsNodes() {
+		return this.installSet(DM.IDENT_IsModel);
 	}
 
 	/** Diese Methode liefert den zum gegebenen {@link QN#value() externen Textwert} hintelegten internen {@link QN Hyperknoten}. Dieser wird bei Bedarf erzeugt

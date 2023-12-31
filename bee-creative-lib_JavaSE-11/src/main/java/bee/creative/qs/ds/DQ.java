@@ -3,6 +3,7 @@ package bee.creative.qs.ds;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import bee.creative.fem.FEMDatetime;
 import bee.creative.qs.QE;
 import bee.creative.qs.QESet;
 import bee.creative.qs.QN;
@@ -13,9 +14,14 @@ import bee.creative.util.Getter;
 import bee.creative.util.HashMap2;
 import bee.creative.util.HashSet2;
 import bee.creative.util.Iterables;
+import bee.creative.util.Translator2;
+import bee.creative.util.Translators;
 
 // TODO
 public class DQ {
+
+	public static final Translator2<String, FEMDatetime> datetimeTrans =
+		Translators.from(String.class, FEMDatetime.class, FEMDatetime::from, FEMDatetime::toString).optionalize();
 
 	public static List<QN> getObjectSet(QN context, QN predicate, QN subject) throws NullPointerException, IllegalArgumentException {
 		return DQ.getEdgesHavingContextAndPredicate(context, predicate).withSubject(subject).objects().toList();

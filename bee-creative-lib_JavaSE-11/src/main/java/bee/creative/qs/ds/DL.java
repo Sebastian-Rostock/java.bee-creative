@@ -16,37 +16,37 @@ import bee.creative.util.Translators;
 import bee.creative.util.Translators.EnumTranslator;
 import bee.creative.util.Translators.OptionalizedTranslator;
 
-/** Diese Schnittstelle definiert ein Datenfeld (Domain-Link) als {@link #label() beschriftete} und {@link #idents() erkennbarer} {@link #node() Prädikatknoten}
+/** Diese Schnittstelle definiert ein Datenfeld (Domain-Link) als {@link #labelAsNode() beschriftete} und {@link #identsAsNodes() erkennbarer} {@link #node() Prädikatknoten}
  * mit Festlegungen zur Vielzahl, Handhabung und Typisierung der damit verbundenen Objekt- und Subjektknoten.
  *
  * @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public interface DL extends DE {
 
-	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für den {@link DT Datentyp} von {@link DL}. */
+	/** Dieses Feld speichert den Textwert eines {@link DE#identsAsNodes() Erkennungsknoten} für den {@link DT Datentyp} von {@link DL}. */
 	String IDENT_IsLink = "DS:IsLink";
 
-	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für das {@link #label()}-{@link DL Datenfeld}. */
+	/** Dieses Feld speichert den Textwert eines {@link DE#identsAsNodes() Erkennungsknoten} für das {@link #labelAsNode()}-{@link DL Datenfeld}. */
 	String IDENT_IsLinkWithLabel = "DS:IsLinkWithLabel";
 
-	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für das {@link #idents()}-{@link DL Datenfeld}. */
+	/** Dieses Feld speichert den Textwert eines {@link DE#identsAsNodes() Erkennungsknoten} für das {@link #identsAsNodes()}-{@link DL Datenfeld}. */
 	String IDENT_IsLinkWithIdent = "DS:IsLinkWithIdent";
 
-	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für das {@link #sourceType()}-{@link DL Datenfeld}. */
+	/** Dieses Feld speichert den Textwert eines {@link DE#identsAsNodes() Erkennungsknoten} für das {@link #sourceTypeAsNode()}-{@link DL Datenfeld}. */
 	String IDENT_IsLinkWithSourceType = "DS:IsLinkWithSourceType";
 
-	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für das {@link #sourceHandling()}-{@link DL Datenfeld}. */
+	/** Dieses Feld speichert den Textwert eines {@link DE#identsAsNodes() Erkennungsknoten} für das {@link #sourceHandlingAsNode()}-{@link DL Datenfeld}. */
 	String IDENT_IsLinkWithSourceHandling = "DS:IsLinkWithSourceHandling";
 
-	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für das {@link #sourceMultiplicity()}-{@link DL Datenfeld}. */
+	/** Dieses Feld speichert den Textwert eines {@link DE#identsAsNodes() Erkennungsknoten} für das {@link #sourceMultiplicityAsNode()}-{@link DL Datenfeld}. */
 	String IDENT_IsLinkWithSourceMultiplicity = "DS:IsLinkWithSourceMultiplicity";
 
-	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für das {@link #targetType()}-{@link DL Datenfeld}. */
+	/** Dieses Feld speichert den Textwert eines {@link DE#identsAsNodes() Erkennungsknoten} für das {@link #targetTypeAsNode()}-{@link DL Datenfeld}. */
 	String IDENT_IsLinkWithTargetType = "DS:IsLinkWithTargetType";
 
-	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für das {@link #targetHandling()}-{@link DL Datenfeld}. */
+	/** Dieses Feld speichert den Textwert eines {@link DE#identsAsNodes() Erkennungsknoten} für das {@link #targetHandlingAsNode()}-{@link DL Datenfeld}. */
 	String IDENT_IsLinkWithTargetHandling = "DS:IsLinkWithTargetHandling";
 
-	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für das {@link #targetMultiplicity()}-{@link DL Datenfeld}. */
+	/** Dieses Feld speichert den Textwert eines {@link DE#identsAsNodes() Erkennungsknoten} für das {@link #targetMultiplicityAsNode()}-{@link DL Datenfeld}. */
 	String IDENT_IsLinkWithTargetMultiplicity = "DS:IsLinkWithTargetMultiplicity";
 
 	/** {@inheritDoc} Dieser wird als {@link QE#predicate() Prädikatknoten} der {@link #edges() Hyperkanten} verwendet. Als {@link QE#context() Kontextknoten}
@@ -58,7 +58,7 @@ public interface DL extends DE {
 	 *
 	 * @see #IDENT_IsLinkWithLabel */
 	@Override
-	default Property2<QN> label() {
+	default Property2<QN> labelAsNode() {
 		return this.parent().getLink(DL.IDENT_IsLinkWithLabel).asTargetProperty(this.node());
 	}
 
@@ -66,7 +66,7 @@ public interface DL extends DE {
 	 *
 	 * @see #IDENT_IsLinkWithIdent */
 	@Override
-	default Set2<QN> idents() {
+	default Set2<QN> identsAsNodes() {
 		return this.parent().getLink(DL.IDENT_IsLinkWithIdent).asTargetSet(this.node());
 	}
 
@@ -78,24 +78,35 @@ public interface DL extends DE {
 		return this.parent().edges().havingPredicate(this.node());
 	}
 
+	/** Diese Methode erlaubt Zugriff auf den {@link DT Datentyp} zulässiger {@link QE#subject() Subjektknoten}. Wenn dieser {@code null} ist, sind die
+	 * Subjektknoten nicht eingeschränkt.
+	 *
+	 * @see DM#typeTrans()
+	 * @see DL#sourceTypeAsNode()
+	 * @return Subjektdatentyp. */
+	default Property2<DT> sourceType() {
+		return this.sourceTypeAsNode().translate(this.parent().typeTrans());
+	}
+
 	/** Diese Methode erlaubt Zugriff auf den {@link DT#node() Hyperknoten} des {@link DT Datentyps} zulässiger {@link QE#subject() Subjektknoten}. Wenn dieser
 	 * {@code null} ist, sind die Subjektknoten nicht eingeschränkt.
 	 *
 	 * @see DL#IDENT_IsLinkWithSourceType
 	 * @see DL#asTargetProperty(QN)
 	 * @return Subjektdatentypknoten. */
-	default Property2<QN> sourceType() {
+	default Property2<QN> sourceTypeAsNode() {
 		return this.parent().getLink(DL.IDENT_IsLinkWithSourceType).asTargetProperty(this.node());
 	}
 
-	/** Diese Methode erlaubt Zugriff auf den {@link DT Datentyp} zulässiger {@link QE#subject() Subjektknoten}. Wenn dieser {@code null} ist, sind die
-	 * Subjektknoten nicht eingeschränkt.
+	/** Diese Methode erlaubt Zugriff auf die {@link Handling Handhabung} von {@link QE#subject() Subjektknoten} beim Entfernen oder Duplizieren eines
+	 * {@link QE#object() Objektknoten}.
 	 *
-	 * @see DM#typeTrans()
-	 * @see DL#sourceType()
-	 * @return Subjektdatentyp. */
-	default Property2<DT> sourceTypeAsType() {
-		return this.sourceType().translate(this.parent().typeTrans());
+	 * @see DL#sourceHandlingAsNode()
+	 * @see QS#valueTrans()
+	 * @see Handling#trans
+	 * @return Subjekthandhabung. */
+	default Property2<Handling> sourceHandling() {
+		return this.sourceHandlingAsNode().translate(this.owner().valueTrans()).translate(Handling.trans);
 	}
 
 	/** Diese Methode erlaubt Zugriff auf den {@link DT#node() Hyperknoten} der {@link Handling Handhabung} von {@link QE#subject() Subjektknoten} beim Entfernen
@@ -103,19 +114,18 @@ public interface DL extends DE {
 	 *
 	 * @see DL#IDENT_IsLinkWithSourceHandling
 	 * @return Subjekthandhabungsknoten. */
-	default Property2<QN> sourceHandling() {
+	default Property2<QN> sourceHandlingAsNode() {
 		return this.parent().getLink(DL.IDENT_IsLinkWithSourceHandling).asTargetProperty(this.node());
 	}
 
-	/** Diese Methode erlaubt Zugriff auf die {@link Handling Handhabung} von {@link QE#subject() Subjektknoten} beim Entfernen oder Duplizieren eines
-	 * {@link QE#object() Objektknoten}.
+	/** Diese Methode erlaubt Zugriff auf die zulässige {@link Multiplicity Vielzahl} von {@link QE#subject() Subjektknoten} je {@link QE#object() Objektknoten}.
 	 *
-	 * @see DL#sourceHandling()
+	 * @see DL#sourceMultiplicityAsNode()
 	 * @see QS#valueTrans()
-	 * @see Handling#trans
-	 * @return Subjekthandhabung. */
-	default Property2<Handling> sourceHandlingAsEnum() {
-		return this.sourceHandling().translate(this.owner().valueTrans()).translate(Handling.trans);
+	 * @see Multiplicity#trans
+	 * @return Subjektvielzahl. */
+	default Property2<Multiplicity> sourceMultiplicity() {
+		return this.sourceMultiplicityAsNode().translate(this.owner().valueTrans()).translate(Multiplicity.trans);
 	}
 
 	/** Diese Methode erlaubt Zugriff auf den {@link DT#node() Hyperknoten} der zulässigen {@link Multiplicity Vielzahl} von {@link QE#subject() Subjektknoten} je
@@ -123,18 +133,12 @@ public interface DL extends DE {
 	 *
 	 * @see DL#IDENT_IsLinkWithSourceMultiplicity
 	 * @return Subjektvielzahlknoten. */
-	default Property2<QN> sourceMultiplicity() {
+	default Property2<QN> sourceMultiplicityAsNode() {
 		return this.parent().getLink(DL.IDENT_IsLinkWithSourceMultiplicity).asTargetProperty(this.node());
 	}
 
-	/** Diese Methode erlaubt Zugriff auf die zulässige {@link Multiplicity Vielzahl} von {@link QE#subject() Subjektknoten} je {@link QE#object() Objektknoten}.
-	 *
-	 * @see DL#sourceMultiplicity()
-	 * @see QS#valueTrans()
-	 * @see Multiplicity#trans
-	 * @return Subjektvielzahl. */
-	default Property2<Multiplicity> sourceMultiplicityAsEnum() {
-		return this.sourceMultiplicity().translate(this.owner().valueTrans()).translate(Multiplicity.trans);
+	default Property2<DT> targetType() {
+		return this.targetTypeAsNode().translate(this.parent().typeTrans());
 	}
 
 	/** Diese Methode erlaubt Zugriff auf den {@link DT#node() Hyperknoten} des {@link DT Datentyps} zulässiger {@link QE#object() Objektknoten}. Wenn dieser
@@ -143,28 +147,24 @@ public interface DL extends DE {
 	 * @see DL#IDENT_IsLinkWithTargetType
 	 * @see DL#asTargetProperty(QN)
 	 * @return Objektdatentypknoten. */
-	default Property2<QN> targetType() {
+	default Property2<QN> targetTypeAsNode() {
 		return this.parent().getLink(DL.IDENT_IsLinkWithTargetType).asTargetProperty(this.node());
 	}
 
-	default Property2<DT> targetTypeAsType() {
-		return this.targetType().translate(this.parent().typeTrans());
+	default Property2<Handling> targetHandling() {
+		return this.targetHandlingAsNode().translate(this.owner().valueTrans()).translate(Handling.trans);
 	}
-
-	default Property2<QN> targetHandling() {
+	
+	default Property2<QN> targetHandlingAsNode() {
 		return this.parent().getLink(DL.IDENT_IsLinkWithTargetHandling).asTargetProperty(this.node());
 	}
 
-	default Property2<Handling> targetHandlingAsEnum() {
-		return this.targetHandling().translate(this.owner().valueTrans()).translate(Handling.trans);
+	default Property2<Multiplicity> targetMultiplicity() {
+		return this.targetMultiplicityAsNode().translate(this.owner().valueTrans()).translate(Multiplicity.trans);
 	}
-
-	default Property2<QN> targetMultiplicity() {
+	
+	default Property2<QN> targetMultiplicityAsNode() {
 		return this.parent().getLink(DL.IDENT_IsLinkWithTargetMultiplicity).asTargetProperty(this.node());
-	}
-
-	default Property2<Multiplicity> targetMultiplicityAsEnum() {
-		return this.targetMultiplicity().translate(this.owner().valueTrans()).translate(Multiplicity.trans);
 	}
 
 	default QN getSource(QN target) throws NullPointerException, IllegalArgumentException {

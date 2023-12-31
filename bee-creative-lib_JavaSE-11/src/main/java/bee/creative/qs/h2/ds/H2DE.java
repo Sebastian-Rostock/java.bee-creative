@@ -41,7 +41,7 @@ public abstract class H2DE implements DE {
 
 	@Override
 	public String toString() {
-		return this.labelAsString().get();
+		return this.label().get();
 	}
 
 	protected H2DE(H2DM parent, H2QN node) {

@@ -16,7 +16,7 @@ import bee.creative.util.Translators.OptionalizedTranslator;
  * @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public interface DM extends QO {
 
-	/** Dieses Feld speichert den Textwert des {@link DS#installSet(String) Erkennungsknoten} für die {@link DS#models() Domänenmodelle} eines {@link DS
+	/** Dieses Feld speichert den Textwert des {@link DS#installSet(String) Erkennungsknoten} für die {@link DS#modelsAsNodes() Domänenmodelle} eines {@link DS
 	 * Domänenspeichers}. */
 	String IDENT_IsModel = "DS:IsModel";
 
@@ -39,53 +39,53 @@ public interface DM extends QO {
 	 * @return Kontextknoten. */
 	QN context();
 
+	/** Diese Methode erlaubt Zugriff auf alle {@link DL Datenfelder}.
+	 *
+	 * @see #linksAsNodes()
+	 * @see #links()
+	 * @return Datenfelder. */
+	default Set2<DL> links() {
+		return this.linksAsNodes().translate(this.linkTrans());
+	}
+
 	/** Diese Methode erlaubt Zugriff auf die {@link DL#node() Hyperknoten} aller {@link DL Datenfelder}.
 	 *
 	 * @see DL#IDENT_IsLink
 	 * @see DL#node()
-	 * @see DT#instances()
+	 * @see DT#instancesAsNodes()
 	 * @return Datenfeldknoten. */
-	default Set2<QN> links() {
-		return this.getType(DL.IDENT_IsLink).instances();
+	default Set2<QN> linksAsNodes() {
+		return this.getType(DL.IDENT_IsLink).instancesAsNodes();
 	}
 
-	/** Diese Methode erlaubt Zugriff auf alle {@link DL Datenfelder}.
+	/** Diese Methode erlaubt Zugriff auf alle {@link DT Datentypen}.
 	 *
-	 * @see #links()
-	 * @see #linksAsLinks()
-	 * @return Datenfelder. */
-	default Set2<DL> linksAsLinks() {
-		return this.links().translate(this.linkTrans());
+	 * @see #typesAsNodes()
+	 * @see #typeTrans()
+	 * @return Datentypen. */
+	default Set2<DT> types() {
+		return this.typesAsNodes().translate(this.typeTrans());
 	}
 
 	/** Diese Methode erlaubt Zugriff auf die {@link DT#node() Hyperknoten} aller {@link DT Datentypen}.
 	 *
 	 * @see DT#IDENT_IsType
 	 * @see DT#node()
-	 * @see DT#instances()
+	 * @see DT#instancesAsNodes()
 	 * @return Datentypknoten. */
-	default Set2<QN> types() {
-		return this.getType(DT.IDENT_IsType).instances();
-	}
-
-	/** Diese Methode erlaubt Zugriff auf alle {@link DT Datentypen}.
-	 *
-	 * @see #types()
-	 * @see #typeTrans()
-	 * @return Datentypen. */
-	default Set2<DT> typesAsTypes() {
-		return this.types().translate(this.typeTrans());
+	default Set2<QN> typesAsNodes() {
+		return this.getType(DT.IDENT_IsType).instancesAsNodes();
 	}
 
 	/** Diese Methode liefert das {@link DL Datenfeld} mit dem gegebenen Erkennungstextwert oder {@code null}.
 	 *
-	 * @param ident {@link QN#value() Textwert} eines {@link DL#idents() Erkennugnsknoten}.
+	 * @param ident {@link QN#value() Textwert} eines {@link DL#identsAsNodes() Erkennugnsknoten}.
 	 * @return {@link DL Datenfeld} oder {@code null}. */
 	DL getLink(String ident);
 
 	/** Diese Methode liefert den {@link DT Datentyp} mit dem gegebenen Erkennungstextwert oder {@code null}.
 	 *
-	 * @param ident {@link QN#value() Textwert} eines {@link DT#idents() Erkennugnsknoten}.
+	 * @param ident {@link QN#value() Textwert} eines {@link DT#identsAsNodes() Erkennugnsknoten}.
 	 * @return {@link DT Datentyp} oder {@code null}. */
 	DT getType(String ident);
 

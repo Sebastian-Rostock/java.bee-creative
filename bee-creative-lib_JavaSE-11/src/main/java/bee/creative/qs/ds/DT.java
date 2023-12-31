@@ -4,29 +4,29 @@ import bee.creative.qs.QN;
 import bee.creative.util.Property2;
 import bee.creative.util.Set2;
 
-/** Diese Schnittstelle definiert einen Datentyp (Domain-type) als {@link #label() beschriftete} und {@link #idents() erkennbare} {@link #instances()
+/** Diese Schnittstelle definiert einen Datentyp (Domain-type) als {@link #labelAsNode() beschriftete} und {@link #identsAsNodes() erkennbare} {@link #instancesAsNodes()
  * Instanzmenge}.
  *
  * @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public interface DT extends DE {
 
-	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für den {@link DT Datentyp} von {@link DT}. */
+	/** Dieses Feld speichert den Textwert eines {@link DE#identsAsNodes() Erkennungsknoten} für den {@link DT Datentyp} von {@link DT}. */
 	String IDENT_IsType = "DS:IsType";
 
-	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für das {@link DE#label()}-{@link DL Datenfeld}. */
+	/** Dieses Feld speichert den Textwert eines {@link DE#identsAsNodes() Erkennungsknoten} für das {@link DE#labelAsNode()}-{@link DL Datenfeld}. */
 	String IDENT_IsTypeWithLabel = "DS:IsTypeWithLabel";
 
-	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für das {@link DE#idents()}-{@link DL Datenfeld}. */
+	/** Dieses Feld speichert den Textwert eines {@link DE#identsAsNodes() Erkennungsknoten} für das {@link DE#identsAsNodes()}-{@link DL Datenfeld}. */
 	String IDENT_IsTypeWithIdent = "DS:IsTypeWithIdent";
 
-	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für das {@link DT#instances()}-{@link DL Datenfeld}. */
+	/** Dieses Feld speichert den Textwert eines {@link DE#identsAsNodes() Erkennungsknoten} für das {@link DT#instancesAsNodes()}-{@link DL Datenfeld}. */
 	String IDENT_IsTypeWithInstance = "DS:IsTypeWithInstance";
 
 	/** {@inheritDoc}
 	 *
 	 * @see #IDENT_IsTypeWithLabel */
 	@Override
-	default Property2<QN> label() {
+	default Property2<QN> labelAsNode() {
 		return this.parent().getLink(DT.IDENT_IsTypeWithLabel).asTargetProperty(this.node());
 	}
 
@@ -34,7 +34,7 @@ public interface DT extends DE {
 	 *
 	 * @see #IDENT_IsTypeWithIdent */
 	@Override
-	default Set2<QN> idents() {
+	default Set2<QN> identsAsNodes() {
 		return this.parent().getLink(DT.IDENT_IsTypeWithIdent).asTargetSet(this.node());
 	}
 
@@ -44,46 +44,46 @@ public interface DT extends DE {
 	 * @see DT#IDENT_IsTypeWithInstance
 	 * @see DL#asTargetSet(QN)
 	 * @return Instanzknoten. */
-	default Set2<QN> instances() {
+	default Set2<QN> instancesAsNodes() {
 		return this.parent().getLink(DT.IDENT_IsTypeWithInstance).asTargetSet(this.node());
 	}
 
-	/** Diese Methode erlaubt Zugriff auf die {@link DL#node() Hyperknoten} der diesen Datentyp als {@link DL#targetTypeAsType() Objektdatentyp} zulassenden
+	/** Diese Methode erlaubt Zugriff auf die diesen Datentyp als {@link DL#targetType() Objektdatentyp} zulassenden {@link DL Datenfelder}.
+	 *
+	 * @see DT#targetLinksAsNodes()
+	 * @see DM#linkTrans()
+	 * @return Objektdatenfelder. */
+	default Set2<DL> targetLinks() {
+		return this.targetLinksAsNodes().translate(this.parent().linkTrans());
+	}
+
+	/** Diese Methode erlaubt Zugriff auf die {@link DL#node() Hyperknoten} der diesen Datentyp als {@link DL#targetType() Objektdatentyp} zulassenden
 	 * {@link DL Datenfelder}.
 	 *
 	 * @see DL#IDENT_IsLinkWithTargetType
 	 * @see DL#asSourceSet(QN)
 	 * @return Objektdatenfeldknoten. */
-	default Set2<QN> targetLinks() {
+	default Set2<QN> targetLinksAsNodes() {
 		return this.parent().getLink(DL.IDENT_IsLinkWithTargetType).asSourceSet(this.node());
 	}
 
-	/** Diese Methode erlaubt Zugriff auf die diesen Datentyp als {@link DL#targetTypeAsType() Objektdatentyp} zulassenden {@link DL Datenfelder}.
+	/** Diese Methode erlaubt Zugriff auf die diesen Datentyp als {@link DL#sourceType() Subjektdatentyp} zulassenden {@link DL Datenfelder}.
 	 *
-	 * @see DT#targetLinks()
+	 * @see DT#sourceLinksAsNodes()
 	 * @see DM#linkTrans()
-	 * @return Objektdatenfelder. */
-	default Set2<DL> targetLinksAsLinks() {
-		return this.targetLinks().translate(this.parent().linkTrans());
+	 * @return Subjektdatenfelder. */
+	default Set2<DL> sourceLinks() {
+		return this.sourceLinksAsNodes().translate(this.parent().linkTrans());
 	}
 
-	/** Diese Methode erlaubt Zugriff auf die {@link DL#node() Hyperknoten} der diesen Datentyp als {@link DL#sourceTypeAsType() Subjektdatentyp} zulassenden
+	/** Diese Methode erlaubt Zugriff auf die {@link DL#node() Hyperknoten} der diesen Datentyp als {@link DL#sourceType() Subjektdatentyp} zulassenden
 	 * {@link DL Datenfelder}.
 	 *
 	 * @see DL#IDENT_IsLinkWithSourceType
 	 * @see DL#asSourceSet(QN)
 	 * @return Subjektdatenfeldknoten. */
-	default Set2<QN> sourceLinks() {
+	default Set2<QN> sourceLinksAsNodes() {
 		return this.parent().getLink(DL.IDENT_IsLinkWithSourceType).asSourceSet(this.node());
-	}
-
-	/** Diese Methode erlaubt Zugriff auf die diesen Datentyp als {@link DL#sourceTypeAsType() Subjektdatentyp} zulassenden {@link DL Datenfelder}.
-	 *
-	 * @see DT#sourceLinks()
-	 * @see DM#linkTrans()
-	 * @return Subjektdatenfelder. */
-	default Set2<DL> sourceLinksAsLinks() {
-		return this.sourceLinks().translate(this.parent().linkTrans());
 	}
 
 }
