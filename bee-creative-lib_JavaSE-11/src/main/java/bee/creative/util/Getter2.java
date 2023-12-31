@@ -1,6 +1,7 @@
 package bee.creative.util;
 
 import java.util.Comparator;
+import java.util.Iterator;
 
 /** Diese Schnittstelle ergänzt einen {@link Getter} insb. um eine Anbindung an Methoden von {@link Getters}.
  *
@@ -37,6 +38,16 @@ public interface Getter2<GItem, GValue> extends Getter<GItem, GValue> {
 	/** Diese Methode ist eine Abkürzung für {@link Setters#translate(Getter, Setter) Setters.translate(this, target)}. */
 	default <GValue2> Setter3<GItem, GValue2> concat(Setter<? super GValue, ? super GValue2> target) {
 		return Setters.translate(this, target);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link Iterables#translate(Iterable, Getter) Iterables.translate(target, this)}. */
+	default Iterable2<GValue> concat(Iterable<? extends GItem> target) {
+		return Iterables.translate(target, this);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link Iterators#translate(Iterator, Getter) Iterators.translate(target, this)}. */
+	default Iterator2<GValue> concat(Iterator<? extends GItem> target) {
+		return Iterators.translate(target, this);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Getters#buffer(Getter) Getters.buffer(this)}. */
