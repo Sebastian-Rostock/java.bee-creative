@@ -285,6 +285,7 @@ public class ThreadPool {
 						sleep = (start + this.waitingTimeout) - System.currentTimeMillis();
 						if (sleep <= 0) {
 							item.node.delete();
+							this.waitingCount--;
 							return null;
 						}
 					}
@@ -795,7 +796,7 @@ public class ThreadPool {
 	 * {@link ThreadPool#ThreadPool(ThreadGroup, boolean) Konstruktor} initialisiert.
 	 *
 	 * @return {@link ThreadGroup} zur {@link java.lang.Thread#Thread(ThreadGroup, String) Erzeugung} neuer Threads. */
-	public ThreadGroup geThreadGroup() {
+	public ThreadGroup getThreadGroup() {
 		return this.group;
 	}
 
