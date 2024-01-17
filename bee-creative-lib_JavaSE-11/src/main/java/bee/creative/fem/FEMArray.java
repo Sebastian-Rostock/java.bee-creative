@@ -431,7 +431,11 @@ public abstract class FEMArray extends FEMValue implements Array<FEMValue>, Iter
 		@Override
 		protected int customFind(final FEMValue that, final int offset1, final int length, final boolean foreward) {
 			final int length1 = this.array1.length, offset2 = offset1 - length1, length2 = offset2 + length;
-			if (offset2 >= 0) return this.array2.customFind(that, offset2, length, foreward) + length1;
+			if (offset2 >= 0) {
+				var result = this.array2.customFind(that, offset2, length, foreward);
+				if (result >= 0) return result + length1;
+				return result;
+			}
 			if (length2 <= 0) return this.array1.customFind(that, offset1, length, foreward);
 			if (foreward) {
 				int result = this.array1.customFind(that, offset1, -offset2, foreward);
