@@ -167,7 +167,7 @@ public class H2QS implements QS, AutoCloseable {
 
 	/** Diese Methode liefert die gegebenen Hyperkoten als {@link H2QESet} dieses {@link QO Graphspeichers}. */
 	public final H2QESet toQESet(Iterable<? extends QE> items) throws NullPointerException, IllegalArgumentException {
-		return items instanceof H2QNSet ? this.asQESet(items) : this.newEdges(items);
+		return items instanceof H2QESet ? this.asQESet(items) : this.newEdges(items);
 	}
 
 	/** Diese Methode liefert die gegebenen Hyperkoten als {@link H2QNSet} dieses {@link QO Graphspeichers}. */
