@@ -99,7 +99,7 @@ public class EMU {
 	 * @return geschätzter Speicherverbrauch. */
 	@SafeVarargs
 	public static <GItem> long fromAll(GItem... items) {
-		long result = 0;
+		var result = 0L;
 		for (var item: items) {
 			result += EMU.from(item);
 		}
@@ -112,7 +112,7 @@ public class EMU {
 	 * @param items Objekte.
 	 * @return geschätzter Speicherverbrauch. */
 	public static long fromAll(Iterable<?> items) {
-		long result = 0;
+		var result = 0L;
 		for (var item: items) {
 			result += EMU.from(item);
 		}
