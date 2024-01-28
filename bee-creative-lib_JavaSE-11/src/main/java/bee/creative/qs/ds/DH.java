@@ -21,6 +21,36 @@ public interface DH extends DO {
 		return !current.putEdges().isEmpty() || !current.popEdges().isEmpty();
 	}
 
+	default boolean redo(Iterable<? extends DC> changes) throws NullPointerException, IllegalArgumentException {
+		var redoChangeNodes = changeTrans().toSource().concat(changes).toList();
+		if (redoChangeNodes.isEmpty()) return false;
+		if (redoChangeNodes.contains(null)) throw new NullPointerException();
+		var currentChangeNode = this.currentAsNode().get();
+		if (currentChangeNode == null) return false;
+		if (redoChangeNodes.contains(currentChangeNode)) throw new IllegalArgumentException();
+		var parent = parent();
+		var edges = parent.owner().edges();
+		var isChangeWithPutContext = parent.getLink(DC.IDENT_IsChangeWithPutContext);
+		var isChangeWithPopContext = parent.getLink(DC.IDENT_IsChangeWithPopContext);
+		var putContext = isChangeWithPutContext.getTarget(currentChangeNode);
+		if (putContext == null) return false;
+		var popContext = isChangeWithPopContext.getTarget(currentChangeNode);
+		if (popContext == null) return false;
+		var putContextByRedoChangeNode = isChangeWithPutContext.getTargetMap(redoChangeNodes);
+		if (putContextByRedoChangeNode.values().contains(null)) throw new NullPointerException();
+		var popContextByRedoChangeNode = isChangeWithPopContext.getTargetMap(redoChangeNodes);
+		if (popContextByRedoChangeNode.values().contains(null)) throw new NullPointerException();
+		redoChangeNodes.forEach(redoChangeNode -> {
+			DQ.putEdges(parent.context(), edges.havingContext(putContextByRedoChangeNode.get(redoChangeNode)), putContext, popContext);
+			DQ.popEdges(parent.context(), edges.havingContext(popContextByRedoChangeNode.get(redoChangeNode)), putContext, popContext);
+		});
+		return true;
+	}
+
+	default void undo(Iterable<? extends DC> changes) {
+
+	}
+
 	// änderung abschließen und neue beginnen
 	void done();
 
