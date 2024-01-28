@@ -67,7 +67,6 @@ public interface Iterator2<GItem> extends Iterator<GItem> {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Iterators#collectAll(Iterator, Consumer) Iterators.collectAll(this, target)}. */
-	@Deprecated
 	default void collectAll(final Consumer<? super GItem> target) throws NullPointerException {
 		Iterators.collectAll(this, target);
 	}
