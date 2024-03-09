@@ -6,8 +6,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import bee.creative.lang.Objects;
 import bee.creative.lang.Objects.BaseObject;
-import bee.creative.util.AbstractGetter;
-import bee.creative.util.Getter;
+import bee.creative.util.Getter3;
 import bee.creative.util.Iterables;
 
 /** Diese Klasse implementiert ein abstraktes Kontextobjekt, das über einen {@link FEMFrame Stapelrahmen} der Auswertung von Funktionen bereitgestellt wird und
@@ -36,14 +35,14 @@ public class FEMContext extends BaseObject {
 	 * Nutzdatensatz}. */
 	public static final FEMContext EMPTY = new FEMContext();
 
-	/** Diese Methode gibt einen {@link Getter} zurück, der seine Eingabe {@code input} über {@link #dataFrom(FEMValue, FEMType) dataFrom(input, type)} in seine
+	/** Diese Methode gibt einen {@link Getter3} zurück, der seine Eingabe {@code input} über {@link #dataFrom(FEMValue, FEMType) dataFrom(input, type)} in seine
 	 * Ausgabe überführt.
 	 *
-	 * @param <GData> Typ der Nutzdaten des gegebenen Datentyps sowie der Ausgebe des erzeugten {@link Getter}.
+	 * @param <GData> Typ der Nutzdaten des gegebenen Datentyps sowie der Ausgebe des erzeugten {@link Getter3}.
 	 * @param type Datentyp.
-	 * @return {@code dataFrom}-{@link Getter}.
+	 * @return {@code dataFrom}-{@link Getter3}.
 	 * @throws NullPointerException Wenn {@code type} {@code null} ist. */
-	public <GData> Getter<FEMValue, GData> dataFrom(final FEMType<? extends GData> type) throws NullPointerException {
+	public <GData> Getter3<FEMValue, GData> dataFrom(final FEMType<? extends GData> type) throws NullPointerException {
 		Objects.notNull(type);
 		return value -> this.dataFrom(value, type);
 	}
@@ -65,11 +64,11 @@ public class FEMContext extends BaseObject {
 		return result;
 	}
 
-	/** Diese Methode gibt einen {@link Getter} zurück, der seine Eingabe {@code input} über {@link #arrayFrom(Object) valueFrom(input)} in seine Ausgabe
+	/** Diese Methode gibt einen {@link Getter3} zurück, der seine Eingabe {@code input} über {@link #arrayFrom(Object) valueFrom(input)} in seine Ausgabe
 	 * überführt.
 	 *
-	 * @return {@code arrayFrom}-{@link Getter}. */
-	public Getter<Object, FEMArray> arrayFrom() {
+	 * @return {@code arrayFrom}-{@link Getter3}. */
+	public Getter3<Object, FEMArray> arrayFrom() {
 		return this::arrayFrom;
 	}
 
@@ -106,11 +105,11 @@ public class FEMContext extends BaseObject {
 		return FEMArray.from(values);
 	}
 
-	/** Diese Methode gibt einen {@link Getter} zurück, der seine Eingabe {@code input} über {@link #valueFrom(Object) valueFrom(input)} in seine Ausgabe
+	/** Diese Methode gibt einen {@link Getter3} zurück, der seine Eingabe {@code input} über {@link #valueFrom(Object) valueFrom(input)} in seine Ausgabe
 	 * überführt.
 	 *
-	 * @return {@code valueFrom}-{@link Getter}. */
-	public Getter<Object, FEMValue> valueFrom() {
+	 * @return {@code valueFrom}-{@link Getter3}. */
+	public Getter3<Object, FEMValue> valueFrom() {
 		return this::valueFrom;
 	}
 
@@ -134,11 +133,11 @@ public class FEMContext extends BaseObject {
 		return this.arrayFrom(object);
 	}
 
-	/** Diese Methode gibt einen {@link Getter} zurück, der seine Eingabe {@code input} über {@link #objectFrom(FEMValue) objectFrom(input)} in seine Ausgabe
+	/** Diese Methode gibt einen {@link Getter3} zurück, der seine Eingabe {@code input} über {@link #objectFrom(FEMValue) objectFrom(input)} in seine Ausgabe
 	 * überführt.
 	 *
-	 * @return {@code objectFrom}-{@link Getter}. */
-	public Getter<FEMValue, Object> objectFrom() {
+	 * @return {@code objectFrom}-{@link Getter3}. */
+	public Getter3<FEMValue, Object> objectFrom() {
 		return this::objectFrom;
 	}
 
