@@ -2,10 +2,15 @@ package bee.creative.util;
 
 import java.util.Map;
 
-/** Diese Schnittstelle definiert eine {@link Map} mit {@link Set2}.
+/** Diese Schnittstelle definiert eine {@link Map} mit {@link Set2} und als {@link Field}.
  *
  * @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public interface Map2<K, V> extends Map<K, V> {
+public interface Map2<K, V> extends Map<K, V>, Getter<Object, V>, Setter<K, V> {
+
+	@Override
+	default void set(K item, V value) {
+		this.put(item, value);
+	}
 
 	@Override
 	Set2<Entry<K, V>> entrySet();
@@ -16,7 +21,7 @@ public interface Map2<K, V> extends Map<K, V> {
 	}
 
 	/** Diese Methode fügt die aus den gegebenen Elementen abgeleiteten Schlüssel-Wert-Paare hinzu.
-	 * 
+	 *
 	 * @param <E> Typ der Elemente.
 	 * @param items Elemente.
 	 * @param asKey Funktion zur Ableitung des Schlüssels.
