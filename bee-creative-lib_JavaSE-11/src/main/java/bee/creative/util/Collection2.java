@@ -22,6 +22,11 @@ public interface Collection2<E> extends Collection<E> {
 		return Iterables.removeAll(this, c);
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@link Iterables#replaceAll(java.util.Collection, Iterable) Iterables.replaceAll(this, c)}. */
+	default boolean replaceAll(Iterable<? extends E> c) {
+		return Iterables.replaceAll(this, c);
+	}
+
 	/** Diese Methode ist eine Abkürzung für {@link Iterables#containsAll(java.util.Collection, Iterable) Iterables.containsAll(this, c)}. */
 	default boolean containsAll(Iterable<?> c) {
 		return Iterables.containsAll(this, c);
