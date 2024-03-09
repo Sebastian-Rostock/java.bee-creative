@@ -598,7 +598,7 @@ public class AppWindow {
 
 						equalSizeItem.prev = hashListMap.put(equalSizeItem.hash, equalSizeItem);
 						if (equalSizeItem.prev != null) {
-							proc.steps++;
+							//proc.steps++;
 						}
 					}
 
@@ -607,7 +607,7 @@ public class AppWindow {
 						var hashList = iterator.next();
 
 						if (hashList.prev != null) {
-							proc.steps++;
+							//proc.steps++;
 
 							itemDataListMap.clear();
 							for (AppItem item3 = hashList, prev; (item3 != null) && !proc.isCanceled; item3 = prev) { // rückwärts
@@ -618,7 +618,7 @@ public class AppWindow {
 
 								item3.prev = itemDataListMap.put(item3.data, item3);
 								if (item3.prev != null) {
-									proc.steps++;
+									//proc.steps++;
 								}
 							}
 							for (var original: itemDataListMap.values()) {
@@ -638,8 +638,8 @@ public class AppWindow {
 			var result = AppEntry.list();
 			var originalMap = new HashMap2<String, AppItem>(1000);
 
-			this.runItems(proc, originalList, original -> originalMap.put(original.file.getPath(), original), null);
-			this.runItems(proc, entryList, entry -> {
+			originalList.forEach( original -> originalMap.put(original.file.getPath(), original));
+			entryList.forEach(entry -> {
 				var file = entry.source.fileOrNull();
 				if (file == null) return;
 				var path = file.getPath();
@@ -653,7 +653,7 @@ public class AppWindow {
 					if (!pathSet.remove(path)) return;
 					result.add(new AppEntry(path));
 				}
-			}, null);
+			});
 
 			this.setEntries_DONE(result);
 		});
