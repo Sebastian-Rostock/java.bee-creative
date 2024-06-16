@@ -45,6 +45,10 @@ public abstract class AbstractHashMap<GKey, GValue> extends AbstractHashData<GKe
 		return this.customGetValue(this.installImpl(key));
 	}
 
+	public GValue install(GKey key, Producer<? extends GValue> installValue) {
+		return this.install(key, Getters.<GKey>neutral(), value -> installValue.get());
+	}
+
 	/** Diese Methode liefert den zum gegebenen Schlüssel hinterlegten Wert, analog zu {@link #get(Object)}. Wenn zu diesem Schlüssel noch kein Wert hinterlegt
 	 * ist, wird diesem Schlüssel der daraus über {@code installValue} erzeugte Wert zugeordnet.
 	 *
@@ -66,6 +70,18 @@ public abstract class AbstractHashMap<GKey, GValue> extends AbstractHashData<GKe
 	 * @return enthaltener und ggf. erzeugter Wert. */
 	public GValue install(GKey key, Getter<? super GKey, ? extends GKey> installKey, Getter<? super GKey, ? extends GValue> installValue) {
 		return this.customGetValue(this.installImpl(key, installKey, installValue));
+	}
+
+	public GValue update(GKey key, Getter<GValue, GValue> updateValue) {
+		return this.update(key, (key2, value) -> updateValue.get(value));
+	}
+
+	public GValue update(GKey key, Reducer<? super GKey, GValue> updateValue) {
+		return this.update(key, Getters.<GKey>neutral(), updateValue);
+	}
+
+	public GValue update(GKey key, Getter<? super GKey, ? extends GKey> installKey, Reducer<? super GKey, GValue> updateValue) {
+		return this.updateImpl(key, installKey, updateValue);
 	}
 
 	@Override

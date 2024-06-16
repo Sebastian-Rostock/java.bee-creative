@@ -6,15 +6,15 @@ import java.util.Iterator;
 /** Diese Klasse implementiert eine abstrakte {@link Collection2} als Platzhalter. Ihren Inhalt liest sie über {@link #getData(boolean)}. Änderungen am Inhalt
  * werden über {@link #setData(Collection)} geschrieben.
  *
- * @param <GItem> Typ der Elemente.
- * @param <GData> Typ des Inhalts. */
-public abstract class AbstractProxyCollection<GItem, GData extends Collection<GItem>> implements Collection2<GItem> {
+ * @param <E> Typ der Elemente.
+ * @param <D> Typ des Inhalts. */
+public abstract class AbstractProxyCollection<E, D extends Collection<E>> implements Collection2<E> {
 
-	final class Iter extends AbstractIterator<GItem> {
+	final class Iter extends AbstractIterator<E> {
 
-		final GData data;
+		final D data;
 
-		final Iterator<GItem> iter;
+		final Iterator<E> iter;
 
 		Iter() {
 			this.data = AbstractProxyCollection.this.getData(false);
@@ -27,7 +27,7 @@ public abstract class AbstractProxyCollection<GItem, GData extends Collection<GI
 		}
 
 		@Override
-		public GItem next() {
+		public E next() {
 			return this.iter.next();
 		}
 
@@ -46,12 +46,12 @@ public abstract class AbstractProxyCollection<GItem, GData extends Collection<GI
 	 * @param readonly {@code true}, wenn der Inhalt nur zum Lesen verwendet wird und eine Kopie damit nicht nötig ist.<br>
 	 *        {@code false}, wenn der Inhalt verändert werden könnte und daher ggf. eine Kopie nötig ist.
 	 * @return Inhalt. */
-	protected abstract GData getData(boolean readonly);
+	protected abstract D getData(boolean readonly);
 
 	/** Diese Methode setzt den Inhalt. Dieser wurde zuvor über {@link #getData(boolean)} zum Schreiben beschafft und anschließend verändert.
 	 *
 	 * @param items neuer Inhalt. */
-	protected abstract void setData(GData items);
+	protected abstract void setData(D items);
 
 	@Override
 	public int size() {
@@ -64,7 +64,7 @@ public abstract class AbstractProxyCollection<GItem, GData extends Collection<GI
 	}
 
 	@Override
-	public boolean add(GItem e) {
+	public boolean add(E e) {
 		var data = this.getData(false);
 		if (!data.add(e)) return false;
 		this.setData(data);
@@ -72,7 +72,7 @@ public abstract class AbstractProxyCollection<GItem, GData extends Collection<GI
 	}
 
 	@Override
-	public boolean addAll(Collection<? extends GItem> c) {
+	public boolean addAll(Collection<? extends E> c) {
 		var data = this.getData(false);
 		if (!data.addAll(c)) return false;
 		this.setData(data);
@@ -131,7 +131,7 @@ public abstract class AbstractProxyCollection<GItem, GData extends Collection<GI
 	}
 
 	@Override
-	public Iterator2<GItem> iterator() {
+	public Iterator2<E> iterator() {
 		return new Iter();
 	}
 

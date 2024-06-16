@@ -293,7 +293,7 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 		@Override
 		public int hashCode() {
 			var entryData = this.entryData;
-			int result = 0;
+			var result = 0;
 			for (var iter = entryData.newKeysIteratorImpl(); iter.hasNext();) {
 				result += entryData.customHashKey(iter.nextIndex());
 			}
@@ -506,12 +506,12 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 		 * @see AbstractHashData#allocateImpl(int)
 		 * @param sourceIndex Index des Quelleintrags.
 		 * @param targetIndex Index des Zieleintrags. */
-		public void copy(int sourceIndex, int targetIndex);
+		void copy(int sourceIndex, int targetIndex);
 
 		/** Diese Methode überträgt die Schlüssel- und Wertlisten auf den Erzeuger dieses Allokators.
 		 *
 		 * @see AbstractHashData#allocateImpl(int) **/
-		public void apply();
+		void apply();
 
 	}
 
@@ -728,10 +728,8 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 		if (count == this.count) {
 			this.customReuseEntry(index);
 		} else {
-			var key2 = this.customInstallKey(key);
-			this.customSetKey(index, key2);
-			var value = this.customInstallValue(key2);
-			this.customSetValue(index, value);
+			this.customSetKey(index, key = this.customInstallKey(key));
+			this.customSetValue(index, this.customInstallValue(key));
 		}
 		return index;
 	}
@@ -755,6 +753,27 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 		var value = installValue.get(key2);
 		this.customSetValue(index, value);
 		return index;
+	}
+
+	protected final GValue updateImpl(GKey key, Getter<? super GKey, ? extends GKey> installKey, Reducer<? super GKey, GValue> updateValue) {
+		var index = this.getIndexImpl(key);
+		GValue value;
+		if (index < 0) {
+			value = updateValue.get(key = installKey.get(key), null);
+			if (value == null) return null;
+			index = this.putIndexImpl(key);
+			this.customSetValue(index, value);
+		} else {
+			value = updateValue.get(key = this.customGetKey(index), this.customGetValue(index));
+			if (value == null) {
+				index = this.popIndexImpl(key);
+				if (index < 0) return null;
+				this.customClearValue(index);
+				return null;
+			}
+		}
+		this.customSetValue(index, value);
+		return value;
 	}
 
 	/** Diese Methode gibt die Anzahl der Einträge zurück.
@@ -792,8 +811,8 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 			AbstractHashData.setupTableImpl(newTable);
 			AbstractHashData.setupNextsImpl(newNexts);
 			var newEntryIndex = 0;
-			for (int i = 0, size = oldTable.length; i < size; i++) {
-				for (var oldEntryIndex = oldTable[i]; 0 <= oldEntryIndex; oldEntryIndex = oldNexts[oldEntryIndex]) {
+			for (int element: oldTable) {
+				for (var oldEntryIndex = element; 0 <= oldEntryIndex; oldEntryIndex = oldNexts[oldEntryIndex]) {
 					var hash = this.customHashKey(oldEntryIndex);
 					var index = hash & newMask;
 					newNexts[newEntryIndex] = newTable[index];

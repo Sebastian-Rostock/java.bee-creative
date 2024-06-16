@@ -5,14 +5,14 @@ import java.util.Set;
 /** Diese Klasse implementiert ein abstraktes {@link Set2} als Platzhalter. Seinen Inhalt liest es über {@link #getData(boolean)}. Änderungen am Inhalt werden
  * über {@link #setData(Set)} geschrieben.
  *
- * @param <GItem> Typ der Elemente.
- * @param <GData> Typ des Inhalts. */
-public abstract class AbstractProxySet<GItem, GData extends Set<GItem>> extends AbstractProxyCollection<GItem, GData> implements Set2<GItem> {
+ * @param <E> Typ der Elemente.
+ * @param <D> Typ des Inhalts. */
+public abstract class AbstractProxySet<E, D extends Set<E>> extends AbstractProxyCollection<E, D> implements Set2<E> {
 
 	@Override
-	protected abstract GData getData(boolean readonly);
+	protected abstract D getData(boolean readonly);
 
 	@Override
-	protected abstract void setData(GData items);
+	protected abstract void setData(D items);
 
 }
