@@ -471,14 +471,6 @@ public class Builders {
 			return new HashSetBuilder<>(withHashCache ? new HashSet2<GItem>() : new HashSet<GItem>());
 		}
 
-		/** Diese Methode gibt einen {@link SetBuilder} zu einem neuen {@link ProxySet} zurück.
-		 *
-		 * @param <GItem> Typ der Elemente.
-		 * @return {@link SetBuilder} eines {@link ProxySet}. */
-		public static <GItem> ProxySetBuilder<GItem> forProxySet(Property<Set<GItem>> property) throws NullPointerException {
-			return new ProxySetBuilder<>(ProxySet.from(property));
-		}
-
 		final GResult value;
 
 		/** Dieser Konstruktor initialisiert das {@link Set}. */
@@ -646,14 +638,6 @@ public class Builders {
 		 * @return {@link ListBuilder} einer {@link LinkedList}. */
 		public static <GItem> LinkedListBuilder<GItem> forLinkedList() {
 			return new LinkedListBuilder<>(new LinkedList<GItem>());
-		}
-
-		/** Diese Methode gibt einen {@link ListBuilder} zu einer neuen {@link ProxyList} zurück.
-		 *
-		 * @param <GItem> Typ der Elemente.
-		 * @return {@link ListBuilder} einer {@link ProxyList}. */
-		public static <GItem> ProxyListBuilder<GItem> forProxyList(Property<List<GItem>> property) throws NullPointerException {
-			return new ProxyListBuilder<>(ProxyList.from(property));
 		}
 
 		final GResult value;
