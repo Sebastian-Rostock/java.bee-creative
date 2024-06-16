@@ -1,40 +1,56 @@
 package bee.creative.util;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert eine {@link AbstractProxyList}, deren Inhalt über ein gegebenes {@link Property} angebunden wird.
  *
- * @param <GItem> Typ der Elemente. */
-@SuppressWarnings ("javadoc")
-public class ProxyList<GItem> extends AbstractProxyList<GItem, List<GItem>> {
+ * @param <E> Typ der Elemente. */
+public class ProxyList<E> extends AbstractProxyList<E, List<E>> {
 
-	/** Diese Methode ist eine Abkürzung für {@link ProxyList new ProxyList<>(that)}. **/
-	public static <GItem> ProxyList<GItem> from(final Property<List<GItem>> that) throws NullPointerException {
-		return new ProxyList<>(that);
+	public static <E> ProxyList<E> from(Producer<List<E>> getValue, Consumer<List<E>> setValue) throws NullPointerException {
+		return ProxyList.<E>from(Producers.translate(getValue, value -> {
+			if (value instanceof ArrayList) return value;
+			if (value != null) return new ArrayList<>(value);
+			return new ArrayList<>();
+		}), Consumers.translate(setValue, value -> {
+			if (value.size() > 1) return value;
+			for (var item: value)
+				return Collections.singletonList(item);
+			return null;
+		}), Producers.translate(getValue, value -> {
+			if (value != null) return value;
+			return Collections.emptyList();
+		}));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(Property) ProxyList.from(Properties.from(that, item))}.
-	 *
-	 * @see Properties#from(Field, Object) */
-	public static <GItem, GEntry> ProxyList<GEntry> from(final Field<? super GItem, List<GEntry>> that, final GItem item) throws NullPointerException {
-		return ProxyList.from(Properties.from(that, item));
+	/** Diese Methode ist eine Abkürzung für {@link ProxyList new ProxyList<>(getValue, setValue, getConst)}. **/
+	public static <E> ProxyList<E> from(Producer<List<E>> getValue, Consumer<List<E>> setValue, Producer<List<E>> getConst) throws NullPointerException {
+		return new ProxyList<>(getValue, setValue, getConst);
 	}
 
-	public final Property<List<GItem>> that;
+	public final Producer<List<E>> getValue;
 
-	public ProxyList(final Property<List<GItem>> that) throws NullPointerException {
-		this.that = Objects.notNull(that);
+	public final Consumer<List<E>> setValue;
+
+	public final Producer<List<E>> getConst;
+
+	public ProxyList(Producer<List<E>> getValue, Consumer<List<E>> setValue, Producer<List<E>> getConst) throws NullPointerException {
+		this.getValue = Objects.notNull(getValue);
+		this.setValue = Objects.notNull(setValue);
+		this.getConst = Objects.notNull(getConst);
 	}
 
 	@Override
-	public List<GItem> getData(final boolean readonly) {
-		return this.that.get();
+	public List<E> getData(boolean readonly) {
+		return (readonly ? this.getConst : this.getValue).get();
 	}
 
 	@Override
-	protected void setData(final List<GItem> items) {
-		this.that.set(items);
+	protected void setData(List<E> items) {
+		this.setValue.set(items);
 	}
 
 }

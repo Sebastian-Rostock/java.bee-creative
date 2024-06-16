@@ -5,37 +5,35 @@ import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert eine {@link AbstractProxyCollection}, deren Inhalt über ein gegebenes {@link Property} angebunden wird.
  *
- * @param <GItem> Typ der Elemente. */
-@SuppressWarnings ("javadoc")
-public class ProxyCollection<GItem> extends AbstractProxyCollection<GItem, Collection<GItem>> {
+ * @param <E> Typ der Elemente. */
+public class ProxyCollection<E> extends AbstractProxyCollection<E, Collection<E>> {
 
-	/** Diese Methode ist eine Abkürzung für {@link ProxyCollection new ProxyCollection<>(that)}. */
-	public static <GItem> ProxyCollection<GItem> from(final Property<Collection<GItem>> that) throws NullPointerException {
-		return new ProxyCollection<>(that);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link #from(Property) ProxyCollection.from(Properties.from(that, item))}.
-	 *
-	 * @see Properties#from(Field, Object) */
-	public static <GItem, GEntry> ProxyCollection<GEntry> from(final Field<? super GItem, Collection<GEntry>> that, final GItem item)
+	/** Diese Methode ist eine Abkürzung für {@link ProxyCollection new ProxyCollection<>(getValue, setValue, getConst)}. **/
+	public static <E> ProxyCollection<E> from(Producer<Collection<E>> getValue, Consumer<Collection<E>> setValue, Producer<Collection<E>> getConst)
 		throws NullPointerException {
-		return ProxyCollection.from(Properties.from(that, item));
+		return new ProxyCollection<>(getValue, setValue, getConst);
 	}
 
-	public final Property<Collection<GItem>> that;
+	public final Producer<Collection<E>> getValue;
 
-	public ProxyCollection(final Property<Collection<GItem>> that) throws NullPointerException {
-		this.that = Objects.notNull(that);
+	public final Consumer<Collection<E>> setValue;
+
+	public final Producer<Collection<E>> getConst;
+
+	public ProxyCollection(Producer<Collection<E>> getValue, Consumer<Collection<E>> setValue, Producer<Collection<E>> getConst) throws NullPointerException {
+		this.getValue = Objects.notNull(getValue);
+		this.setValue = Objects.notNull(setValue);
+		this.getConst = Objects.notNull(getConst);
 	}
 
 	@Override
-	public Collection<GItem> getData(final boolean readonly) {
-		return this.that.get();
+	public Collection<E> getData(boolean readonly) {
+		return (readonly ? this.getConst : this.getValue).get();
 	}
 
 	@Override
-	protected void setData(final Collection<GItem> items) {
-		this.that.set(items);
+	protected void setData(Collection<E> items) {
+		this.setValue.set(items);
 	}
 
 }

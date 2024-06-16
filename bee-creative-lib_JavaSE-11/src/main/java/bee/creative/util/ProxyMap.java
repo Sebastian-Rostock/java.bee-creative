@@ -1,42 +1,57 @@
 package bee.creative.util;
 
+import java.util.Collections;
 import java.util.Map;
 import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert eine {@link AbstractProxyMap}, deren Inhalt über ein gegebenen {@link Property} angebunden wird.
  *
- * @param <GKey> Typ der Schlüssel.
- * @param <GValue> Typ der Werte. */
-@SuppressWarnings ("javadoc")
-public class ProxyMap<GKey, GValue> extends AbstractProxyMap<GKey, GValue, Map<GKey, GValue>> {
+ * @param <K> Typ der Schlüssel.
+ * @param <V> Typ der Werte. */
+public class ProxyMap<K, V> extends AbstractProxyMap<K, V, Map<K, V>> {
 
-	/** Diese Methode ist eine Abkürzung für {@link ProxyMap new ProxyMap<>(that)}. */
-	public static <GKey, GValue> ProxyMap<GKey, GValue> from(final Property<Map<GKey, GValue>> property) throws NullPointerException {
-		return new ProxyMap<>(property);
+	public static <K, V> ProxyMap<K, V> from(Producer<Map<K, V>> getValue, Consumer<Map<K, V>> setValue) throws NullPointerException {
+		return ProxyMap.from(Producers.translate(getValue, value -> {
+			if (value instanceof HashMap2) return value;
+			if (value != null) return new HashMap2<>(value);
+			return new HashMap2<>();
+		}), Consumers.translate(setValue, value -> {
+			if (value.size() > 1) return value;
+			for (var entry: value.entrySet())
+				return Collections.singletonMap(entry.getKey(), entry.getValue());
+			return null;
+		}), Producers.translate(getValue, value -> {
+			if (value != null) return value;
+			return Collections.emptyMap();
+		}));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(Property) ProxyMap.from(Properties.from(that, item))}.
-	 *
-	 * @see Properties#from(Field, Object) */
-	public static <GItem, GKey, GValue> ProxyMap<GKey, GValue> from(final GItem item, final Field<? super GItem, Map<GKey, GValue>> field)
+	/** Diese Methode ist eine Abkürzung für {@link ProxyMap new ProxyMap<>(getValue, setValue, getConst)}. **/
+	public static <K, V> ProxyMap<K, V> from(Producer<Map<K, V>> getValue, Consumer<Map<K, V>> setValue, Producer<Map<K, V>> getConst)
 		throws NullPointerException {
-		return ProxyMap.from(Properties.from(field, item));
+		return new ProxyMap<>(getValue, setValue, getConst);
 	}
 
-	public final Property<Map<GKey, GValue>> that;
+	public final Producer<Map<K, V>> getValue;
 
-	public ProxyMap(final Property<Map<GKey, GValue>> that) throws NullPointerException {
-		this.that = Objects.notNull(that);
+	public final Consumer<Map<K, V>> setValue;
+
+	public final Producer<Map<K, V>> getConst;
+
+	public ProxyMap(Producer<Map<K, V>> getValue, Consumer<Map<K, V>> setValue, Producer<Map<K, V>> getConst) throws NullPointerException {
+		this.getValue = Objects.notNull(getValue);
+		this.setValue = Objects.notNull(setValue);
+		this.getConst = Objects.notNull(getConst);
 	}
 
 	@Override
-	public Map<GKey, GValue> getData(final boolean readonly) {
-		return this.that.get();
+	public Map<K, V> getData(boolean readonly) {
+		return (readonly ? this.getConst : this.getValue).get();
 	}
 
 	@Override
-	protected void setData(final Map<GKey, GValue> items) {
-		this.that.set(items);
+	protected void setData(Map<K, V> items) {
+		this.setValue.set(items);
 	}
 
 }
