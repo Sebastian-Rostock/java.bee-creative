@@ -61,6 +61,7 @@ public class AppWindow {
 		{
 			this.procQueue = new AppQueue() {
 
+				// TODO setter
 				@Override
 				public void onError(AppProcess proc, Throwable error) {
 					AppWindow.this.runDialog_DONE() //
@@ -68,6 +69,7 @@ public class AppWindow {
 						.useMessage("Unerwarteter Fehler\n%s", error);
 				}
 
+				// TODO consumer
 				@Override
 				public void onSelect(AppProcess proc) {
 					AppWindow.this.display.syncExec(() -> {
@@ -121,8 +123,8 @@ public class AppWindow {
 				// this.createMenuItem(menu, AppIcon.saveVariable, "...in Variable speichern", this::runSaveEntriesToVar);
 				// this.createMenuItem(menu, AppIcon.loadVariable, "...aus Variable einfügen", this::runLoadEntriesFromVar);
 				// this.createMenuLine(menu);
-				this.createMenuItem(menu, "copy.png", "Datenpfade in Zwischenablage kopieren", this::runSaveSourcesToClipboard);
-				this.createMenuItem(menu, "paste.png", "Datenpfade aus Zwischenablage annfügen", this::runLoadSourcesFromClipboard);
+				this.createMenuItem(menu, "copy.png", "Datenpfade in Zwischenablage kopieren", this::runSaveSourcesToClipboard_DONE);
+				this.createMenuItem(menu, "paste.png", "Datenpfade aus Zwischenablage annfügen", this::runLoadSourcesFromClipboard_DONE);
 			});
 			this.createMenu(mbar, "name.png", null, menu -> {
 				this.createMenuItem(menu, "name-okay.png", "Zeitnamen ableiten", this::runSetupTimename);
@@ -288,11 +290,11 @@ public class AppWindow {
 	}
 
 	/** Diese Methode führt die gegebene Berechnung {@code task} mit dem gegebenen Titel {@code title} in einem {@link Thread} aus. */
-	void runTask(String title, AppTask task) {
+	private void runTask(String title, AppTask task) {
 		this.procQueue.push(title, task);
 	}
 
-	<GItem> void runItems(AppProcess proc, Collection<GItem> items, Consumer<GItem> regular, Consumer<GItem> canceled) {
+	private <GItem> void runItems(AppProcess proc, Collection<GItem> items, Consumer<GItem> regular, Consumer<GItem> canceled) {
 		var iter = items.iterator();
 		proc.steps += items.size();
 		if (regular != null) {
@@ -541,7 +543,7 @@ public class AppWindow {
 			.useOption("Puffergröße für Streuwert", this.settings.contentHashSize) //
 			.useOption("Puffergröße für Dateivergleich", this.settings.contentTestSize) //
 			.useButton("Duplikate Dateien finden", () -> this.runAnalyzeContentImpl_DONE(true)) //
-		//	.useButton("Einzigartige Dateien finden", () -> this.runAnalyzeContentImpl_DONE(false)) //
+			.useButton("Einzigartige Dateien finden", () -> this.runAnalyzeContentImpl_DONE(false)) //
 		;
 	}
 
@@ -565,6 +567,7 @@ public class AppWindow {
 				proc.steps++;
 			}, null);
 
+			// Dateien je Dateigröße zusammenfassen
 			var sizeListMap = new HashMap2<Object, AppItem>();
 			while (!itemList.isEmpty() && !proc.isCanceled) { // rückwärts
 				var sizeItem = itemList.remove(0);
@@ -578,10 +581,11 @@ public class AppWindow {
 			sizeListMap.remove(null);
 			itemList.clear();
 
+			// Dateien je Inhalt zusammenfassen
+			pathSet.clear();
 			var hashListMap = new HashMap2<Object, AppItem>(1000);
 			var itemDataListMap = new HashMap2<Object, AppItem>(1000);
 			var originalList = new LinkedList<AppItem>();
-
 			var equalSizeIter = sizeListMap.values().iterator();
 			while (equalSizeIter.hasNext() && !proc.isCanceled) {
 				var equalSizeList = equalSizeIter.next();
@@ -597,39 +601,40 @@ public class AppWindow {
 						equalSizeItem.hash = Objects.notNull(caches.get(equalSizeItem.text, hashSize), equalSizeItem);
 
 						equalSizeItem.prev = hashListMap.put(equalSizeItem.hash, equalSizeItem);
-						if (equalSizeItem.prev != null) {
-							//proc.steps++;
-						}
+
 					}
 
-					var iterator = hashListMap.values().iterator();
-					while (iterator.hasNext() && !proc.isCanceled) {
-						var hashList = iterator.next();
+					var equalHashIter = hashListMap.values().iterator();
+					while (equalHashIter.hasNext() && !proc.isCanceled) {
+						var equalHashList = equalHashIter.next();
 
-						if (hashList.prev != null) {
-							//proc.steps++;
+						if (equalHashList.prev != null) {
 
 							itemDataListMap.clear();
-							for (AppItem item3 = hashList, prev; (item3 != null) && !proc.isCanceled; item3 = prev) { // rückwärts
+							for (AppItem item3 = equalHashList, prev; (item3 != null) && !proc.isCanceled; item3 = prev) { // rückwärts
 
 								prev = item3.prev;
 
 								item3.data = new AppData(item3.text, testSize2);
 
 								item3.prev = itemDataListMap.put(item3.data, item3);
-								if (item3.prev != null) {
-									//proc.steps++;
-								}
+
 							}
-							for (var original: itemDataListMap.values()) {
-								if (original.prev != null) {
-									originalList.add(original);
+							for (var equalDataList: itemDataListMap.values()) {
+								if (equalDataList.prev != null) {
+									originalList.add(equalDataList);
+								} else {
+									pathSet.add(equalDataList);
 								}
 							}
 
+						} else {
+							pathSet.add(equalHashList);
 						}
 					}
 
+				} else {
+					pathSet.add(equalSizeList);
 				}
 			}
 
@@ -638,20 +643,20 @@ public class AppWindow {
 			var result = AppEntry.list();
 			var originalMap = new HashMap2<String, AppItem>(1000);
 
-			originalList.forEach( original -> originalMap.put(original.file.getPath(), original));
+			originalList.forEach(original -> originalMap.put(original.file.getPath(), original));
 			entryList.forEach(entry -> {
-				var file = entry.source.fileOrNull();
-				if (file == null) return;
-				var path = file.getPath();
 				if (isKeep) {
+					var file = entry.source.fileOrNull();
+					if (file == null) return;
+					var path = file.getPath();
 					var original = originalMap.remove(path);
 					if (original == null) return;
 					for (var duplikat = original.prev; duplikat != null; duplikat = duplikat.prev) { // vorwärts
 						result.add(new AppEntry(original, duplikat));
 					}
 				} else {
-					if (!pathSet.remove(path)) return;
-					result.add(new AppEntry(path));
+					if (!pathSet.remove(entry.source)) return;
+					result.add(entry);
 				}
 			});
 
@@ -711,11 +716,7 @@ public class AppWindow {
 		});
 	}
 
-	// tabelle als text in ram puffer
-	public void runSaveEntriesToVar() {
-	}
-
-	public void runSaveSourcesToClipboard() {
+	public void runSaveSourcesToClipboard_DONE() {
 		this.runTask("Kopieren", prov -> {
 			var pathList = new ArrayList<String>(1000);
 			this.runItems(prov, this.getEntries_DONE(), entry -> {
@@ -732,10 +733,7 @@ public class AppWindow {
 		});
 	}
 
-	public void runLoadEntriesFromVar() {
-	}
-
-	public void runLoadSourcesFromClipboard() {
+	public void runLoadSourcesFromClipboard_DONE() {
 		this.runTask("Einfügen", proc -> {
 			this.runPushImpl(proc, this.display.syncCall(() -> {
 				var clp = new Clipboard(this.display);
@@ -746,7 +744,7 @@ public class AppWindow {
 		});
 	}
 
-	public void runReplaceByPattern() { // target = regex(source)
+	public void runReplaceByPattern() { // TODO target = regex(source)
 	}
 
 	public void runResolveFiles_DONE() {
@@ -808,7 +806,7 @@ public class AppWindow {
 		});
 	}
 
-	void runSetupTimename() {
+	public void runSetupTimename() {
 		this.runDialog_DONE() //
 			.useTitle("Sollen die Zielnamen wirklich aus den Änderungszeitpunkten der Quelldateien abgeleitet werden?") //
 			.useMessage("""
@@ -821,7 +819,7 @@ public class AppWindow {
 		;
 	}
 
-	void runUpdateTimename() {
+	public void runUpdateTimename() {
 		this.runDialog_DONE() //
 			.useTitle("Sollen die Zielnamen wirklich aus den Zeitpunkten in den Quellnamen abgeleitet werden?") //
 			.useMessage("""
@@ -834,7 +832,7 @@ public class AppWindow {
 		;
 	}
 
-	void runUpdateTimepath() {
+	public void runUpdateTimepath() {
 		this.runDialog_DONE() //
 			.useTitle("Sollen die Zielpfade wirklich aus den Zeitpunkten in den Quellnamen abgeleitet werden?") //
 			.useMessage("""
@@ -848,7 +846,7 @@ public class AppWindow {
 		;
 	}
 
-	void runComputeTimenameImpl(boolean isPath, boolean isName) {
+	private void runComputeTimenameImpl(boolean isPath, boolean isName) {
 		// isName = true, wenn Zeitpunkt aus Dateinamen abgeleitet werden soll
 		// isName = false, wenn Anderungszeitpunkt verwendet werden soll
 		long moveTime = this.settings.timenameOffset.getValue();
@@ -868,15 +866,16 @@ public class AppWindow {
 				var index = sourceName.lastIndexOf('.');
 				if (index < 0) return;
 				var sourceType = sourceName.substring(index).toLowerCase();
-				FEMDatetime datetime;
+				var datetime = FEMDatetime.EMPTY;
 				if (isName) {
 					var nameMatcher = namePattern.matcher(sourceName);
 					if (!nameMatcher.find()) return;
 					datetime = FEMDatetime.from(nameMatcher.group(1) + "-" + nameMatcher.group(2) + "-" + nameMatcher.group(3) + //
-						"T" + nameMatcher.group(4) + ":" + nameMatcher.group(5) + ":" + nameMatcher.group(6)).move(0, moveTime * 1000);
+						"T" + nameMatcher.group(4) + ":" + nameMatcher.group(5) + ":" + nameMatcher.group(6));
 				} else {
-					datetime = FEMDatetime.from(sourceFile.lastModified() + (moveTime * 1000));
+					datetime = FEMDatetime.from(sourceFile.lastModified());
 				}
+				datetime = datetime.move(0, moveTime * 1000);
 				while (true) {
 					var targetName = String.format("%04d-%02d-%02d %02d.%02d.%02d%s", //
 						datetime.yearValue(), datetime.monthValue(), datetime.dateValue(), //
@@ -916,7 +915,7 @@ public class AppWindow {
 			var entryList = AppEntry.list();
 			this.runItems(proc, this.getEntries_DONE(), entry -> {
 				try {
-					var sourceFile = entry.source.file;
+					var sourceFile = entry.source.fileOrNull();
 					if ((sourceFile != null) && sourceFile.isFile() && (entry.source.madeOrNull().longValue() < filterTime)) {
 						var sourcePath = sourceFile.toPath();
 						var targetFile = new File(sourceFile.getParentFile(), sourceFile.getName() + ".tempcopy");
