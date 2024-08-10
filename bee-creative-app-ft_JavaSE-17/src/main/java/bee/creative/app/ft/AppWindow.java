@@ -870,8 +870,24 @@ public class AppWindow {
 				if (isName) {
 					var nameMatcher = namePattern.matcher(sourceName);
 					if (!nameMatcher.find()) return;
-					datetime = FEMDatetime.from(nameMatcher.group(1) + "-" + nameMatcher.group(2) + "-" + nameMatcher.group(3) + //
-						"T" + nameMatcher.group(4) + ":" + nameMatcher.group(5) + ":" + nameMatcher.group(6));
+					var yearValue = nameMatcher.group(1);
+					var monthValue = nameMatcher.group(2);
+					var dateValue = nameMatcher.group(3);
+					var hourValue = nameMatcher.group(4);
+					var minuteValue = nameMatcher.group(5);
+					var secondValue = nameMatcher.group(6);
+					try {
+						datetime = FEMDatetime.from(yearValue + "-" + monthValue + "-" + dateValue + "T" + hourValue + ":" + minuteValue + ":" + secondValue);
+					} catch (RuntimeException ignore) {
+						try {
+							datetime = FEMDatetime.fromDate(Integer.parseInt(yearValue), 1, 1).withTime(0)
+								.move(0, 0, Integer.parseInt(dateValue) - 1, Integer.parseInt(hourValue), Integer.parseInt(minuteValue), Integer.parseInt(secondValue), 0)
+								.move(Integer.parseInt(monthValue) - 1, 0);
+						} catch (RuntimeException e) {
+							System.out.println(sourceName);
+							return;
+						}
+					}
 				} else {
 					datetime = FEMDatetime.from(sourceFile.lastModified());
 				}
