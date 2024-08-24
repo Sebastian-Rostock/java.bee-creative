@@ -992,7 +992,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	}
 
 	@Override
-	public final FEMBinary result(final boolean deep) {
+	public final FEMBinary result(boolean deep) {
 		return deep ? this.compact() : this;
 	}
 

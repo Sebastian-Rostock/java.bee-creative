@@ -1613,7 +1613,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	@Override
-	public final FEMString result(final boolean deep) {
+	public final FEMString result(boolean deep) {
 		return deep ? this.compact() : this;
 	}
 
