@@ -16,21 +16,19 @@ public class HashMap2<GKey, GValue> extends HashMap<GKey, GValue> {
 	private static final long serialVersionUID = -8419791227943208230L;
 
 	/** Diese Methode ist eine Abkürzung für {@link #from(Hasher, Getter, Getter, Setter) HashMap2.from(hasher, Getters.neutral(), Getters.empty(), null)}. */
-	public static <GKey, GValue> HashMap2<GKey, GValue> from(final Hasher hasher) throws NullPointerException {
-		return HashMap2.from(hasher, Getters.<GKey>neutral(), Getters.<GKey, GValue>empty(), null);
+	public static <GKey, GValue> HashMap2<GKey, GValue> from(Hasher hasher) throws NullPointerException {
+		return HashMap2.from(hasher, Getters.neutral(), Getters.empty(), null);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #from(Hasher, Getter, Getter, Setter) HashMap2.from(hasher, Getters.neutral(), installValue, null)}. */
-	public static <GKey, GValue> HashMap2<GKey, GValue> from(final Hasher hasher, final Getter<? super GKey, ? extends GValue> installValue)
-		throws NullPointerException {
-		return HashMap2.from(hasher, Getters.<GKey>neutral(), installValue, null);
+	public static <GKey, GValue> HashMap2<GKey, GValue> from(Hasher hasher, Getter<? super GKey, ? extends GValue> installValue) throws NullPointerException {
+		return HashMap2.from(hasher, Getters.neutral(), installValue, null);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #from(Hasher, Getter, Getter, Setter) HashMap2.from(hasher, Getters.neutral(), installAndReuseValue,
 	 * installAndReuseValue)}. */
-	public static <GKey, GValue> HashMap2<GKey, GValue> from(final Hasher hasher, final Field<? super GKey, GValue> installAndReuseValue)
-		throws NullPointerException {
-		return HashMap2.from(hasher, Getters.<GKey>neutral(), installAndReuseValue, installAndReuseValue);
+	public static <GKey, GValue> HashMap2<GKey, GValue> from(Hasher hasher, Field<? super GKey, GValue> installAndReuseValue) throws NullPointerException {
+		return HashMap2.from(hasher, Getters.neutral(), installAndReuseValue, installAndReuseValue);
 	}
 
 	/** Diese Methode liefert eine neue {@link HashMap2}, welche Streuwert, Äquivalenz, Installation und Wiederverwendung von Schlüsseln, Werten bzw. Einträgen an
@@ -40,8 +38,8 @@ public class HashMap2<GKey, GValue> extends HashMap<GKey, GValue> {
 	 * @param installKey Methode zur {@link #customInstallKey(Object) Installation} des Schlüssels.
 	 * @param installValue Methode zur {@link #customInstallValue(Object) Installation} des Werts.
 	 * @param reuseEntry Methode zur Anzeige der {@link #customReuseEntry(int) Wiederverwendung} des Eintrags oder {@code null}. */
-	public static <GKey, GValue> HashMap2<GKey, GValue> from(final Hasher hasher, final Getter<? super GKey, ? extends GKey> installKey,
-		final Getter<? super GKey, ? extends GValue> installValue, final Setter<? super GKey, ? super GValue> reuseEntry) throws NullPointerException {
+	public static <GKey, GValue> HashMap2<GKey, GValue> from(Hasher hasher, Getter<? super GKey, ? extends GKey> installKey,
+		Getter<? super GKey, ? extends GValue> installValue, Setter<? super GKey, ? super GValue> reuseEntry) throws NullPointerException {
 		Objects.notNull(hasher);
 		Objects.notNull(installKey);
 		Objects.notNull(installValue);
@@ -50,27 +48,27 @@ public class HashMap2<GKey, GValue> extends HashMap<GKey, GValue> {
 			private static final long serialVersionUID = 2518756984792880994L;
 
 			@Override
-			protected int customHash(final Object key) {
+			protected int customHash(Object key) {
 				return hasher.hash(key);
 			}
 
 			@Override
-			protected boolean customEqualsKey(final int entryIndex, final Object key) {
+			protected boolean customEqualsKey(int entryIndex, Object key) {
 				return hasher.equals(this.customGetKey(entryIndex), key);
 			}
 
 			@Override
-			protected GKey customInstallKey(final GKey key) {
+			protected GKey customInstallKey(GKey key) {
 				return installKey.get(key);
 			}
 
 			@Override
-			protected GValue customInstallValue(final GKey key) {
+			protected GValue customInstallValue(GKey key) {
 				return installValue.get(key);
 			}
 
 			@Override
-			protected void customReuseEntry(final int entryIndex) {
+			protected void customReuseEntry(int entryIndex) {
 				if (reuseEntry == null) return;
 				reuseEntry.set(this.customGetKey(entryIndex), this.customGetValue(entryIndex));
 			}
@@ -88,36 +86,36 @@ public class HashMap2<GKey, GValue> extends HashMap<GKey, GValue> {
 	/** Dieser Konstruktor initialisiert die Kapazität.
 	 *
 	 * @param capacity Kapazität. */
-	public HashMap2(final int capacity) {
+	public HashMap2(int capacity) {
 		this.allocateImpl(capacity);
 	}
 
 	/** Dieser Konstruktor initialisiert die {@link HashMap2} mit dem Inhalt der gegebenen {@link Map}.
 	 *
 	 * @param source gegebene Einträge. */
-	public HashMap2(final Map<? extends GKey, ? extends GValue> source) {
+	public HashMap2(Map<? extends GKey, ? extends GValue> source) {
 		this.allocateImpl(source.size());
 		this.putAll(source);
 	}
 
 	@Override
-	protected void customSetKey(final int entryIndex, final GKey key, final int keyHash) {
+	protected void customSetKey(int entryIndex, GKey key, int keyHash) {
 		this.customSetKey(entryIndex, key);
 		this.hashes[entryIndex] = keyHash;
 	}
 
 	@Override
-	protected int customHashKey(final int entryIndex) {
+	protected int customHashKey(int entryIndex) {
 		return this.hashes[entryIndex];
 	}
 
 	@Override
-	protected boolean customEqualsKey(final int entryIndex, final Object key, final int keyHash) {
+	protected boolean customEqualsKey(int entryIndex, Object key, int keyHash) {
 		return (this.customHashKey(entryIndex) == keyHash) && this.customEqualsKey(entryIndex, key);
 	}
 
 	@Override
-	protected HashAllocator customAllocator(final int capacity) {
+	protected HashAllocator customAllocator(int capacity) {
 		final Object[] keys2;
 		final Object[] values2;
 		final int[] hashes2;
@@ -133,7 +131,7 @@ public class HashMap2<GKey, GValue> extends HashMap<GKey, GValue> {
 		return new HashAllocator() {
 
 			@Override
-			public void copy(final int sourceIndex, final int targetIndex) {
+			public void copy(int sourceIndex, int targetIndex) {
 				keys2[targetIndex] = HashMap2.this.keys[sourceIndex];
 				values2[targetIndex] = HashMap2.this.values[sourceIndex];
 				hashes2[targetIndex] = HashMap2.this.hashes[sourceIndex];
@@ -156,7 +154,7 @@ public class HashMap2<GKey, GValue> extends HashMap<GKey, GValue> {
 
 	@Override
 	public HashMap2<GKey, GValue> clone() {
-		final HashMap2<GKey, GValue> result = (HashMap2<GKey, GValue>)super.clone();
+		var result = (HashMap2<GKey, GValue>)super.clone();
 		if (this.capacityImpl() == 0) return result;
 		result.hashes = this.hashes.clone();
 		return result;
