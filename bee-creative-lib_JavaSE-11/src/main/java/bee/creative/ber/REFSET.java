@@ -4,7 +4,7 @@ package bee.creative.ber;
  * Struktur gegeben ist: <pre>(size, mask, free, (head, next, item)[mask + 1])</pre> Die Datenfelder haben folgende Bedeutung:
  * <ul>
  * <li>{@code size} - Anzahl der verwalteten Elemente.</li>
- * <li>{@code mask} - Bitmaske zur Umrechnung eines Elements in die Position des zugehörigen Listenkopfes. Die Bitmaske ist stets positiv, kleiner als eine
+ * <li>{@code mask} - Bitmaske zur Umrechnung eines Elements in die Position des zugehörigen Listenkopfes. Die Bitmaske ist stets größer als 0, kleiner als eine
  * Milliarde und eins kleiner als eine Potenz von Zwei.</li>
  * <li>{@code free} - 1-basierte Position des nächsten unbenutzten {@code item} oder {@code 0}.</li>
  * <li>{@code head} - 1-basierte Position der ersten Referenz in der einfach verketteten Liste oder {@code 0}.</li>
@@ -28,7 +28,7 @@ abstract class REFSET {
 	public static int getIdx(int[] refset, int ref) {
 		if (ref == 0) return 0;
 		var idx = ref & /* refset.mask */ refset[1];
-		var res = /* refset.head_item_next[idx].head */ refset[(idx * 3) + 3 + 0];
+		var res = /* refset.head_item_next[idx].head */ refset[(idx * 3) + 3];
 		while (res != 0) {
 			if (ref == /* refset.head_item_next[res-1].item */ refset[(res * 3) + 2]) return res;
 			res = /* refset.head_item_next[res-1].next */ refset[(res * 3) + 1];
@@ -46,6 +46,7 @@ abstract class REFSET {
 		return 0;
 	}
 
+	/** Diese Methode liefert die Referenz an der gegebenen {@link #getIdx(int[], int) 1-basierten Position} {@code idx}. */
 	static int getRef(int[] refset, int idx) {
 		return refset[(idx * 3) + 2];
 	}
@@ -62,9 +63,9 @@ abstract class REFSET {
 		}
 		res = /* refset.free */ refset[2];
 		if (res == 0) return 0;
-		/* refset.free */ refset[2] = /* refset.head_item_next[res-1].next */ refset[(res * 3) + 2];
-		/* refset.head_item_next[idx].head */ refset[(idx * 3) + 3] = res;
+		/* refset.free */ refset[2] = /* refset.head_item_next[res-1].next */ refset[(res * 3) + 1];
 		/* refset.head_item_next[res-1].next */ refset[(res * 3) + 1] = /* refset.head_item_next[idx].head */ refset[(idx * 3) + 3];
+		/* refset.head_item_next[idx].head */ refset[(idx * 3) + 3] = res;
 		/* refset.head_item_next[res-1].item */ refset[(res * 3) + 2] = ref;
 		/* refset.size */ refset[0]++;
 		return res;
@@ -115,22 +116,26 @@ abstract class REFSET {
 	static int[] copy(int[] refset) {
 		var size = /* refset.size */ refset[0];
 		var mask = /* refset.mask */ refset[1];
-		var mask2 = (size > mask) ? (mask * 2) + 1 : ((size * 2) < mask) ? (mask / 2) + 1 : mask;
+		var mask2 = (size > mask) ? ((mask * 2) + 1) & 536870911 : ((size * 2) < mask) ? (mask / 2) | 1 : mask;
 		if (mask == mask2) return refset.clone();
-		var refset2 = new int[(mask2 * 3) + 3];
-		// TODO
+		var refset2 = new int[(mask2 * 3) + 6];
 		var free = 1;
-		for (var idx = (mask * 3) + 2; 3 < idx; idx -= 3) {
-			var ref = refset[idx];
+		for (var off = refset.length - 1; 3 < off; off -= 3) {
+			var ref = refset[off];
 			if (ref != 0) {
-				var idx2 = ref & mask2;
-				/* refset2.head_item_next[idx2].head */ refset2[(free * 3) + 1] = refset2[idx2 * 3];
-
+				var idx = ref & mask2;
+				/* refset2.head_item_next[free-1].next */ refset2[(free * 3) + 1] = /* refset2.head_item_next[idx].head */ refset2[(idx * 3) + 3];
+				/* refset2.head_item_next[idx].head */ refset2[(idx * 3) + 3] = free;
+				/* refset2.head_item_next[free-1].item */ refset2[(free * 3) + 2] = ref;
+				free++;
 			}
 		}
-		// private static void setupNextsImpl(int[] that) {
-		// for (int i = 0, size = array.length; i < size; array[i] = ++i) {}
-		// }
+		/* refset2.size*/ refset2[0] = size;
+		/* refset2.mask */ refset2[1] = mask2;
+		/* refset2.free */ refset2[2] = free;
+		while (free <= mask2) {
+			/* refset2.head_item_next[free-1].next */ refset2[(free * 3) + 1] = ++free;
+		}
 		return refset2;
 	}
 
