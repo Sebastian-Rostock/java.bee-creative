@@ -1,42 +1,75 @@
 package bee.creative.ber;
 
+/** Diese Klasse implementiert eine Menge von Kanten eines bidirectional-entity-relation Speichers.
+ *
+ * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 class BEREdges {
 
 	/** Diese Methode liefert die Anzahl der als {@code source} vorkommenden Entitäten.
 	 *
 	 * @return {@code source}-Anzahl. */
 	public int getSourceCount() {
-		return REFSET.size(this.sourceSet);
+		return REFMAP.size(this.sourceMap);
 	}
 
 	// anzahl der als source bei target und rel vorkommenden knoten
 	public int getSourceCount(int targetRef, int relationRef) {
-		var targetIdx = REFSET.getIdx(this.targetSet, targetRef);
-
-		return 0;
+		if ((targetRef == 0) || (relationRef == 0)) return 0;
+		var targetIdx = REFMAP.getIdx(this.targetMap, targetRef);
+		if (targetIdx == 0) return 0;
+		var relationMap = BEREdges.asRefMap(REFMAP.getVal(this.targetMap, targetIdx));
+		var relationIdx = REFMAP.getIdx(relationMap, relationRef);
+		if (relationIdx == 0) return 0;
+		var sourceVal = REFMAP.getVal(relationMap, relationIdx);
+		if (BEREdges.isRef(sourceVal)) return 1;
+		return REFSET.size(BEREdges.asRefSet(sourceVal));
 	}
 
 	// erster als source bei target und rel vorkommender knoten
 	public int getSourceRef(int targetRef, int relationRef) {
-		return 0;
+		if ((targetRef == 0) || (relationRef == 0)) return 0;
+		var targetIdx = REFMAP.getIdx(this.targetMap, targetRef);
+		if (targetIdx == 0) return 0;
+		var relationMap = BEREdges.asRefMap(REFMAP.getVal(this.targetMap, targetIdx));
+		var relationIdx = REFMAP.getIdx(relationMap, relationRef);
+		if (relationIdx == 0) return 0;
+		var sourceVal = REFMAP.getVal(relationMap, relationIdx);
+		if (BEREdges.isRef(sourceVal)) return BEREdges.asRef(sourceVal);
+		return REFSET.getRef(BEREdges.asRefSet(sourceVal));
 	}
 
 	// als source vorkommende knoten
 	public int[] getSourceRefs() {
-		return null;
+		return REFMAP.toArray(this.sourceMap);
 	}
 
 	// als source bei target und rel vorkommende knoten
 	public int[] getSourceRefs(int targetRef, int relationRef) {
-		return null;
+		if ((targetRef == 0) || (relationRef == 0)) return BEREdges.EMPTY_REFS;
+		var targetIdx = REFMAP.getIdx(this.targetMap, targetRef);
+		if (targetIdx == 0) return BEREdges.EMPTY_REFS;
+		var relationMap = BEREdges.asRefMap(REFMAP.getVal(this.targetMap, targetIdx));
+		var relationIdx = REFMAP.getIdx(relationMap, relationRef);
+		if (relationIdx == 0) return BEREdges.EMPTY_REFS;
+		var sourceVal = REFMAP.getVal(relationMap, relationIdx);
+		if (BEREdges.isRef(sourceVal)) return new int[]{BEREdges.asRef(sourceVal)};
+		return REFSET.toArray(BEREdges.asRefSet(sourceVal));
 	}
 
 	public int getSourceRelationCount(int sourceRef) {
-		return 0;
+		if (sourceRef == 0) return 0;
+		var sourceIdx = REFMAP.getIdx(this.sourceMap, sourceRef);
+		if (sourceIdx == 0) return 0;
+		var relationMap = BEREdges.asRefMap(REFMAP.getVal(this.sourceMap, sourceIdx));
+		return REFMAP.size(relationMap);
 	}
 
 	public int[] getSourceRelationRefs(int sourceRef) {
-		return null;
+		if (sourceRef == 0) return BEREdges.EMPTY_REFS;
+		var sourceIdx = REFMAP.getIdx(this.sourceMap, sourceRef);
+		if (sourceIdx == 0) return BEREdges.EMPTY_REFS;
+		var relationMap = BEREdges.asRefMap(REFMAP.getVal(this.sourceMap, sourceIdx));
+		return REFMAP.toArray(relationMap);
 	}
 
 	public int getTargetCount() {
@@ -66,33 +99,79 @@ class BEREdges {
 	}
 
 	public boolean isSourceRef(int sourceRef) {
-		return false;
+		if (sourceRef == 0) return false;
+		return REFMAP.getIdx(this.sourceMap, sourceRef) != 0;
 	}
 
 	public boolean isSourceRef(int targetRef, int relationRef, int sourceRef) {
-		return false;
+		if ((targetRef == 0) || (relationRef == 0) || (sourceRef == 0)) return false;
+		var targetIdx = REFMAP.getIdx(this.targetMap, targetRef);
+		if (targetIdx == 0) return false;
+		var relationMap = BEREdges.asRefMap(REFMAP.getVal(this.targetMap, targetIdx));
+		var relationIdx = REFMAP.getIdx(relationMap, relationRef);
+		if (relationIdx == 0) return false;
+		var sourceVal = REFMAP.getVal(relationMap, relationIdx);
+		if (BEREdges.isRef(sourceVal)) return BEREdges.asRef(sourceVal) == sourceRef;
+		return REFSET.getIdx(BEREdges.asRefSet(sourceVal), sourceRef) != 0;
 	}
 
 	public boolean isSourceRelationRef(int sourceRef, int relationRef) {
-		return false;
+		if ((sourceRef == 0) || (relationRef == 0)) return false;
+		var sourceIdx = REFMAP.getIdx(this.sourceMap, sourceRef);
+		if (sourceIdx == 0) return false;
+		var relationMap = BEREdges.asRefMap(REFMAP.getVal(this.sourceMap, sourceIdx));
+		return REFMAP.getIdx(relationMap, relationRef) != 0;
 	}
 
 	public boolean isTargetRef(int targetRef) {
-		return false;
+		if (targetRef == 0) return false;
+		return REFMAP.getIdx(this.targetMap, targetRef) != 0;
 	}
 
 	public boolean isTargetRef(int sourceRef, int relationRef, int targetRef) {
-		return false;
+		if ((sourceRef == 0) || (relationRef == 0) || (targetRef == 0)) return false;
+		var sourceIdx = REFMAP.getIdx(this.sourceMap, sourceRef);
+		if (sourceIdx == 0) return false;
+		var relationMap = BEREdges.asRefMap(REFMAP.getVal(this.sourceMap, sourceIdx));
+		var relationIdx = REFMAP.getIdx(relationMap, relationRef);
+		if (relationIdx == 0) return false;
+		var targetVal = REFMAP.getVal(relationMap, relationIdx);
+		if (BEREdges.isRef(targetVal)) return BEREdges.asRef(targetVal) == targetRef;
+		return REFSET.getIdx(BEREdges.asRefSet(targetVal), targetRef) != 0;
 	}
 
 	public boolean isTargetRelationRef(int targetRef, int relationRef) {
-		return false;
+		if ((targetRef == 0) || (relationRef == 0)) return false;
+		var targetIdx = REFMAP.getIdx(this.targetMap, targetRef);
+		if (targetIdx == 0) return false;
+		var relationMap = BEREdges.asRefMap(REFMAP.getVal(this.targetMap, targetIdx));
+		return REFMAP.getIdx(relationMap, relationRef) != 0;
 	}
 
-	int[] sourceSet;
+	static final int[] EMPTY_REFS = new int[0];
 
-	// speichert die RELMAP je source
-	Object[][] sourceRelationSet;
+	static boolean isRef(Object val) {
+		return val instanceof Integer;
+	}
 
-	int[] targetSet;
+	static int asRef(Object val) {
+		return ((Integer)val);
+	}
+
+	static int[] asRefSet(Object val) {
+		return (int[])val;
+	}
+
+	static Object[] asRefMap(Object val) {
+		return (Object[])val;
+	}
+
+	/** Dieses Feld speichert die Referenzabbildung gemäß {@link REFMAP} von {@code source}-Referenzen auf Referenzabbildungen gemäß {@link REFMAP} von
+	 * {@code relation}-Referenzen auf {@code target}-Referenzen. Letztere sind dabei als {@link Integer} oder gemäß {@link REFSET} abgebildet. */
+	Object[] sourceMap = REFMAP.EMPTY;
+
+	/** Dieses Feld speichert die Referenzabbildung gemäß {@link REFMAP} von {@code target}-Referenzen auf Referenzabbildungen gemäß {@link REFMAP} von
+	 * {@code relation}-Referenzen auf {@code source}-Referenzen. Letztere sind dabei als {@link Integer} oder gemäß {@link REFSET} abgebildet. */
+	Object[] targetMap = REFMAP.EMPTY;
+
 }
