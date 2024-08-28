@@ -73,29 +73,66 @@ class BEREdges {
 	}
 
 	public int getTargetCount() {
-		return 0;
-	}
-
-	public int[] getTargetRefs() {
-		return null;
+		return REFMAP.size(this.targetMap);
 	}
 
 	public int getTargetCount(int sourceRef, int relationRef) {
-		return 0;
+		if ((sourceRef == 0) || (relationRef == 0)) return 0;
+		var sourceIdx = REFMAP.getIdx(this.sourceMap, sourceRef);
+		if (sourceIdx == 0) return 0;
+		var relationMap = BEREdges.asRefMap(REFMAP.getVal(this.sourceMap, sourceIdx));
+		var relationIdx = REFMAP.getIdx(relationMap, relationRef);
+		if (relationIdx == 0) return 0;
+		var targetVal = REFMAP.getVal(relationMap, relationIdx);
+		if (BEREdges.isRef(targetVal)) return 1;
+		return REFSET.size(BEREdges.asRefSet(targetVal));
+	}
+
+	// erster als target bei source  und rel vorkommender knoten
+	public int getTargetRef(int sourceRef, int relationRef) {
+		if ((sourceRef == 0) || (relationRef == 0)) return 0;
+		var sourceIdx = REFMAP.getIdx(this.sourceMap, sourceRef);
+		if (sourceIdx == 0) return 0;
+		var relationMap = BEREdges.asRefMap(REFMAP.getVal(this.sourceMap, sourceIdx));
+		var relationIdx = REFMAP.getIdx(relationMap, relationRef);
+		if (relationIdx == 0) return 0;
+		var targetVal = REFMAP.getVal(relationMap, relationIdx);
+		if (BEREdges.isRef(targetVal)) return BEREdges.asRef(targetVal);
+		return REFSET.getRef(BEREdges.asRefSet(targetVal));
+	}
+
+	public int[] getTargetRefs() {
+		return REFMAP.toArray(this.targetMap);
 	}
 
 	public int[] getTargetRefs(int sourceRef, int relationRef) {
-		return null;
+		if ((sourceRef == 0) || (relationRef == 0)) return BEREdges.EMPTY_REFS;
+		var sourceIdx = REFMAP.getIdx(this.sourceMap, sourceRef);
+		if (sourceIdx == 0) return BEREdges.EMPTY_REFS;
+		var relationMap = BEREdges.asRefMap(REFMAP.getVal(this.sourceMap, sourceIdx));
+		var relationIdx = REFMAP.getIdx(relationMap, relationRef);
+		if (relationIdx == 0) return BEREdges.EMPTY_REFS;
+		var targetVal = REFMAP.getVal(relationMap, relationIdx);
+		if (BEREdges.isRef(targetVal)) return new int[]{BEREdges.asRef(targetVal)};
+		return REFSET.toArray(BEREdges.asRefSet(targetVal));
 	}
 
 	// anzahl der als rel bei target vorkommenden knoten
 	public int getTargetRelationCount(int targetRef) {
-		return 0;
+		if (targetRef == 0) return 0;
+		var targetIdx = REFMAP.getIdx(this.targetMap, targetRef);
+		if (targetIdx == 0) return 0;
+		var relationMap = BEREdges.asRefMap(REFMAP.getVal(this.targetMap, targetIdx));
+		return REFMAP.size(relationMap);
 	}
 
 	// als rel bei target vorkommenden knoten
 	public int[] getTargetRelationRefs(int targetRef) {
-		return null;
+		if (targetRef == 0) return BEREdges.EMPTY_REFS;
+		var targetIdx = REFMAP.getIdx(this.targetMap, targetRef);
+		if (targetIdx == 0) return BEREdges.EMPTY_REFS;
+		var relationMap = BEREdges.asRefMap(REFMAP.getVal(this.targetMap, targetIdx));
+		return REFMAP.toArray(relationMap);
 	}
 
 	public boolean isSourceRef(int sourceRef) {

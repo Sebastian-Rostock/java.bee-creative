@@ -1,7 +1,7 @@
 package bee.creative.ber;
 
 /** Diese Klasse implementiert einen bidirectional-entity-relation Speicher.
- * 
+ *
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 class BERStore extends BERState {
 
@@ -21,8 +21,18 @@ class BERStore extends BERState {
 
 	}
 
-	void setRootRef(int rootRef) {
+	public void setRootRef(int rootRef) {
+		if (this.prevRootRef == null) {
+			this.prevRootRef = this.getRootRef();
+		}
+		this.rootRef = rootRef;
+	}
 
+	public void setNextRef(int nextRef) {
+		if (this.prevNextRef == null) {
+			this.prevNextRef = this.getNextRef();
+		}
+		this.nextRef = nextRef;
 	}
 
 	int newEntityRef() {
@@ -30,7 +40,7 @@ class BERStore extends BERState {
 	}
 
 	/** Diese Methode gibt das zurück. wenn gegebener nodeRef als source oder target vorkommt, in cow-nodeRefGen eintragen und aus source/target maps entfernen
-	 * 
+	 *
 	 * @param entityRef */
 	void popEntityRef(int entityRef) {
 
@@ -44,7 +54,7 @@ class BERStore extends BERState {
 
 	/** Diese Methode gibt das zurück. ersetzt die als source von target und rel vorkommenden referenzen mit den > 0 gegebenen liefert die anzahl der
 	 * einzigartigen referenzen kopiert diese an den beginn von sourceRefs
-	 * 
+	 *
 	 * @param targetRef
 	 * @param relationRef
 	 * @param sourceRefs
@@ -66,11 +76,24 @@ class BERStore extends BERState {
 	}
 
 	BERUpdate commit() {
+		
+		
+		
+		
+		
+		prevRootRef=null;
+		prevNextRef=null;
+		
 		return null;
 	}
 
 	/** verwirft die änderungen seit dem letzten commit. das betrifft getRootRef, getEntityRefs, getSource..., getTarget... */
 	BERUpdate rollback() {
+		// der aktuelle
+		var oldState = new BERState();
+		// der in prev gespeicherte und wiederhergestellte
+		var newState = new BERState();
+			
 		return null;
 	}
 
@@ -79,5 +102,13 @@ class BERStore extends BERState {
 	BERUpdate rollback(BERState state) {
 		return null;
 	}
+
+	Integer prevRootRef;
+
+	Integer prevNextRef;
+
+	Object[] prevSourceMap = REFMAP.EMPTY;
+
+	Object[] prevTargetMap = REFMAP.EMPTY;
 
 }
