@@ -41,34 +41,36 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 		/** tableAddr = count: int, range: int[count-1], index: int[length] */
 		final long addr;
 
-		MappedArray(final FEMBuffer buffer, final long addr) throws IllegalArgumentException {
+		MappedArray(FEMBuffer buffer, long addr) throws IllegalArgumentException {
 			super(buffer.buffer.getInt(addr));
 			this.buffer = buffer;
 			this.addr = addr + 8;
 		}
 
 		@Override
-		protected FEMValue customGet(final int index) {
+		protected FEMValue customGet(int index) {
 			return this.buffer.getAt(this.addr + (index * 8L), FEMValue.class);
 		}
 
 		@Override
-		protected int customFind(final FEMValue that, final int offset, int length, final boolean foreward) {
-			final long tableAddr = this.buffer.buffer.getLong(this.addr + (this.length * 8L));
+		protected int customFind(FEMValue that, int offset, int length, boolean foreward) {
+			var tableAddr = this.buffer.buffer.getLong(this.addr + (this.length * 8L));
 			if (tableAddr == 0) return super.customFind(that, offset, length, foreward);
-			final int count = this.buffer.buffer.getInt(tableAddr), hash = that.hashCode() & (count - 2);
-			final long rangeAddr = tableAddr + (hash * 4L);
-			int rangeL = this.buffer.buffer.getInt(rangeAddr), rangeR = this.buffer.buffer.getInt(rangeAddr + 4) - 1;
+			var count = this.buffer.buffer.getInt(tableAddr);
+			var hash = that.hashCode() & (count - 2);
+			var rangeAddr = tableAddr + (hash * 4L);
+			var rangeL = this.buffer.buffer.getInt(rangeAddr);
+			var rangeR = this.buffer.buffer.getInt(rangeAddr + 4) - 1;
 			length += offset;
 			if (foreward) {
 				for (; rangeL <= rangeR; rangeL++) {
-					final int result = this.buffer.buffer.getInt(tableAddr + (rangeL * 4L));
+					var result = this.buffer.buffer.getInt(tableAddr + (rangeL * 4L));
 					if (length <= result) return -1;
 					if ((offset <= result) && that.equals(this.customGet(result))) return result;
 				}
 			} else {
 				for (; rangeL <= rangeR; rangeR--) {
-					final int result = this.buffer.buffer.getInt(tableAddr + (rangeR * 4L));
+					var result = this.buffer.buffer.getInt(tableAddr + (rangeR * 4L));
 					if (result < offset) return -1;
 					if ((result < length) && that.equals(this.customGet(result))) return result;
 				}
@@ -77,17 +79,22 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 		}
 
 		@Override
-		protected boolean customEquals(final FEMArray that) throws NullPointerException {
+		protected boolean customEquals(FEMArray that) throws NullPointerException {
 			if (this == that) return true;
 			if (that instanceof MappedArray) {
-				final MappedArray that2 = (MappedArray)that;
+				var that2 = (MappedArray)that;
 				if ((this.addr == that2.addr) && (this.buffer.buffer == that2.buffer.buffer)) return true;
 			}
 			return super.customEquals(that);
 		}
 
 		@Override
-		public FEMArray compact(final boolean index) {
+		public FEMArray result(boolean deep) {
+			return this;
+		}
+
+		@Override
+		public FEMArray compact(boolean index) {
 			return !index || this.isIndexed() ? this : super.compact(true);
 		}
 

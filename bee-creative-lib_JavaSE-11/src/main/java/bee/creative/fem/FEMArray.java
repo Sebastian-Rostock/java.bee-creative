@@ -637,8 +637,7 @@ public abstract class FEMArray extends FEMValue implements Array<FEMValue>, Iter
 
 		@Override
 		public FEMArray result(boolean deep) {
-			if (!deep) return this;
-			return new UniformArray2(this.length, this.value);
+			return deep ? new UniformArray2(this.length, this.value) : this;
 		}
 
 		@Override
@@ -683,8 +682,8 @@ public abstract class FEMArray extends FEMValue implements Array<FEMValue>, Iter
 
 		CompactArray(FEMValue[] items) throws IllegalArgumentException {
 			this(items.length, items);
-			for (var i = 0; i < items.length; i++) {
-				Objects.notNull(items[i]);
+			for (var item: items) {
+				Objects.notNull(item);
 			}
 		}
 
@@ -706,6 +705,11 @@ public abstract class FEMArray extends FEMValue implements Array<FEMValue>, Iter
 		@Override
 		public FEMValue[] value() {
 			return this.items.clone();
+		}
+
+		@Override
+		public FEMArray result(boolean deep) {
+			return deep ? new CompactArray2(this.items) : this;
 		}
 
 		@Override
@@ -1172,9 +1176,8 @@ public abstract class FEMArray extends FEMValue implements Array<FEMValue>, Iter
 	}
 
 	@Override
-	public FEMArray result(final boolean deep) {
-		if (!deep) return this;
-		return new CompactArray2(this.value());
+	public FEMArray result(boolean deep) {
+		return deep ? new CompactArray2(this.value()) : this;
 	}
 
 	@Override
