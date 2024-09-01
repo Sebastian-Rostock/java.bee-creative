@@ -72,6 +72,12 @@ public abstract class REFMAP {
 		return REFMAP.copy(refmap, refset, REFSET.pack(refset));
 	}
 
+	public static Object[] copy(Object[] refmap) {
+		var refmap2 = refmap.clone();
+		refmap2[0] = REFSET.copy(refset(refmap));
+		return refmap2;
+	}
+
 	/** Diese Methode liefert nur dann {@code true}, wenn die gegebenen Referenzabbildungn {@code refmap} die gleichen Paare aus Referenzen und Elementen
 	 * enthalten. */
 	public static boolean equals(Object[] refmap1, Object[] refmap2) {

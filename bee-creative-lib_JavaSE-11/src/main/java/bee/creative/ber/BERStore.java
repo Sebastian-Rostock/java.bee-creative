@@ -36,7 +36,11 @@ class BERStore extends BERState {
 	}
 
 	int newEntityRef() {
-		return 0;
+		var nextRef = this.nextRef;
+		while (isSourceRef(nextRef) || isTargetRef(nextRef))
+			nextRef++;
+		setNewEntityRef(nextRef + 1);
+		return nextRef;
 	}
 
 	/** Diese Methode gibt das zurück. wenn gegebener nodeRef als source oder target vorkommt, in cow-nodeRefGen eintragen und aus source/target maps entfernen
@@ -60,7 +64,21 @@ class BERStore extends BERState {
 	 * @param sourceRefs
 	 * @return */
 	int setSourceRefs(int targetRef, int relationRef, int[] sourceRefs) {
+
 		return 0;
+	}
+
+	boolean putSourceRef(int targetRef, int relationRef, int sourceRef) {
+		var nsm = sourceMap;
+		var psm = prevSourceMap;
+		if (psm == null) {
+			prevSourceMap = psm = REFMAP.copy(nsm);
+		}
+		psm = REFMAP.grow(nsm);
+		var psi = REFMAP.getIdx(psm, sourceRef);
+		var nsi = REFMAP.getIdx(nsm, sourceRef);
+
+		return false;
 	}
 
 	/** ergänzt die als source von target und rel vorkommenden referenzen mit den > 0 gegebenen liefert die anzahl der ergänzten referenzen kopiert diese an den
@@ -76,14 +94,10 @@ class BERStore extends BERState {
 	}
 
 	BERUpdate commit() {
-		
-		
-		
-		
-		
-		prevRootRef=null;
-		prevNextRef=null;
-		
+
+		prevRootRef = null;
+		prevNextRef = null;
+
 		return null;
 	}
 
@@ -93,7 +107,7 @@ class BERStore extends BERState {
 		var oldState = new BERState();
 		// der in prev gespeicherte und wiederhergestellte
 		var newState = new BERState();
-			
+
 		return null;
 	}
 

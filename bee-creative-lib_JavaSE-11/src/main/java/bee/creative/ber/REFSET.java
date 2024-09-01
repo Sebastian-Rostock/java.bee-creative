@@ -128,6 +128,11 @@ public abstract class REFSET {
 		return size > mask ? refset : REFSET.copy(refset, mask | 1);
 	}
 
+	public static int[] copy(int[] refset) {
+		var refset2=refset.clone();
+		return refset2;
+	}
+
 	/** Diese Methode liefert nur dann {@code true}, wenn die gegebenen Referenzmengen {@code refset} die gleichen Referenzen enthalten. */
 	public static boolean equals(int[] refset1, int[] refset2) {
 		if (refset1 == refset2) return true;
