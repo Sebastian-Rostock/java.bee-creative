@@ -35,6 +35,17 @@ class REFSET_TEST {
 		a = REFSET.pack(a);
 		print(a);
 
+		
+		var e = new BERStore();
+		e.putEdge(1, 2, 3);
+		e.putEdge(1, 2, 3);
+		System.out.println(e);
+		e.putEdge(1, 2, 4);
+		e.putEdge(1, 2, 4);
+		System.out.println(e);
+		e.putEdge(1, 2, 5);
+		System.out.println(e);
+		
 	}
 
 	private static void print(int[] a) {

@@ -1,9 +1,14 @@
 package bee.creative.ber;
 
+import bee.creative.lang.Strings;
+import bee.creative.util.Iterable2;
+import bee.creative.util.Iterator2;
+import bee.creative.util.Iterators;
+
 /** Diese Klasse implementiert eine Menge von Kanten eines bidirectional-entity-relation Speichers.
  *
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-class BEREdges {
+class BEREdges implements Iterable2<BEREdge> {
 
 	/** Diese Methode liefert die Anzahl der als {@code source} vorkommenden Entitäten.
 	 *
@@ -88,7 +93,7 @@ class BEREdges {
 		return REFSET.size(BEREdges.asRefSet(targetVal));
 	}
 
-	// erster als target bei source  und rel vorkommender knoten
+	// erster als target bei source und rel vorkommender knoten
 	public int getTargetRef(int sourceRef, int relationRef) {
 		if ((sourceRef == 0) || (relationRef == 0)) return 0;
 		var sourceIdx = REFMAP.getIdx(this.sourceMap, sourceRef);
@@ -185,6 +190,30 @@ class BEREdges {
 		return REFMAP.getIdx(relationMap, relationRef) != 0;
 	}
 
+	@Override
+	public Iterator2<BEREdge> iterator() {
+		var sourceRefs = this.getSourceRefs();
+		return Iterators.concatAll(Iterators.concatAll(Iterators.fromCount(sourceRefs.length).translate(sourceIdx -> {
+			var sourceRef = sourceRefs[sourceIdx];
+			var relationRefs = this.getSourceRelationRefs(sourceRef);
+			return Iterators.fromCount(relationRefs.length).translate(relationIdx -> {
+				var relationRef = relationRefs[relationIdx];
+				var targetRefs = this.getTargetRefs(sourceRef, relationRef);
+				return Iterators.fromCount(targetRefs.length).translate(targetIdx -> {
+					var targetRef = targetRefs[targetIdx];
+					return new BEREdge(sourceRef, relationRef, targetRef);
+				});
+			});
+		})));
+	}
+
+	@Override
+	public String toString() {
+		var res = new StringBuilder("{ ");
+		Strings.join(res, ", ", this);
+		return res.append(" }").toString();
+	}
+
 	static final int[] EMPTY_REFS = new int[0];
 
 	static boolean isRef(Object val) {
@@ -205,10 +234,10 @@ class BEREdges {
 
 	/** Dieses Feld speichert die Referenzabbildung gemäß {@link REFMAP} von {@code source}-Referenzen auf Referenzabbildungen gemäß {@link REFMAP} von
 	 * {@code relation}-Referenzen auf {@code target}-Referenzen. Letztere sind dabei als {@link Integer} oder gemäß {@link REFSET} abgebildet. */
-	Object[] sourceMap = REFMAP.EMPTY;
+	Object[] sourceMap = REFMAP.make();
 
 	/** Dieses Feld speichert die Referenzabbildung gemäß {@link REFMAP} von {@code target}-Referenzen auf Referenzabbildungen gemäß {@link REFMAP} von
 	 * {@code relation}-Referenzen auf {@code source}-Referenzen. Letztere sind dabei als {@link Integer} oder gemäß {@link REFSET} abgebildet. */
-	Object[] targetMap = REFMAP.EMPTY;
+	Object[] targetMap = REFMAP.make();
 
 }

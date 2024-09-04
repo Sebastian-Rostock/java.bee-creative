@@ -39,7 +39,6 @@ public abstract class REFMAP {
 	/** Diese Methode setzt das Element {@code val} zur Referenz an der gegebenen {@link #getIdx(Object[], int) 1-basierten Position} {@code idx} der gegebenen
 	 * Referenzabbildung {@code refmap}. */
 	public static void setVal(Object[] refmap, int idx, Object val) {
-		if ((idx == 0) || (val == null)) return;
 		refmap[idx] = val;
 	}
 
