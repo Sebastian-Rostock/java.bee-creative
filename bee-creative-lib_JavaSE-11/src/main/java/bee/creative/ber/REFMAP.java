@@ -119,6 +119,7 @@ public abstract class REFMAP {
 	static Object[] copy(Object[] refmap1, int[] refset1, int[] refset2) {
 		if (refset1 == refset2) return refmap1;
 		var refmap2 = new Object[REFSET.mask(refset2) + 1];
+		refmap2[0] = refset2;
 		for (var idx1 = REFSET.mask(refset1); 0 < idx1; idx1--) {
 			var ref = REFSET.getRef(refset1, idx1);
 			if (ref != 0) {
