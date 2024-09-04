@@ -38,12 +38,9 @@ class REFSET_TEST {
 		
 		var e = new BERStore();
 		e.putEdge(1, 2, 3);
-		e.putEdge(1, 2, 3);
-		System.out.println(e);
 		e.putEdge(1, 2, 4);
-		e.putEdge(1, 2, 4);
-		System.out.println(e);
-		e.putEdge(1, 2, 5);
+		e.putEdge(1, 3, 4);
+		e.putEdge(2, 2, 4);
 		System.out.println(e);
 		
 	}

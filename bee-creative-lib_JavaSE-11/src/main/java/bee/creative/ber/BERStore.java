@@ -76,13 +76,14 @@ class BERStore extends BERState {
 		return 0;
 	}
 
-	public boolean putEdge(int sourceRef, int relationRef, int targetRef) {
-		return putSourceRef(targetRef, relationRef, sourceRef);
+	public boolean putEdge(BEREdge edge) {
+		if (edge == null) return false;
+		return this.putEdge(edge.sourceRef, edge.relationRef, edge.targetRef);
 	}
-	public boolean putSourceRef(int targetRef, int relationRef, int sourceRef) {
+
+	public boolean putEdge(int sourceRef, int relationRef, int targetRef) {
 		if ((sourceRef == 0) || (relationRef == 0) || (targetRef == 0)) return false;
 
-		// grow sourceMap
 		var prevSourceMap = this.prevSourceMap;
 		var nextSourceMap = this.sourceMap;
 		if (prevSourceMap == null) {
@@ -95,10 +96,22 @@ class BERStore extends BERState {
 		}
 		this.sourceMap = nextSourceMap;
 
-		// grow prevSourceMap[sourceRef]
+		var prevTargetMap = this.prevTargetMap;
+		var nextTargetMap = this.targetMap;
+		if (prevTargetMap == null) {
+			nextTargetMap = REFMAP.grow(this.prevTargetMap = prevTargetMap = nextTargetMap);
+			if (prevTargetMap == nextTargetMap) {
+				nextTargetMap = REFMAP.copy(nextTargetMap);
+			}
+		} else {
+			nextTargetMap = REFMAP.grow(nextTargetMap);
+		}
+		this.targetMap = nextTargetMap;
+
 		var prevSourceRelationIdx = REFMAP.getIdx(prevSourceMap, sourceRef);
 		var prevSourceRelationMap = prevSourceRelationIdx != 0 ? BEREdges.asRefMap(REFMAP.getVal(prevSourceMap, prevSourceRelationIdx)) : null;
 		var nextSourceRelationIdx = REFMAP.putRef(nextSourceMap, sourceRef);
+		if (nextSourceRelationIdx == 0) return false;
 		var nextSourceRelationMap = BEREdges.asRefMap(REFMAP.getVal(nextSourceMap, nextSourceRelationIdx));
 		if (nextSourceRelationMap == null) {
 			nextSourceRelationMap = REFMAP.make();
@@ -112,21 +125,34 @@ class BERStore extends BERState {
 		}
 		REFMAP.setVal(nextSourceMap, nextSourceRelationIdx, nextSourceRelationMap);
 
-		var result = 0;
+		var prevTargetRelationIdx = REFMAP.getIdx(prevTargetMap, targetRef);
+		var prevTargetRelationMap = prevTargetRelationIdx != 0 ? BEREdges.asRefMap(REFMAP.getVal(prevTargetMap, prevTargetRelationIdx)) : null;
+		var nextTargetRelationIdx = REFMAP.putRef(nextTargetMap, targetRef);
+		if (nextTargetRelationIdx == 0) return false;
+		var nextTargetRelationMap = BEREdges.asRefMap(REFMAP.getVal(nextTargetMap, nextTargetRelationIdx));
+		if (nextTargetRelationMap == null) {
+			nextTargetRelationMap = REFMAP.make();
+		} else if (nextTargetRelationMap == prevTargetRelationMap) {
+			nextTargetRelationMap = REFMAP.grow(prevTargetRelationMap);
+			if (nextTargetRelationMap == prevTargetRelationMap) {
+				nextTargetRelationMap = REFMAP.copy(prevTargetRelationMap);
+			}
+		} else {
+			nextTargetRelationMap = REFMAP.grow(nextTargetRelationMap);
+		}
+		REFMAP.setVal(nextTargetMap, nextTargetRelationIdx, nextTargetRelationMap);
 
-		// grow prevSourceMap[sourceRef][relationRef]
 		var prevSourceRelationTargetIdx = prevSourceRelationMap != null ? REFMAP.getIdx(prevSourceRelationMap, relationRef) : 0;
 		var prevSourceRelationTargetVal = prevSourceRelationTargetIdx != 0 ? REFMAP.getVal(prevSourceRelationMap, prevSourceRelationTargetIdx) : null;
 		var nextSourceRelationTargetIdx = REFMAP.putRef(nextSourceRelationMap, relationRef);
+		if (nextSourceRelationTargetIdx == 0) return false;
 		var nextSourceRelationTargetVal = REFMAP.getVal(nextSourceRelationMap, nextSourceRelationTargetIdx);
-		if (nextSourceRelationTargetVal == null) { // ok
+		if (nextSourceRelationTargetVal == null) {
 			REFMAP.setVal(nextSourceRelationMap, nextSourceRelationTargetIdx, targetRef);
-			result |= 1;
-		} else if (BEREdges.isRef(nextSourceRelationTargetVal)) { // ok
+		} else if (BEREdges.isRef(nextSourceRelationTargetVal)) {
 			var targetRef2 = BEREdges.asRef(nextSourceRelationTargetVal);
 			if (targetRef == targetRef2) return false;
 			REFMAP.setVal(nextSourceRelationMap, nextSourceRelationTargetIdx, REFSET.from(targetRef, targetRef2));
-			result |= 1;
 		} else if (nextSourceRelationTargetVal == prevSourceRelationTargetVal) {
 			var prevSourceRelationTargetSet = BEREdges.asRefSet(prevSourceRelationTargetVal);
 			var nextSourceRelationTargetSet = REFSET.grow(prevSourceRelationTargetSet);
@@ -145,20 +171,42 @@ class BERStore extends BERState {
 			if (nextSourceRelationTargetCount == REFSET.size(nextSourceRelationTargetSet)) return false;
 		}
 
-		// grow targetMap
-		var prevTargetMap = this.prevTargetMap;
-		var nextTargetMap = this.targetMap;
-		if (prevTargetMap == null) {
-			nextTargetMap = REFMAP.grow(this.prevTargetMap = prevTargetMap = nextTargetMap);
-			if (prevTargetMap == nextTargetMap) {
-				nextTargetMap = REFMAP.copy(nextTargetMap);
+		var prevTargetRelationSourceIdx = prevTargetRelationMap != null ? REFMAP.getIdx(prevTargetRelationMap, relationRef) : 0;
+		var prevTargetRelationSourceVal = prevTargetRelationSourceIdx != 0 ? REFMAP.getVal(prevTargetRelationMap, prevTargetRelationSourceIdx) : null;
+		var nextTargetRelationSourceIdx = REFMAP.putRef(nextTargetRelationMap, relationRef);
+		if (nextTargetRelationSourceIdx == 0) return false;
+		var nextTargetRelationSourceVal = REFMAP.getVal(nextTargetRelationMap, nextTargetRelationSourceIdx);
+		if (nextTargetRelationSourceVal == null) {
+			REFMAP.setVal(nextTargetRelationMap, nextTargetRelationSourceIdx, sourceRef);
+		} else if (BEREdges.isRef(nextTargetRelationSourceVal)) {
+			var sourceRef2 = BEREdges.asRef(nextTargetRelationSourceVal);
+			// if (sourceRef == sourceRef2) {
+			// return false;
+			// }
+			REFMAP.setVal(nextTargetRelationMap, nextTargetRelationSourceIdx, REFSET.from(sourceRef, sourceRef2));
+		} else if (nextTargetRelationSourceVal == prevTargetRelationSourceVal) {
+			var prevTargetRelationSourceSet = BEREdges.asRefSet(prevTargetRelationSourceVal);
+			var nextTargetRelationSourceSet = REFSET.grow(prevTargetRelationSourceSet);
+			if (nextTargetRelationSourceSet == prevTargetRelationSourceSet) {
+				nextTargetRelationSourceSet = REFSET.copy(prevTargetRelationSourceSet);
 			}
+			REFMAP.setVal(nextTargetRelationMap, nextTargetRelationSourceIdx, nextTargetRelationSourceSet);
+			// var nextTargetRelationSourceCount = REFSET.size(nextTargetRelationSourceSet);
+			REFSET.putRef(nextTargetRelationSourceSet, sourceRef);
+			// if (nextTargetRelationSourceCount == REFSET.size(nextTargetRelationSourceSet)) {
+			// return false;
+			// }
 		} else {
-			nextTargetMap = REFMAP.grow(nextTargetMap);
+			var nextTargetRelationSourceSet = REFSET.grow(BEREdges.asRefSet(nextTargetRelationSourceVal));
+			REFMAP.setVal(nextTargetRelationMap, nextTargetRelationSourceIdx, nextTargetRelationSourceSet);
+			// var nextTargetRelationSourceCount = REFSET.size(nextTargetRelationSourceSet);
+			REFSET.putRef(nextTargetRelationSourceSet, sourceRef);
+			// if (nextTargetRelationSourceCount == REFSET.size(nextTargetRelationSourceSet)) {
+			// return false;
+			// }
 		}
-		this.targetMap = nextTargetMap;
 
-		return result != 0;
+		return true;
 	}
 
 	/** ergänzt die als source von target und rel vorkommenden referenzen mit den > 0 gegebenen liefert die anzahl der ergänzten referenzen kopiert diese an den
