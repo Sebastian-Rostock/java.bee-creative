@@ -2,8 +2,10 @@ package bee.creative.ber;
 
 import java.util.Arrays;
 import bee.creative.emu.EMU;
+import bee.creative.emu.Emuable;
+import bee.creative.emu.Emuator;
 
-/** Diese Klasse implementiert Methoden zur Verarbeitung einer steuwertbasierten Menge von Referenen ungleich Null, die als {@code int}-Array mit folgender
+/** Diese Klasse implementiert Methoden zur Verarbeitung einer steuwertbasierten Menge von Referenen ungleich {@code 0}, die als {@code int}-Array mit folgender
  * Struktur gegeben ist: <pre>(size, mask, free, (head, next, item)[mask + 1])</pre> Die Datenfelder haben folgende Bedeutung:
  * <ul>
  * <li>{@code size} - Anzahl der verwalteten Elemente.</li>
@@ -16,14 +18,15 @@ import bee.creative.emu.EMU;
  * </ul>
  *
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public abstract class REFSET {
+public final class REFSET {
 
 	/** Diese Methode liefert eine neue leere Referenzmenge mit Kapazität 2. */
 	public static int[] make() {
 		return new int[]{0, 1, 1, 0, 2, 0, 0, 0, 0};
 	}
 
-	/** Diese Methode liefert eine neue Referenzmenge mit den gegebenen Referenzen {@code ref1} und {@code ref2}. */
+	/** Diese Methode liefert eine neue Referenzmenge mit den gegebenen Referenzen {@code ref1} und {@code ref2}, wenn beide Referenzen ungleich {@code 0}
+	 * sind. */
 	public static int[] from(int ref1, int ref2) {
 		var refset = REFSET.make();
 		REFSET.putRef(refset, ref1);
@@ -31,11 +34,10 @@ public abstract class REFSET {
 		return refset;
 	}
 
-	/** Diese Methode liefert die 1-basierte Position der gegebenen Referenz {@code ref} in der gegebenen Referenzmenge {@code refset}. Wenn die Referenz nicht in
-	 * der Referenzmenge enthalten ist, wird {@code 0} geliefert. **/
+	/** Diese Methode liefert die 1-basierte Position der gegebenen Referenz {@code ref} in der gegebenen Referenzmenge {@code refset}, wenn die Referenz ungleich
+	 * {@code 0} ist. Wenn die Referenz nicht in der Referenzmenge enthalten ist, wird {@code 0} geliefert. **/
 	public static int getIdx(int[] refset, int ref) {
-		if (ref == 0) return 0;
-		var idx = ref & REFSET.mask(refset);
+		var idx = ref & REFSET.getMask(refset);
 		var res = /* refset.head_item_next[idx].head */ refset[(idx * 3) + 3];
 		while (res != 0) {
 			if (ref == /* refset.head_item_next[res-1].item */ refset[(res * 3) + 2]) return res;
@@ -54,42 +56,45 @@ public abstract class REFSET {
 		return 0;
 	}
 
-	/** Diese Methode liefert die Referenz an der gegebenen {@link #getIdx(int[], int) 1-basierten Position} {@code idx}. */
+	/** Diese Methode liefert die Referenz an der gegebenen {@link #getIdx(int[], int) 1-basierten Position} {@code idx}, wenn die Position ungleich {@code 0}
+	 * ist. */
 	public static int getRef(int[] refset, int idx) {
 		return refset[(idx * 3) + 2];
 	}
 
-	/** Diese Methode liefert die 1-basierte Position der gegebenen Referenz {@code ref} in der gegebenen Referenzmenge {@code refset}. Wenn die Referenz nicht in
-	 * der Referenzmenge enthalten ist, wird sie eingefügt. Wenn sie {@code 0} ist oder die Kapazität erschöpft ist, wird {@code 0} geliefert. **/
+	/** Diese Methode liefert die 1-basierte Position der gegebenen Referenz {@code ref} in der gegebenen Referenzmenge {@code refset}, wenn die Referenz ungleich
+	 * {@code 0} ist. Wenn die Referenz nicht in der Referenzmenge enthalten ist, wird sie eingefügt. Wenn die Kapazität erschöpft ist, wird {@code 0}
+	 * geliefert. **/
 	public static int putRef(int[] refset, int ref) {
-		if (ref == 0) return 0;
-		var idx = ref & REFSET.mask(refset);
+		var idx = ref & REFSET.getMask(refset);
 		var res = /* refset.head_item_next[idx].head */ refset[(idx * 3) + 3];
 		while (res != 0) {
 			if (ref == /* refset.head_item_next[res-1].item */ refset[(res * 3) + 2]) return res;
 			res = /* refset.head_item_next[res-1].next */ refset[(res * 3) + 1];
 		}
-		res = /* refset.free */ refset[2];
+		res = REFSET.getFree(refset);
 		if (res == 0) return 0;
-		/* refset.free */ refset[2] = /* refset.head_item_next[res-1].next */ refset[(res * 3) + 1];
+		REFSET.setFree(refset, /* refset.head_item_next[res-1].next */ refset[(res * 3) + 1]);
 		/* refset.head_item_next[res-1].next */ refset[(res * 3) + 1] = /* refset.head_item_next[idx].head */ refset[(idx * 3) + 3];
 		/* refset.head_item_next[idx].head */ refset[(idx * 3) + 3] = res;
 		/* refset.head_item_next[res-1].item */ refset[(res * 3) + 2] = ref;
-		/* refset.size */ refset[0]++;
+		REFSET.setSize(refset, REFSET.getSize(refset) + 1);
 		return res;
 	}
 
+	/** Diese Methode entfernt die gegebenen Referenz {@code ref} aus der gegebenen Referenzmenge {@code refset} und liefert die 1-basierte Position der Referenz,
+	 * wenn die Referenz ungleich {@code 0} ist. Wenn die Referenz nicht in der Referenzmenge enthalten ist, wird {@code 0} geliefert. **/
 	public static int popRef(int[] refset, int ref) {
-		if ((ref == 0) || (REFSET.size(refset) == 0)) return 0;
-		var idx = ref & REFSET.mask(refset);
+		if (REFSET.size(refset) == 0) return 0;
+		var idx = ref & REFSET.getMask(refset);
 		var res = /* refset.head_item_next[idx].head */ refset[(idx * 3) + 3];
 		if (res == 0) return 0;
 		if (ref == /* refset.head_item_next[res-1].item */ refset[(res * 3) + 2]) {
 			/* refset.head_item_next[idx].head */ refset[(idx * 3) + 3] = /* refset.head_item_next[res-1].next */ refset[(res * 3) + 1];
 			/* refset.head_item_next[res-1].next */ refset[(res * 3) + 1] = /* refset.free */ refset[2];
 			/* refset.head_item_next[res-1].item */ refset[(res * 3) + 2] = 0;
-			/* refset.free */ refset[2] = res;
-			/* refset.size */ refset[0]--;
+			REFSET.setFree(refset, res);
+			REFSET.setSize(refset, REFSET.getSize(refset) - 1);
 			return res;
 		}
 		while (true) {
@@ -97,10 +102,10 @@ public abstract class REFSET {
 			if (res2 == 0) return 0;
 			if (ref == /* refset.head_item_next[res2-1].item */ refset[(res2 * 3) + 2]) {
 				/* refset.head_item_next[res-1].head */ refset[(res * 3) + 1] = /* refset.head_item_next[res2-1].next */ refset[(res2 * 3) + 1];
-				/* refset.head_item_next[res2-1].next */ refset[(res2 * 3) + 1] = /* refset.free */ refset[2];
+				/* refset.head_item_next[res2-1].next */ refset[(res2 * 3) + 1] = REFSET.getFree(refset);
 				/* refset.head_item_next[res2-1].item */ refset[(res2 * 3) + 2] = 0;
-				/* refset.free */ refset[2] = res2;
-				/* refset.size */ refset[0]--;
+				REFSET.setFree(refset, res);
+				REFSET.setSize(refset, REFSET.getSize(refset) - 1);
 				return res2;
 			}
 			res = res2;
@@ -109,27 +114,25 @@ public abstract class REFSET {
 
 	/** Diese Methode liefert die Anzahl der Referenzen in der gegebenen Referenzmenge {@code refset}. */
 	public static int size(int[] refset) {
-		return /* refset.size */ refset[0];
+		return REFSET.getSize(refset);
 	}
 
 	/** Diese Methode liefert die gegebenen Referenzmenge {@code refset}, wenn sie die maximale Kapazität besitzt oder darin noch Platz für mindestens eine
 	 * weitere Referenz ist. Andernfalls liefert sie eine Kopie mit doppelter Kapazität. */
 	public static int[] grow(int[] refset) {
-		var size = REFSET.size(refset);
-		var mask = REFSET.mask(refset);
-		return size <= mask ? refset : REFSET.copy(refset, ((mask << 1) & 536870911) | 1);
+		return REFSET.getFree(refset) != 0 ? refset : REFSET.tryCopy(refset, ((REFSET.getMask(refset) << 1) & 536870911) | 1);
 	}
 
 	/** Diese Methode liefert die gegebenen Referenzmenge {@code refset}, wenn sie die minimale Kapazität besitzt oder darin bei halber Kapazität kein Platz für
 	 * eine weitere Referenz ist. Andernfalls liefert sie eine Kopie mit halber Kapazität. */
 	public static int[] pack(int[] refset) {
-		var size = REFSET.size(refset);
-		var mask = REFSET.mask(refset) >> 1;
-		return size > mask ? refset : REFSET.copy(refset, mask | 1);
+		var mask = REFSET.getMask(refset) >> 1;
+		return REFSET.size(refset) > mask ? refset : REFSET.tryCopy(refset, mask | 1);
 	}
 
+	/** Diese Methode liefert eine Kopie der gegebenen Referenzmenge {@code refset}. */
 	public static int[] copy(int[] refset) {
-		var refset2=refset.clone();
+		var refset2 = refset.clone();
 		return refset2;
 	}
 
@@ -169,18 +172,39 @@ public abstract class REFSET {
 		return Arrays.toString(refs);
 	}
 
+	/** @see Emuator#emu(Object) */
 	public static long emu(int[] refset) {
 		return EMU.fromArray(Integer.TYPE, refset.length);
 	}
 
-	static final int[] EMPTY = new int[6];
+	static final int[] EMPTY = new int[]{0, 1, 0, 0, 0, 0, 0, 0, 0};
 
-	static int mask(int[] refset) {
+	static int getSize(int[] refset) {
+		return /* refset.size */ refset[0];
+	}
+
+	static int setSize(int[] refset, int size) {
+		return /* refset.size */ refset[0] = size;
+	}
+
+	static int getMask(int[] refset) {
 		return /* refset.mask */ refset[1];
 	}
 
-	static int[] copy(int[] refset, int mask) {
-		if (mask == REFSET.mask(refset)) return refset;
+	static int setMask(int[] refset, int mask) {
+		return /* refset.mask */ refset[1] = mask;
+	}
+
+	static int getFree(int[] refset) {
+		return /* refset.free */ refset[2];
+	}
+
+	static int setFree(int[] refset, int free) {
+		return /* refset.free */ refset[2] = free;
+	}
+
+	static int[] tryCopy(int[] refset, int mask) {
+		if (mask == REFSET.getMask(refset)) return refset;
 		var free = 1;
 		var refset2 = new int[(mask * 3) + 6];
 		for (var off = refset.length - 1; 3 < off; off -= 3) {
@@ -193,9 +217,9 @@ public abstract class REFSET {
 				free++;
 			}
 		}
-		/* refset2.size*/ refset2[0] = REFSET.size(refset);
-		/* refset2.mask */ refset2[1] = mask;
-		/* refset2.free */ refset2[2] = free;
+		REFSET.setSize(refset2, REFSET.size(refset));
+		REFSET.setMask(refset2, mask);
+		REFSET.setFree(refset2, free);
 		while (free <= mask) {
 			/* refset2.head_item_next[free-1].next */ refset2[(free * 3) + 1] = ++free;
 		}

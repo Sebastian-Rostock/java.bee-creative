@@ -4,7 +4,12 @@ class REFSET_TEST {
 
 	public static void main(String[] args) {
 
-		var a = REFSET.from(0, 0);
+		var x = REFSET.EMPTY;
+		System.out.println(x);
+		System.out.println(REFSET.putRef(x,9));
+		System.out.println(REFSET.pack(x));
+		
+		var a = REFSET.EMPTY;
 		print(a);
 
 		a = REFSET.grow(a);

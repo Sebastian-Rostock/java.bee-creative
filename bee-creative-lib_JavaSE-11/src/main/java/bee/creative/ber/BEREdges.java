@@ -234,10 +234,10 @@ class BEREdges implements Iterable2<BEREdge> {
 
 	/** Dieses Feld speichert die Referenzabbildung gemäß {@link REFMAP} von {@code source}-Referenzen auf Referenzabbildungen gemäß {@link REFMAP} von
 	 * {@code relation}-Referenzen auf {@code target}-Referenzen. Letztere sind dabei als {@link Integer} oder gemäß {@link REFSET} abgebildet. */
-	Object[] sourceMap = REFMAP.make();
+	Object[] sourceMap = REFMAP.EMPTY;
 
 	/** Dieses Feld speichert die Referenzabbildung gemäß {@link REFMAP} von {@code target}-Referenzen auf Referenzabbildungen gemäß {@link REFMAP} von
 	 * {@code relation}-Referenzen auf {@code source}-Referenzen. Letztere sind dabei als {@link Integer} oder gemäß {@link REFSET} abgebildet. */
-	Object[] targetMap = REFMAP.make();
+	Object[] targetMap = REFMAP.EMPTY;
 
 }
