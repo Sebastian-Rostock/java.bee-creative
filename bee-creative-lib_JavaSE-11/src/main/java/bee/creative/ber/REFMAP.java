@@ -5,7 +5,7 @@ import bee.creative.emu.Emuator;
 import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert Methoden zur Verarbeitung einer steuwertbasierten Abbildung von Referenen ungleich {@code 0} auf Elemente ungleich {@code null},
- * die als {@link Object}-Array mit folgender Struktur gegeben ist: <pre>(keys, value[keys.mask + 1])</pre> Die Datenfelder haben folgende Bedeutung:
+ * die als {@link Object}-Array mit folgender Struktur gegeben ist: <pre>(keys, value[keys.mask + 2])</pre> Die Datenfelder haben folgende Bedeutung:
  * <ul>
  * <li>{@code keys} - Referenen gemäß {@link REFSET}.</li>
  * <li>{@code value} - Element oder {@code null}.</li>
@@ -34,7 +34,13 @@ public abstract class REFMAP {
 	/** Diese Methode liefert das Element zur Referenz an der gegebenen {@link #getIdx(Object[], int) 1-basierten Position} {@code idx} der gegebenen
 	 * Referenzabbildung {@code refmap}, wenn die Position ungleich {@code 0} ist. */
 	public static Object getVal(Object[] refmap, int idx) {
-		return refmap[idx];
+		try {
+			return refmap[idx];
+
+		} catch (RuntimeException e) {
+			throw e;
+			// TODO: handle exception
+		}
 	}
 
 	/** Diese Methode setzt das Element {@code val} zur Referenz an der gegebenen {@link #getIdx(Object[], int) 1-basierten Position} {@code idx} der gegebenen
@@ -118,10 +124,14 @@ public abstract class REFMAP {
 		return REFSET.emu(REFMAP.getKeys(refmap)) + EMU.fromArray(Object.class, refmap.length);
 	}
 
-	static final Object[] EMPTY = new Object[]{REFSET.EMPTY, null, null};
+	static final Object[] EMPTY = new Object[]{REFSET.EMPTY, null, null, null};
 
 	static int[] getKeys(Object[] refmap) {
-		return (int[]) /* refmap.keys */ refmap[0];
+		try {
+			return (int[]) /* refmap.keys */ refmap[0];
+		} catch (RuntimeException e) {
+			throw e;
+		}
 	}
 
 	static void setKeys(Object[] refmap, int[] keys) {
@@ -130,9 +140,9 @@ public abstract class REFMAP {
 
 	static Object[] tryCopy(Object[] refmap1, int[] keys1, int[] keys2) {
 		if (keys1 == keys2) return refmap1;
-		var refmap2 = new Object[REFSET.getMask(keys2) + 1];
+		var refmap2 = new Object[REFSET.getMask(keys2) + 2];
 		REFMAP.setKeys(refmap2, keys2);
-		for (var idx1 = REFSET.getMask(keys1); 0 < idx1; idx1--) {
+		for (var idx1 = REFSET.getMask(keys1) + 1; 0 < idx1; idx1--) {
 			var ref = REFSET.getRef(keys1, idx1);
 			if (ref != 0) {
 				REFMAP.setVal(refmap2, REFSET.getIdx(keys2, ref), REFMAP.getVal(refmap1, idx1));

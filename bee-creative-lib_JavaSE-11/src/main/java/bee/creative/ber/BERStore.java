@@ -141,8 +141,16 @@ class BERStore extends BERState {
 		return true;
 	}
 
+	void putAll(BEREdges edges) {
+	
+	}
+
 	public boolean pop(BEREdge edge) {
 		return this.pop(edge.sourceRef, edge.relationRef, edge.targetRef);
+	}
+
+	void popEdges(BEREdges edges) {
+	
 	}
 
 	public boolean pop(int sourceRef, int relationRef, int targetRef) {
@@ -258,14 +266,6 @@ class BERStore extends BERState {
 
 	public Object getOwner() {
 		return owner;
-	}
-
-	void putAll(BEREdges edges) {
-
-	}
-
-	void popEdges(BEREdges edges) {
-
 	}
 
 	public void setRootRef(int rootRef) {
