@@ -2,7 +2,6 @@ package bee.creative.ber;
 
 import java.util.Arrays;
 import bee.creative.emu.EMU;
-import bee.creative.emu.Emuable;
 import bee.creative.emu.Emuator;
 
 /** Diese Klasse implementiert Methoden zur Verarbeitung einer steuwertbasierten Menge von Referenen ungleich {@code 0}, die als {@code int}-Array mit folgender

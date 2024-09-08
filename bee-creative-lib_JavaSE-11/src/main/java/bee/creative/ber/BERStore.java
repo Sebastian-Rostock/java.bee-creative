@@ -5,83 +5,15 @@ package bee.creative.ber;
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 class BERStore extends BERState {
 
-	private Object owner;
-
-	BERStore() {
-		this(null);
-	}
-
-	BERStore(Object owner) {
+	public BERStore(Object owner) {
 		this.owner = owner;
-
 	}
 
-	Object getOwner() {
-		return null;
+	public boolean put(BEREdge edge) {
+		return this.put(edge.sourceRef, edge.relationRef, edge.targetRef);
 	}
 
-	void putEdges(BEREdges edges) {
-
-	}
-
-	void popEdges(BEREdges edges) {
-
-	}
-
-	public void setRootRef(int rootRef) {
-		if (this.prevRootRef == null) {
-			this.prevRootRef = this.rootRef;
-		}
-		this.rootRef = rootRef;
-	}
-
-	public void setNextRef(int nextRef) {
-		if (this.prevNextRef == null) {
-			this.prevNextRef = this.nextRef;
-		}
-		this.nextRef = nextRef;
-	}
-
-	int newEntityRef() {
-		var nextRef = this.nextRef;
-		while (this.isSourceRef(nextRef) || this.isTargetRef(nextRef)) {
-			nextRef++;
-		}
-		this.setNewEntityRef(nextRef + 1);
-		return nextRef;
-	}
-
-	/** Diese Methode gibt das zurück. wenn gegebener nodeRef als source oder target vorkommt, in cow-nodeRefGen eintragen und aus source/target maps entfernen
-	 *
-	 * @param entityRef */
-	void popEntityRef(int entityRef) {
-
-	}
-
-	/** Diese Methode gibt das zurück. übernimmt die gegebenen refs zur wiederverwendung. weitere werden nach dem größten automatisch ergänzt. duplikate und refs
-	 * <=0 nicht zulässig. leere liste nicht zulässig. */
-	void setNewEntityRef(int entityRef) {
-
-	}
-
-	/** Diese Methode gibt das zurück. ersetzt die als source von target und rel vorkommenden referenzen mit den > 0 gegebenen liefert die anzahl der
-	 * einzigartigen referenzen kopiert diese an den beginn von sourceRefs
-	 *
-	 * @param targetRef
-	 * @param relationRef
-	 * @param sourceRefs
-	 * @return */
-	int setSourceRefs(int targetRef, int relationRef, int[] sourceRefs) {
-
-		return 0;
-	}
-
-	public boolean putEdge(BEREdge edge) {
-		if (edge == null) return false;
-		return this.putEdge(edge.sourceRef, edge.relationRef, edge.targetRef);
-	}
-
-	public boolean putEdge(int sourceRef, int relationRef, int targetRef) {
+	public boolean put(int sourceRef, int relationRef, int targetRef) {
 		if ((sourceRef == 0) || (relationRef == 0) || (targetRef == 0)) return false;
 
 		var prevSourceMap = this.prevSourceMap;
@@ -209,6 +141,181 @@ class BERStore extends BERState {
 		return true;
 	}
 
+	public boolean pop(BEREdge edge) {
+		return this.pop(edge.sourceRef, edge.relationRef, edge.targetRef);
+	}
+
+	public boolean pop(int sourceRef, int relationRef, int targetRef) {
+		if ((sourceRef == 0) || (relationRef == 0) || (targetRef == 0)) return false;
+
+		var nextSourceMap = this.sourceMap;
+		var nextSourceIdx = REFMAP.getIdx(nextSourceMap, sourceRef);
+		if (nextSourceIdx == 0) return false;
+
+		var nextTargetMap = this.targetMap;
+		var nextTargetIdx = REFMAP.getIdx(nextTargetMap, targetRef);
+		if (nextTargetIdx == 0) return false;
+
+		var prevSourceMap = this.prevSourceMap;
+		if (prevSourceMap == null) {
+			nextSourceMap = REFMAP.copy(this.prevSourceMap = prevSourceMap = nextSourceMap);
+		}
+
+		var prevTargetMap = this.prevTargetMap;
+		if (prevTargetMap == null) {
+			nextTargetMap = REFMAP.copy(this.prevTargetMap = prevTargetMap = nextTargetMap);
+		}
+
+		var prevSourceIdx = REFMAP.getIdx(prevSourceMap, sourceRef);
+		var prevSourceRelationMap = prevSourceIdx != 0 ? BEREdges.asRefMap(REFMAP.getVal(prevSourceMap, prevSourceIdx)) : null;
+		var nextSourceRelationMap = BEREdges.asRefMap(REFMAP.getVal(nextSourceMap, nextSourceIdx));
+		if (nextSourceRelationMap == prevSourceRelationMap) {
+			nextSourceRelationMap = REFMAP.copy(nextSourceRelationMap);
+			REFMAP.setVal(nextSourceMap, nextSourceIdx, nextSourceRelationMap);
+		}
+
+		var prevTargetIdx = REFMAP.getIdx(prevTargetMap, targetRef);
+		var prevTargetRelationMap = prevTargetIdx != 0 ? BEREdges.asRefMap(REFMAP.getVal(prevTargetMap, prevTargetIdx)) : null;
+		var nextTargetRelationMap = BEREdges.asRefMap(REFMAP.getVal(nextTargetMap, nextTargetIdx));
+		if (nextTargetRelationMap == prevTargetRelationMap) {
+			nextTargetRelationMap = REFMAP.copy(nextTargetRelationMap);
+			REFMAP.setVal(nextTargetMap, nextTargetIdx, nextTargetRelationMap);
+		}
+
+		var nextSourceRelationIdx = REFMAP.getIdx(nextSourceRelationMap, relationRef);
+		if (nextSourceRelationIdx == 0) return false;
+		var nextSourceRelationTargetVal = REFMAP.getVal(nextSourceRelationMap, nextSourceRelationIdx);
+
+		var nextTargetRelationIdx = REFMAP.putRef(nextTargetRelationMap, relationRef);
+		if (nextTargetRelationIdx == 0) return false; // IllegalState
+		var nextTargetRelationSourceVal = REFMAP.getVal(nextTargetRelationMap, nextTargetRelationIdx);
+
+		if (BEREdges.isRef(nextSourceRelationTargetVal)) {
+			var targetRef2 = BEREdges.asRef(nextSourceRelationTargetVal);
+			if (targetRef != targetRef2) return false;
+			REFMAP.setVal(nextSourceRelationMap, REFMAP.popRef(nextSourceRelationMap, relationRef), null);
+			if (REFMAP.size(nextSourceRelationMap) == 0) {
+				REFMAP.setVal(nextSourceMap, REFMAP.popRef(nextSourceMap, sourceRef), null);
+				this.sourceMap = REFMAP.pack(nextSourceMap);
+			} else {
+				REFMAP.setVal(nextSourceMap, nextSourceIdx, REFMAP.pack(nextSourceRelationMap));
+			}
+		} else {
+			var nextSourceRelationTargetSet = BEREdges.asRefSet(nextSourceRelationTargetVal);
+			var prevSourceRelationIdx = prevSourceRelationMap != null ? REFMAP.getIdx(prevSourceRelationMap, relationRef) : 0;
+			var prevSourceRelationTargetVal = prevSourceRelationIdx != 0 ? REFMAP.getVal(prevSourceRelationMap, prevSourceRelationIdx) : null;
+			if (nextSourceRelationTargetSet == prevSourceRelationTargetVal) {
+				nextSourceRelationTargetSet = REFSET.copy(BEREdges.asRefSet(nextSourceRelationTargetVal));
+			}
+			var nextSourceRelationTargetIdx = REFSET.popRef(nextSourceRelationTargetSet, targetRef);
+			if (nextSourceRelationTargetIdx == 0) return false;
+			if (REFSET.size(nextSourceRelationTargetSet) == 0) {
+				REFMAP.setVal(nextSourceRelationMap, nextSourceRelationIdx, null);
+				if (REFMAP.size(nextSourceRelationMap) == 0) {
+					REFMAP.setVal(nextSourceMap, REFMAP.popRef(nextSourceMap, sourceRef), null);
+					this.sourceMap = REFMAP.pack(nextSourceMap);
+				} else {
+					REFMAP.setVal(nextSourceMap, nextSourceIdx, REFMAP.pack(nextSourceRelationMap));
+				}
+			} else {
+				REFMAP.setVal(nextSourceRelationMap, nextSourceRelationIdx, REFSET.pack(nextSourceRelationTargetSet));
+			}
+		}
+
+		if (BEREdges.isRef(nextTargetRelationSourceVal)) {
+			// var sourceRef2 = BEREdges.asRef(nextTargetRelationSourceVal);
+			// if (sourceRef != sourceRef2) return false;
+			REFMAP.setVal(nextTargetRelationMap, REFMAP.popRef(nextTargetRelationMap, relationRef), null);
+			if (REFMAP.size(nextTargetRelationMap) == 0) {
+				REFMAP.setVal(nextTargetMap, REFMAP.popRef(nextTargetMap, targetRef), null);
+				this.targetMap = REFMAP.pack(nextTargetMap);
+			} else {
+				REFMAP.setVal(nextTargetMap, nextTargetIdx, REFMAP.pack(nextTargetRelationMap));
+			}
+		} else {
+			var nextTargetRelationSourceSet = BEREdges.asRefSet(nextTargetRelationSourceVal);
+			var prevTargetRelationIdx = prevTargetRelationMap != null ? REFMAP.getIdx(prevTargetRelationMap, relationRef) : 0;
+			var prevTargetRelationSourceVal = prevTargetRelationIdx != 0 ? REFMAP.getVal(prevTargetRelationMap, prevTargetRelationIdx) : null;
+			if (nextTargetRelationSourceSet == prevTargetRelationSourceVal) {
+				nextTargetRelationSourceSet = REFSET.copy(BEREdges.asRefSet(nextTargetRelationSourceVal));
+			}
+			REFSET.popRef(nextTargetRelationSourceSet, sourceRef);
+			if (REFSET.size(nextTargetRelationSourceSet) == 0) {
+				REFMAP.setVal(nextTargetRelationMap, nextTargetRelationIdx, null);
+				if (REFMAP.size(nextTargetRelationMap) == 0) {
+					REFMAP.setVal(nextTargetMap, REFMAP.popRef(nextTargetMap, targetRef), null);
+					this.targetMap = REFMAP.pack(nextTargetMap);
+				} else {
+					REFMAP.setVal(nextTargetMap, nextTargetIdx, REFMAP.pack(nextTargetRelationMap));
+				}
+			} else {
+				REFMAP.setVal(nextTargetRelationMap, nextTargetRelationIdx, REFSET.pack(nextTargetRelationSourceSet));
+			}
+		}
+
+		return true;
+	}
+
+	public Object getOwner() {
+		return owner;
+	}
+
+	void putAll(BEREdges edges) {
+
+	}
+
+	void popEdges(BEREdges edges) {
+
+	}
+
+	public void setRootRef(int rootRef) {
+		if (this.prevRootRef == null) {
+			this.prevRootRef = this.rootRef;
+		}
+		this.rootRef = rootRef;
+	}
+
+	public void setNextRef(int nextRef) {
+		if (this.prevNextRef == null) {
+			this.prevNextRef = this.nextRef;
+		}
+		this.nextRef = nextRef;
+	}
+
+	int newEntityRef() {
+		var nextRef = this.nextRef;
+		while (this.isSourceRef(nextRef) || this.isTargetRef(nextRef)) {
+			nextRef++;
+		}
+		this.setNewEntityRef(nextRef + 1);
+		return nextRef;
+	}
+
+	/** Diese Methode gibt das zurück. wenn gegebener nodeRef als source oder target vorkommt, in cow-nodeRefGen eintragen und aus source/target maps entfernen
+	 *
+	 * @param entityRef */
+	void popEntityRef(int entityRef) {
+
+	}
+
+	/** Diese Methode gibt das zurück. übernimmt die gegebenen refs zur wiederverwendung. weitere werden nach dem größten automatisch ergänzt. duplikate und refs
+	 * <=0 nicht zulässig. leere liste nicht zulässig. */
+	void setNewEntityRef(int entityRef) {
+
+	}
+
+	/** Diese Methode gibt das zurück. ersetzt die als source von target und rel vorkommenden referenzen mit den > 0 gegebenen liefert die anzahl der
+	 * einzigartigen referenzen kopiert diese an den beginn von sourceRefs
+	 *
+	 * @param targetRef
+	 * @param relationRef
+	 * @param sourceRefs
+	 * @return */
+	int setSourceRefs(int targetRef, int relationRef, int[] sourceRefs) {
+
+		return 0;
+	}
+
 	/** ergänzt die als source von target und rel vorkommenden referenzen mit den > 0 gegebenen liefert die anzahl der ergänzten referenzen kopiert diese an den
 	 * beginn von sourceRefs */
 	int putSourceRefs(int targetRef, int relationRef, int[] sourceRefs) {
@@ -244,6 +351,8 @@ class BERStore extends BERState {
 	BERUpdate rollback(BERState state) {
 		return null;
 	}
+
+	Object owner;
 
 	Integer prevRootRef;
 
