@@ -9,10 +9,12 @@ class BERStore extends BERState {
 		this.owner = owner;
 	}
 
+	@Override
 	public boolean put(BEREdge edge) {
 		return this.put(edge.sourceRef, edge.relationRef, edge.targetRef);
 	}
 
+	@Override
 	public boolean put(int sourceRef, int relationRef, int targetRef) {
 		if ((sourceRef == 0) || (relationRef == 0) || (targetRef == 0)) return false;
 
@@ -75,10 +77,10 @@ class BERStore extends BERState {
 		REFMAP.setVal(nextTargetMap, nextTargetRelationIdx, nextTargetRelationMap);
 
 		var prevSourceRelationTargetIdx = prevSourceRelationMap != null ? REFMAP.getIdx(prevSourceRelationMap, relationRef) : 0;
-		var prevSourceRelationTargetVal = prevSourceRelationTargetIdx != 0 ? REFMAP.getVal(prevSourceRelationMap, prevSourceRelationTargetIdx) : null;
+		var prevSourceRelationTargetVal = prevSourceRelationTargetIdx != 0 ? asRefVal(REFMAP.getVal(prevSourceRelationMap, prevSourceRelationTargetIdx) ): null;
 		var nextSourceRelationTargetIdx = REFMAP.putRef(nextSourceRelationMap, relationRef);
 		if (nextSourceRelationTargetIdx == 0) return false;
-		var nextSourceRelationTargetVal = REFMAP.getVal(nextSourceRelationMap, nextSourceRelationTargetIdx);
+		var nextSourceRelationTargetVal =asRefVal( REFMAP.getVal(nextSourceRelationMap, nextSourceRelationTargetIdx));
 		if (nextSourceRelationTargetVal == null) {
 			REFMAP.setVal(nextSourceRelationMap, nextSourceRelationTargetIdx, targetRef);
 		} else if (BEREdges.isRef(nextSourceRelationTargetVal)) {
@@ -86,7 +88,7 @@ class BERStore extends BERState {
 			if (targetRef == targetRef2) return false;
 			REFMAP.setVal(nextSourceRelationMap, nextSourceRelationTargetIdx, REFSET.from(targetRef, targetRef2));
 		} else if (nextSourceRelationTargetVal == prevSourceRelationTargetVal) {
-			var prevSourceRelationTargetSet = BEREdges.asRefSet(prevSourceRelationTargetVal);
+			var prevSourceRelationTargetSet = prevSourceRelationTargetVal;
 			var nextSourceRelationTargetSet = REFSET.grow(prevSourceRelationTargetSet);
 			if (nextSourceRelationTargetSet == prevSourceRelationTargetSet) {
 				nextSourceRelationTargetSet = REFSET.copy(prevSourceRelationTargetSet);
@@ -96,7 +98,7 @@ class BERStore extends BERState {
 			REFSET.putRef(nextSourceRelationTargetSet, targetRef);
 			if (nextSourceRelationTargetCount == REFSET.size(nextSourceRelationTargetSet)) return false;
 		} else {
-			var nextSourceRelationTargetSet = REFSET.grow(BEREdges.asRefSet(nextSourceRelationTargetVal));
+			var nextSourceRelationTargetSet = REFSET.grow(nextSourceRelationTargetVal);
 			REFMAP.setVal(nextSourceRelationMap, nextSourceRelationTargetIdx, nextSourceRelationTargetSet);
 			var nextSourceRelationTargetCount = REFSET.size(nextSourceRelationTargetSet);
 			REFSET.putRef(nextSourceRelationTargetSet, targetRef);
@@ -104,10 +106,10 @@ class BERStore extends BERState {
 		}
 
 		var prevTargetRelationSourceIdx = prevTargetRelationMap != null ? REFMAP.getIdx(prevTargetRelationMap, relationRef) : 0;
-		var prevTargetRelationSourceVal = prevTargetRelationSourceIdx != 0 ? REFMAP.getVal(prevTargetRelationMap, prevTargetRelationSourceIdx) : null;
+		var prevTargetRelationSourceVal = prevTargetRelationSourceIdx != 0 ? asRefVal(REFMAP.getVal(prevTargetRelationMap, prevTargetRelationSourceIdx)) : null;
 		var nextTargetRelationSourceIdx = REFMAP.putRef(nextTargetRelationMap, relationRef);
 		if (nextTargetRelationSourceIdx == 0) return false;
-		var nextTargetRelationSourceVal = REFMAP.getVal(nextTargetRelationMap, nextTargetRelationSourceIdx);
+		var nextTargetRelationSourceVal =asRefVal( REFMAP.getVal(nextTargetRelationMap, nextTargetRelationSourceIdx));
 		if (nextTargetRelationSourceVal == null) {
 			REFMAP.setVal(nextTargetRelationMap, nextTargetRelationSourceIdx, sourceRef);
 		} else if (BEREdges.isRef(nextTargetRelationSourceVal)) {
@@ -117,7 +119,7 @@ class BERStore extends BERState {
 			// }
 			REFMAP.setVal(nextTargetRelationMap, nextTargetRelationSourceIdx, REFSET.from(sourceRef, sourceRef2));
 		} else if (nextTargetRelationSourceVal == prevTargetRelationSourceVal) {
-			var prevTargetRelationSourceSet = BEREdges.asRefSet(prevTargetRelationSourceVal);
+			var prevTargetRelationSourceSet = prevTargetRelationSourceVal;
 			var nextTargetRelationSourceSet = REFSET.grow(prevTargetRelationSourceSet);
 			if (nextTargetRelationSourceSet == prevTargetRelationSourceSet) {
 				nextTargetRelationSourceSet = REFSET.copy(prevTargetRelationSourceSet);
@@ -129,7 +131,7 @@ class BERStore extends BERState {
 			// return false;
 			// }
 		} else {
-			var nextTargetRelationSourceSet = REFSET.grow(BEREdges.asRefSet(nextTargetRelationSourceVal));
+			var nextTargetRelationSourceSet = REFSET.grow(nextTargetRelationSourceVal);
 			REFMAP.setVal(nextTargetRelationMap, nextTargetRelationSourceIdx, nextTargetRelationSourceSet);
 			// var nextTargetRelationSourceCount = REFSET.size(nextTargetRelationSourceSet);
 			REFSET.putRef(nextTargetRelationSourceSet, sourceRef);
@@ -141,18 +143,18 @@ class BERStore extends BERState {
 		return true;
 	}
 
-	void putAll(BEREdges edges) {
-	
+	@Override
+	public boolean putAll(BEREdges edges) {
+		return this.defaultPutAll(edges);
 	}
 
-	public boolean pop(BEREdge edge) {
-		return this.pop(edge.sourceRef, edge.relationRef, edge.targetRef);
-	}
+ 
 
 	void popEdges(BEREdges edges) {
-	
+
 	}
 
+	@Override
 	public boolean pop(int sourceRef, int relationRef, int targetRef) {
 		if ((sourceRef == 0) || (relationRef == 0) || (targetRef == 0)) return false;
 
@@ -192,11 +194,11 @@ class BERStore extends BERState {
 
 		var nextSourceRelationIdx = REFMAP.getIdx(nextSourceRelationMap, relationRef);
 		if (nextSourceRelationIdx == 0) return false;
-		var nextSourceRelationTargetVal = REFMAP.getVal(nextSourceRelationMap, nextSourceRelationIdx);
+		var nextSourceRelationTargetVal =asRefVal( REFMAP.getVal(nextSourceRelationMap, nextSourceRelationIdx));
 
 		var nextTargetRelationIdx = REFMAP.putRef(nextTargetRelationMap, relationRef);
 		if (nextTargetRelationIdx == 0) return false; // IllegalState
-		var nextTargetRelationSourceVal = REFMAP.getVal(nextTargetRelationMap, nextTargetRelationIdx);
+		var nextTargetRelationSourceVal =asRefVal( REFMAP.getVal(nextTargetRelationMap, nextTargetRelationIdx));
 
 		if (BEREdges.isRef(nextSourceRelationTargetVal)) {
 			var targetRef2 = BEREdges.asRef(nextSourceRelationTargetVal);
@@ -209,11 +211,11 @@ class BERStore extends BERState {
 				REFMAP.setVal(nextSourceMap, nextSourceIdx, REFMAP.pack(nextSourceRelationMap));
 			}
 		} else {
-			var nextSourceRelationTargetSet = BEREdges.asRefSet(nextSourceRelationTargetVal);
+			var nextSourceRelationTargetSet = nextSourceRelationTargetVal;
 			var prevSourceRelationIdx = prevSourceRelationMap != null ? REFMAP.getIdx(prevSourceRelationMap, relationRef) : 0;
 			var prevSourceRelationTargetVal = prevSourceRelationIdx != 0 ? REFMAP.getVal(prevSourceRelationMap, prevSourceRelationIdx) : null;
 			if (nextSourceRelationTargetSet == prevSourceRelationTargetVal) {
-				nextSourceRelationTargetSet = REFSET.copy(BEREdges.asRefSet(nextSourceRelationTargetVal));
+				nextSourceRelationTargetSet = REFSET.copy(nextSourceRelationTargetVal);
 			}
 			var nextSourceRelationTargetIdx = REFSET.popRef(nextSourceRelationTargetSet, targetRef);
 			if (nextSourceRelationTargetIdx == 0) return false;
@@ -241,11 +243,11 @@ class BERStore extends BERState {
 				REFMAP.setVal(nextTargetMap, nextTargetIdx, REFMAP.pack(nextTargetRelationMap));
 			}
 		} else {
-			var nextTargetRelationSourceSet = BEREdges.asRefSet(nextTargetRelationSourceVal);
+			var nextTargetRelationSourceSet = nextTargetRelationSourceVal;
 			var prevTargetRelationIdx = prevTargetRelationMap != null ? REFMAP.getIdx(prevTargetRelationMap, relationRef) : 0;
 			var prevTargetRelationSourceVal = prevTargetRelationIdx != 0 ? REFMAP.getVal(prevTargetRelationMap, prevTargetRelationIdx) : null;
 			if (nextTargetRelationSourceSet == prevTargetRelationSourceVal) {
-				nextTargetRelationSourceSet = REFSET.copy(BEREdges.asRefSet(nextTargetRelationSourceVal));
+				nextTargetRelationSourceSet = REFSET.copy(nextTargetRelationSourceVal);
 			}
 			REFSET.popRef(nextTargetRelationSourceSet, sourceRef);
 			if (REFSET.size(nextTargetRelationSourceSet) == 0) {
@@ -265,9 +267,10 @@ class BERStore extends BERState {
 	}
 
 	public Object getOwner() {
-		return owner;
+		return this.owner;
 	}
 
+	@Override
 	public void setRootRef(int rootRef) {
 		if (this.prevRootRef == null) {
 			this.prevRootRef = this.rootRef;
@@ -275,6 +278,7 @@ class BERStore extends BERState {
 		this.rootRef = rootRef;
 	}
 
+	@Override
 	public void setNextRef(int nextRef) {
 		if (this.prevNextRef == null) {
 			this.prevNextRef = this.nextRef;

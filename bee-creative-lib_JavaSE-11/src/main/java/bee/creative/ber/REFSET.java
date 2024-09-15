@@ -3,19 +3,31 @@ package bee.creative.ber;
 import java.util.Arrays;
 import bee.creative.emu.EMU;
 import bee.creative.emu.Emuator;
+import bee.creative.util.HashMapII;
 
-/** Diese Klasse implementiert Methoden zur Verarbeitung einer steuwertbasierten Menge von Referenen ungleich {@code 0}, die als {@code int}-Array mit folgender
- * Struktur gegeben ist: <pre>(size, mask, free, (head, next, item)[mask + 1])</pre> Die Datenfelder haben folgende Bedeutung:
- * <ul>
- * <li>{@code size} - Anzahl der verwalteten Elemente.</li>
- * <li>{@code mask} - Bitmaske zur Umrechnung eines Elements in die Position des zugehörigen Listenkopfes. Die Bitmaske ist stets größer als 0, kleiner als eine
- * Milliarde und eins kleiner als eine Potenz von Zwei.</li>
- * <li>{@code free} - 1-basierte Position des nächsten unbenutzten {@code item} oder {@code 0}.</li>
- * <li>{@code head} - 1-basierte Position der ersten Referenz in der einfach verketteten Liste oder {@code 0}.</li>
- * <li>{@code next} - 1-basierte Position des nächsten Referenz in der einfach verketteten Liste oder {@code 0}.</li>
- * <li>{@code item} - Referenz oder {@code 0}.</li>
- * </ul>
- *
+/** Diese Klasse implementiert Methoden zur Verarbeitung einer steuwertbasierten Menge von Referenen ungleich {@code 0} mit durchschnittlich 4 Speicherzugriffen
+ * zum {@link #getIdx(int[], int) Finden} einer vorhandenen Referenz. Die Menge ist als {@code int}-Array mit folgender Struktur umgesetzt:
+ * <dl>
+ * <dt>{@code (size, mask, free, (head, next, item)[mask + 1])}
+ * <dd>
+ * <dl>
+ * <dt>{@code size}</dt>
+ * <dd>Anzahl der verwalteten Elemente.</dd>
+ * <dt>{@code mask}</dt>
+ * <dd>Bitmaske zur Umrechnung eines Elements in die Position des zugehörigen Listenkopfes.<br>
+ * Die Bitmaske ist stets größer als 0, kleiner als eine Milliarde und eins kleiner als eine Potenz von Zwei.</dd>
+ * <dt>{@code free}</dt>
+ * <dd>1-basierte Position des nächsten unbenutzten {@code item} oder {@code 0}.</dd>
+ * <dt>{@code head}</dt>
+ * <dd>1-basierte Position der ersten Referenz in der einfach verketteten Liste oder {@code 0}.</dd>
+ * <dt>{@code next}</dt>
+ * <dd>1-basierte Position des nächsten Referenz in der einfach verketteten Liste oder {@code 0}.</dd>
+ * <dt>{@code item}</dt>
+ * <dd>Referenz oder {@code 0}.</dd>
+ * </dl>
+ * </dd>
+ * </dl>
+ * 
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class REFSET {
 
@@ -163,6 +175,41 @@ public final class REFSET {
 		}
 		return refs;
 	}
+
+	// public static HashMapII toCollisions(int[] refset) {
+	// var res = new HashMapII();
+	//
+	// var mask = getMask(refset);
+	//
+	// for (var idx = 0; idx <= mask; idx++) {
+	// var count = 0;
+	// for (var idx2 = /* refset.head_item_next[idx].head */ refset[(idx * 3) + 3]; idx2 != 0; idx2 =
+	// /* refset.head_item_next[idx-1].next */ refset[(idx2 * 3) + 1]) {
+	// count++;
+	// }
+	// if (count != 0) {
+	// res.add(count, count);
+	// }
+	// }
+	// return res;
+	// }
+	//
+	// public static float toAccess(int[] refset) {
+	// var s = getSize(refset);
+	// var x = toCollisions(refset);
+	// //
+	// var res = new float[1];
+	// res[0] = s * 4;// length, mask
+	// x.forEach((colls, items) -> {
+	// var b = 0;
+	// for (var a = 1; a < colls; a++) {
+	// b += a * 2;
+	// }
+	// b = b * (items / colls);
+	// res[0] += b;
+	// });
+	// return res[0] / s;
+	// }
 
 	/** Diese Methode liefert die Textdarstellung der gegebenen Referenzmenge {@code refset}. */
 	public static String toString(int[] refset) {

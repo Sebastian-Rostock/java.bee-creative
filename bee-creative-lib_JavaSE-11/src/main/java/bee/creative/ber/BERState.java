@@ -6,11 +6,20 @@ class BERState extends BEREdges {
 		return this.rootRef;
 	}
 
+	public void setRootRef(int rootRef) {
+		this.rootRef = rootRef;
+	}
+
 	public int getNextRef() {
 		return this.nextRef;
+	}
+
+	public void setNextRef(int nextRef) {
+		this.nextRef = nextRef;
 	}
 
 	int rootRef;
 
 	int nextRef;
+
 }
