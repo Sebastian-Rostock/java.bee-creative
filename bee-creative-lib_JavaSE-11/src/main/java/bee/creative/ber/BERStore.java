@@ -9,37 +9,123 @@ class BERStore extends BERState {
 		this.owner = owner;
 	}
 
-	@Override
-	public boolean put(BEREdge edge) {
-		return this.put(edge.sourceRef, edge.relationRef, edge.targetRef);
+	public Object getOwner() {
+		return this.owner;
 	}
 
 	@Override
-	public boolean put(int sourceRef, int relationRef, int targetRef) {
-		if ((sourceRef == 0) || (relationRef == 0) || (targetRef == 0)) return false;
+	public void clear() {
+		if (this.prevSourceMap == null) {
+			this.prevSourceMap = this.sourceMap;
+			this.prevTargetMap = this.targetMap;
+		}
+		super.clear();
+	}
+
+	@Override
+	public void setRootRef(int rootRef) {
+		if (this.prevRootRef == null) {
+			this.prevRootRef = this.rootRef;
+		}
+		this.rootRef = rootRef;
+	}
+
+	@Override
+	public void setNextRef(int nextRef) {
+		if (this.prevNextRef == null) {
+			this.prevNextRef = this.nextRef;
+		}
+		this.nextRef = nextRef;
+	}
+
+	int newEntityRef() {
+		var nextRef = this.nextRef;
+		while (this.isSourceRef(nextRef) || this.isTargetRef(nextRef)) {
+			nextRef++;
+		}
+		this.setNewEntityRef(nextRef + 1);
+		return nextRef;
+	}
+
+	/** Diese Methode gibt das zurück. wenn gegebener nodeRef als source oder target vorkommt, in cow-nodeRefGen eintragen und aus source/target maps entfernen
+	 *
+	 * @param entityRef */
+	void popEntityRef(int entityRef) {
+
+	}
+
+	/** Diese Methode gibt das zurück. übernimmt die gegebenen refs zur wiederverwendung. weitere werden nach dem größten automatisch ergänzt. duplikate und refs
+	 * <=0 nicht zulässig. leere liste nicht zulässig. */
+	void setNewEntityRef(int entityRef) {
+
+	}
+
+	/** Diese Methode gibt das zurück. ersetzt die als source von target und rel vorkommenden referenzen mit den > 0 gegebenen liefert die anzahl der
+	 * einzigartigen referenzen kopiert diese an den beginn von sourceRefs
+	 *
+	 * @param targetRef
+	 * @param relationRef
+	 * @param sourceRefs
+	 * @return */
+	int setSourceRefs(int targetRef, int relationRef, int[] sourceRefs) {
+
+		return 0;
+	}
+
+	/** ergänzt die als source von target und rel vorkommenden referenzen mit den > 0 gegebenen liefert die anzahl der ergänzten referenzen kopiert diese an den
+	 * beginn von sourceRefs */
+	int putSourceRefs(int targetRef, int relationRef, int[] sourceRefs) {
+		return 0;
+	}
+
+	/** entfernt von den als source von target und rel vorkommenden referenzen die > 0 gegebenen liefert die anzahl der entfernten referenzen kopiert diese an den
+	 * beginn von sourceRefs */
+	int popSourceRefs(int targetRef, int relationRef, int[] sourceRefs) {
+		return 0;
+	}
+
+	public BERUpdate commit() {
+		return new BERUpdate(this, true);
+	}
+
+	/** verwirft die änderungen seit dem letzten commit. das betrifft getRootRef, getEntityRefs, getSource..., getTarget... */
+	public BERUpdate rollback() {
+		return new BERUpdate(this, false);
+	}
+
+	public BERUpdate setState(BERState2 state) {
+		this.clear();
+		this.setNextRef(state.nextRef);
+		this.setRootRef(state.rootRef);
+		this.sourceMap = state.sourceMap;
+		this.targetMap = state.targetMap;
+		return null;
+	}
+
+	@Override
+	boolean customPut(int sourceRef, int relationRef, int targetRef) {
 
 		var prevSourceMap = this.prevSourceMap;
+		var prevTargetMap = this.prevTargetMap;
 		var nextSourceMap = this.sourceMap;
+		var nextTargetMap = this.targetMap;
+
 		if (prevSourceMap == null) {
-			nextSourceMap = REFMAP.grow(this.prevSourceMap = prevSourceMap = nextSourceMap);
+			nextSourceMap = REFMAP.grow(prevSourceMap = nextSourceMap);
+			nextTargetMap = REFMAP.grow(prevTargetMap = nextTargetMap);
 			if (prevSourceMap == nextSourceMap) {
 				nextSourceMap = REFMAP.copy(nextSourceMap);
 			}
-		} else {
-			nextSourceMap = REFMAP.grow(nextSourceMap);
-		}
-		this.sourceMap = nextSourceMap;
-
-		var prevTargetMap = this.prevTargetMap;
-		var nextTargetMap = this.targetMap;
-		if (prevTargetMap == null) {
-			nextTargetMap = REFMAP.grow(this.prevTargetMap = prevTargetMap = nextTargetMap);
 			if (prevTargetMap == nextTargetMap) {
 				nextTargetMap = REFMAP.copy(nextTargetMap);
 			}
+			this.prevSourceMap = prevSourceMap;
+			this.prevTargetMap = prevTargetMap;
 		} else {
+			nextSourceMap = REFMAP.grow(nextSourceMap);
 			nextTargetMap = REFMAP.grow(nextTargetMap);
 		}
+		this.sourceMap = nextSourceMap;
 		this.targetMap = nextTargetMap;
 
 		var prevSourceRelationIdx = REFMAP.getIdx(prevSourceMap, sourceRef);
@@ -77,12 +163,13 @@ class BERStore extends BERState {
 		REFMAP.setVal(nextTargetMap, nextTargetRelationIdx, nextTargetRelationMap);
 
 		var prevSourceRelationTargetIdx = prevSourceRelationMap != null ? REFMAP.getIdx(prevSourceRelationMap, relationRef) : 0;
-		var prevSourceRelationTargetVal = prevSourceRelationTargetIdx != 0 ? asRefVal(REFMAP.getVal(prevSourceRelationMap, prevSourceRelationTargetIdx) ): null;
+		var prevSourceRelationTargetVal =
+			prevSourceRelationTargetIdx != 0 ? BEREdges.asRefVal(REFMAP.getVal(prevSourceRelationMap, prevSourceRelationTargetIdx)) : null;
 		var nextSourceRelationTargetIdx = REFMAP.putRef(nextSourceRelationMap, relationRef);
 		if (nextSourceRelationTargetIdx == 0) return false;
-		var nextSourceRelationTargetVal =asRefVal( REFMAP.getVal(nextSourceRelationMap, nextSourceRelationTargetIdx));
+		var nextSourceRelationTargetVal = BEREdges.asRefVal(REFMAP.getVal(nextSourceRelationMap, nextSourceRelationTargetIdx));
 		if (nextSourceRelationTargetVal == null) {
-			REFMAP.setVal(nextSourceRelationMap, nextSourceRelationTargetIdx, targetRef);
+			REFMAP.setVal(nextSourceRelationMap, nextSourceRelationTargetIdx, BEREdges.toRef(targetRef));
 		} else if (BEREdges.isRef(nextSourceRelationTargetVal)) {
 			var targetRef2 = BEREdges.asRef(nextSourceRelationTargetVal);
 			if (targetRef == targetRef2) return false;
@@ -106,12 +193,13 @@ class BERStore extends BERState {
 		}
 
 		var prevTargetRelationSourceIdx = prevTargetRelationMap != null ? REFMAP.getIdx(prevTargetRelationMap, relationRef) : 0;
-		var prevTargetRelationSourceVal = prevTargetRelationSourceIdx != 0 ? asRefVal(REFMAP.getVal(prevTargetRelationMap, prevTargetRelationSourceIdx)) : null;
+		var prevTargetRelationSourceVal =
+			prevTargetRelationSourceIdx != 0 ? BEREdges.asRefVal(REFMAP.getVal(prevTargetRelationMap, prevTargetRelationSourceIdx)) : null;
 		var nextTargetRelationSourceIdx = REFMAP.putRef(nextTargetRelationMap, relationRef);
 		if (nextTargetRelationSourceIdx == 0) return false;
-		var nextTargetRelationSourceVal =asRefVal( REFMAP.getVal(nextTargetRelationMap, nextTargetRelationSourceIdx));
+		var nextTargetRelationSourceVal = BEREdges.asRefVal(REFMAP.getVal(nextTargetRelationMap, nextTargetRelationSourceIdx));
 		if (nextTargetRelationSourceVal == null) {
-			REFMAP.setVal(nextTargetRelationMap, nextTargetRelationSourceIdx, sourceRef);
+			REFMAP.setVal(nextTargetRelationMap, nextTargetRelationSourceIdx, BEREdges.toRef(sourceRef));
 		} else if (BEREdges.isRef(nextTargetRelationSourceVal)) {
 			var sourceRef2 = BEREdges.asRef(nextTargetRelationSourceVal);
 			// if (sourceRef == sourceRef2) {
@@ -144,19 +232,7 @@ class BERStore extends BERState {
 	}
 
 	@Override
-	public boolean putAll(BEREdges edges) {
-		return this.defaultPutAll(edges);
-	}
-
- 
-
-	void popEdges(BEREdges edges) {
-
-	}
-
-	@Override
-	public boolean pop(int sourceRef, int relationRef, int targetRef) {
-		if ((sourceRef == 0) || (relationRef == 0) || (targetRef == 0)) return false;
+	boolean customPop(int sourceRef, int relationRef, int targetRef) {
 
 		var nextSourceMap = this.sourceMap;
 		var nextSourceIdx = REFMAP.getIdx(nextSourceMap, sourceRef);
@@ -167,13 +243,12 @@ class BERStore extends BERState {
 		if (nextTargetIdx == 0) return false;
 
 		var prevSourceMap = this.prevSourceMap;
-		if (prevSourceMap == null) {
-			nextSourceMap = REFMAP.copy(this.prevSourceMap = prevSourceMap = nextSourceMap);
-		}
-
 		var prevTargetMap = this.prevTargetMap;
-		if (prevTargetMap == null) {
-			nextTargetMap = REFMAP.copy(this.prevTargetMap = prevTargetMap = nextTargetMap);
+		if (prevSourceMap == null) {
+			nextSourceMap = REFMAP.copy(prevSourceMap = nextSourceMap);
+			nextTargetMap = REFMAP.copy(prevTargetMap = nextTargetMap);
+			this.prevSourceMap = prevSourceMap;
+			this.prevTargetMap = prevTargetMap;
 		}
 
 		var prevSourceIdx = REFMAP.getIdx(prevSourceMap, sourceRef);
@@ -194,11 +269,11 @@ class BERStore extends BERState {
 
 		var nextSourceRelationIdx = REFMAP.getIdx(nextSourceRelationMap, relationRef);
 		if (nextSourceRelationIdx == 0) return false;
-		var nextSourceRelationTargetVal =asRefVal( REFMAP.getVal(nextSourceRelationMap, nextSourceRelationIdx));
+		var nextSourceRelationTargetVal = BEREdges.asRefVal(REFMAP.getVal(nextSourceRelationMap, nextSourceRelationIdx));
 
 		var nextTargetRelationIdx = REFMAP.putRef(nextTargetRelationMap, relationRef);
 		if (nextTargetRelationIdx == 0) return false; // IllegalState
-		var nextTargetRelationSourceVal =asRefVal( REFMAP.getVal(nextTargetRelationMap, nextTargetRelationIdx));
+		var nextTargetRelationSourceVal = BEREdges.asRefVal(REFMAP.getVal(nextTargetRelationMap, nextTargetRelationIdx));
 
 		if (BEREdges.isRef(nextSourceRelationTargetVal)) {
 			var targetRef2 = BEREdges.asRef(nextSourceRelationTargetVal);
@@ -264,96 +339,6 @@ class BERStore extends BERState {
 		}
 
 		return true;
-	}
-
-	public Object getOwner() {
-		return this.owner;
-	}
-
-	@Override
-	public void setRootRef(int rootRef) {
-		if (this.prevRootRef == null) {
-			this.prevRootRef = this.rootRef;
-		}
-		this.rootRef = rootRef;
-	}
-
-	@Override
-	public void setNextRef(int nextRef) {
-		if (this.prevNextRef == null) {
-			this.prevNextRef = this.nextRef;
-		}
-		this.nextRef = nextRef;
-	}
-
-	int newEntityRef() {
-		var nextRef = this.nextRef;
-		while (this.isSourceRef(nextRef) || this.isTargetRef(nextRef)) {
-			nextRef++;
-		}
-		this.setNewEntityRef(nextRef + 1);
-		return nextRef;
-	}
-
-	/** Diese Methode gibt das zurück. wenn gegebener nodeRef als source oder target vorkommt, in cow-nodeRefGen eintragen und aus source/target maps entfernen
-	 *
-	 * @param entityRef */
-	void popEntityRef(int entityRef) {
-
-	}
-
-	/** Diese Methode gibt das zurück. übernimmt die gegebenen refs zur wiederverwendung. weitere werden nach dem größten automatisch ergänzt. duplikate und refs
-	 * <=0 nicht zulässig. leere liste nicht zulässig. */
-	void setNewEntityRef(int entityRef) {
-
-	}
-
-	/** Diese Methode gibt das zurück. ersetzt die als source von target und rel vorkommenden referenzen mit den > 0 gegebenen liefert die anzahl der
-	 * einzigartigen referenzen kopiert diese an den beginn von sourceRefs
-	 *
-	 * @param targetRef
-	 * @param relationRef
-	 * @param sourceRefs
-	 * @return */
-	int setSourceRefs(int targetRef, int relationRef, int[] sourceRefs) {
-
-		return 0;
-	}
-
-	/** ergänzt die als source von target und rel vorkommenden referenzen mit den > 0 gegebenen liefert die anzahl der ergänzten referenzen kopiert diese an den
-	 * beginn von sourceRefs */
-	int putSourceRefs(int targetRef, int relationRef, int[] sourceRefs) {
-		return 0;
-	}
-
-	/** entfernt von den als source von target und rel vorkommenden referenzen die > 0 gegebenen liefert die anzahl der entfernten referenzen kopiert diese an den
-	 * beginn von sourceRefs */
-	int popSourceRefs(int targetRef, int relationRef, int[] sourceRefs) {
-		return 0;
-	}
-
-	BERUpdate commit() {
-
-		this.prevRootRef = null;
-		this.prevNextRef = null;
-
-		return null;
-	}
-
-	/** verwirft die änderungen seit dem letzten commit. das betrifft getRootRef, getEntityRefs, getSource..., getTarget... */
-	BERUpdate rollback() {
-		// der aktuelle
-		var oldState = new BERState();
-		// der in prev gespeicherte und wiederhergestellte
-		var newState = new BERState();
-
-		return null;
-	}
-
-	// verwirft die änderungen seit dem letzten commit.
-	// stellt den gegebenen zustand wieder her.
-	BERUpdate rollback(BERState state) {
-		return null;
 	}
 
 	Object owner;

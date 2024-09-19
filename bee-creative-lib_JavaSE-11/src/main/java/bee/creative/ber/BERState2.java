@@ -8,7 +8,7 @@ class BERState2 extends BERState {
 	}
 
 	@Override
-	public boolean putAll(BEREdges edges) {
+	public boolean putAll(Iterable<BEREdge> edges) {
 		return false;
 	}
 
@@ -18,8 +18,12 @@ class BERState2 extends BERState {
 	}
 
 	@Override
-	public boolean popAll(BEREdges edges) {
+	public boolean popAll(Iterable<BEREdge> edges) {
 		return false;
+	}
+
+	@Override
+	public void clear() {
 	}
 
 	@Override

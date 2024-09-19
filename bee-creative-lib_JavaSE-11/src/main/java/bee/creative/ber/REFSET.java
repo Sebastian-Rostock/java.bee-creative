@@ -3,7 +3,6 @@ package bee.creative.ber;
 import java.util.Arrays;
 import bee.creative.emu.EMU;
 import bee.creative.emu.Emuator;
-import bee.creative.util.HashMapII;
 
 /** Diese Klasse implementiert Methoden zur Verarbeitung einer steuwertbasierten Menge von Referenen ungleich {@code 0} mit durchschnittlich 4 Speicherzugriffen
  * zum {@link #getIdx(int[], int) Finden} einer vorhandenen Referenz. Die Menge ist als {@code int}-Array mit folgender Struktur umgesetzt:
@@ -175,41 +174,6 @@ public final class REFSET {
 		}
 		return refs;
 	}
-
-	// public static HashMapII toCollisions(int[] refset) {
-	// var res = new HashMapII();
-	//
-	// var mask = getMask(refset);
-	//
-	// for (var idx = 0; idx <= mask; idx++) {
-	// var count = 0;
-	// for (var idx2 = /* refset.head_item_next[idx].head */ refset[(idx * 3) + 3]; idx2 != 0; idx2 =
-	// /* refset.head_item_next[idx-1].next */ refset[(idx2 * 3) + 1]) {
-	// count++;
-	// }
-	// if (count != 0) {
-	// res.add(count, count);
-	// }
-	// }
-	// return res;
-	// }
-	//
-	// public static float toAccess(int[] refset) {
-	// var s = getSize(refset);
-	// var x = toCollisions(refset);
-	// //
-	// var res = new float[1];
-	// res[0] = s * 4;// length, mask
-	// x.forEach((colls, items) -> {
-	// var b = 0;
-	// for (var a = 1; a < colls; a++) {
-	// b += a * 2;
-	// }
-	// b = b * (items / colls);
-	// res[0] += b;
-	// });
-	// return res[0] / s;
-	// }
 
 	/** Diese Methode liefert die Textdarstellung der gegebenen Referenzmenge {@code refset}. */
 	public static String toString(int[] refset) {

@@ -4,27 +4,35 @@ package bee.creative.ber;
  * <p>
  * (sourceCount, (sourceRef, targetRefCount, targetSetCount, (relationRef, targetRef)[targetRefCount], (relationRef, targetCount,
  * targetRef[targetCount])[targetSetCount])[sourceCount])
- * 
+ *
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 class BERCodec {
 
-	public static int[] persistEdges(BEREdges src) {
-		return persist(0, 0, src);
+	public static int[] persistState(BERState src) {
+		return BERCodec.persist(src.rootRef, src.nextRef, src);
 	}
 
-	public static BEREdges restoreEdges(byte[] src) {
+	public static int[] persistEdges(BEREdges src) {
+		return BERCodec.persist(0, 0, src);
+	}
+
+	public static BERState restoreState(int[] src) {
+		BEREdges res = new BERState();
 
 		return null;
 	}
 
-	public static int[] persistState(BERState src) {
-		return persist(src.rootRef, src.nextRef, src);
+	public static BEREdges restoreEdges(int[] src) {
+		BEREdges res = new BEREdges();
+		
+		
+		return null;
 	}
 
 	private static int[] persist(int rootRef, int nextRef, BEREdges src) {
 
 		var sourceMap = src.sourceMap;
-		// sourceCount, (sourceRef, targetRefCount, targetSetCount, (relationRef, targetRef)[targetRefCount], (relationRef, targetCount,
+		// rootRef, nextRef, sourceCount, (sourceRef, targetRefCount, targetSetCount, (relationRef, targetRef)[targetRefCount], (relationRef, targetCount,
 		// targetRef[targetCount])[targetSetCount])[sourceCount]
 		var sourceSize = 3;
 		var sourceCount = 0;
@@ -33,12 +41,12 @@ class BERCodec {
 			if (relationMap != null) {
 				var relationSize = 0;
 				for (var relationIdx = relationMap.length - 1; 0 < relationIdx; relationIdx--) {
-					var targetVal = relationMap[relationIdx];
+					var targetVal = BEREdges.asRefVal(relationMap[relationIdx]);
 					if (targetVal != null) {
-						if (targetVal instanceof Integer) {
+						if (BEREdges.isRef(targetVal)) {
 							relationSize += /*relationRef*/ 1 + /*targetRef*/ 1;
 						} else {
-							var c = REFSET.size((int[])targetVal);
+							var c = REFSET.size(targetVal);
 							if (c == 1) {
 								relationSize += /*relationRef*/ 1 + /*targetRef*/ 1;
 							} else if (c > 0) {
@@ -54,21 +62,15 @@ class BERCodec {
 			}
 		}
 
-		int[] res = new int[sourceSize];
+		var res = new int[sourceSize];
 
 		res[0] = rootRef;
 		res[1] = nextRef;
 		res[2] = sourceCount;
-		
-		
 
+		System.out.println(sourceSize*4);
+		
 		return res;
-	}
- 
-
-	public static BERState restoreState(byte[] src) {
-
-		return null;
 	}
 
 }

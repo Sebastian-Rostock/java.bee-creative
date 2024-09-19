@@ -8,24 +8,17 @@ class REFSET_TEST {
 
 	public static void main(String[] args) {
 
-		// System.out.println("BERStore");
-		// for (int a = 0; a < 10; a++) {
-		// var r = new Random(a);
-		// var s = new BERStore(null);
-		// System.out.println(new Tester(() -> {
-		// for (int i = 0; i < 100000; i++) {
-		// s.put(r.nextInt(1000) + 1, r.nextInt(50) + 1, r.nextInt(1000) + 1);
-		// }
-		// }));
-		// BERCodec.persistEdges(s);
-		// }
+ 
 		System.out.println("BEREdges2");
 		for (int a = 0; a < 10; a++) {
 			var r = new Random(a);
-			var s = new BEREdges();
+			var s = new BERStore(null);
 			var l = new Tester(() -> {
-				for (int i = 0; i < 100000; i++) {
-					s.put(r.nextInt(1000) + 1, r.nextInt(50) + 1, r.nextInt(1000) + 1);
+				for (int i = 0; i < 1000000; ) {
+					for (int j = 0; j < 100; i++,j++) {
+					s.put(r.nextInt(5000) + 1, r.nextInt(50) + 1, r.nextInt(5000) + 1);
+					}
+					s.commit();
 				}
 			});
 			System.out.println(l);

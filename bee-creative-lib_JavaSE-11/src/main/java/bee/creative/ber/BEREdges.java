@@ -12,11 +12,12 @@ import bee.creative.util.Iterators;
 class BEREdges implements Iterable2<BEREdge> {
 
 	public boolean put(BEREdge edge) {
-		return this.put(edge.sourceRef, edge.relationRef, edge.targetRef);
+		return this.customPut(edge.sourceRef, edge.relationRef, edge.targetRef);
 	}
 
 	public boolean put(int sourceRef, int relationRef, int targetRef) {
-		return this.defaultPut(sourceRef, relationRef, targetRef);
+		if ((sourceRef == 0) || (relationRef == 0) || (targetRef == 0)) return false;
+		return this.customPut(sourceRef, relationRef, targetRef);
 	}
 
 	public boolean putAll(BEREdge... edges) {
@@ -24,24 +25,16 @@ class BEREdges implements Iterable2<BEREdge> {
 	}
 
 	public boolean putAll(Iterable<BEREdge> edges) {
-		return edges instanceof BEREdges ? this.putAll((BEREdges)edges) : this.defaultPutAll(edges);
-	}
-
-	public boolean putAll(BEREdges edges) {
-		var res = false;
-		// TODO
-
-		return res;
+		return this.defaultPutAll(edges);
 	}
 
 	public boolean pop(BEREdge edge) {
-		return this.pop(edge.sourceRef, edge.relationRef, edge.targetRef);
+		return this.customPop(edge.sourceRef, edge.relationRef, edge.targetRef);
 	}
 
 	public boolean pop(int sourceRef, int relationRef, int targetRef) {
 		if ((sourceRef == 0) || (relationRef == 0) || (targetRef == 0)) return false;
-
-		return dp(sourceRef, relationRef, targetRef);
+		return this.customPop(sourceRef, relationRef, targetRef);
 	}
 
 	public boolean popAll(BEREdge... edges) {
@@ -49,18 +42,12 @@ class BEREdges implements Iterable2<BEREdge> {
 	}
 
 	public boolean popAll(Iterable<BEREdge> edges) {
-		if (edges instanceof BEREdges) return this.popAll((BEREdges)edges);
-		var res = false;
-		for (var edge: edges) {
-			res = this.pop(edge) | res;
-		}
-		return res;
+		return this.defaultPopAll(edges);
 	}
 
-	public boolean popAll(BEREdges edges) {
-		var res = false;
-
-		return res;
+	public void clear() {
+		this.sourceMap = REFMAP.EMPTY;
+		this.targetMap = REFMAP.EMPTY;
 	}
 
 	/** Diese Methode liefert die Anzahl der als {@code source} vorkommenden Entitäten.
@@ -78,7 +65,7 @@ class BEREdges implements Iterable2<BEREdge> {
 		var relationMap = BEREdges.asRefMap(REFMAP.getVal(this.targetMap, targetIdx));
 		var relationIdx = REFMAP.getIdx(relationMap, relationRef);
 		if (relationIdx == 0) return 0;
-		var sourceVal = asRefVal(REFMAP.getVal(relationMap, relationIdx));
+		var sourceVal = BEREdges.asRefVal(REFMAP.getVal(relationMap, relationIdx));
 		if (BEREdges.isRef(sourceVal)) return 1;
 		return REFSET.size(sourceVal);
 	}
@@ -91,7 +78,7 @@ class BEREdges implements Iterable2<BEREdge> {
 		var relationMap = BEREdges.asRefMap(REFMAP.getVal(this.targetMap, targetIdx));
 		var relationIdx = REFMAP.getIdx(relationMap, relationRef);
 		if (relationIdx == 0) return 0;
-		var sourceVal = asRefVal(REFMAP.getVal(relationMap, relationIdx));
+		var sourceVal = BEREdges.asRefVal(REFMAP.getVal(relationMap, relationIdx));
 		if (BEREdges.isRef(sourceVal)) return BEREdges.asRef(sourceVal);
 		return REFSET.getRef(sourceVal);
 	}
@@ -109,7 +96,7 @@ class BEREdges implements Iterable2<BEREdge> {
 		var relationMap = BEREdges.asRefMap(REFMAP.getVal(this.targetMap, targetIdx));
 		var relationIdx = REFMAP.getIdx(relationMap, relationRef);
 		if (relationIdx == 0) return BEREdges.EMPTY_REFS;
-		var sourceVal = asRefVal(REFMAP.getVal(relationMap, relationIdx));
+		var sourceVal = BEREdges.asRefVal(REFMAP.getVal(relationMap, relationIdx));
 		if (BEREdges.isRef(sourceVal)) return new int[]{BEREdges.asRef(sourceVal)};
 		return REFSET.toArray(sourceVal);
 	}
@@ -141,7 +128,7 @@ class BEREdges implements Iterable2<BEREdge> {
 		var relationMap = BEREdges.asRefMap(REFMAP.getVal(this.sourceMap, sourceIdx));
 		var relationIdx = REFMAP.getIdx(relationMap, relationRef);
 		if (relationIdx == 0) return 0;
-		var targetVal = asRefVal(REFMAP.getVal(relationMap, relationIdx));
+		var targetVal = BEREdges.asRefVal(REFMAP.getVal(relationMap, relationIdx));
 		if (BEREdges.isRef(targetVal)) return 1;
 		return REFSET.size(targetVal);
 	}
@@ -154,7 +141,7 @@ class BEREdges implements Iterable2<BEREdge> {
 		var relationMap = BEREdges.asRefMap(REFMAP.getVal(this.sourceMap, sourceIdx));
 		var relationIdx = REFMAP.getIdx(relationMap, relationRef);
 		if (relationIdx == 0) return 0;
-		var targetVal = asRefVal(REFMAP.getVal(relationMap, relationIdx));
+		var targetVal = BEREdges.asRefVal(REFMAP.getVal(relationMap, relationIdx));
 		if (BEREdges.isRef(targetVal)) return BEREdges.asRef(targetVal);
 		return REFSET.getRef(targetVal);
 	}
@@ -170,7 +157,7 @@ class BEREdges implements Iterable2<BEREdge> {
 		var relationMap = BEREdges.asRefMap(REFMAP.getVal(this.sourceMap, sourceIdx));
 		var relationIdx = REFMAP.getIdx(relationMap, relationRef);
 		if (relationIdx == 0) return BEREdges.EMPTY_REFS;
-		var targetVal = asRefVal(REFMAP.getVal(relationMap, relationIdx));
+		var targetVal = BEREdges.asRefVal(REFMAP.getVal(relationMap, relationIdx));
 		if (BEREdges.isRef(targetVal)) return new int[]{BEREdges.asRef(targetVal)};
 		return REFSET.toArray(targetVal);
 	}
@@ -205,7 +192,7 @@ class BEREdges implements Iterable2<BEREdge> {
 		var relationMap = BEREdges.asRefMap(REFMAP.getVal(this.targetMap, targetIdx));
 		var relationIdx = REFMAP.getIdx(relationMap, relationRef);
 		if (relationIdx == 0) return false;
-		var sourceVal = asRefVal(REFMAP.getVal(relationMap, relationIdx));
+		var sourceVal = BEREdges.asRefVal(REFMAP.getVal(relationMap, relationIdx));
 		if (BEREdges.isRef(sourceVal)) return BEREdges.asRef(sourceVal) == sourceRef;
 		return REFSET.getIdx(sourceVal, sourceRef) != 0;
 	}
@@ -230,7 +217,7 @@ class BEREdges implements Iterable2<BEREdge> {
 		var relationMap = BEREdges.asRefMap(REFMAP.getVal(this.sourceMap, sourceIdx));
 		var relationIdx = REFMAP.getIdx(relationMap, relationRef);
 		if (relationIdx == 0) return false;
-		var targetVal = asRefVal(REFMAP.getVal(relationMap, relationIdx));
+		var targetVal = BEREdges.asRefVal(REFMAP.getVal(relationMap, relationIdx));
 		if (BEREdges.isRef(targetVal)) return BEREdges.asRef(targetVal) == targetRef;
 		return REFSET.getIdx(targetVal, targetRef) != 0;
 	}
@@ -245,11 +232,6 @@ class BEREdges implements Iterable2<BEREdge> {
 
 	public boolean isReadonly() {
 		return false;
-	}
-
-	public void clear() {
-		this.sourceMap = REFMAP.EMPTY;
-		this.targetMap = REFMAP.EMPTY;
 	}
 
 	@Override
@@ -269,11 +251,6 @@ class BEREdges implements Iterable2<BEREdge> {
 		})));
 	}
 
-	public byte[] toBytes() {
-
-		return null;
-	}
-
 	@Override
 	public String toString() {
 		var res = new StringBuilder("{ ");
@@ -285,6 +262,10 @@ class BEREdges implements Iterable2<BEREdge> {
 
 	static boolean isRef(int[] val) {
 		return val.length == 1;
+	}
+
+	static int[] toRef(int ref) {
+		return new int[]{ref};
 	}
 
 	static int asRef(int[] val) {
@@ -307,9 +288,15 @@ class BEREdges implements Iterable2<BEREdge> {
 	 * {@code relation}-Referenzen auf {@code source}-Referenzen. Letztere sind dabei als {@link Integer} oder gemäß {@link REFSET} abgebildet. */
 	Object[] targetMap = REFMAP.EMPTY;
 
-	final boolean defaultPut(int sourceRef, int relationRef, int targetRef) {
-		if ((sourceRef == 0) || (relationRef == 0) || (targetRef == 0)) return false;
+	boolean customPut(int sourceRef, int relationRef, int targetRef) {
+		return this.defaultPut(sourceRef, relationRef, targetRef);
+	}
 
+	boolean customPop(int sourceRef, int relationRef, int targetRef) {
+		return this.defaultPop(sourceRef, relationRef, targetRef);
+	}
+
+	final boolean defaultPut(int sourceRef, int relationRef, int targetRef) {
 		var sourceMap = this.sourceMap = REFMAP.grow(this.sourceMap);
 
 		var targetMap = this.targetMap = REFMAP.grow(this.targetMap);
@@ -336,9 +323,9 @@ class BEREdges implements Iterable2<BEREdge> {
 
 		var sourceRelationIdx = REFMAP.putRef(sourceRelationMap, relationRef);
 		if (sourceRelationIdx == 0) return false;
-		var sourceRelationTargetVal = asRefVal(REFMAP.getVal(sourceRelationMap, sourceRelationIdx));
+		var sourceRelationTargetVal = BEREdges.asRefVal(REFMAP.getVal(sourceRelationMap, sourceRelationIdx));
 		if (sourceRelationTargetVal == null) {
-			REFMAP.setVal(sourceRelationMap, sourceRelationIdx, toRef(targetRef));
+			REFMAP.setVal(sourceRelationMap, sourceRelationIdx, BEREdges.toRef(targetRef));
 		} else if (BEREdges.isRef(sourceRelationTargetVal)) {
 			var targetRef2 = BEREdges.asRef(sourceRelationTargetVal);
 			if (targetRef == targetRef2) return false;
@@ -353,9 +340,9 @@ class BEREdges implements Iterable2<BEREdge> {
 
 		var targetRelationIdx = REFMAP.putRef(targetRelationMap, relationRef);
 		if (targetRelationIdx == 0) return false;
-		var targetRelationSourceVal = asRefVal(REFMAP.getVal(targetRelationMap, targetRelationIdx));
+		var targetRelationSourceVal = BEREdges.asRefVal(REFMAP.getVal(targetRelationMap, targetRelationIdx));
 		if (targetRelationSourceVal == null) {
-			REFMAP.setVal(targetRelationMap, targetRelationIdx, toRef(sourceRef));
+			REFMAP.setVal(targetRelationMap, targetRelationIdx, BEREdges.toRef(sourceRef));
 		} else if (BEREdges.isRef(targetRelationSourceVal)) {
 			var sourceRef2 = BEREdges.asRef(targetRelationSourceVal);
 			REFMAP.setVal(targetRelationMap, targetRelationIdx, REFSET.from(sourceRef, sourceRef2));
@@ -368,10 +355,6 @@ class BEREdges implements Iterable2<BEREdge> {
 		return true;
 	}
 
-	static int[] toRef(int ref) {
-		return new int[]{ref};
-	}
-
 	final boolean defaultPutAll(Iterable<BEREdge> edges) {
 		var res = false;
 		for (var edge: edges) {
@@ -380,7 +363,7 @@ class BEREdges implements Iterable2<BEREdge> {
 		return res;
 	}
 
-	boolean dp(int sourceRef, int relationRef, int targetRef) {
+	final boolean defaultPop(int sourceRef, int relationRef, int targetRef) {
 		var nextSourceMap = this.sourceMap;
 		var nextSourceIdx = REFMAP.getIdx(nextSourceMap, sourceRef);
 		if (nextSourceIdx == 0) return false;
@@ -395,11 +378,11 @@ class BEREdges implements Iterable2<BEREdge> {
 
 		var nextSourceRelationIdx = REFMAP.getIdx(nextSourceRelationMap, relationRef);
 		if (nextSourceRelationIdx == 0) return false;
-		var nextSourceRelationTargetVal = asRefVal(REFMAP.getVal(nextSourceRelationMap, nextSourceRelationIdx));
+		var nextSourceRelationTargetVal = BEREdges.asRefVal(REFMAP.getVal(nextSourceRelationMap, nextSourceRelationIdx));
 
 		var nextTargetRelationIdx = REFMAP.putRef(nextTargetRelationMap, relationRef);
 		if (nextTargetRelationIdx == 0) return false; // IllegalState
-		var nextTargetRelationSourceVal = asRefVal(REFMAP.getVal(nextTargetRelationMap, nextTargetRelationIdx));
+		var nextTargetRelationSourceVal = BEREdges.asRefVal(REFMAP.getVal(nextTargetRelationMap, nextTargetRelationIdx));
 
 		if (BEREdges.isRef(nextSourceRelationTargetVal)) {
 			var targetRef2 = BEREdges.asRef(nextSourceRelationTargetVal);
@@ -453,6 +436,14 @@ class BEREdges implements Iterable2<BEREdge> {
 		}
 
 		return true;
+	}
+
+	final boolean defaultPopAll(Iterable<BEREdge> edges) {
+		var res = false;
+		for (var edge: edges) {
+			res = this.pop(edge) | res;
+		}
+		return res;
 	}
 
 }
