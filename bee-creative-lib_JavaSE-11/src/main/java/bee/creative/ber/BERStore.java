@@ -35,13 +35,6 @@ class BERStore extends BERState {
 		return nextRef;
 	}
 
-	/** Diese Methode gibt das zurück. wenn gegebener nodeRef als source oder target vorkommt, in cow-nodeRefGen eintragen und aus source/target maps entfernen
-	 *
-	 * @param entityRef */
-	void popEntityRef(int entityRef) {
-
-	}
-
 	/** Diese Methode gibt das zurück. ersetzt die als source von target und rel vorkommenden referenzen mit den > 0 gegebenen liefert die anzahl der
 	 * einzigartigen referenzen kopiert diese an den beginn von sourceRefs
 	 *
@@ -264,15 +257,15 @@ class BERStore extends BERState {
 	}
 
 	boolean customPop(int sourceRef, int relationRef, int targetRef) {
-	
+
 		var nextSourceMap = this.sourceMap;
 		var nextSourceIdx = REFMAP.getIdx(nextSourceMap, sourceRef);
 		if (nextSourceIdx == 0) return false;
-	
+
 		var nextTargetMap = this.targetMap;
 		var nextTargetIdx = REFMAP.getIdx(nextTargetMap, targetRef);
 		if (nextTargetIdx == 0) return false;
-	
+
 		var prevSourceMap = this.prevSourceMap;
 		var prevTargetMap = this.prevTargetMap;
 		if (prevSourceMap == null) {
@@ -281,7 +274,7 @@ class BERStore extends BERState {
 			this.prevSourceMap = prevSourceMap;
 			this.prevTargetMap = prevTargetMap;
 		}
-	
+
 		var prevSourceIdx = REFMAP.getIdx(prevSourceMap, sourceRef);
 		var prevSourceRelationMap = prevSourceIdx != 0 ? BERState.asRefMap(REFMAP.getVal(prevSourceMap, prevSourceIdx)) : null;
 		var nextSourceRelationMap = BERState.asRefMap(REFMAP.getVal(nextSourceMap, nextSourceIdx));
@@ -289,7 +282,7 @@ class BERStore extends BERState {
 			nextSourceRelationMap = REFMAP.copy(nextSourceRelationMap);
 			REFMAP.setVal(nextSourceMap, nextSourceIdx, nextSourceRelationMap);
 		}
-	
+
 		var prevTargetIdx = REFMAP.getIdx(prevTargetMap, targetRef);
 		var prevTargetRelationMap = prevTargetIdx != 0 ? BERState.asRefMap(REFMAP.getVal(prevTargetMap, prevTargetIdx)) : null;
 		var nextTargetRelationMap = BERState.asRefMap(REFMAP.getVal(nextTargetMap, nextTargetIdx));
@@ -297,15 +290,15 @@ class BERStore extends BERState {
 			nextTargetRelationMap = REFMAP.copy(nextTargetRelationMap);
 			REFMAP.setVal(nextTargetMap, nextTargetIdx, nextTargetRelationMap);
 		}
-	
+
 		var nextSourceRelationIdx = REFMAP.getIdx(nextSourceRelationMap, relationRef);
 		if (nextSourceRelationIdx == 0) return false;
 		var nextSourceRelationTargetVal = BERState.asRefVal(REFMAP.getVal(nextSourceRelationMap, nextSourceRelationIdx));
-	
+
 		var nextTargetRelationIdx = REFMAP.putRef(nextTargetRelationMap, relationRef);
 		if (nextTargetRelationIdx == 0) return false; // IllegalState
 		var nextTargetRelationSourceVal = BERState.asRefVal(REFMAP.getVal(nextTargetRelationMap, nextTargetRelationIdx));
-	
+
 		if (BERState.isRef(nextSourceRelationTargetVal)) {
 			var targetRef2 = BERState.asRef(nextSourceRelationTargetVal);
 			if (targetRef != targetRef2) return false;
@@ -337,7 +330,7 @@ class BERStore extends BERState {
 				REFMAP.setVal(nextSourceRelationMap, nextSourceRelationIdx, REFSET.pack(nextSourceRelationTargetSet));
 			}
 		}
-	
+
 		if (BERState.isRef(nextTargetRelationSourceVal)) {
 			// var sourceRef2 = BEREdges.asRef(nextTargetRelationSourceVal);
 			// if (sourceRef != sourceRef2) return false;
@@ -368,7 +361,7 @@ class BERStore extends BERState {
 				REFMAP.setVal(nextTargetRelationMap, nextTargetRelationIdx, REFSET.pack(nextTargetRelationSourceSet));
 			}
 		}
-	
+
 		return true;
 	}
 
