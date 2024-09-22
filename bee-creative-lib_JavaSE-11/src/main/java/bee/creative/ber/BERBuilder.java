@@ -15,7 +15,7 @@ interface BERBuilder {
 	}
 
 	default boolean putAll(Iterable<BEREdge> edges) {
-		if (edges instanceof BEREdges) return this.putAll((BEREdges)edges);
+		if (edges instanceof BERState) return this.putAll((BERState)edges);
 		var res = false;
 		for (var edge: edges) {
 			res = this.put(edge) | res;
@@ -23,7 +23,7 @@ interface BERBuilder {
 		return res;
 	}
 
-	boolean putAll(BEREdges edges);
+	boolean putAll(BERState edges);
 
 	default boolean pop(BEREdge edge) {
 		return this.pop(edge.sourceRef, edge.relationRef, edge.targetRef);
@@ -36,7 +36,7 @@ interface BERBuilder {
 	}
 
 	default boolean popAll(Iterable<BEREdge> edges) {
-		if (edges instanceof BEREdges) return this.popAll((BEREdges)edges);
+		if (edges instanceof BERState) return this.popAll((BERState)edges);
 		var res = false;
 		for (var edge: edges) {
 			res = this.pop(edge) | res;
@@ -44,6 +44,6 @@ interface BERBuilder {
 		return res;
 	}
 
-	boolean popAll(BEREdges edges);
+	boolean popAll(BERState edges);
 
 }

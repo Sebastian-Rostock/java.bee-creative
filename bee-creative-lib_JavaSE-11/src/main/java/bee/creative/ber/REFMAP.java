@@ -34,13 +34,7 @@ public abstract class REFMAP {
 	/** Diese Methode liefert das Element zur Referenz an der gegebenen {@link #getIdx(Object[], int) 1-basierten Position} {@code idx} der gegebenen
 	 * Referenzabbildung {@code refmap}, wenn die Position ungleich {@code 0} ist. */
 	public static Object getVal(Object[] refmap, int idx) {
-		try {
-			return refmap[idx];
-
-		} catch (RuntimeException e) {
-			throw e;
-			// TODO: handle exception
-		}
+		return refmap[idx];
 	}
 
 	/** Diese Methode setzt das Element {@code val} zur Referenz an der gegebenen {@link #getIdx(Object[], int) 1-basierten Position} {@code idx} der gegebenen

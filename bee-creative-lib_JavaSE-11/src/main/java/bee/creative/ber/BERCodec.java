@@ -1,6 +1,6 @@
 package bee.creative.ber;
 
-/** Diese Klasse implementiert den Codec zum Speichern einer {@link BEREdges Kantenmenge} oder eines {@link BERState Speicherzustands} in ein int-Array.
+/** Diese Klasse implementiert den Codec zum Speichern einer {@link BERState Kantenmenge} oder eines {@link BERState Speicherzustands} in ein int-Array.
  * <p>
  * (sourceCount, (sourceRef, targetRefCount, targetSetCount, (relationRef, targetRef)[targetRefCount], (relationRef, targetCount,
  * targetRef[targetCount])[targetSetCount])[sourceCount])
@@ -12,24 +12,24 @@ class BERCodec {
 		return BERCodec.persist(src.rootRef, src.nextRef, src);
 	}
 
-	public static int[] persistEdges(BEREdges src) {
+	public static int[] persistEdges(BERState src) {
 		return BERCodec.persist(0, 0, src);
 	}
 
 	public static BERState restoreState(int[] src) {
-		BEREdges res = new BERState();
+		BERState res = new BERState();
 
 		return null;
 	}
 
-	public static BEREdges restoreEdges(int[] src) {
-		BEREdges res = new BEREdges();
+	public static BERState restoreEdges(int[] src) {
+		BERState res = new BERState();
 		
 		
 		return null;
 	}
 
-	private static int[] persist(int rootRef, int nextRef, BEREdges src) {
+	private static int[] persist(int rootRef, int nextRef, BERState src) {
 
 		var sourceMap = src.sourceMap;
 		// rootRef, nextRef, sourceCount, (sourceRef, targetRefCount, targetSetCount, (relationRef, targetRef)[targetRefCount], (relationRef, targetCount,
@@ -41,9 +41,9 @@ class BERCodec {
 			if (relationMap != null) {
 				var relationSize = 0;
 				for (var relationIdx = relationMap.length - 1; 0 < relationIdx; relationIdx--) {
-					var targetVal = BEREdges.asRefVal(relationMap[relationIdx]);
+					var targetVal = BERState.asRefVal(relationMap[relationIdx]);
 					if (targetVal != null) {
-						if (BEREdges.isRef(targetVal)) {
+						if (BERState.isRef(targetVal)) {
 							relationSize += /*relationRef*/ 1 + /*targetRef*/ 1;
 						} else {
 							var c = REFSET.size(targetVal);

@@ -15,49 +15,41 @@ class BERUpdate {
 		return this.newState;
 	}
 
-	// berechnet bei bedarf die in newState dazugekommenen inhalte
-	BEREdges getPutEdges() {
-		return null;
+	// die in newState dazugekommenen inhalte
+	public BERState getPutEdges() {
+		return this.putEdges == null ? this.putEdges = BERState.from(this.oldState, this.newState) : this.putEdges;
 	}
 
-	// berechnet bei bedarf die in newState entfallenen inhalte
-	BEREdges getPopEdges() {
-		return null;
+	// die in newState entfallenen inhalte
+	public BERState getPopEdges() {
+		return this.popEdges == null ? this.popEdges = BERState.from(this.newState, this.oldState) : this.popEdges;
 	}
 
 	BERUpdate(BERStore store, boolean commit) {
-		var prevState = new BERState2();
-		prevState.nextRef = store.prevNextRef != null ? store.prevNextRef : store.nextRef;
-		prevState.rootRef = store.prevRootRef != null ? store.prevRootRef : store.rootRef;
-		prevState.sourceMap = store.prevSourceMap != null ? store.prevSourceMap : store.sourceMap;
-		prevState.targetMap = store.prevTargetMap != null ? store.prevTargetMap : store.targetMap;
-		var nextState = new BERState2();
-		nextState.nextRef = store.nextRef;
-		nextState.rootRef = store.rootRef;
-		nextState.sourceMap = store.sourceMap;
-		nextState.targetMap = store.targetMap;
 		this.store = store;
-		if (commit) {
-			this.oldState = prevState;
-			this.newState = nextState;
+		if (store.backup != null) {
+			if (commit) {
+				this.oldState.setAll(store.backup);
+				this.newState.setAll(store);
+			} else {
+				this.oldState.setAll(store);
+				this.newState.setAll(store.backup);
+			}
+			store.backup = null;
 		} else {
-			this.oldState = nextState;
-			this.newState = prevState;
-			store.nextRef = prevState.nextRef;
-			store.rootRef = prevState.rootRef;
-			store.sourceMap = prevState.sourceMap;
-			store.targetMap = prevState.targetMap;
+			this.oldState.setAll(store);
+			this.newState.setAll(store);
 		}
-		store.prevRootRef = null;
-		store.prevNextRef = null;
-		store.prevSourceMap = null;
-		store.prevTargetMap = null;
 	}
 
 	final BERStore store;
 
-	final BERState oldState;
+	final BERState oldState = new BERState();
 
-	final BERState newState;
+	final BERState newState = new BERState();
+
+	BERState putEdges;
+
+	BERState popEdges;
 
 }
