@@ -12,7 +12,7 @@ import bee.creative.lang.Objects;
  * </ul>
  *
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public abstract class REFMAP {
+public final class REFMAP {
 
 	/** Diese Methode liefert eine neue leere Referenzabbildung mit Kapazität 2. */
 	public static Object[] make() {
@@ -103,6 +103,17 @@ public abstract class REFMAP {
 		return size == 0;
 	}
 
+	/** Diese Methode übergibt alle Referenzen und deren Elemente an {@link REFMAPRUN#run(int, Object) task.run()}. */
+	public static void forEach(Object[] refmap, REFMAPRUN task) {
+		var keys = REFMAP.getKeys(refmap);
+		for (var idx = refmap.length - 1; 0 < idx; idx--) {
+			var val = refmap[idx];
+			if (val != null) {
+				task.run(REFSET.getRef(keys, idx), val);
+			}
+		}
+	}
+
 	/** Diese Methode liefert alle Schlüssel der gegebenen Referenzabbildung {@code refmap}. */
 	public static int[] toArray(Object[] refmap) {
 		return REFSET.toArray(REFMAP.getKeys(refmap));
@@ -118,14 +129,10 @@ public abstract class REFMAP {
 		return REFSET.emu(REFMAP.getKeys(refmap)) + EMU.fromArray(Object.class, refmap.length);
 	}
 
-	static final Object[] EMPTY = new Object[]{REFSET.EMPTY, null, null, null};
+	static final Object[] EMPTY = new Object[]{REFSET.EMPTY};
 
 	static int[] getKeys(Object[] refmap) {
-		try {
-			return (int[]) /* refmap.keys */ refmap[0];
-		} catch (RuntimeException e) {
-			throw e;
-		}
+		return (int[]) /* refmap.keys */ refmap[0];
 	}
 
 	static void setKeys(Object[] refmap, int[] keys) {

@@ -68,28 +68,82 @@ class BERStore extends BERState {
 		return null;
 	}
 
-	boolean customPut(int sourceRef, int relationRef, int targetRef) {
+	public boolean put(BEREdge edge) {
+		this.backup();
+		return this.insert(edge.sourceRef, edge.relationRef, edge.targetRef);
+	}
 
-		var prevSourceMap = this.prevSourceMap;
-		var prevTargetMap = this.prevTargetMap;
+	public boolean put(int sourceRef, int relationRef, int targetRef) {
+		if ((sourceRef == 0) || (relationRef == 0) || (targetRef == 0)) return false;
+		this.backup();
+		return this.insert(sourceRef, relationRef, targetRef);
+	}
+
+	public boolean putAll(BEREdge... edges) {
+		return this.putAll(Arrays.asList(edges));
+	}
+
+	public boolean putAll(Iterable<BEREdge> edges) {
+		this.backup();
+		var res = false;
+		for (var edge: edges) {
+			res = this.insert(edge.sourceRef, edge.relationRef, edge.targetRef) | res;
+		}
+		return res;
+	}
+
+	public boolean pop(BEREdge edge) {
+		this.backup();
+		return this.delete(edge.sourceRef, edge.relationRef, edge.targetRef);
+	}
+
+	public boolean pop(int sourceRef, int relationRef, int targetRef) {
+		if ((sourceRef == 0) || (relationRef == 0) || (targetRef == 0)) return false;
+		this.backup();
+		return this.delete(sourceRef, relationRef, targetRef);
+	}
+
+	public boolean popAll(BEREdge... edges) {
+		return this.popAll(Arrays.asList(edges));
+	}
+
+	public boolean popAll(Iterable<BEREdge> edges) {
+		this.backup();
+		var res = false;
+		for (var edge: edges) {
+			res = this.pop(edge) | res;
+		}
+		return res;
+	}
+
+	public boolean popAll(BERState edges) {
+		this.backup();
+		var res = new boolean[1];
+		edges.forEach((sourceRef, relationRef, targetRef) -> res[0] = this.delete(sourceRef, relationRef, targetRef) | res[0]);
+		return res[0];
+	}
+
+	public BERUpdate commit() {
+		return new BERUpdate(this, true);
+	}
+
+	/** verwirft die änderungen seit dem letzten commit. das betrifft getRootRef, getEntityRefs, getSource..., getTarget... */
+	public BERUpdate rollback() {
+		return new BERUpdate(this, false);
+	}
+
+	BERState backup;
+
+	private boolean insert(int sourceRef, int relationRef, int targetRef) {
+
+		var prevSourceMap = this.backup.sourceMap;
+		var prevTargetMap = this.backup.targetMap;
 		var nextSourceMap = this.sourceMap;
 		var nextTargetMap = this.targetMap;
 
-		if (prevSourceMap == null) {
-			nextSourceMap = REFMAP.grow(prevSourceMap = nextSourceMap);
-			nextTargetMap = REFMAP.grow(prevTargetMap = nextTargetMap);
-			if (prevSourceMap == nextSourceMap) {
-				nextSourceMap = REFMAP.copy(nextSourceMap);
-			}
-			if (prevTargetMap == nextTargetMap) {
-				nextTargetMap = REFMAP.copy(nextTargetMap);
-			}
-			this.prevSourceMap = prevSourceMap;
-			this.prevTargetMap = prevTargetMap;
-		} else {
-			nextSourceMap = REFMAP.grow(nextSourceMap);
-			nextTargetMap = REFMAP.grow(nextTargetMap);
-		}
+		nextSourceMap = REFMAP.grow(nextSourceMap);
+		nextTargetMap = REFMAP.grow(nextTargetMap);
+
 		this.sourceMap = nextSourceMap;
 		this.targetMap = nextTargetMap;
 
@@ -196,67 +250,7 @@ class BERStore extends BERState {
 		return true;
 	}
 
-	public boolean put(BEREdge edge) {
-		return this.customPut(edge.sourceRef, edge.relationRef, edge.targetRef);
-	}
-
-	public boolean put(int sourceRef, int relationRef, int targetRef) {
-		if ((sourceRef == 0) || (relationRef == 0) || (targetRef == 0)) return false;
-		return this.customPut(sourceRef, relationRef, targetRef);
-	}
-
-	public boolean putAll(BEREdge... edges) {
-		return this.putAll(Arrays.asList(edges));
-	}
-
-	public boolean putAll(Iterable<BEREdge> edges) {
-		return this.defaultPutAll(edges);
-	}
-
-	public boolean pop(BEREdge edge) {
-		this.backup();
-		return this.customPop(edge.sourceRef, edge.relationRef, edge.targetRef);
-	}
-
-	public boolean pop(int sourceRef, int relationRef, int targetRef) {
-		if ((sourceRef == 0) || (relationRef == 0) || (targetRef == 0)) return false;
-		this.backup();
-		return this.customPop(sourceRef, relationRef, targetRef);
-	}
-
-	public boolean popAll(BEREdge... edges) {
-		return this.popAll(Arrays.asList(edges));
-	}
-
-	public boolean popAll(Iterable<BEREdge> edges) {
-		return this.defaultPopAll(edges);
-	}
-
-	public boolean popAll(BERState edges) {
-		this.backup();
-		var res = new boolean[1];
-		edges.forEach((sourceRef, relationRef, targetRef) -> res[0] = this.customPop(sourceRef, relationRef, targetRef) | res[0]);
-		return res[0];
-	}
-
-	public BERUpdate commit() {
-		return new BERUpdate(this, true);
-	}
-
-	/** verwirft die änderungen seit dem letzten commit. das betrifft getRootRef, getEntityRefs, getSource..., getTarget... */
-	public BERUpdate rollback() {
-		return new BERUpdate(this, false);
-	}
-
-	final boolean defaultPutAll(Iterable<BEREdge> edges) {
-		var res = false;
-		for (var edge: edges) {
-			res = this.put(edge) | res;
-		}
-		return res;
-	}
-
-	boolean customPop(int sourceRef, int relationRef, int targetRef) {
+	private boolean delete(int sourceRef, int relationRef, int targetRef) {
 
 		var nextSourceMap = this.sourceMap;
 		var nextSourceIdx = REFMAP.getIdx(nextSourceMap, sourceRef);
@@ -266,14 +260,8 @@ class BERStore extends BERState {
 		var nextTargetIdx = REFMAP.getIdx(nextTargetMap, targetRef);
 		if (nextTargetIdx == 0) return false;
 
-		var prevSourceMap = this.prevSourceMap;
-		var prevTargetMap = this.prevTargetMap;
-		if (prevSourceMap == null) {
-			nextSourceMap = REFMAP.copy(prevSourceMap = nextSourceMap);
-			nextTargetMap = REFMAP.copy(prevTargetMap = nextTargetMap);
-			this.prevSourceMap = prevSourceMap;
-			this.prevTargetMap = prevTargetMap;
-		}
+		var prevSourceMap = this.backup.sourceMap;
+		var prevTargetMap = this.backup.targetMap;
 
 		var prevSourceIdx = REFMAP.getIdx(prevSourceMap, sourceRef);
 		var prevSourceRelationMap = prevSourceIdx != 0 ? BERState.asRefMap(REFMAP.getVal(prevSourceMap, prevSourceIdx)) : null;
@@ -365,26 +353,11 @@ class BERStore extends BERState {
 		return true;
 	}
 
-	final boolean defaultPopAll(Iterable<BEREdge> edges) {
-		var res = false;
-		for (var edge: edges) {
-			res = this.pop(edge) | res;
-		}
-		return res;
-	}
-
-	Object owner;
-
-	BERState backup;
-
-	Object[] prevSourceMap;
-
-	Object[] prevTargetMap;
-
-	void backup() {
+	private void backup() {
 		if (this.backup != null) return;
-		this.backup = new BERState();
-		this.backup.setAll(this);
+		this.backup = new BERState(this);
+		this.sourceMap = REFMAP.copy(this.sourceMap);
+		this.targetMap = REFMAP.copy(this.targetMap);
 	}
 
 }

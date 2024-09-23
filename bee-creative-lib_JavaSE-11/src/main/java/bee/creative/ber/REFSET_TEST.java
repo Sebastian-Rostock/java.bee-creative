@@ -14,15 +14,14 @@ class REFSET_TEST {
 			var s = new BERStore();
 			var l = new Tester(() -> {
 				for (int i = 0; i < 1000000;) {
-					for (int j = 0; j < 100; i++, j++) {
+					for (int j = 0; j < 1000; i++, j++) {
 						s.put(r.nextInt(5000) + 1, r.nextInt(50) + 1, r.nextInt(5000) + 1);
 					}
-					// s.commit();
+					 s.commit();
 				}
 			});
 			System.out.println(l);
 			// l.cause.printStackTrace();
-			BERCodec.persistEdges(s);
 		}
 
 	}

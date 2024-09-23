@@ -1,16 +1,22 @@
 package bee.creative.ber;
 
-/** liefert schreibgeschützte sicht auf vorherigen und neuen datenstand sowie die differenz */
-class BERUpdate {
+/** Diese Klasse implementiert den Änderungsbericht zu {@link BERStore#commit()} und {@link BERStore#rollback()}.
+ * 
+ * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
+public class BERUpdate {
 
 	public BERStore getStore() {
 		return this.store;
 	}
 
+	/** Diese Methode liefet bei einem {@link BERStore#commit()} die Kantenmenge vor der ersten Änderung. Bei einem {@link BERStore#rollback()} liefert sie die
+	 * Kantenmenge nach der letzten Änderung. */
 	public BERState getOldState() {
 		return this.oldState;
 	}
 
+	/** Diese Methode liefet bei einem {@link BERStore#commit()} die Kantenmenge nach der letzten Änderung. Bei einem {@link BERStore#rollback()} liefert sie die
+	 * Kantenmenge vor der ersten Änderung. */
 	public BERState getNewState() {
 		return this.newState;
 	}
@@ -29,27 +35,26 @@ class BERUpdate {
 		this.store = store;
 		if (store.backup != null) {
 			if (commit) {
-				this.oldState.setAll(store.backup);
-				this.newState.setAll(store);
+				this.oldState = new BERState(store.backup);
+				this.newState = new BERState(store);
 			} else {
-				this.oldState.setAll(store);
-				this.newState.setAll(store.backup);
+				this.oldState = new BERState(store);
+				this.newState = new BERState(store.backup);
 			}
 			store.backup = null;
 		} else {
-			this.oldState.setAll(store);
-			this.newState.setAll(store);
+			this.newState = this.oldState = new BERState(store);
 		}
 	}
 
-	final BERStore store;
+	private final BERStore store;
 
-	final BERState oldState = new BERState();
+	private final BERState oldState;
 
-	final BERState newState = new BERState();
+	private final BERState newState;
 
-	BERState putEdges;
+	private BERState putEdges;
 
-	BERState popEdges;
+	private BERState popEdges;
 
 }

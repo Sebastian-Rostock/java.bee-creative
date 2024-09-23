@@ -1,5 +1,6 @@
 package bee.creative.ber;
 
+
 import java.util.Arrays;
 import bee.creative.emu.EMU;
 import bee.creative.emu.Emuator;
@@ -26,7 +27,7 @@ import bee.creative.emu.Emuator;
  * </dl>
  * </dd>
  * </dl>
- * 
+ *
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class REFSET {
 
@@ -160,6 +161,16 @@ public final class REFSET {
 			}
 		}
 		return size == 0;
+	}
+
+	/** Diese Methode übergibt alle Referenzen an {@link REFSETRUN#run(int) task.run()}. */
+	public static void forEach(int[] refset, REFSETRUN task) {
+		for (var off = refset.length - 1; 3 < off; off -= 3) {
+			var ref = refset[off];
+			if (ref != 0) {
+				task.run(ref);
+			}
+		}
 	}
 
 	/** Diese Methode liefert alle Referenzen der gegebenen Referenzmenge {@code refset}. */
