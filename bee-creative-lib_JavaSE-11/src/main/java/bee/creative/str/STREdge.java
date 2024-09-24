@@ -1,22 +1,22 @@
-package bee.creative.ber;
+package bee.creative.str;
 
-final class BEREdge {
+final class STREdge {
 
-	public static BEREdge from(int sourceRef, int relationRef, int targetRef) {
+	public static STREdge from(int sourceRef, int relationRef, int targetRef) {
 		if ((sourceRef == 0) || (relationRef == 0) || (targetRef == 0)) return null;
-		return new BEREdge(sourceRef, relationRef, targetRef);
+		return new STREdge(sourceRef, relationRef, targetRef);
 	}
 
 	public int getSourceRef() {
-		return sourceRef;
+		return this.sourceRef;
 	}
 
 	public int getRelationRef() {
-		return relationRef;
+		return this.relationRef;
 	}
 
 	public int getTargetRef() {
-		return targetRef;
+		return this.targetRef;
 	}
 
 	@Override
@@ -30,7 +30,7 @@ final class BEREdge {
 
 	final int targetRef;
 
-	BEREdge(int sourceRef, int relationRef, int targetRef) {
+	STREdge(int sourceRef, int relationRef, int targetRef) {
 		this.sourceRef = sourceRef;
 		this.relationRef = relationRef;
 		this.targetRef = targetRef;

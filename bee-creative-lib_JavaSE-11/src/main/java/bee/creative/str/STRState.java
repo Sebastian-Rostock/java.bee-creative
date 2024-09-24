@@ -1,4 +1,4 @@
-package bee.creative.ber;
+package bee.creative.str;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -11,53 +11,55 @@ import bee.creative.util.Iterators;
 /** Diese Klasse implementiert eine Menge von Kanten eines bidirectional-entity-relation Speichers.
  *
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-class BERState implements Iterable2<BEREdge> {
+public class STRState implements Iterable2<STREdge> {
 
 	/** Diese Methode liefert die Menge der Kanten zur gegebenen {@link #toInts() kompakten Abschrift}. */
-	public static BERState from(int[] storage) {
-		return new BERState(storage.clone());
+	public static STRState from(int[] storage) {
+		return new STRState(storage.clone());
 	}
 
-	public static BERState from(byte[] bytes) {
-		return BERState.from(ByteBuffer.wrap(bytes));
+	public static STRState from(byte[] bytes) {
+		return STRState.from(ByteBuffer.wrap(bytes));
 	}
 
-	public static BERState from(IntBuffer buffer) {
+	public static STRState from(IntBuffer buffer) {
 		var storage = new int[buffer.remaining()];
 		buffer.get(storage);
-		return new BERState(storage);
+		return new STRState(storage);
 	}
 
-	public static BERState from(ByteBuffer buffer) {
-		return BERState.from(buffer.order(ByteOrder.nativeOrder()).asIntBuffer());
+	public static STRState from(ByteBuffer buffer) {
+		return STRState.from(buffer.order(ByteOrder.nativeOrder()).asIntBuffer());
 	}
 
-	/** Diese Methode liefert die Kanten des {@code newState} ohne denen des {@code oldState}, bspw. für {@link BERUpdate#getPutEdges()} und
-	 * {@link BERUpdate#getPopEdges()}.
+	/** Diese Methode liefert die Kanten des {@code newState} ohne denen des {@code oldState}, bspw. für {@link STRUpdate#getPutState()} und
+	 * {@link STRUpdate#getPopState()}.
 	 *
 	 * @param oldState alte Kantenmenge.
 	 * @param newState neue Kantenmenge.
 	 * @return Differenz der gegebenen alte Kangenmengen. */
-	public static BERState from(BERState oldState, BERState newState) {
-		var result = new BERState();
+	public static STRState from(STRState oldState, STRState newState) {
+		var result = new STRState();
 		oldState.restore();
 		newState.restore();
+		result.nextRef = newState.nextRef - oldState.nextRef;
+		result.rootRef = newState.rootRef - oldState.rootRef;
 		var oldSourceMap = oldState.sourceMap;
 		var newSourceMap = newState.sourceMap;
 		var newSourceKeys = REFMAP.getKeys(newSourceMap);
-		for (var newSourceIdx = newSourceMap.length; 0 < newSourceIdx; newSourceIdx--) {
-			var newRelationMap = BERState.asRefMap(REFMAP.getVal(newSourceMap, newSourceIdx));
+		for (var newSourceIdx = newSourceMap.length - 1; 0 < newSourceIdx; newSourceIdx--) {
+			var newRelationMap = STRState.asRefMap(REFMAP.getVal(newSourceMap, newSourceIdx));
 			if (newRelationMap != null) {
 				var sourceRef = REFSET.getRef(newSourceKeys, newSourceIdx);
 				var oldSourceIdx = REFMAP.getIdx(oldSourceMap, sourceRef);
 				if (oldSourceIdx == 0) {
 					var newRelationKeys = REFMAP.getKeys(newRelationMap);
-					for (var newRelationIdx = newRelationMap.length; 0 < newRelationIdx; newRelationIdx--) {
-						var newTargetVal = BERState.asRefVal(REFMAP.getVal(newRelationMap, newRelationIdx));
+					for (var newRelationIdx = newRelationMap.length - 1; 0 < newRelationIdx; newRelationIdx--) {
+						var newTargetVal = STRState.asRefVal(REFMAP.getVal(newRelationMap, newRelationIdx));
 						if (newTargetVal != null) {
 							var relationRef = REFSET.getRef(newRelationKeys, newRelationIdx);
-							if (BERState.isRef(newTargetVal)) {
-								result.insert(sourceRef, relationRef, BERState.asRef(newTargetVal));
+							if (STRState.isRef(newTargetVal)) {
+								result.insert(sourceRef, relationRef, STRState.asRef(newTargetVal));
 							} else {
 								for (var newTargetIdx = newTargetVal.length - 1; 3 < newTargetIdx; newTargetIdx -= 3) {
 									var newTargetRef = newTargetVal[newTargetIdx];
@@ -69,18 +71,18 @@ class BERState implements Iterable2<BEREdge> {
 						}
 					}
 				} else {
-					var oldRelationMap = BERState.asRefMap(REFMAP.getVal(oldSourceMap, oldSourceIdx));
+					var oldRelationMap = STRState.asRefMap(REFMAP.getVal(oldSourceMap, oldSourceIdx));
 					if (newRelationMap != oldRelationMap) {
 						var newRelationKeys = REFMAP.getKeys(newRelationMap);
-						for (var newRelationIdx = newRelationMap.length; 0 < newRelationIdx; newRelationIdx--) {
-							var newTargetVal = BERState.asRefVal(REFMAP.getVal(newRelationMap, newRelationIdx));
+						for (var newRelationIdx = newRelationMap.length - 1; 0 < newRelationIdx; newRelationIdx--) {
+							var newTargetVal = STRState.asRefVal(REFMAP.getVal(newRelationMap, newRelationIdx));
 							if (newTargetVal != null) {
 								var relationRef = REFSET.getRef(newRelationKeys, newRelationIdx);
 								var oldRelationIdx = REFMAP.getIdx(oldRelationMap, relationRef);
 
 								if (oldRelationIdx == 0) {
-									if (BERState.isRef(newTargetVal)) {
-										result.insert(sourceRef, relationRef, BERState.asRef(newTargetVal));
+									if (STRState.isRef(newTargetVal)) {
+										result.insert(sourceRef, relationRef, STRState.asRef(newTargetVal));
 									} else {
 										for (var newTargetIdx = newTargetVal.length - 1; 3 < newTargetIdx; newTargetIdx -= 3) {
 											var newTargetRef = newTargetVal[newTargetIdx];
@@ -90,12 +92,12 @@ class BERState implements Iterable2<BEREdge> {
 										}
 									}
 								} else {
-									var oldTargetVal = BERState.asRefVal(REFMAP.getVal(oldRelationMap, oldRelationIdx));
+									var oldTargetVal = STRState.asRefVal(REFMAP.getVal(oldRelationMap, oldRelationIdx));
 									if (newTargetVal != oldTargetVal) {
-										if (BERState.isRef(oldTargetVal)) {
-											var oldTargetRef = BERState.asRef(oldTargetVal);
-											if (BERState.isRef(newTargetVal)) {
-												var newTargetRef = BERState.asRef(newTargetVal);
+										if (STRState.isRef(oldTargetVal)) {
+											var oldTargetRef = STRState.asRef(oldTargetVal);
+											if (STRState.isRef(newTargetVal)) {
+												var newTargetRef = STRState.asRef(newTargetVal);
 												if (oldTargetRef != newTargetRef) {
 													result.insert(sourceRef, relationRef, newTargetRef);
 												}
@@ -110,8 +112,8 @@ class BERState implements Iterable2<BEREdge> {
 												}
 											}
 										} else {
-											if (BERState.isRef(newTargetVal)) {
-												var newTargetRef = BERState.asRef(newTargetVal);
+											if (STRState.isRef(newTargetVal)) {
+												var newTargetRef = STRState.asRef(newTargetVal);
 												if (REFSET.getIdx(oldTargetVal, newTargetRef) == 0) {
 													result.insert(sourceRef, relationRef, newTargetRef);
 												}
@@ -134,12 +136,10 @@ class BERState implements Iterable2<BEREdge> {
 				}
 			}
 		}
-
-		return null;
-
+		return result;
 	}
 
-	public void forEach(BERTask task) {
+	public void forEach(STRTask task) {
 		if (this.storage != null) {
 			this.select(this.storage, task);
 		} else {
@@ -170,11 +170,11 @@ class BERState implements Iterable2<BEREdge> {
 	}
 
 	public int[] getSourceRelationRefs(int sourceRef) {
-		if (sourceRef == 0) return BERState.EMPTY_REFS;
+		if (sourceRef == 0) return STRState.EMPTY_REFS;
 		this.restore();
 		var sourceIdx = REFMAP.getIdx(this.sourceMap, sourceRef);
-		if (sourceIdx == 0) return BERState.EMPTY_REFS;
-		var relationMap = BERState.asRefMap(REFMAP.getVal(this.sourceMap, sourceIdx));
+		if (sourceIdx == 0) return STRState.EMPTY_REFS;
+		var relationMap = STRState.asRefMap(REFMAP.getVal(this.sourceMap, sourceIdx));
 		return REFMAP.toArray(relationMap);
 	}
 
@@ -183,7 +183,7 @@ class BERState implements Iterable2<BEREdge> {
 		this.restore();
 		var sourceIdx = REFMAP.getIdx(this.sourceMap, sourceRef);
 		if (sourceIdx == 0) return 0;
-		var relationMap = BERState.asRefMap(REFMAP.getVal(this.sourceMap, sourceIdx));
+		var relationMap = STRState.asRefMap(REFMAP.getVal(this.sourceMap, sourceIdx));
 		return REFMAP.size(relationMap);
 	}
 
@@ -193,24 +193,24 @@ class BERState implements Iterable2<BEREdge> {
 		this.restore();
 		var sourceIdx = REFMAP.getIdx(this.sourceMap, sourceRef);
 		if (sourceIdx == 0) return 0;
-		var relationMap = BERState.asRefMap(REFMAP.getVal(this.sourceMap, sourceIdx));
+		var relationMap = STRState.asRefMap(REFMAP.getVal(this.sourceMap, sourceIdx));
 		var relationIdx = REFMAP.getIdx(relationMap, relationRef);
 		if (relationIdx == 0) return 0;
-		var targetVal = BERState.asRefVal(REFMAP.getVal(relationMap, relationIdx));
-		if (BERState.isRef(targetVal)) return BERState.asRef(targetVal);
+		var targetVal = STRState.asRefVal(REFMAP.getVal(relationMap, relationIdx));
+		if (STRState.isRef(targetVal)) return STRState.asRef(targetVal);
 		return REFSET.getRef(targetVal);
 	}
 
 	public int[] getSourceRelationTargetRefs(int sourceRef, int relationRef) {
-		if ((sourceRef == 0) || (relationRef == 0)) return BERState.EMPTY_REFS;
+		if ((sourceRef == 0) || (relationRef == 0)) return STRState.EMPTY_REFS;
 		this.restore();
 		var sourceIdx = REFMAP.getIdx(this.sourceMap, sourceRef);
-		if (sourceIdx == 0) return BERState.EMPTY_REFS;
-		var relationMap = BERState.asRefMap(REFMAP.getVal(this.sourceMap, sourceIdx));
+		if (sourceIdx == 0) return STRState.EMPTY_REFS;
+		var relationMap = STRState.asRefMap(REFMAP.getVal(this.sourceMap, sourceIdx));
 		var relationIdx = REFMAP.getIdx(relationMap, relationRef);
-		if (relationIdx == 0) return BERState.EMPTY_REFS;
-		var targetVal = BERState.asRefVal(REFMAP.getVal(relationMap, relationIdx));
-		if (BERState.isRef(targetVal)) return new int[]{BERState.asRef(targetVal)};
+		if (relationIdx == 0) return STRState.EMPTY_REFS;
+		var targetVal = STRState.asRefVal(REFMAP.getVal(relationMap, relationIdx));
+		if (STRState.isRef(targetVal)) return new int[]{STRState.asRef(targetVal)};
 		return REFSET.toArray(targetVal);
 	}
 
@@ -219,11 +219,11 @@ class BERState implements Iterable2<BEREdge> {
 		this.restore();
 		var sourceIdx = REFMAP.getIdx(this.sourceMap, sourceRef);
 		if (sourceIdx == 0) return 0;
-		var relationMap = BERState.asRefMap(REFMAP.getVal(this.sourceMap, sourceIdx));
+		var relationMap = STRState.asRefMap(REFMAP.getVal(this.sourceMap, sourceIdx));
 		var relationIdx = REFMAP.getIdx(relationMap, relationRef);
 		if (relationIdx == 0) return 0;
-		var targetVal = BERState.asRefVal(REFMAP.getVal(relationMap, relationIdx));
-		if (BERState.isRef(targetVal)) return 1;
+		var targetVal = STRState.asRefVal(REFMAP.getVal(relationMap, relationIdx));
+		if (STRState.isRef(targetVal)) return 1;
 		return REFSET.size(targetVal);
 	}
 
@@ -239,11 +239,11 @@ class BERState implements Iterable2<BEREdge> {
 
 	// als rel bei target vorkommenden knoten
 	public int[] getTargetRelationRefs(int targetRef) {
-		if (targetRef == 0) return BERState.EMPTY_REFS;
+		if (targetRef == 0) return STRState.EMPTY_REFS;
 		this.restore();
 		var targetIdx = REFMAP.getIdx(this.targetMap, targetRef);
-		if (targetIdx == 0) return BERState.EMPTY_REFS;
-		var relationMap = BERState.asRefMap(REFMAP.getVal(this.targetMap, targetIdx));
+		if (targetIdx == 0) return STRState.EMPTY_REFS;
+		var relationMap = STRState.asRefMap(REFMAP.getVal(this.targetMap, targetIdx));
 		return REFMAP.toArray(relationMap);
 	}
 
@@ -253,7 +253,7 @@ class BERState implements Iterable2<BEREdge> {
 		this.restore();
 		var targetIdx = REFMAP.getIdx(this.targetMap, targetRef);
 		if (targetIdx == 0) return 0;
-		var relationMap = BERState.asRefMap(REFMAP.getVal(this.targetMap, targetIdx));
+		var relationMap = STRState.asRefMap(REFMAP.getVal(this.targetMap, targetIdx));
 		return REFMAP.size(relationMap);
 	}
 
@@ -263,25 +263,25 @@ class BERState implements Iterable2<BEREdge> {
 		this.restore();
 		var targetIdx = REFMAP.getIdx(this.targetMap, targetRef);
 		if (targetIdx == 0) return 0;
-		var relationMap = BERState.asRefMap(REFMAP.getVal(this.targetMap, targetIdx));
+		var relationMap = STRState.asRefMap(REFMAP.getVal(this.targetMap, targetIdx));
 		var relationIdx = REFMAP.getIdx(relationMap, relationRef);
 		if (relationIdx == 0) return 0;
-		var sourceVal = BERState.asRefVal(REFMAP.getVal(relationMap, relationIdx));
-		if (BERState.isRef(sourceVal)) return BERState.asRef(sourceVal);
+		var sourceVal = STRState.asRefVal(REFMAP.getVal(relationMap, relationIdx));
+		if (STRState.isRef(sourceVal)) return STRState.asRef(sourceVal);
 		return REFSET.getRef(sourceVal);
 	}
 
 	// als source bei target und rel vorkommende knoten
 	public int[] getTargetRelationSourceRefs(int targetRef, int relationRef) {
-		if ((targetRef == 0) || (relationRef == 0)) return BERState.EMPTY_REFS;
+		if ((targetRef == 0) || (relationRef == 0)) return STRState.EMPTY_REFS;
 		this.restore();
 		var targetIdx = REFMAP.getIdx(this.targetMap, targetRef);
-		if (targetIdx == 0) return BERState.EMPTY_REFS;
-		var relationMap = BERState.asRefMap(REFMAP.getVal(this.targetMap, targetIdx));
+		if (targetIdx == 0) return STRState.EMPTY_REFS;
+		var relationMap = STRState.asRefMap(REFMAP.getVal(this.targetMap, targetIdx));
 		var relationIdx = REFMAP.getIdx(relationMap, relationRef);
-		if (relationIdx == 0) return BERState.EMPTY_REFS;
-		var sourceVal = BERState.asRefVal(REFMAP.getVal(relationMap, relationIdx));
-		if (BERState.isRef(sourceVal)) return new int[]{BERState.asRef(sourceVal)};
+		if (relationIdx == 0) return STRState.EMPTY_REFS;
+		var sourceVal = STRState.asRefVal(REFMAP.getVal(relationMap, relationIdx));
+		if (STRState.isRef(sourceVal)) return new int[]{STRState.asRef(sourceVal)};
 		return REFSET.toArray(sourceVal);
 	}
 
@@ -291,11 +291,11 @@ class BERState implements Iterable2<BEREdge> {
 		this.restore();
 		var targetIdx = REFMAP.getIdx(this.targetMap, targetRef);
 		if (targetIdx == 0) return 0;
-		var relationMap = BERState.asRefMap(REFMAP.getVal(this.targetMap, targetIdx));
+		var relationMap = STRState.asRefMap(REFMAP.getVal(this.targetMap, targetIdx));
 		var relationIdx = REFMAP.getIdx(relationMap, relationRef);
 		if (relationIdx == 0) return 0;
-		var sourceVal = BERState.asRefVal(REFMAP.getVal(relationMap, relationIdx));
-		if (BERState.isRef(sourceVal)) return 1;
+		var sourceVal = STRState.asRefVal(REFMAP.getVal(relationMap, relationIdx));
+		if (STRState.isRef(sourceVal)) return 1;
 		return REFSET.size(sourceVal);
 	}
 
@@ -304,11 +304,11 @@ class BERState implements Iterable2<BEREdge> {
 		this.restore();
 		var sourceIdx = REFMAP.getIdx(this.sourceMap, sourceRef);
 		if (sourceIdx == 0) return false;
-		var relationMap = BERState.asRefMap(REFMAP.getVal(this.sourceMap, sourceIdx));
+		var relationMap = STRState.asRefMap(REFMAP.getVal(this.sourceMap, sourceIdx));
 		var relationIdx = REFMAP.getIdx(relationMap, relationRef);
 		if (relationIdx == 0) return false;
-		var targetVal = BERState.asRefVal(REFMAP.getVal(relationMap, relationIdx));
-		if (BERState.isRef(targetVal)) return BERState.asRef(targetVal) == targetRef;
+		var targetVal = STRState.asRefVal(REFMAP.getVal(relationMap, relationIdx));
+		if (STRState.isRef(targetVal)) return STRState.asRef(targetVal) == targetRef;
 		return REFSET.getIdx(targetVal, targetRef) != 0;
 	}
 
@@ -323,7 +323,7 @@ class BERState implements Iterable2<BEREdge> {
 		this.restore();
 		var sourceIdx = REFMAP.getIdx(this.sourceMap, sourceRef);
 		if (sourceIdx == 0) return false;
-		var relationMap = BERState.asRefMap(REFMAP.getVal(this.sourceMap, sourceIdx));
+		var relationMap = STRState.asRefMap(REFMAP.getVal(this.sourceMap, sourceIdx));
 		return REFMAP.getIdx(relationMap, relationRef) != 0;
 	}
 
@@ -338,12 +338,12 @@ class BERState implements Iterable2<BEREdge> {
 		this.restore();
 		var targetIdx = REFMAP.getIdx(this.targetMap, targetRef);
 		if (targetIdx == 0) return false;
-		var relationMap = BERState.asRefMap(REFMAP.getVal(this.targetMap, targetIdx));
+		var relationMap = STRState.asRefMap(REFMAP.getVal(this.targetMap, targetIdx));
 		return REFMAP.getIdx(relationMap, relationRef) != 0;
 	}
 
 	@Override
-	public Iterator2<BEREdge> iterator() { // TODO eigene iter
+	public Iterator2<STREdge> iterator() { // TODO eigene iter
 		var sourceRefs = this.getSourceRefs();
 		return Iterators.concatAll(Iterators.concatAll(Iterators.fromCount(sourceRefs.length).translate(sourceIdx -> {
 			var sourceRef = sourceRefs[sourceIdx];
@@ -353,13 +353,13 @@ class BERState implements Iterable2<BEREdge> {
 				var targetRefs = this.getSourceRelationTargetRefs(sourceRef, relationRef);
 				return Iterators.fromCount(targetRefs.length).translate(targetIdx -> {
 					var targetRef = targetRefs[targetIdx];
-					return new BEREdge(sourceRef, relationRef, targetRef);
+					return new STREdge(sourceRef, relationRef, targetRef);
 				});
 			});
 		})));
 	}
 
-	/** Diese Methode liefert ein kompakte Abschrift aller {@link BEREdge Katen} dieser Menge als {@code int}-Array mit der Struktur
+	/** Diese Methode liefert ein kompakte Abschrift aller {@link STREdge Katen} dieser Menge als {@code int}-Array mit der Struktur
 	 * {@code (nextRef, rootRef, sourceCount, (sourceRef, targetRefCount, targetSetCount, (relationRef, targetRef)[targetRefCount], (relationRef, targetCount, targetRef[targetCount])[targetSetCount])[sourceCount])}.
 	 *
 	 * @return */
@@ -373,13 +373,13 @@ class BERState implements Iterable2<BEREdge> {
 		var storageSize = 3;
 		var sourceCount = 0;
 		for (var sourceIdx = sourceMap.length - 1; 0 < sourceIdx; sourceIdx--) {
-			var relationMap = BERState.asRefMap(sourceMap[sourceIdx]);
+			var relationMap = STRState.asRefMap(sourceMap[sourceIdx]);
 			if (relationMap != null) {
 				var relationSize = 0;
 				for (var relationIdx = relationMap.length - 1; 0 < relationIdx; relationIdx--) {
-					var targetVal = BERState.asRefVal(relationMap[relationIdx]);
+					var targetVal = STRState.asRefVal(relationMap[relationIdx]);
 					if (targetVal != null) {
-						if (BERState.isRef(targetVal)) {
+						if (STRState.isRef(targetVal)) {
 							relationSize += /*relationRef*/ 1 + /*targetRef*/ 1;
 						} else {
 							var c = REFSET.size(targetVal);
@@ -426,10 +426,8 @@ class BERState implements Iterable2<BEREdge> {
 		return res.append(" }").toString();
 	}
 
-	BERState() {
+	STRState() {
 	}
-
-	static final int[] EMPTY_REFS = new int[0];
 
 	static boolean isRef(int[] val) {
 		return val.length == 1;
@@ -463,12 +461,12 @@ class BERState implements Iterable2<BEREdge> {
 	 * {@code relation}-Referenzen auf {@code source}-Referenzen. Letztere sind dabei als {@link Integer} oder gemäß {@link REFSET} abgebildet. */
 	Object[] targetMap = REFMAP.EMPTY;
 
-	/** Dieses Feld speichert alle {@link BEREdge Kanten} als kompaktes {@code int}-Array der Struktur
+	/** Dieses Feld speichert alle {@link STREdge Kanten} als kompaktes {@code int}-Array der Struktur
 	 * {@code (nextRef, rootRef, sourceCount, (sourceRef, targetRefCount, targetSetCount, (relationRef, targetRef)[targetRefCount], (relationRef, targetCount, targetRef[targetCount])[targetSetCount])[sourceCount])}. */
 	int[] storage;
 
-	/** Dieser Konstruktor übernimmt die Merkmale des gegebenen {@link BERState}. */
-	BERState(BERState that) {
+	/** Dieser Konstruktor übernimmt die Merkmale des gegebenen {@link STRState}. */
+	STRState(STRState that) {
 		this.rootRef = that.rootRef;
 		this.nextRef = that.nextRef;
 		this.sourceMap = that.sourceMap;
@@ -476,13 +474,15 @@ class BERState implements Iterable2<BEREdge> {
 		this.storage = that.storage;
 	}
 
-	private BERState(int[] storage) {
+	private static final int[] EMPTY_REFS = new int[0];
+
+	private STRState(int[] storage) {
 		this.nextRef = storage[0];
 		this.rootRef = storage[1];
 		this.storage = storage;
 	}
 
-	private void select(int[] storage, BERTask task) {
+	private void select(int[] storage, STRTask task) {
 		var storageIdx = 2;
 		var sourceCount = storage[storageIdx++];
 		while (0 < sourceCount--) {
@@ -505,19 +505,19 @@ class BERState implements Iterable2<BEREdge> {
 		}
 	}
 
-	private void select(Object[] sourceMap, BERTask task) {
+	private void select(Object[] sourceMap, STRTask task) {
 		var sourceKeys = REFMAP.getKeys(sourceMap);
 		for (var sourceIdx = sourceMap.length; 0 < sourceIdx; sourceIdx--) {
-			var relationMap = BERState.asRefMap(REFMAP.getVal(sourceMap, sourceIdx));
+			var relationMap = STRState.asRefMap(REFMAP.getVal(sourceMap, sourceIdx));
 			if (relationMap != null) {
 				var sourceRef = REFSET.getRef(sourceKeys, sourceIdx);
 				var relationKeys = REFMAP.getKeys(relationMap);
 				for (var relationIdx = relationMap.length; 0 < relationIdx; relationIdx--) {
-					var targetVal = BERState.asRefVal(REFMAP.getVal(relationMap, relationIdx));
+					var targetVal = STRState.asRefVal(REFMAP.getVal(relationMap, relationIdx));
 					if (targetVal != null) {
 						var relationRef = REFSET.getRef(relationKeys, relationIdx);
-						if (BERState.isRef(targetVal)) {
-							task.run(sourceRef, relationRef, BERState.asRef(targetVal));
+						if (STRState.isRef(targetVal)) {
+							task.run(sourceRef, relationRef, STRState.asRef(targetVal));
 						} else {
 							REFSET.toArray(targetVal);
 							for (var targetIdx = targetVal.length - 1; 3 < targetIdx; targetIdx -= 3) {
@@ -545,18 +545,18 @@ class BERState implements Iterable2<BEREdge> {
 		var sourceIdx = REFMAP.putRef(sourceMap, sourceRef);
 		if (sourceIdx == 0) throw new IllegalStateException();
 
-		var sourceRelationMap = BERState.asRefMap(REFMAP.getVal(sourceMap, sourceIdx));
+		var sourceRelationMap = STRState.asRefMap(REFMAP.getVal(sourceMap, sourceIdx));
 		sourceRelationMap = sourceRelationMap == null ? REFMAP.make() : REFMAP.grow(sourceRelationMap);
 		REFMAP.setVal(sourceMap, sourceIdx, sourceRelationMap);
 
 		var sourceRelationIdx = REFMAP.putRef(sourceRelationMap, relationRef);
 		if (sourceRelationIdx == 0) throw new IllegalStateException();
 
-		var sourceRelationTargetVal = BERState.asRefVal(REFMAP.getVal(sourceRelationMap, sourceRelationIdx));
+		var sourceRelationTargetVal = STRState.asRefVal(REFMAP.getVal(sourceRelationMap, sourceRelationIdx));
 		if (sourceRelationTargetVal == null) {
-			REFMAP.setVal(sourceRelationMap, sourceRelationIdx, BERState.toRef(targetRef));
-		} else if (BERState.isRef(sourceRelationTargetVal)) {
-			var targetRef2 = BERState.asRef(sourceRelationTargetVal);
+			REFMAP.setVal(sourceRelationMap, sourceRelationIdx, STRState.toRef(targetRef));
+		} else if (STRState.isRef(sourceRelationTargetVal)) {
+			var targetRef2 = STRState.asRef(sourceRelationTargetVal);
 			if (targetRef == targetRef2) return sourceMap;
 			REFMAP.setVal(sourceRelationMap, sourceRelationIdx, REFSET.from(targetRef, targetRef2));
 		} else {
@@ -569,7 +569,7 @@ class BERState implements Iterable2<BEREdge> {
 		return sourceMap;
 	}
 
-	/** Diese Methode ersetzt {@link #sourceMap} und {@link #targetMap} nur dann mit den in {@link #storage} hinterlegten {@link BEREdge}, wenn {@link #storage}
+	/** Diese Methode ersetzt {@link #sourceMap} und {@link #targetMap} nur dann mit den in {@link #storage} hinterlegten {@link STREdge}, wenn {@link #storage}
 	 * nicht {@code null} ist. Anschließend wird {@link #storage} auf {@code null} gesetzt. */
 	private void restore() {
 		if (this.storage == null) return;

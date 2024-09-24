@@ -1,6 +1,6 @@
-package bee.creative.ber;
+package bee.creative.str;
 
-public interface BERTask {
+public interface STRTask {
 
 	void run(int sourceRef, int relationRef, int targetRef);
 

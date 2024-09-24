@@ -1,4 +1,4 @@
-package bee.creative.ber;
+package bee.creative.str;
 
 /** Diese Schnittstelle definiert den Empfänger der Referenzen für {@link REFSET#forEach(int[], REFSETRUN)}.
  * 

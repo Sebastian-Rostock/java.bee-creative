@@ -1,4 +1,4 @@
-package bee.creative.ber;
+package bee.creative.str;
 
 import bee.creative.emu.EMU;
 import bee.creative.emu.Emuator;
