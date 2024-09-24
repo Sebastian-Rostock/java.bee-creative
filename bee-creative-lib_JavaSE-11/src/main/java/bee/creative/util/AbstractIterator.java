@@ -20,9 +20,4 @@ public abstract class AbstractIterator<GItem> extends BaseObject implements Iter
 		throw new NoSuchElementException();
 	}
 
-	@Override
-	public void remove() {
-		new UnsupportedOperationException();
-	}
-
 }
