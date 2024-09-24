@@ -28,7 +28,7 @@ class BERStore extends BERState {
 	public int newNextRef() {
 		this.backup();
 		var nextRef = this.getNextRef();
-		while (this.isSourceRef(nextRef) || this.isTargetRef(nextRef)) {
+		while (this.containsSourceRef(nextRef) || this.containsTargetRef(nextRef)) {
 			nextRef++;
 		}
 		this.nextRef = nextRef + 1;
@@ -136,115 +136,166 @@ class BERStore extends BERState {
 
 	private boolean insert(int sourceRef, int relationRef, int targetRef) {
 
-		var prevSourceMap = this.backup.sourceMap;
-		var prevTargetMap = this.backup.targetMap;
-		var nextSourceMap = this.sourceMap;
-		var nextTargetMap = this.targetMap;
+		var sourceMap = this.sourceMap;
+		var targetMap = this.targetMap;
 
-		nextSourceMap = REFMAP.grow(nextSourceMap);
-		nextTargetMap = REFMAP.grow(nextTargetMap);
+		sourceMap = REFMAP.grow(sourceMap);
+		targetMap = REFMAP.grow(targetMap);
 
-		this.sourceMap = nextSourceMap;
-		this.targetMap = nextTargetMap;
+		this.sourceMap = sourceMap;
+		this.targetMap = targetMap;
 
-		var prevSourceRelationIdx = REFMAP.getIdx(prevSourceMap, sourceRef);
-		var prevSourceRelationMap = prevSourceRelationIdx != 0 ? BERState.asRefMap(REFMAP.getVal(prevSourceMap, prevSourceRelationIdx)) : null;
-		var nextSourceRelationIdx = REFMAP.putRef(nextSourceMap, sourceRef);
-		if (nextSourceRelationIdx == 0) return false;
-		var nextSourceRelationMap = BERState.asRefMap(REFMAP.getVal(nextSourceMap, nextSourceRelationIdx));
-		if (nextSourceRelationMap == null) {
-			nextSourceRelationMap = REFMAP.make();
-		} else if (nextSourceRelationMap == prevSourceRelationMap) {
-			nextSourceRelationMap = REFMAP.grow(prevSourceRelationMap);
-			if (nextSourceRelationMap == prevSourceRelationMap) {
-				nextSourceRelationMap = REFMAP.copy(prevSourceRelationMap);
-			}
+		// PUT sourceMap
+		var nextSourceIdx = REFMAP.putRef(sourceMap, sourceRef);
+
+		// MAX sourceMap
+		if (nextSourceIdx == 0) throw new IllegalStateException();
+
+		// GET sourceRelationMap
+		var sourceRelationMap = BERState.asRefMap(REFMAP.getVal(sourceMap, nextSourceIdx));
+		Object[] backupSourceRelationMap = null;
+
+		if (sourceRelationMap == null) {
+			// NEW sourceRelationMap
+			REFMAP.setVal(sourceMap, nextSourceIdx, REFMAP.EMPTY);
+			sourceRelationMap = REFMAP.make();
 		} else {
-			nextSourceRelationMap = REFMAP.grow(nextSourceRelationMap);
+			var backupSourceMap = this.backup.sourceMap;
+			var backupSourceIdx = REFMAP.getIdx(backupSourceMap, sourceRef);
+			backupSourceRelationMap = backupSourceIdx != 0 ? BERState.asRefMap(REFMAP.getVal(backupSourceMap, backupSourceIdx)) : null;
+			if (sourceRelationMap == backupSourceRelationMap) {
+				// COW sourceRelationMap
+				sourceRelationMap = REFMAP.grow(backupSourceRelationMap);
+				if (sourceRelationMap == backupSourceRelationMap) {
+					sourceRelationMap = REFMAP.copy(backupSourceRelationMap);
+				}
+			} else {
+				// OWN sourceRelationMap
+				sourceRelationMap = REFMAP.grow(sourceRelationMap);
+			}
 		}
-		REFMAP.setVal(nextSourceMap, nextSourceRelationIdx, nextSourceRelationMap);
+		REFMAP.setVal(sourceMap, nextSourceIdx, sourceRelationMap);
 
-		var prevTargetRelationIdx = REFMAP.getIdx(prevTargetMap, targetRef);
-		var prevTargetRelationMap = prevTargetRelationIdx != 0 ? BERState.asRefMap(REFMAP.getVal(prevTargetMap, prevTargetRelationIdx)) : null;
-		var nextTargetRelationIdx = REFMAP.putRef(nextTargetMap, targetRef);
-		if (nextTargetRelationIdx == 0) return false;
-		var nextTargetRelationMap = BERState.asRefMap(REFMAP.getVal(nextTargetMap, nextTargetRelationIdx));
-		if (nextTargetRelationMap == null) {
-			nextTargetRelationMap = REFMAP.make();
-		} else if (nextTargetRelationMap == prevTargetRelationMap) {
-			nextTargetRelationMap = REFMAP.grow(prevTargetRelationMap);
-			if (nextTargetRelationMap == prevTargetRelationMap) {
-				nextTargetRelationMap = REFMAP.copy(prevTargetRelationMap);
-			}
+		// PUT targetMap
+		var targetIdx = REFMAP.putRef(targetMap, targetRef);
+
+		// MAX targetMap
+		if (targetIdx == 0) throw new IllegalStateException();
+
+		// GET targetRelationMap
+		var targetRelationMap = BERState.asRefMap(REFMAP.getVal(targetMap, targetIdx));
+		Object[] backupTargetRelationMap = null;
+
+		if (targetRelationMap == null) {
+			// NEW targetRelationMap
+			REFMAP.setVal(targetMap, targetIdx, REFMAP.EMPTY);
+			targetRelationMap = REFMAP.make();
 		} else {
-			nextTargetRelationMap = REFMAP.grow(nextTargetRelationMap);
+			var backupTargetMap = this.backup.targetMap;
+			var backupTargetIdx = REFMAP.getIdx(backupTargetMap, targetRef);
+			backupTargetRelationMap = backupTargetIdx != 0 ? BERState.asRefMap(REFMAP.getVal(backupTargetMap, backupTargetIdx)) : null;
+			if (targetRelationMap == backupTargetRelationMap) {
+				// COW targetRelationMap
+				targetRelationMap = REFMAP.grow(backupTargetRelationMap);
+				if (targetRelationMap == backupTargetRelationMap) {
+					targetRelationMap = REFMAP.copy(backupTargetRelationMap);
+				}
+			} else {
+				// OWN targetRelationMap
+				targetRelationMap = REFMAP.grow(targetRelationMap);
+			}
 		}
-		REFMAP.setVal(nextTargetMap, nextTargetRelationIdx, nextTargetRelationMap);
+		REFMAP.setVal(targetMap, targetIdx, targetRelationMap);
 
-		var prevSourceRelationTargetIdx = prevSourceRelationMap != null ? REFMAP.getIdx(prevSourceRelationMap, relationRef) : 0;
-		var prevSourceRelationTargetVal =
-			prevSourceRelationTargetIdx != 0 ? BERState.asRefVal(REFMAP.getVal(prevSourceRelationMap, prevSourceRelationTargetIdx)) : null;
-		var nextSourceRelationTargetIdx = REFMAP.putRef(nextSourceRelationMap, relationRef);
-		if (nextSourceRelationTargetIdx == 0) return false;
-		var nextSourceRelationTargetVal = BERState.asRefVal(REFMAP.getVal(nextSourceRelationMap, nextSourceRelationTargetIdx));
-		if (nextSourceRelationTargetVal == null) {
-			REFMAP.setVal(nextSourceRelationMap, nextSourceRelationTargetIdx, BERState.toRef(targetRef));
-		} else if (BERState.isRef(nextSourceRelationTargetVal)) {
-			var targetRef2 = BERState.asRef(nextSourceRelationTargetVal);
-			if (targetRef == targetRef2) return false;
-			REFMAP.setVal(nextSourceRelationMap, nextSourceRelationTargetIdx, REFSET.from(targetRef, targetRef2));
-		} else if (nextSourceRelationTargetVal == prevSourceRelationTargetVal) {
-			var prevSourceRelationTargetSet = prevSourceRelationTargetVal;
-			var nextSourceRelationTargetSet = REFSET.grow(prevSourceRelationTargetSet);
-			if (nextSourceRelationTargetSet == prevSourceRelationTargetSet) {
-				nextSourceRelationTargetSet = REFSET.copy(prevSourceRelationTargetSet);
-			}
-			REFMAP.setVal(nextSourceRelationMap, nextSourceRelationTargetIdx, nextSourceRelationTargetSet);
-			var nextSourceRelationTargetCount = REFSET.size(nextSourceRelationTargetSet);
-			REFSET.putRef(nextSourceRelationTargetSet, targetRef);
-			if (nextSourceRelationTargetCount == REFSET.size(nextSourceRelationTargetSet)) return false;
+		// PUT sourceRelationMap
+		var sourceRelationIdx = REFMAP.putRef(sourceRelationMap, relationRef);
+
+		// MAX sourceRelationMap
+		if (sourceRelationIdx == 0) throw new IllegalStateException();
+
+		// GET sourceRelationTargetVal
+		var sourceRelationTargetVal = BERState.asRefVal(REFMAP.getVal(sourceRelationMap, sourceRelationIdx));
+		var backupRelationTargetVal = sourceRelationTargetVal;
+
+		if (sourceRelationTargetVal == null) {
+			// NEW sourceRelationTargetVal
+			REFMAP.setVal(sourceRelationMap, sourceRelationIdx, REFSET.EMPTY);
+			sourceRelationTargetVal = BERState.toRef(targetRef);
+			REFMAP.setVal(sourceRelationMap, sourceRelationIdx, sourceRelationTargetVal);
+		} else if (BERState.isRef(sourceRelationTargetVal)) {
+			// ADD sourceRelationTargetVal
+			var targetRef2 = BERState.asRef(sourceRelationTargetVal);
+			if (targetRef == targetRef2) return false; // OLD
+			sourceRelationTargetVal = REFSET.from(targetRef, targetRef2);
+			REFMAP.setVal(sourceRelationMap, sourceRelationIdx, sourceRelationTargetVal);
 		} else {
-			var nextSourceRelationTargetSet = REFSET.grow(nextSourceRelationTargetVal);
-			REFMAP.setVal(nextSourceRelationMap, nextSourceRelationTargetIdx, nextSourceRelationTargetSet);
-			var nextSourceRelationTargetCount = REFSET.size(nextSourceRelationTargetSet);
-			REFSET.putRef(nextSourceRelationTargetSet, targetRef);
-			if (nextSourceRelationTargetCount == REFSET.size(nextSourceRelationTargetSet)) return false;
+			var backupSourceRelationIdx = backupSourceRelationMap != null ? REFMAP.getIdx(backupSourceRelationMap, relationRef) : 0;
+			var backupSourceRelationTargetVal =
+				backupSourceRelationIdx != 0 ? BERState.asRefVal(REFMAP.getVal(backupSourceRelationMap, backupSourceRelationIdx)) : null;
+			if (sourceRelationTargetVal == backupSourceRelationTargetVal) {
+				// COW sourceRelationTargetVal
+				sourceRelationTargetVal = REFSET.grow(backupSourceRelationTargetVal);
+				if (sourceRelationTargetVal == backupSourceRelationTargetVal) {
+					sourceRelationTargetVal = REFSET.copy(backupSourceRelationTargetVal);
+				}
+				var nextSourceRelationTargetCount = REFSET.size(sourceRelationTargetVal);
+				REFSET.putRef(sourceRelationTargetVal, targetRef);
+				REFMAP.setVal(sourceRelationMap, sourceRelationIdx, sourceRelationTargetVal);
+				if (nextSourceRelationTargetCount == REFSET.size(sourceRelationTargetVal)) return false; // OLD
+			} else {
+				// OWN sourceRelationTargetVal
+				sourceRelationTargetVal = REFSET.grow(sourceRelationTargetVal);
+				var nextSourceRelationTargetCount = REFSET.size(sourceRelationTargetVal);
+				REFSET.putRef(sourceRelationTargetVal, targetRef);
+				REFMAP.setVal(sourceRelationMap, sourceRelationIdx, sourceRelationTargetVal);
+				if (nextSourceRelationTargetCount == REFSET.size(sourceRelationTargetVal)) return false; // OLD
+			}
 		}
 
-		var prevTargetRelationSourceIdx = prevTargetRelationMap != null ? REFMAP.getIdx(prevTargetRelationMap, relationRef) : 0;
-		var prevTargetRelationSourceVal =
-			prevTargetRelationSourceIdx != 0 ? BERState.asRefVal(REFMAP.getVal(prevTargetRelationMap, prevTargetRelationSourceIdx)) : null;
-		var nextTargetRelationSourceIdx = REFMAP.putRef(nextTargetRelationMap, relationRef);
-		if (nextTargetRelationSourceIdx == 0) return false;
-		var nextTargetRelationSourceVal = BERState.asRefVal(REFMAP.getVal(nextTargetRelationMap, nextTargetRelationSourceIdx));
-		if (nextTargetRelationSourceVal == null) {
-			REFMAP.setVal(nextTargetRelationMap, nextTargetRelationSourceIdx, BERState.toRef(sourceRef));
-		} else if (BERState.isRef(nextTargetRelationSourceVal)) {
-			var sourceRef2 = BERState.asRef(nextTargetRelationSourceVal);
-			// if (sourceRef == sourceRef2) {
-			// return false;
-			// }
-			REFMAP.setVal(nextTargetRelationMap, nextTargetRelationSourceIdx, REFSET.from(sourceRef, sourceRef2));
-		} else if (nextTargetRelationSourceVal == prevTargetRelationSourceVal) {
-			var prevTargetRelationSourceSet = prevTargetRelationSourceVal;
-			var nextTargetRelationSourceSet = REFSET.grow(prevTargetRelationSourceSet);
-			if (nextTargetRelationSourceSet == prevTargetRelationSourceSet) {
-				nextTargetRelationSourceSet = REFSET.copy(prevTargetRelationSourceSet);
+		// PUT targetRelationMap
+		var targetRelationIdx = REFMAP.putRef(targetRelationMap, relationRef);
+
+		// MAX targetRelationMap
+		if (targetRelationIdx == 0) {
+			if (BERState.isRef(sourceRelationTargetVal)) {
+				REFMAP.setVal(sourceRelationMap, REFMAP.popRef(sourceRelationMap, relationRef), null);
+			} else if (BERState.isRef(backupRelationTargetVal)) {
+				REFMAP.setVal(sourceRelationMap, sourceRelationIdx, backupRelationTargetVal);
+			} else {
+				REFSET.popRef(sourceRelationTargetVal, targetRef);
 			}
-			REFMAP.setVal(nextTargetRelationMap, nextTargetRelationSourceIdx, nextTargetRelationSourceSet);
-			// var nextTargetRelationSourceCount = REFSET.size(nextTargetRelationSourceSet);
-			REFSET.putRef(nextTargetRelationSourceSet, sourceRef);
-			// if (nextTargetRelationSourceCount == REFSET.size(nextTargetRelationSourceSet)) {
-			// return false;
-			// }
+			throw new IllegalStateException();
+		}
+
+		var targetRelationSourceVal = BERState.asRefVal(REFMAP.getVal(targetRelationMap, targetRelationIdx));
+		
+		if (targetRelationSourceVal == null) {
+			REFMAP.setVal(targetRelationMap, targetRelationIdx, REFSET.EMPTY);
+			targetRelationSourceVal = BERState.toRef(sourceRef);
+			REFMAP.setVal(targetRelationMap, targetRelationIdx, targetRelationSourceVal);
+		} else if (BERState.isRef(targetRelationSourceVal)) {
+			// ADD targetRelationSourceVal
+			var sourceRef2 = BERState.asRef(targetRelationSourceVal);
+			targetRelationSourceVal = REFSET.from(sourceRef, sourceRef2);
+			REFMAP.setVal(targetRelationMap, targetRelationIdx, targetRelationSourceVal);
 		} else {
-			var nextTargetRelationSourceSet = REFSET.grow(nextTargetRelationSourceVal);
-			REFMAP.setVal(nextTargetRelationMap, nextTargetRelationSourceIdx, nextTargetRelationSourceSet);
-			// var nextTargetRelationSourceCount = REFSET.size(nextTargetRelationSourceSet);
-			REFSET.putRef(nextTargetRelationSourceSet, sourceRef);
-			// if (nextTargetRelationSourceCount == REFSET.size(nextTargetRelationSourceSet)) {
-			// return false;
-			// }
+			var backupTargetRelationIdx = backupTargetRelationMap != null ? REFMAP.getIdx(backupTargetRelationMap, relationRef) : 0;
+			var backupTargetRelationSourceVal =
+				backupTargetRelationIdx != 0 ? BERState.asRefVal(REFMAP.getVal(backupTargetRelationMap, backupTargetRelationIdx)) : null;
+			if (targetRelationSourceVal == backupTargetRelationSourceVal) {
+				// COW targetRelationSourceVal
+				targetRelationSourceVal = REFSET.grow(backupTargetRelationSourceVal);
+				if (targetRelationSourceVal == backupTargetRelationSourceVal) {
+					targetRelationSourceVal = REFSET.copy(backupTargetRelationSourceVal);
+				}
+				REFMAP.setVal(targetRelationMap, targetRelationIdx, targetRelationSourceVal);
+				REFSET.putRef(targetRelationSourceVal, sourceRef);
+			} else {
+				// OWN targetRelationSourceVal
+				targetRelationSourceVal = REFSET.grow(targetRelationSourceVal);
+				REFMAP.setVal(targetRelationMap, targetRelationIdx, targetRelationSourceVal);
+				REFSET.putRef(targetRelationSourceVal, sourceRef);
+			}
 		}
 
 		return true;
