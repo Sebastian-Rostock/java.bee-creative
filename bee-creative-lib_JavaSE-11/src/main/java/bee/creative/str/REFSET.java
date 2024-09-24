@@ -1,6 +1,8 @@
 package bee.creative.str;
 
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 import bee.creative.emu.EMU;
 import bee.creative.emu.Emuator;
 import bee.creative.util.AbstractIterator;
@@ -173,6 +175,7 @@ public final class REFSET {
 		}
 	}
 
+	/** Diese Methode liefert den {@link Iterator} über die Referenzen der gegebenen Referenzmenge {@code refset}. */
 	public static ITER iterator(int[] refset) {
 		return new ITER(refset);
 	}
@@ -213,7 +216,7 @@ public final class REFSET {
 	}
 
 	/** Diese Klasse implementiert {@link REFSET#iterator(int[])}.
-	 * 
+	 *
 	 * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static class ITER extends AbstractIterator<Integer> {
 
@@ -224,6 +227,7 @@ public final class REFSET {
 
 		/** Diese Methode liefert die nächsten Referenz oder {@code 0}. */
 		public int nextRef() {
+			if (!this.hasNext()) throw new NoSuchElementException();
 			var ref = this.ref;
 			for (; (3 < this.index) && ((this.ref = this.refset[this.index]) != 0); this.index -= 3) {}
 			return ref;
