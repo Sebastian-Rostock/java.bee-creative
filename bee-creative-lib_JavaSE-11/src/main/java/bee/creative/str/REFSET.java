@@ -1,9 +1,9 @@
 package bee.creative.str;
 
-
 import java.util.Arrays;
 import bee.creative.emu.EMU;
 import bee.creative.emu.Emuator;
+import bee.creative.util.AbstractIterator;
 
 /** Diese Klasse implementiert Methoden zur Verarbeitung einer steuwertbasierten Menge von Referenen ungleich {@code 0} mit durchschnittlich 4 Speicherzugriffen
  * zum {@link #getIdx(int[], int) Finden} einer vorhandenen Referenz. Die Menge ist als {@code int}-Array mit folgender Struktur umgesetzt:
@@ -163,14 +163,18 @@ public final class REFSET {
 		return size == 0;
 	}
 
-	/** Diese Methode übergibt alle Referenzen an {@link REFSETRUN#run(int) task.run()}. */
-	public static void forEach(int[] refset, REFSETRUN task) {
+	/** Diese Methode übergibt alle Referenzen an {@link RUN#run(int) task.run()}. */
+	public static void forEach(int[] refset, RUN task) {
 		for (var off = refset.length - 1; 3 < off; off -= 3) {
 			var ref = refset[off];
 			if (ref != 0) {
 				task.run(ref);
 			}
 		}
+	}
+
+	public static ITER iterator(int[] refset) {
+		return new ITER(refset);
 	}
 
 	/** Diese Methode liefert alle Referenzen der gegebenen Referenzmenge {@code refset}. */
@@ -196,6 +200,56 @@ public final class REFSET {
 	/** @see Emuator#emu(Object) */
 	public static long emu(int[] refset) {
 		return EMU.fromArray(Integer.TYPE, refset.length);
+	}
+
+	/** Diese Schnittstelle definiert den Empfänger der Referenzen für {@link REFSET#forEach(int[], RUN)}.
+	 *
+	 * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
+	public static interface RUN {
+
+		/** Diese Methode verarbeitet die gegebene Referenz {@code ref}. */
+		void run(int ref);
+
+	}
+
+	/** Diese Klasse implementiert {@link REFSET#iterator(int[])}.
+	 * 
+	 * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
+	public static class ITER extends AbstractIterator<Integer> {
+
+		@Override
+		public Integer next() {
+			return this.nextRef();
+		}
+
+		/** Diese Methode liefert die nächsten Referenz oder {@code 0}. */
+		public int nextRef() {
+			var ref = this.ref;
+			for (; (3 < this.index) && ((this.ref = this.refset[this.index]) != 0); this.index -= 3) {}
+			return ref;
+		}
+
+		/** Diese Methode liefert die 1-basierte Position der nächsten von {@link #nextRef()} gelieferten Referenz oder {@code 0}. */
+		public int nextIdx() {
+			return this.index / 3;
+		}
+
+		@Override
+		public boolean hasNext() {
+			return 3 < this.index;
+		}
+
+		private int ref;
+
+		private int index;
+
+		private int[] refset;
+
+		private ITER(int[] refset) {
+			this.index = (this.refset = refset).length - 1;
+			this.nextRef();
+		}
+
 	}
 
 	static final int[] EMPTY = new int[]{0, 1, 0, 0, 0, 0, 0, 0, 0};
