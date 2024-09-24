@@ -343,20 +343,51 @@ public class STRState implements Iterable2<STREdge> {
 	}
 
 	@Override
-	public Iterator2<STREdge> iterator() { // TODO eigene iter
-		var sourceRefs = this.getSourceRefs();
-		return Iterators.concatAll(Iterators.concatAll(Iterators.fromCount(sourceRefs.length).translate(sourceIdx -> {
-			var sourceRef = sourceRefs[sourceIdx];
-			var relationRefs = this.getSourceRelationRefs(sourceRef);
-			return Iterators.fromCount(relationRefs.length).translate(relationIdx -> {
-				var relationRef = relationRefs[relationIdx];
-				var targetRefs = this.getSourceRelationTargetRefs(sourceRef, relationRef);
-				return Iterators.fromCount(targetRefs.length).translate(targetIdx -> {
-					var targetRef = targetRefs[targetIdx];
-					return new STREdge(sourceRef, relationRef, targetRef);
-				});
-			});
-		})));
+	public Iterator2<STREdge> iterator() {
+		var sourceIter = REFMAP.iterator(this.sourceMap);
+		return Iterators.concatAll(Iterators.concatAll(new Iterator2<Iterator2<Iterator2<STREdge>>>() {
+
+			@Override
+			public Iterator2<Iterator2<STREdge>> next() {
+				var relationIter = REFMAP.iterator(STRState.asRefMap(sourceIter.nextVal()));
+				var sourceRef = sourceIter.nextRef();
+				return new Iterator2<>() {
+
+					@Override
+					public Iterator2<STREdge> next() {
+						var targetVal = STRState.asRefVal(relationIter.nextVal());
+						var relationRef = relationIter.nextRef();
+						if (STRState.isRef(targetVal)) return Iterators.fromItem(new STREdge(sourceRef, relationRef, STRState.asRef(targetVal)));
+						var targetIter = REFSET.iterator(targetVal);
+						return new Iterator2<>() {
+
+							@Override
+							public STREdge next() {
+								return new STREdge(sourceRef, relationRef, targetIter.nextRef());
+							}
+
+							@Override
+							public boolean hasNext() {
+								return targetIter.hasNext();
+							}
+
+						};
+					}
+
+					@Override
+					public boolean hasNext() {
+						return relationIter.hasNext();
+					}
+
+				};
+			}
+
+			@Override
+			public boolean hasNext() {
+				return sourceIter.hasNext();
+			}
+
+		}));
 	}
 
 	/** Diese Methode liefert ein kompakte Abschrift aller {@link STREdge Katen} dieser Menge als {@code int}-Array mit der Struktur
@@ -409,9 +440,7 @@ public class STRState implements Iterable2<STREdge> {
 		return res;
 	}
 
-	/** Diese Methode liefert die {@link #toInts()} als byte-Array mit nativer Bytereihenfolge.
-	 *
-	 * @return */
+	/** Diese Methode liefert die {@link #toInts()} als {@code byte}-Array mit nativer Bytereihenfolge. */
 	public byte[] toBytes() {
 		var ints = this.toInts();
 		var bytes = ByteBuffer.allocate(ints.length * 4);
@@ -465,6 +494,12 @@ public class STRState implements Iterable2<STREdge> {
 	 * {@code (nextRef, rootRef, sourceCount, (sourceRef, targetRefCount, targetSetCount, (relationRef, targetRef)[targetRefCount], (relationRef, targetCount, targetRef[targetCount])[targetSetCount])[sourceCount])}. */
 	int[] storage;
 
+	STRState(int[] storage) {
+		this.nextRef = storage[0];
+		this.rootRef = storage[1];
+		this.storage = storage;
+	}
+
 	/** Dieser Konstruktor übernimmt die Merkmale des gegebenen {@link STRState}. */
 	STRState(STRState that) {
 		this.rootRef = that.rootRef;
@@ -474,13 +509,24 @@ public class STRState implements Iterable2<STREdge> {
 		this.storage = that.storage;
 	}
 
-	private static final int[] EMPTY_REFS = new int[0];
-
-	private STRState(int[] storage) {
-		this.nextRef = storage[0];
-		this.rootRef = storage[1];
-		this.storage = storage;
+	/** Diese Methode ersetzt {@link #sourceMap} und {@link #targetMap} nur dann mit den in {@link #storage} hinterlegten {@link STREdge Kanten}, wenn
+	 * {@link #storage} nicht {@code null} ist. Anschließend wird {@link #storage} auf {@code null} gesetzt. */
+	void restore() throws IllegalStateException {
+		if (this.storage == null) return;
+		try {
+			this.sourceMap = REFMAP.EMPTY;
+			this.targetMap = REFMAP.EMPTY;
+			this.select(this.storage, this::insert);
+			this.storage = null;
+		} finally {
+			if (this.storage != null) {
+				this.sourceMap = REFMAP.EMPTY;
+				this.targetMap = REFMAP.EMPTY;
+			}
+		}
 	}
+
+	private static final int[] EMPTY_REFS = new int[0];
 
 	private void select(int[] storage, STRTask task) {
 		var storageIdx = 2;
@@ -507,12 +553,12 @@ public class STRState implements Iterable2<STREdge> {
 
 	private void select(Object[] sourceMap, STRTask task) {
 		var sourceKeys = REFMAP.getKeys(sourceMap);
-		for (var sourceIdx = sourceMap.length; 0 < sourceIdx; sourceIdx--) {
+		for (var sourceIdx = sourceMap.length - 1; 0 < sourceIdx; sourceIdx--) {
 			var relationMap = STRState.asRefMap(REFMAP.getVal(sourceMap, sourceIdx));
 			if (relationMap != null) {
 				var sourceRef = REFSET.getRef(sourceKeys, sourceIdx);
 				var relationKeys = REFMAP.getKeys(relationMap);
-				for (var relationIdx = relationMap.length; 0 < relationIdx; relationIdx--) {
+				for (var relationIdx = relationMap.length - 1; 0 < relationIdx; relationIdx--) {
 					var targetVal = STRState.asRefVal(REFMAP.getVal(relationMap, relationIdx));
 					if (targetVal != null) {
 						var relationRef = REFSET.getRef(relationKeys, relationIdx);
@@ -567,23 +613,6 @@ public class STRState implements Iterable2<STREdge> {
 		}
 
 		return sourceMap;
-	}
-
-	/** Diese Methode ersetzt {@link #sourceMap} und {@link #targetMap} nur dann mit den in {@link #storage} hinterlegten {@link STREdge}, wenn {@link #storage}
-	 * nicht {@code null} ist. Anschließend wird {@link #storage} auf {@code null} gesetzt. */
-	private void restore() {
-		if (this.storage == null) return;
-		try {
-			this.sourceMap = REFMAP.EMPTY;
-			this.targetMap = REFMAP.EMPTY;
-			this.select(this.storage, this::insert);
-			this.storage = null;
-		} finally {
-			if (this.storage != null) {
-				this.sourceMap = REFMAP.EMPTY;
-				this.targetMap = REFMAP.EMPTY;
-			}
-		}
 	}
 
 }
