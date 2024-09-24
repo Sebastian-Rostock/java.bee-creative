@@ -1,8 +1,13 @@
 package bee.creative.str;
 
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.Map.Entry;
 import bee.creative.emu.EMU;
 import bee.creative.emu.Emuator;
 import bee.creative.lang.Objects;
+import bee.creative.util.AbstractIterator;
+import bee.creative.util.Entries;
 
 /** Diese Klasse implementiert Methoden zur Verarbeitung einer steuwertbasierten Abbildung von Referenen ungleich {@code 0} auf Elemente ungleich {@code null},
  * die als {@link Object}-Array mit folgender Struktur gegeben ist: <pre>(keys, value[keys.mask + 2])</pre> Die Datenfelder haben folgende Bedeutung:
@@ -103,8 +108,8 @@ public final class REFMAP {
 		return size == 0;
 	}
 
-	/** Diese Methode übergibt alle Referenzen und deren Elemente an {@link REFMAPRUN#run(int, Object) task.run()}. */
-	public static void forEach(Object[] refmap, REFMAPRUN task) {
+	/** Diese Methode übergibt alle Referenzen und deren Elemente an {@link RUN#run(int, Object) task.run()}. */
+	public static void forEach(Object[] refmap, RUN task) {
 		var keys = REFMAP.getKeys(refmap);
 		for (var idx = refmap.length - 1; 0 < idx; idx--) {
 			var val = refmap[idx];
@@ -112,6 +117,11 @@ public final class REFMAP {
 				task.run(REFSET.getRef(keys, idx), val);
 			}
 		}
+	}
+
+	/** Diese Methode liefert den {@link Iterator} über die Referenzen und Elemente der gegebenen Referenzabbildung {@code refmap}. */
+	public static ITER iterator(Object[] refmap) {
+		return new ITER(refmap);
 	}
 
 	/** Diese Methode liefert alle Schlüssel der gegebenen Referenzabbildung {@code refmap}. */
@@ -127,6 +137,63 @@ public final class REFMAP {
 	/** @see Emuator#emu(Object) */
 	public static long emu(Object[] refmap) {
 		return REFSET.emu(REFMAP.getKeys(refmap)) + EMU.fromArray(Object.class, refmap.length);
+	}
+
+	/** Diese Schnittstelle definiert den Empfänger der Referenzen und Elementen für {@link REFMAP#forEach(Object[], RUN)}.
+	 *
+	 * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
+	public interface RUN {
+
+		/** Diese Methode verarbeitet die gegebene Referenz {@code ref} und das gegebene Elemente {@code val}. */
+		void run(int ref, Object val);
+
+	}
+
+	public static class ITER extends AbstractIterator<Entry<Integer, Object>> {
+
+		@Override
+		public Entry<Integer, Object> next() {
+			var val = this.val;
+			return Entries.from(this.nextRef(), val);
+		}
+
+		/** Diese Methode liefert die nächsten Referenz oder {@code 0}. */
+		public int nextRef() {
+			if (!this.hasNext()) throw new NoSuchElementException();
+			var ref = REFSET.getRef(this.refset, this.index);
+			while ((0 < this.index) && ((this.val = this.refmap[--this.index]) == null)) {}
+			return ref;
+		}
+
+		/** Diese Methode liefert das Element der nächsten von {@link #nextRef()} gelieferten Referenz oder {@code null}. */
+		public Object nextVal() {
+			return this.val;
+		}
+
+		/** Diese Methode liefert die 1-basierte Position der nächsten von {@link #nextRef()} gelieferten Referenz oder {@code 0}. */
+		public int nextIdx() {
+			return this.index;
+		}
+
+		@Override
+		public boolean hasNext() {
+			return 0 < this.index;
+		}
+
+		private Object val;
+
+		private int index;
+
+		private int[] refset;
+
+		private Object[] refmap;
+
+		private ITER(Object[] refmap) {
+			this.index = (this.refmap = refmap).length - 1;
+			this.refset = REFMAP.getKeys(refmap);
+			this.nextRef();
+		}
+
 	}
 
 	static final Object[] EMPTY = new Object[]{REFSET.EMPTY};
