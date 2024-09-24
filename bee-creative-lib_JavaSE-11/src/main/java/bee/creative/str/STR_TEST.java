@@ -18,6 +18,7 @@ class STR_TEST {
 						s.put(r.nextInt(5000) + 1, r.nextInt(50) + 1, r.nextInt(5000) + 1);
 					}
 			var ddd=		 s.commit();
+			System.out.println(ddd.getPutState());
 				}
 			});
 			System.out.println(l);

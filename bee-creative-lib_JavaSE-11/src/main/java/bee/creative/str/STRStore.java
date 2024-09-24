@@ -7,12 +7,6 @@ import java.util.Arrays;
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class STRStore extends STRState {
 
-	public void clear() {
-		this.backup();
-		this.sourceMap = REFMAP.EMPTY;
-		this.targetMap = REFMAP.EMPTY;
-	}
-
 	public void setRootRef(int rootRef) {
 		this.backup();
 		this.rootRef = rootRef;
@@ -23,8 +17,6 @@ public class STRStore extends STRState {
 		this.nextRef = nextRef;
 	}
 
-	/** Diese Methode gibt das zurück. übernimmt die gegebenen refs zur wiederverwendung. weitere werden nach dem größten automatisch ergänzt. duplikate und refs
-	 * <=0 nicht zulässig. leere liste nicht zulässig. */
 	public int newNextRef() {
 		this.backup();
 		var nextRef = this.getNextRef();
@@ -43,29 +35,22 @@ public class STRStore extends STRState {
 	 * @param sourceRefs
 	 * @return */
 	int setSourceRefs(int targetRef, int relationRef, int[] sourceRefs) {
-
+		// TODO
 		return 0;
 	}
 
 	/** ergänzt die als source von target und rel vorkommenden referenzen mit den > 0 gegebenen liefert die anzahl der ergänzten referenzen kopiert diese an den
 	 * beginn von sourceRefs */
 	int putSourceRefs(int targetRef, int relationRef, int[] sourceRefs) {
+		// TODO
 		return 0;
 	}
 
 	/** entfernt von den als source von target und rel vorkommenden referenzen die > 0 gegebenen liefert die anzahl der entfernten referenzen kopiert diese an den
 	 * beginn von sourceRefs */
 	int popSourceRefs(int targetRef, int relationRef, int[] sourceRefs) {
+		// TODO
 		return 0;
-	}
-
-	public STRUpdate setState(STRState state) {
-		this.clear();
-		this.setNextRef(state.nextRef);
-		this.setRootRef(state.rootRef);
-		this.sourceMap = state.sourceMap;
-		this.targetMap = state.targetMap;
-		return null;
 	}
 
 	public boolean put(STREdge edge) {
@@ -116,11 +101,37 @@ public class STRStore extends STRState {
 		return res;
 	}
 
+	public void clear() {
+		this.backup();
+		this.sourceMap = REFMAP.EMPTY;
+		this.targetMap = REFMAP.EMPTY;
+	}
+
+	public void replace(STRState state) {
+		if (state instanceof STRStore) {
+			state = new STRState(state.toInts()); // TODO bessere deep copy
+		} else {
+			state.restore();
+		}
+		this.clear();
+		this.nextRef = state.nextRef;
+		this.rootRef = state.rootRef;
+		this.sourceMap = state.sourceMap; // hier deep copy einsetzen
+		this.targetMap = state.targetMap; // hier deep copy einsetzen
+	}
+
+	public void insertAll(STRState state) {
+		this.backup();
+		state.forEach(this::insert);
+		this.nextRef += state.nextRef;
+		this.rootRef += state.rootRef;
+	}
+
 	public void deleteAll(STRState state) {
 		this.backup();
 		state.forEach(this::delete);
-		nextRef -= state.nextRef;
-		rootRef -= state.rootRef;
+		this.nextRef -= state.nextRef;
+		this.rootRef -= state.rootRef;
 	}
 
 	public STRUpdate commit() {
@@ -322,7 +333,7 @@ public class STRStore extends STRState {
 	}
 
 	private boolean delete(int sourceRef, int relationRef, int targetRef) {
-
+		// TODO prüfen
 		var nextSourceMap = this.sourceMap;
 		var nextSourceIdx = REFMAP.getIdx(nextSourceMap, sourceRef);
 		if (nextSourceIdx == 0) return false;
@@ -426,9 +437,10 @@ public class STRStore extends STRState {
 
 	private void backup() {
 		if (this.backup != null) return;
-		this.backup = new STRState(this);
+		var backup = new STRState(this);
 		this.sourceMap = REFMAP.copy(this.sourceMap);
 		this.targetMap = REFMAP.copy(this.targetMap);
+		this.backup = backup;
 	}
 
 }
