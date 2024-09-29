@@ -8,28 +8,34 @@ import bee.creative.util.Iterable2;
 import bee.creative.util.Iterator2;
 import bee.creative.util.Iterators;
 
-/** Diese Klasse implementiert eine Menge von Kanten eines bidirectional-entity-relation Speichers.
+/** Diese Klasse implementiert eine Menge {@link STREdge typisierter Kanten}, auf welche effizient sowohl von der {@link #getSourceRefs() Quellen} als auch von
+ * den {@link #getTargetRefs() Zielen} zugegriffen werden kann.
  *
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class STRState implements Iterable2<STREdge> {
+
+	public static final STRState EMPTY = new STRState();
 
 	/** Diese Methode liefert die Menge der Kanten zur gegebenen {@link #toInts() kompakten Abschrift}. */
 	public static STRState from(int[] storage) {
 		return new STRState(storage.clone());
 	}
 
+	/** Diese Methode liefert die Menge der Kanten zur gegebenen {@link #toBytes() binarisierten kompakten Abschrift}. */
 	public static STRState from(byte[] bytes) {
 		return STRState.from(ByteBuffer.wrap(bytes));
 	}
 
+	/** Diese Methode liefert die Menge der Kanten zur gegebenen {@link #toInts() kompakten Abschrift}. */
 	public static STRState from(IntBuffer buffer) {
 		var storage = new int[buffer.remaining()];
 		buffer.get(storage);
 		return new STRState(storage);
 	}
 
+	/** Diese Methode liefert die Menge der Kanten zur gegebenen {@link #toBytes() binarisierten kompakten Abschrift}. */
 	public static STRState from(ByteBuffer buffer) {
-		return STRState.from(buffer.order(ByteOrder.nativeOrder()).asIntBuffer());
+		return STRState.from(buffer.asIntBuffer());
 	}
 
 	/** Diese Methode liefert die Kanten des {@code newState} ohne denen des {@code oldState}, bspw. für {@link STRUpdate#getPutState()} und
@@ -42,6 +48,7 @@ public class STRState implements Iterable2<STREdge> {
 		var result = new STRState();
 		oldState.restore();
 		newState.restore();
+		if (oldState == newState) return result;
 		result.nextRef = newState.nextRef - oldState.nextRef;
 		result.rootRef = newState.rootRef - oldState.rootRef;
 		var oldSourceMap = oldState.sourceMap;
@@ -53,10 +60,12 @@ public class STRState implements Iterable2<STREdge> {
 				var sourceRef = REFSET.getRef(newSourceKeys, newSourceIdx);
 				var oldSourceIdx = REFMAP.getIdx(oldSourceMap, sourceRef);
 				if (oldSourceIdx == 0) {
+					// COPY newRelationMap
 					var newRelationKeys = REFMAP.getKeys(newRelationMap);
 					for (var newRelationIdx = newRelationMap.length - 1; 0 < newRelationIdx; newRelationIdx--) {
 						var newTargetVal = STRState.asRefVal(REFMAP.getVal(newRelationMap, newRelationIdx));
 						if (newTargetVal != null) {
+							// COPY newTargetVal
 							var relationRef = REFSET.getRef(newRelationKeys, newRelationIdx);
 							if (STRState.isRef(newTargetVal)) {
 								result.insert(sourceRef, relationRef, STRState.asRef(newTargetVal));
@@ -79,8 +88,8 @@ public class STRState implements Iterable2<STREdge> {
 							if (newTargetVal != null) {
 								var relationRef = REFSET.getRef(newRelationKeys, newRelationIdx);
 								var oldRelationIdx = REFMAP.getIdx(oldRelationMap, relationRef);
-
 								if (oldRelationIdx == 0) {
+									// COPY newTargetVal
 									if (STRState.isRef(newTargetVal)) {
 										result.insert(sourceRef, relationRef, STRState.asRef(newTargetVal));
 									} else {
@@ -139,7 +148,12 @@ public class STRState implements Iterable2<STREdge> {
 		return result;
 	}
 
-	public void forEach(STRTask task) {
+	/** Diese Methode übergibt alle Kanten an {@link STRTask#run(int) task.run()}. */
+
+	/** Diese Methode gibt das zurück.
+	 *
+	 * @param task */
+	public void forEach(RUN task) {
 		if (this.storage != null) {
 			this.select(this.storage, task);
 		} else {
@@ -357,13 +371,13 @@ public class STRState implements Iterable2<STREdge> {
 					public Iterator2<STREdge> next() {
 						var targetVal = STRState.asRefVal(relationIter.nextVal());
 						var relationRef = relationIter.nextRef();
-						if (STRState.isRef(targetVal)) return Iterators.fromItem(new STREdge(sourceRef, relationRef, STRState.asRef(targetVal)));
+						if (STRState.isRef(targetVal)) return Iterators.fromItem(new STREdge(sourceRef, STRState.asRef(targetVal), relationRef));
 						var targetIter = REFSET.iterator(targetVal);
 						return new Iterator2<>() {
 
 							@Override
 							public STREdge next() {
-								return new STREdge(sourceRef, relationRef, targetIter.nextRef());
+								return new STREdge(sourceRef, targetIter.nextRef(), relationRef);
 							}
 
 							@Override
@@ -391,18 +405,14 @@ public class STRState implements Iterable2<STREdge> {
 	}
 
 	/** Diese Methode liefert ein kompakte Abschrift aller {@link STREdge Katen} dieser Menge als {@code int}-Array mit der Struktur
-	 * {@code (nextRef, rootRef, sourceCount, (sourceRef, targetRefCount, targetSetCount, (relationRef, targetRef)[targetRefCount], (relationRef, targetCount, targetRef[targetCount])[targetSetCount])[sourceCount])}.
+	 * {@code (nextRef, rootRef, sourceCount, (sourceRef, targetRefCount, (targetRef, relationRef)[targetRefCount], targetSetCount, (relationRef, targetCount, targetRef[targetCount])[targetSetCount])[sourceCount])}.
 	 *
-	 * @return */
+	 * @return kompakte Abschrift. */
 	public int[] toInts() {
 		if (this.storage != null) return this.storage.clone();
-		// TODO
-
 		var sourceMap = this.sourceMap;
-		// rootRef, nextRef, sourceCount, (sourceRef, targetRefCount, targetSetCount, (relationRef, targetRef)[targetRefCount], (relationRef, targetCount,
-		// targetRef[targetCount])[targetSetCount])[sourceCount]
-		var storageSize = 3;
 		var sourceCount = 0;
+		var storageSize = 3;
 		for (var sourceIdx = sourceMap.length - 1; 0 < sourceIdx; sourceIdx--) {
 			var relationMap = STRState.asRefMap(sourceMap[sourceIdx]);
 			if (relationMap != null) {
@@ -413,11 +423,11 @@ public class STRState implements Iterable2<STREdge> {
 						if (STRState.isRef(targetVal)) {
 							relationSize += /*relationRef*/ 1 + /*targetRef*/ 1;
 						} else {
-							var c = REFSET.size(targetVal);
-							if (c == 1) {
+							var targetCount = REFSET.size(targetVal);
+							if (targetCount == 1) {
 								relationSize += /*relationRef*/ 1 + /*targetRef*/ 1;
-							} else if (c > 0) {
-								relationSize += /*relationRef*/ 1 + /*targetCount*/ 1 + /*targetRef*/ c;
+							} else if (targetCount > 0) {
+								relationSize += /*relationRef*/ 1 + /*targetCount*/ 1 + /*targetRef*/ targetCount;
 							}
 						}
 					}
@@ -428,23 +438,80 @@ public class STRState implements Iterable2<STREdge> {
 				}
 			}
 		}
-
-		var res = new int[storageSize];
-
-		res[0] = this.rootRef;
-		res[1] = this.nextRef;
-		res[2] = sourceCount;
-
-		System.out.println(storageSize * 4);
-
-		return res;
+		var storage = new int[storageSize];
+		var storageIdx = 0;
+		storage[storageIdx++] = this.rootRef;
+		storage[storageIdx++] = this.nextRef;
+		storage[storageIdx++] = sourceCount;
+		for (var sourceIdx = sourceMap.length - 1; 0 < sourceIdx; sourceIdx--) {
+			var relationMap = STRState.asRefMap(sourceMap[sourceIdx]);
+			if (relationMap != null) {
+				var targetRefCount = 0;
+				var targetSetCount = 0;
+				for (var relationIdx = relationMap.length - 1; 0 < relationIdx; relationIdx--) {
+					var targetVal = STRState.asRefVal(relationMap[relationIdx]);
+					if (targetVal != null) {
+						if (STRState.isRef(targetVal)) {
+							targetRefCount++;
+						} else {
+							var targetCount = REFSET.size(targetVal);
+							if (targetCount == 1) {
+								targetRefCount++;
+							} else if (targetCount > 0) {
+								targetSetCount++;
+							}
+						}
+					}
+				}
+				if ((targetRefCount != 0) || (targetSetCount != 0)) {
+					storage[storageIdx++] = REFSET.getRef(REFMAP.getKeys(sourceMap), sourceIdx);
+					storage[storageIdx++] = targetRefCount;
+					if (targetRefCount != 0) {
+						for (var relationIdx = relationMap.length - 1; 0 < relationIdx; relationIdx--) {
+							var targetVal = STRState.asRefVal(relationMap[relationIdx]);
+							if ((targetVal != null) && (STRState.isRef(targetVal) || (REFSET.size(targetVal) == 1))) {
+								storage[storageIdx++] = STRState.asRef(targetVal);
+								storage[storageIdx++] = REFSET.getRef(REFMAP.getKeys(relationMap), relationIdx);
+							}
+						}
+					}
+					storage[storageIdx++] = targetSetCount;
+					if (targetSetCount != 0) {
+						for (var relationIdx = relationMap.length - 1; 0 < relationIdx; relationIdx--) {
+							var targetVal = STRState.asRefVal(relationMap[relationIdx]);
+							if (targetVal != null) {
+								if (!STRState.isRef(targetVal)) {
+									var targetCount = REFSET.size(targetVal);
+									if (targetCount > 1) {
+										storage[storageIdx++] = REFSET.getRef(REFMAP.getKeys(relationMap), relationIdx);
+										storage[storageIdx++] = targetCount;
+										for (var targetIdx = targetVal.length - 1; 3 < targetIdx; targetIdx -= 3) {
+											var targetRef = targetVal[targetIdx];
+											if (targetRef != 0) {
+												storage[storageIdx++] = targetRef;
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		return storage;
 	}
 
 	/** Diese Methode liefert die {@link #toInts()} als {@code byte}-Array mit nativer Bytereihenfolge. */
 	public byte[] toBytes() {
+		return this.toBytes(ByteOrder.nativeOrder());
+	}
+
+	/** Diese Methode liefert die {@link #toInts()} als {@code byte}-Array mit der gegebenen Bytereihenfolge {@code order}. */
+	public byte[] toBytes(ByteOrder order) {
 		var ints = this.toInts();
 		var bytes = ByteBuffer.allocate(ints.length * 4);
-		bytes.order(ByteOrder.nativeOrder()).asIntBuffer().put(ints);
+		bytes.order(order).asIntBuffer().put(ints);
 		return bytes.array();
 	}
 
@@ -455,7 +522,10 @@ public class STRState implements Iterable2<STREdge> {
 		return res.append(" }").toString();
 	}
 
-	STRState() {
+	public interface RUN {
+
+		void run(int sourceRef, int targetRef, int relationRef);
+
 	}
 
 	static boolean isRef(int[] val) {
@@ -483,17 +553,20 @@ public class STRState implements Iterable2<STREdge> {
 	int rootRef;
 
 	/** Dieses Feld speichert die Referenzabbildung gemäß {@link REFMAP} von {@code source}-Referenzen auf Referenzabbildungen gemäß {@link REFMAP} von
-	 * {@code relation}-Referenzen auf {@code target}-Referenzen. Letztere sind dabei als {@link Integer} oder gemäß {@link REFSET} abgebildet. */
+	 * {@code relation}-Referenzen auf {@code target}-Referenzen. Letztere sind dabei als {@code int[1]} oder gemäß {@link REFSET} abgebildet. */
 	Object[] sourceMap = REFMAP.EMPTY;
 
 	/** Dieses Feld speichert die Referenzabbildung gemäß {@link REFMAP} von {@code target}-Referenzen auf Referenzabbildungen gemäß {@link REFMAP} von
-	 * {@code relation}-Referenzen auf {@code source}-Referenzen. Letztere sind dabei als {@link Integer} oder gemäß {@link REFSET} abgebildet. */
+	 * {@code relation}-Referenzen auf {@code source}-Referenzen. Letztere sind dabei als {@code int[1]} oder gemäß {@link REFSET} abgebildet. */
 	Object[] targetMap = REFMAP.EMPTY;
 
-	/** Dieses Feld speichert alle {@link STREdge Kanten} als kompaktes {@code int}-Array der Struktur
-	 * {@code (nextRef, rootRef, sourceCount, (sourceRef, targetRefCount, targetSetCount, (relationRef, targetRef)[targetRefCount], (relationRef, targetCount, targetRef[targetCount])[targetSetCount])[sourceCount])}. */
 	int[] storage;
 
+	/** Dieser Konstruktor erzeugt eine leere Menge. */
+	STRState() {
+	}
+
+	/** Dieser Konstruktor übernimmt die Merkmale der gegebenen {@link #toInts() kompakten Abschrift}. */
 	STRState(int[] storage) {
 		this.nextRef = storage[0];
 		this.rootRef = storage[1];
@@ -528,30 +601,30 @@ public class STRState implements Iterable2<STREdge> {
 
 	private static final int[] EMPTY_REFS = new int[0];
 
-	private void select(int[] storage, STRTask task) {
+	private void select(int[] storage, RUN task) {
 		var storageIdx = 2;
 		var sourceCount = storage[storageIdx++];
 		while (0 < sourceCount--) {
 			var sourceRef = storage[storageIdx++];
 			var targetRefCount = storage[storageIdx++];
-			var targetSetCount = storage[storageIdx++];
 			while (0 < targetRefCount--) {
-				var relationRef = storage[storageIdx++];
 				var targetRef = storage[storageIdx++];
-				task.run(sourceRef, relationRef, targetRef);
+				var relationRef = storage[storageIdx++];
+				task.run(sourceRef, targetRef, relationRef);
 			}
+			var targetSetCount = storage[storageIdx++];
 			while (0 < targetSetCount--) {
 				var relationRef = storage[storageIdx++];
 				var targetCount = storage[storageIdx++];
 				while (0 < targetCount--) {
 					var targetRef = storage[storageIdx++];
-					task.run(sourceRef, relationRef, targetRef);
+					task.run(sourceRef, targetRef, relationRef);
 				}
 			}
 		}
 	}
 
-	private void select(Object[] sourceMap, STRTask task) {
+	private void select(Object[] sourceMap, RUN task) {
 		var sourceKeys = REFMAP.getKeys(sourceMap);
 		for (var sourceIdx = sourceMap.length - 1; 0 < sourceIdx; sourceIdx--) {
 			var relationMap = STRState.asRefMap(REFMAP.getVal(sourceMap, sourceIdx));
@@ -563,13 +636,12 @@ public class STRState implements Iterable2<STREdge> {
 					if (targetVal != null) {
 						var relationRef = REFSET.getRef(relationKeys, relationIdx);
 						if (STRState.isRef(targetVal)) {
-							task.run(sourceRef, relationRef, STRState.asRef(targetVal));
+							task.run(sourceRef, STRState.asRef(targetVal), relationRef);
 						} else {
-							REFSET.toArray(targetVal);
 							for (var targetIdx = targetVal.length - 1; 3 < targetIdx; targetIdx -= 3) {
 								var targetRef = targetVal[targetIdx];
 								if (targetRef != 0) {
-									task.run(sourceRef, relationRef, targetRef);
+									task.run(sourceRef, targetRef, relationRef);
 								}
 							}
 						}
@@ -592,7 +664,7 @@ public class STRState implements Iterable2<STREdge> {
 		if (sourceIdx == 0) throw new IllegalStateException();
 
 		var sourceRelationMap = STRState.asRefMap(REFMAP.getVal(sourceMap, sourceIdx));
-		sourceRelationMap = sourceRelationMap == null ? REFMAP.make() : REFMAP.grow(sourceRelationMap);
+		sourceRelationMap = sourceRelationMap == null ? REFMAP.create() : REFMAP.grow(sourceRelationMap);
 		REFMAP.setVal(sourceMap, sourceIdx, sourceRelationMap);
 
 		var sourceRelationIdx = REFMAP.putRef(sourceRelationMap, relationRef);

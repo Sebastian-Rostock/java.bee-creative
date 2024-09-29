@@ -34,14 +34,14 @@ import bee.creative.util.AbstractIterator;
 public final class REFSET {
 
 	/** Diese Methode liefert eine neue leere Referenzmenge mit Kapazität 2. */
-	public static int[] make() {
+	public static int[] create() {
 		return new int[]{0, 1, 1, 0, 2, 0, 0, 0, 0};
 	}
 
 	/** Diese Methode liefert eine neue Referenzmenge mit den gegebenen Referenzen {@code ref1} und {@code ref2}, wenn beide Referenzen ungleich {@code 0}
 	 * sind. */
 	public static int[] from(int ref1, int ref2) {
-		var refset = REFSET.make();
+		var refset = REFSET.create();
 		REFSET.putRef(refset, ref1);
 		REFSET.putRef(refset, ref2);
 		return refset;
@@ -205,54 +205,11 @@ public final class REFSET {
 		return EMU.fromArray(Integer.TYPE, refset.length);
 	}
 
-	/** Diese Schnittstelle definiert den Empfänger der Referenzen für {@link REFSET#forEach(int[], RUN)}.
-	 *
-	 * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
+	/** Diese Schnittstelle definiert den Empfänger der Referenzen für {@link REFSET#forEach(int[], RUN)}. */
 	public static interface RUN {
 
 		/** Diese Methode verarbeitet die gegebene Referenz {@code ref}. */
 		void run(int ref);
-
-	}
-
-	/** Diese Klasse implementiert {@link REFSET#iterator(int[])}.
-	 *
-	 * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public static class ITER extends AbstractIterator<Integer> {
-
-		@Override
-		public Integer next() {
-			return this.nextRef();
-		}
-
-		/** Diese Methode liefert die nächsten Referenz oder {@code 0}. */
-		public int nextRef() {
-			if (!this.hasNext()) throw new NoSuchElementException();
-			var ref = this.ref;
-			for (; (3 < this.index) && ((this.ref = this.refset[this.index]) != 0); this.index -= 3) {}
-			return ref;
-		}
-
-		/** Diese Methode liefert die 1-basierte Position der nächsten von {@link #nextRef()} gelieferten Referenz oder {@code 0}. */
-		public int nextIdx() {
-			return this.index / 3;
-		}
-
-		@Override
-		public boolean hasNext() {
-			return 3 < this.index;
-		}
-
-		private int ref;
-
-		private int index;
-
-		private int[] refset;
-
-		private ITER(int[] refset) {
-			this.index = (this.refset = refset).length - 1;
-			this.nextRef();
-		}
 
 	}
 
@@ -303,6 +260,45 @@ public final class REFSET {
 			/* refset2.head_item_next[free-1].next */ refset2[(free * 3) + 1] = ++free;
 		}
 		return refset2;
+	}
+
+	/** Diese Klasse implementiert {@link REFSET#iterator(int[])}. **/
+	static class ITER extends AbstractIterator<Integer> {
+
+		@Override
+		public Integer next() {
+			return this.nextRef();
+		}
+
+		/** Diese Methode liefert die nächsten Referenz oder {@code 0}. */
+		public int nextRef() {
+			if (!this.hasNext()) throw new NoSuchElementException();
+			var ref = this.ref;
+			for (; (3 < this.index) && ((this.ref = this.refset[this.index]) != 0); this.index -= 3) {}
+			return ref;
+		}
+
+		/** Diese Methode liefert die 1-basierte Position der nächsten von {@link #nextRef()} gelieferten Referenz oder {@code 0}. */
+		public int nextIdx() {
+			return this.index / 3;
+		}
+
+		@Override
+		public boolean hasNext() {
+			return 3 < this.index;
+		}
+
+		private int ref;
+
+		private int index;
+
+		private int[] refset;
+
+		private ITER(int[] refset) {
+			this.index = (this.refset = refset).length - 1;
+			this.nextRef();
+		}
+
 	}
 
 }

@@ -1,39 +1,52 @@
 package bee.creative.str;
 
-final class STREdge {
+/** Diese Klasse implementiert eine mit {@link #relationRef() Beziehungsreferenz} typisierte Kante von einer {@link #sourceRef() Quellreferenz} zu einer
+ * {@link #targetRef() Zielreferenz}.
+ * 
+ * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
+public final class STREdge {
 
-	public static STREdge from(int sourceRef, int relationRef, int targetRef) {
-		if ((sourceRef == 0) || (relationRef == 0) || (targetRef == 0)) return null;
-		return new STREdge(sourceRef, relationRef, targetRef);
+	/** Diese Methode liefert eine neue Kante mmit den gegebenen Refernezen, sofern diese ungleich {@code 0} sind.
+	 * 
+	 * @param sourceRef Quellreferenz oder {@code 0}.
+	 * @param targetRef Zielreferenz oder {@code 0}.
+	 * @param relationRef Beziehungsreferenz oder {@code 0}.
+	 * @return Kante oder {@code null}. */
+	public static STREdge from(int sourceRef, int targetRef, int relationRef) {
+		if ((sourceRef == 0) || (targetRef == 0) || (relationRef == 0)) return null;
+		return new STREdge(sourceRef, targetRef, relationRef);
 	}
 
-	public int getSourceRef() {
+	/** Diese Methode liefert die Quellreferenz. */
+	public int sourceRef() {
 		return this.sourceRef;
 	}
 
-	public int getRelationRef() {
-		return this.relationRef;
+	/** Diese Methode liefert die Zielreferenz. */
+	public int targetRef() {
+		return this.targetRef;
 	}
 
-	public int getTargetRef() {
-		return this.targetRef;
+	/** Diese Methode liefert die Beziehungsreferenz. */
+	public int relationRef() {
+		return this.relationRef;
 	}
 
 	@Override
 	public String toString() {
-		return "(" + this.sourceRef + ", " + this.relationRef + ", " + this.targetRef + ")";
+		return "(" + this.sourceRef + ", " + this.targetRef + ", " + this.relationRef + ")";
 	}
 
 	final int sourceRef;
 
-	final int relationRef;
-
 	final int targetRef;
 
-	STREdge(int sourceRef, int relationRef, int targetRef) {
+	final int relationRef;
+
+	STREdge(int sourceRef, int targetRef, int relationRef) {
 		this.sourceRef = sourceRef;
-		this.relationRef = relationRef;
 		this.targetRef = targetRef;
+		this.relationRef = relationRef;
 	}
 
 }

@@ -2,7 +2,7 @@ package bee.creative.str;
 
 import java.util.Arrays;
 
-/** Diese Klasse implementiert einen bidirectional-entity-relation Speicher.
+/** Diese Klasse implementiert einen Speicher.
  *
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class STRStore extends STRState {
@@ -55,13 +55,13 @@ public class STRStore extends STRState {
 
 	public boolean put(STREdge edge) {
 		this.backup();
-		return this.insert(edge.sourceRef, edge.relationRef, edge.targetRef);
+		return this.insert(edge.sourceRef, edge.targetRef, edge.relationRef);
 	}
 
 	public boolean put(int sourceRef, int relationRef, int targetRef) {
 		if ((sourceRef == 0) || (relationRef == 0) || (targetRef == 0)) return false;
 		this.backup();
-		return this.insert(sourceRef, relationRef, targetRef);
+		return this.insert(sourceRef, targetRef, relationRef);
 	}
 
 	public boolean putAll(STREdge... edges) {
@@ -72,20 +72,20 @@ public class STRStore extends STRState {
 		this.backup();
 		var res = false;
 		for (var edge: edges) {
-			res = this.insert(edge.sourceRef, edge.relationRef, edge.targetRef) | res;
+			res = this.insert(edge.sourceRef, edge.targetRef, edge.relationRef) | res;
 		}
 		return res;
 	}
 
 	public boolean pop(STREdge edge) {
 		this.backup();
-		return this.delete(edge.sourceRef, edge.relationRef, edge.targetRef);
+		return this.delete(edge.sourceRef, edge.targetRef, edge.relationRef);
 	}
 
 	public boolean pop(int sourceRef, int relationRef, int targetRef) {
 		if ((sourceRef == 0) || (relationRef == 0) || (targetRef == 0)) return false;
 		this.backup();
-		return this.delete(sourceRef, relationRef, targetRef);
+		return this.delete(sourceRef, targetRef, relationRef);
 	}
 
 	public boolean popAll(STREdge... edges) {
@@ -145,7 +145,7 @@ public class STRStore extends STRState {
 
 	STRState backup;
 
-	private boolean insert(int sourceRef, int relationRef, int targetRef) {
+	private boolean insert(int sourceRef, int targetRef, int relationRef) {
 
 		var sourceMap = this.sourceMap;
 		var targetMap = this.targetMap;
@@ -169,7 +169,7 @@ public class STRStore extends STRState {
 		if (sourceRelationMap == null) {
 			// NEW sourceRelationMap
 			REFMAP.setVal(sourceMap, nextSourceIdx, REFMAP.EMPTY);
-			sourceRelationMap = REFMAP.make();
+			sourceRelationMap = REFMAP.create();
 		} else {
 			var backupSourceMap = this.backup.sourceMap;
 			var backupSourceIdx = REFMAP.getIdx(backupSourceMap, sourceRef);
@@ -200,7 +200,7 @@ public class STRStore extends STRState {
 		if (targetRelationMap == null) {
 			// NEW targetRelationMap
 			REFMAP.setVal(targetMap, targetIdx, REFMAP.EMPTY);
-			targetRelationMap = REFMAP.make();
+			targetRelationMap = REFMAP.create();
 		} else {
 			var backupTargetMap = this.backup.targetMap;
 			var backupTargetIdx = REFMAP.getIdx(backupTargetMap, targetRef);
@@ -332,7 +332,7 @@ public class STRStore extends STRState {
 		return true;
 	}
 
-	private boolean delete(int sourceRef, int relationRef, int targetRef) {
+	private boolean delete(int sourceRef, int targetRef, int relationRef) {
 		// TODO prüfen
 		var nextSourceMap = this.sourceMap;
 		var nextSourceIdx = REFMAP.getIdx(nextSourceMap, sourceRef);

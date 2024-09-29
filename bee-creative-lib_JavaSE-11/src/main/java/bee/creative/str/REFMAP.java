@@ -9,19 +9,26 @@ import bee.creative.lang.Objects;
 import bee.creative.util.AbstractIterator;
 import bee.creative.util.Entries;
 
-/** Diese Klasse implementiert Methoden zur Verarbeitung einer steuwertbasierten Abbildung von Referenen ungleich {@code 0} auf Elemente ungleich {@code null},
- * die als {@link Object}-Array mit folgender Struktur gegeben ist: <pre>(keys, value[keys.mask + 2])</pre> Die Datenfelder haben folgende Bedeutung:
- * <ul>
- * <li>{@code keys} - Referenen gemäß {@link REFSET}.</li>
- * <li>{@code value} - Element oder {@code null}.</li>
- * </ul>
+/** Diese Klasse implementiert Methoden zur Verarbeitung einer steuwertbasierten Abbildung von Referenen ungleich {@code 0} auf Elemente ungleich {@code null}.
+ * Die Abbildung ist als {@code Object}-Array mit folgender Struktur umgesetzt:
+ * <dl>
+ * <dt>{@code (keys, value[keys.mask + 2])}
+ * <dd>
+ * <dl>
+ * <dt>{@code keys}</dt>
+ * <dd>Referenen gemäß {@link REFSET}.</dd>
+ * <dt>{@code value}</dt>
+ * <dd>Element oder {@code null}.</dd>
+ * </dl>
+ * </dd>
+ * </dl>
  *
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class REFMAP {
 
 	/** Diese Methode liefert eine neue leere Referenzabbildung mit Kapazität 2. */
-	public static Object[] make() {
-		return new Object[]{REFSET.make(), null, null};
+	public static Object[] create() {
+		return new Object[]{REFSET.create(), null, null};
 	}
 
 	/** Diese Methode liefert die 1-basierte Position der gegebenen Referenz {@code ref} in der gegebenen Referenzabbildung {@code refmap}, wenn die Referenz
@@ -58,6 +65,11 @@ public final class REFMAP {
 	 * Referenz, wenn die Referenz ungleich {@code 0} ist. Wenn die Referenz nicht in der Referenzabbildung enthalten ist, wird {@code 0} geliefert. **/
 	public static int popRef(Object[] refmap, int ref) {
 		return REFSET.popRef(REFMAP.getKeys(refmap), ref);
+	}
+
+	/** @see Emuator#emu(Object) */
+	public static long emu(Object[] refmap) {
+		return REFSET.emu(REFMAP.getKeys(refmap)) + EMU.fromArray(Object.class, refmap.length);
 	}
 
 	/** Diese Methode liefert die Anzahl der Referenzen in der gegebenen Referenzabbildung {@code refmap}. */
@@ -134,14 +146,7 @@ public final class REFMAP {
 		return REFSET.toString(REFMAP.getKeys(refmap));
 	}
 
-	/** @see Emuator#emu(Object) */
-	public static long emu(Object[] refmap) {
-		return REFSET.emu(REFMAP.getKeys(refmap)) + EMU.fromArray(Object.class, refmap.length);
-	}
-
-	/** Diese Schnittstelle definiert den Empfänger der Referenzen und Elementen für {@link REFMAP#forEach(Object[], RUN)}.
-	 *
-	 * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
+	/** Diese Schnittstelle definiert den Empfänger der Referenzen und Elementen für {@link REFMAP#forEach(Object[], RUN)}. */
 	public interface RUN {
 
 		/** Diese Methode verarbeitet die gegebene Referenz {@code ref} und das gegebene Elemente {@code val}. */
@@ -149,7 +154,31 @@ public final class REFMAP {
 
 	}
 
-	public static class ITER extends AbstractIterator<Entry<Integer, Object>> {
+	static final Object[] EMPTY = new Object[]{REFSET.EMPTY};
+
+	static int[] getKeys(Object[] refmap) {
+		return (int[]) /* refmap.keys */ refmap[0];
+	}
+
+	static void setKeys(Object[] refmap, int[] keys) {
+		/* refmap.keys */ refmap[0] = keys;
+	}
+
+	static Object[] tryCopy(Object[] refmap1, int[] keys1, int[] keys2) {
+		if (keys1 == keys2) return refmap1;
+		var refmap2 = new Object[REFSET.getMask(keys2) + 2];
+		REFMAP.setKeys(refmap2, keys2);
+		for (var idx1 = REFSET.getMask(keys1) + 1; 0 < idx1; idx1--) {
+			var ref = REFSET.getRef(keys1, idx1);
+			if (ref != 0) {
+				REFMAP.setVal(refmap2, REFSET.getIdx(keys2, ref), REFMAP.getVal(refmap1, idx1));
+			}
+		}
+		return refmap2;
+	}
+
+	/** Diese Klasse implementiert {@link REFMAP#iterator(Object[])}. */
+	static class ITER extends AbstractIterator<Entry<Integer, Object>> {
 
 		@Override
 		public Entry<Integer, Object> next() {
@@ -194,29 +223,6 @@ public final class REFMAP {
 			this.nextRef();
 		}
 
-	}
-
-	static final Object[] EMPTY = new Object[]{REFSET.EMPTY};
-
-	static int[] getKeys(Object[] refmap) {
-		return (int[]) /* refmap.keys */ refmap[0];
-	}
-
-	static void setKeys(Object[] refmap, int[] keys) {
-		/* refmap.keys */ refmap[0] = keys;
-	}
-
-	static Object[] tryCopy(Object[] refmap1, int[] keys1, int[] keys2) {
-		if (keys1 == keys2) return refmap1;
-		var refmap2 = new Object[REFSET.getMask(keys2) + 2];
-		REFMAP.setKeys(refmap2, keys2);
-		for (var idx1 = REFSET.getMask(keys1) + 1; 0 < idx1; idx1--) {
-			var ref = REFSET.getRef(keys1, idx1);
-			if (ref != 0) {
-				REFMAP.setVal(refmap2, REFSET.getIdx(keys2, ref), REFMAP.getVal(refmap1, idx1));
-			}
-		}
-		return refmap2;
 	}
 
 }

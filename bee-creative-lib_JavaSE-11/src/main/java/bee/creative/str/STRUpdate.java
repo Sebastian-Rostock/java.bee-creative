@@ -1,11 +1,13 @@
 package bee.creative.str;
 
 /** Diese Klasse implementiert den Änderungsbericht zu {@link STRStore#commit()} und {@link STRStore#rollback()}.
- * 
+ *
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class STRUpdate {
 
-	public STRStore getStore() {
+	/** Diese Methode liefet den {@link STRStore Kandenspeicher} einem {@link STRStore#commit()} die Kantenmenge vor der ersten Änderung. Bei einem
+	 * {@link STRStore#rollback()} liefert sie die Kantenmenge nach der letzten Änderung. */
+	public STRStore owner() {
 		return this.store;
 	}
 
@@ -21,12 +23,14 @@ public class STRUpdate {
 		return this.newState;
 	}
 
-	// die in newState dazugekommenen inhalte
+	/** Diese Methode liefet die Menge der durch die Änderung ergänzten Kanten sowie die dabei eingetretene Erhöhung von {@link STRState#getNextRef()} und
+	 * {@link STRState#getRootRef()}. */
 	public synchronized STRState getPutState() {
 		return this.putState == null ? this.putState = STRState.from(this.oldState, this.newState) : this.putState;
 	}
 
-	// die in newState entfallenen inhalte
+	/** Diese Methode liefet die Menge der durch die Änderung entfernten Kanten sowie die dabei eingetretene Senkung von {@link STRState#getNextRef()} und
+	 * {@link STRState#getRootRef()}. */
 	public synchronized STRState getPopState() {
 		return this.popState == null ? this.popState = STRState.from(this.newState, this.oldState) : this.popState;
 	}
@@ -44,7 +48,6 @@ public class STRUpdate {
 			store.backup = null;
 		} else {
 			this.newState = this.oldState = new STRState(store);
-			
 		}
 	}
 
