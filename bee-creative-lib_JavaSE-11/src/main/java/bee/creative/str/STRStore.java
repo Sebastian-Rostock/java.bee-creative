@@ -107,6 +107,12 @@ public class STRStore extends STRState {
 		this.targetMap = REFMAP.EMPTY;
 	}
 
+	public void putAll(STRState state) {
+		this.backup();
+		
+		
+	}
+	
 	public void replace(STRState state) {
 		if (state instanceof STRStore) {
 			state = new STRState(state.toInts()); // TODO bessere deep copy

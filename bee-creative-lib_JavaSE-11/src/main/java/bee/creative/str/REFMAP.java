@@ -1,8 +1,8 @@
 package bee.creative.str;
 
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 import java.util.Map.Entry;
+import java.util.NoSuchElementException;
 import bee.creative.emu.EMU;
 import bee.creative.emu.Emuator;
 import bee.creative.lang.Objects;
@@ -220,7 +220,9 @@ public final class REFMAP {
 		private ITER(Object[] refmap) {
 			this.index = (this.refmap = refmap).length - 1;
 			this.refset = REFMAP.getKeys(refmap);
-			this.nextRef();
+			if (this.hasNext()) {
+				this.nextRef();
+			}
 		}
 
 	}

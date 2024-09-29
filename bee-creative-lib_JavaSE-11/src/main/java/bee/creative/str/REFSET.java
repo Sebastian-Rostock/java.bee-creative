@@ -274,7 +274,11 @@ public final class REFSET {
 		public int nextRef() {
 			if (!this.hasNext()) throw new NoSuchElementException();
 			var ref = this.ref;
-			for (; (3 < this.index) && ((this.ref = this.refset[this.index]) != 0); this.index -= 3) {}
+			while ((3 < this.index)) {
+				this.ref = this.refset[this.index];
+				this.index -= 3;
+				if (this.ref != 0) return ref;
+			}
 			return ref;
 		}
 
@@ -296,7 +300,9 @@ public final class REFSET {
 
 		private ITER(int[] refset) {
 			this.index = (this.refset = refset).length - 1;
-			this.nextRef();
+			if (this.hasNext()) {
+				this.nextRef();
+			}
 		}
 
 	}

@@ -14,6 +14,7 @@ import bee.creative.util.Iterators;
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class STRState implements Iterable2<STREdge> {
 
+	/** Dieses Feld speichert die leere Menge. */
 	public static final STRState EMPTY = new STRState();
 
 	/** Diese Methode liefert die Menge der Kanten zur gegebenen {@link #toInts() kompakten Abschrift}. */
@@ -21,21 +22,31 @@ public class STRState implements Iterable2<STREdge> {
 		return new STRState(storage.clone());
 	}
 
-	/** Diese Methode liefert die Menge der Kanten zur gegebenen {@link #toBytes() binarisierten kompakten Abschrift}. */
+	/** Diese Methode liefert die Menge der Kanten zur gegebenen {@link #toBytes() binarisierten kompakten Abschrift} mit nativer Bytereihenfolge. */
 	public static STRState from(byte[] bytes) {
-		return STRState.from(ByteBuffer.wrap(bytes));
+		return STRState.from(bytes, ByteOrder.nativeOrder());
+	}
+
+	/** Diese Methode liefert die Menge der Kanten zur gegebenen {@link #toBytes() binarisierten kompakten Abschrift} mit der gegebenen Bytereihenfolge. */
+	public static STRState from(byte[] bytes, ByteOrder order) {
+		return STRState.from(ByteBuffer.wrap(bytes), order);
 	}
 
 	/** Diese Methode liefert die Menge der Kanten zur gegebenen {@link #toInts() kompakten Abschrift}. */
 	public static STRState from(IntBuffer buffer) {
 		var storage = new int[buffer.remaining()];
-		buffer.get(storage);
+		buffer.duplicate().get(storage);
 		return new STRState(storage);
 	}
 
-	/** Diese Methode liefert die Menge der Kanten zur gegebenen {@link #toBytes() binarisierten kompakten Abschrift}. */
+	/** Diese Methode liefert die Menge der Kanten zur gegebenen {@link #toBytes() binarisierten kompakten Abschrift} mit nativer Bytereihenfolge. */
 	public static STRState from(ByteBuffer buffer) {
-		return STRState.from(buffer.asIntBuffer());
+		return STRState.from(buffer, ByteOrder.nativeOrder());
+	}
+
+	/** Diese Methode liefert die Menge der Kanten zur gegebenen {@link #toBytes() binarisierten kompakten Abschrift} mit der gegebenen Bytereihenfolge. */
+	public static STRState from(ByteBuffer buffer, ByteOrder order) {
+		return STRState.from(buffer.duplicate().order(order).asIntBuffer());
 	}
 
 	/** Diese Methode liefert die Kanten des {@code newState} ohne denen des {@code oldState}, bspw. für {@link STRUpdate#getPutState()} und
@@ -43,7 +54,7 @@ public class STRState implements Iterable2<STREdge> {
 	 *
 	 * @param oldState alte Kantenmenge.
 	 * @param newState neue Kantenmenge.
-	 * @return Differenz der gegebenen alte Kangenmengen. */
+	 * @return Differenz der Kangenmengen. */
 	public static STRState from(STRState oldState, STRState newState) {
 		var result = new STRState();
 		oldState.restore();
@@ -161,10 +172,14 @@ public class STRState implements Iterable2<STREdge> {
 		}
 	}
 
+	/** Diese Methode liefert die Referenz auf die Entität des Inhaltsverzeichnisses oder {@code 0}. Wenn dieses Objekt über {@link #from(STRState, STRState)}
+	 * erzeugt wurde, liefert sie {@code newState.getRootRef() - oldState.getRootRef()}. */
 	public int getRootRef() {
 		return this.rootRef;
 	}
 
+	/** Diese Methode liefert die Referenz auf die nächste neue Entität oder {@code 0}. Wenn dieses Objekt über {@link #from(STRState, STRState)} erzeugt wurde,
+	 * liefert sie {@code newState.getNextRef() - oldState.getNextRef()}. */
 	public int getNextRef() {
 		return this.nextRef;
 	}
@@ -358,6 +373,8 @@ public class STRState implements Iterable2<STREdge> {
 
 	@Override
 	public Iterator2<STREdge> iterator() {
+		// TODO auch für storage?
+		this.restore();
 		var sourceIter = REFMAP.iterator(this.sourceMap);
 		return Iterators.concatAll(Iterators.concatAll(new Iterator2<Iterator2<Iterator2<STREdge>>>() {
 
@@ -522,8 +539,10 @@ public class STRState implements Iterable2<STREdge> {
 		return res.append(" }").toString();
 	}
 
+	/** Diese Schnittstelle definiert den Empfänger der Referenzen für {@link STRState#forEach(RUN)}. */
 	public interface RUN {
 
+		/** Diese Methode verarbeitet die gegebene Kante. */
 		void run(int sourceRef, int targetRef, int relationRef);
 
 	}
