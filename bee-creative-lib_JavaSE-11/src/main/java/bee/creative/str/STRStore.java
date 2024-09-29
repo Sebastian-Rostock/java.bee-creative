@@ -7,14 +7,14 @@ import java.util.Arrays;
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class STRStore extends STRState {
 
-	public void setRootRef(int rootRef) {
-		this.backup();
-		this.rootRef = rootRef;
-	}
-
 	public void setNextRef(int nextRef) {
 		this.backup();
 		this.nextRef = nextRef;
+	}
+
+	public void setRootRef(int rootRef) {
+		this.backup();
+		this.rootRef = rootRef;
 	}
 
 	public int newNextRef() {
@@ -35,6 +35,7 @@ public class STRStore extends STRState {
 	 * @param sourceRefs
 	 * @return */
 	int setSourceRefs(int targetRef, int relationRef, int[] sourceRefs) {
+		
 		// TODO
 		return 0;
 	}
@@ -77,6 +78,13 @@ public class STRStore extends STRState {
 		return res;
 	}
 
+	public void putState(STRState state) {
+		this.backup();
+		state.forEach(this::insert);
+		this.nextRef += state.nextRef;
+		this.rootRef += state.rootRef;
+	}
+
 	public boolean pop(STREdge edge) {
 		this.backup();
 		return this.delete(edge.sourceRef, edge.targetRef, edge.relationRef);
@@ -101,18 +109,19 @@ public class STRStore extends STRState {
 		return res;
 	}
 
+	public void popState(STRState state) {
+		this.backup();
+		state.forEach(this::delete);
+		this.nextRef -= state.nextRef;
+		this.rootRef -= state.rootRef;
+	}
+
 	public void clear() {
 		this.backup();
 		this.sourceMap = REFMAP.EMPTY;
 		this.targetMap = REFMAP.EMPTY;
 	}
 
-	public void putAll(STRState state) {
-		this.backup();
-		
-		
-	}
-	
 	public void replace(STRState state) {
 		if (state instanceof STRStore) {
 			state = new STRState(state.toInts()); // TODO bessere deep copy

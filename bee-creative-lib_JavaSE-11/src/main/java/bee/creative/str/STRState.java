@@ -8,8 +8,8 @@ import bee.creative.util.Iterable2;
 import bee.creative.util.Iterator2;
 import bee.creative.util.Iterators;
 
-/** Diese Klasse implementiert eine Menge {@link STREdge typisierter Kanten}, auf welche effizient sowohl von der {@link #getSourceRefs() Quellen} als auch von
- * den {@link #getTargetRefs() Zielen} zugegriffen werden kann.
+/** Diese Klasse implementiert eine Menge {@link STREdge typisierter Kanten}, auf welche effizient sowohl von der {@link #getSourceRefs() Quellreferenzen} als
+ * auch von den {@link #getTargetRefs() Zielreferenzen} zugegriffen werden kann.
  *
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class STRState implements Iterable2<STREdge> {
@@ -172,16 +172,16 @@ public class STRState implements Iterable2<STREdge> {
 		}
 	}
 
-	/** Diese Methode liefert die Referenz auf die Entität des Inhaltsverzeichnisses oder {@code 0}. Wenn dieses Objekt über {@link #from(STRState, STRState)}
-	 * erzeugt wurde, liefert sie {@code newState.getRootRef() - oldState.getRootRef()}. */
-	public int getRootRef() {
-		return this.rootRef;
-	}
-
 	/** Diese Methode liefert die Referenz auf die nächste neue Entität oder {@code 0}. Wenn dieses Objekt über {@link #from(STRState, STRState)} erzeugt wurde,
 	 * liefert sie {@code newState.getNextRef() - oldState.getNextRef()}. */
 	public int getNextRef() {
 		return this.nextRef;
+	}
+
+	/** Diese Methode liefert die Referenz auf die Entität des Inhaltsverzeichnisses oder {@code 0}. Wenn dieses Objekt über {@link #from(STRState, STRState)}
+	 * erzeugt wurde, liefert sie {@code newState.getRootRef() - oldState.getRootRef()}. */
+	public int getRootRef() {
+		return this.rootRef;
 	}
 
 	// als source vorkommende knoten
