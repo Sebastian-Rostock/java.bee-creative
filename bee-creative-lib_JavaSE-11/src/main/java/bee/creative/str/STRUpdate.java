@@ -3,7 +3,7 @@ package bee.creative.str;
 /** Diese Klasse implementiert den Änderungsbericht zu {@link STRStore#commit()} und {@link STRStore#rollback()}.
  *
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public class STRUpdate {
+public final class STRUpdate {
 
 	/** Diese Methode liefet den {@link STRStore Kandenspeicher} einem {@link STRStore#commit()} die Kantenmenge vor der ersten Änderung. Bei einem
 	 * {@link STRStore#rollback()} liefert sie die Kantenmenge nach der letzten Änderung. */

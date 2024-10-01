@@ -2,18 +2,18 @@ package bee.creative.str;
 
 import bee.creative.lang.Objects;
 
-/** Diese Klasse implementiert eine mit {@link #relationRef() Beziehungsreferenz} typisierte Kante von einer {@link #sourceRef() Quellreferenz} zu einer
- * {@link #targetRef() Zielreferenz}.
+/** Diese Klasse implementiert eine Hyperkante von einer {@link #sourceRef() Quellreferenz} zu einer {@link #targetRef() Zielreferenz}, typisiert mit einer
+ * {@link #relationRef() Beziehungsreferenz}.
  *
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class STREdge {
 
-	/** Diese Methode liefert eine neue Kante mmit den gegebenen Refernezen, sofern diese ungleich {@code 0} sind.
+	/** Diese Methode liefert eine neue Hyperkante mmit den gegebenen Refernezen, sofern diese ungleich {@code 0} sind.
 	 *
 	 * @param sourceRef Quellreferenz oder {@code 0}.
 	 * @param targetRef Zielreferenz oder {@code 0}.
 	 * @param relationRef Beziehungsreferenz oder {@code 0}.
-	 * @return Kante oder {@code null}. */
+	 * @return Hyperkante oder {@code null}. */
 	public static STREdge from(int sourceRef, int targetRef, int relationRef) {
 		if ((sourceRef == 0) || (targetRef == 0) || (relationRef == 0)) return null;
 		return new STREdge(sourceRef, targetRef, relationRef);

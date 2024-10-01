@@ -49,6 +49,12 @@ public class STRState implements Iterable2<STREdge> {
 		return STRState.from(buffer.duplicate().order(order).asIntBuffer());
 	}
 
+	/** Diese Methode liefert eine Kopie der gegebenen Kantenmenge udn ist eine Abkürzung von {@link #from(STRState, STRState) STRState.from(STRState.EMPTY,
+	 * newState)}. */
+	public static STRState from(STRState newState) {
+		return STRState.from(STRState.EMPTY, newState);
+	}
+
 	/** Diese Methode liefert die Kanten des {@code newState} ohne denen des {@code oldState}, bspw. für {@link STRUpdate#getPutState()} und
 	 * {@link STRUpdate#getPopState()}.
 	 *
@@ -162,9 +168,9 @@ public class STRState implements Iterable2<STREdge> {
 	/** Diese Methode übergibt alle Kanten an {@link RUN#run(int, int, int) task.run()}. */
 	public void forEach(RUN task) {
 		if (this.storage != null) {
-			this.select(this.storage, task);
+			STRState.select(this.storage, task);
 		} else {
-			this.select(this.sourceMap, task);
+			STRState.select(this.sourceMap, task);
 		}
 	}
 
@@ -192,6 +198,8 @@ public class STRState implements Iterable2<STREdge> {
 		return REFMAP.size(this.sourceMap);
 	}
 
+	/** Diese Methode liefert die als {@link STREdge#relationRef()} vorkommenden Referenzen aller {@link STREdge Kanten} mit der gegebene {@code sourceRef} als
+	 * {@link STREdge#sourceRef()}. */
 	public int[] getSourceRelationRefs(int sourceRef) {
 		if (sourceRef == 0) return STRState.EMPTY_REFS;
 		this.restore();
@@ -201,6 +209,8 @@ public class STRState implements Iterable2<STREdge> {
 		return REFMAP.toArray(relationMap);
 	}
 
+	/** Diese Methode liefert die Anzahl der als {@link STREdge#relationRef()} vorkommenden Referenzen aller {@link STREdge Kanten} mit der gegebene
+	 * {@code sourceRef} als {@link STREdge#sourceRef()}. */
 	public int getSourceRelationCount(int sourceRef) {
 		if (sourceRef == 0) return 0;
 		this.restore();
@@ -210,7 +220,8 @@ public class STRState implements Iterable2<STREdge> {
 		return REFMAP.size(relationMap);
 	}
 
-	// erster als target bei source und rel vorkommender knoten
+	/** Diese Methode liefert eine der als {@link STREdge#targetRef()} vorkommenden Referenzen aller {@link STREdge Kanten} mit der gegebene {@code sourceRef} als
+	 * {@link STREdge#sourceRef()} und der gegebene {@code relationRef} als {@link STREdge#relationRef()} oder {@code 0}. */
 	public int getSourceRelationTargetRef(int sourceRef, int relationRef) {
 		if ((sourceRef == 0) || (relationRef == 0)) return 0;
 		this.restore();
@@ -224,6 +235,8 @@ public class STRState implements Iterable2<STREdge> {
 		return REFSET.getRef(targetVal);
 	}
 
+	/** Diese Methode liefert die als {@link STREdge#targetRef()} vorkommenden Referenzen aller {@link STREdge Kanten} mit der gegebene {@code sourceRef} als
+	 * {@link STREdge#sourceRef()} und der gegebene {@code relationRef} als {@link STREdge#relationRef()}. */
 	public int[] getSourceRelationTargetRefs(int sourceRef, int relationRef) {
 		if ((sourceRef == 0) || (relationRef == 0)) return STRState.EMPTY_REFS;
 		this.restore();
@@ -237,6 +250,8 @@ public class STRState implements Iterable2<STREdge> {
 		return REFSET.toArray(targetVal);
 	}
 
+	/** Diese Methode liefert die Anzahl der als {@link STREdge#targetRef()} vorkommenden Referenzen aller {@link STREdge Kanten} mit der gegebene
+	 * {@code sourceRef} als {@link STREdge#sourceRef()} und der gegebene {@code relationRef} als {@link STREdge#relationRef()}. */
 	public int getSourceRelationTargetCount(int sourceRef, int relationRef) {
 		if ((sourceRef == 0) || (relationRef == 0)) return 0;
 		this.restore();
@@ -250,17 +265,20 @@ public class STRState implements Iterable2<STREdge> {
 		return REFSET.size(targetVal);
 	}
 
+	/** Diese Methode liefert die als {@link STREdge#targetRef()} vorkommenden Referenzen. */
 	public int[] getTargetRefs() {
 		this.restore();
 		return REFMAP.toArray(this.targetMap);
 	}
 
+	/** Diese Methode liefert die Anzahl der als {@link STREdge#targetRef()} vorkommenden Referenzen. */
 	public int getTargetCount() {
 		this.restore();
 		return REFMAP.size(this.targetMap);
 	}
 
-	// als rel bei target vorkommenden knoten
+	/** Diese Methode liefert die als {@link STREdge#relationRef()} vorkommenden Referenzen aller {@link STREdge Kanten} mit der gegebene {@code targetRef} als
+	 * {@link STREdge#targetRef()}. */
 	public int[] getTargetRelationRefs(int targetRef) {
 		if (targetRef == 0) return STRState.EMPTY_REFS;
 		this.restore();
@@ -270,7 +288,8 @@ public class STRState implements Iterable2<STREdge> {
 		return REFMAP.toArray(relationMap);
 	}
 
-	// anzahl der als rel bei target vorkommenden knoten
+	/** Diese Methode liefert die Anzahl der als {@link STREdge#relationRef()} vorkommenden Referenzen aller {@link STREdge Kanten} mit der gegebene
+	 * {@code targetRef} als {@link STREdge#targetRef()}. */
 	public int getTargetRelationCount(int targetRef) {
 		if (targetRef == 0) return 0;
 		this.restore();
@@ -280,7 +299,8 @@ public class STRState implements Iterable2<STREdge> {
 		return REFMAP.size(relationMap);
 	}
 
-	// erster als source bei target und rel vorkommender knoten
+	/** Diese Methode liefert eine der als {@link STREdge#sourceRef()} vorkommenden Referenzen aller {@link STREdge Kanten} mit der gegebene {@code targetRef} als
+	 * {@link STREdge#targetRef()} und der gegebene {@code relationRef} als {@link STREdge#relationRef()} oder {@code 0}. */
 	public int getTargetRelationSourceRef(int targetRef, int relationRef) {
 		if ((targetRef == 0) || (relationRef == 0)) return 0;
 		this.restore();
@@ -294,7 +314,8 @@ public class STRState implements Iterable2<STREdge> {
 		return REFSET.getRef(sourceVal);
 	}
 
-	// als source bei target und rel vorkommende knoten
+	/** Diese Methode liefert die als {@link STREdge#sourceRef()} vorkommenden Referenzen aller {@link STREdge Kanten} mit der gegebene {@code targetRef} als
+	 * {@link STREdge#targetRef()} und der gegebene {@code relationRef} als {@link STREdge#relationRef()} oder {@code 0}. */
 	public int[] getTargetRelationSourceRefs(int targetRef, int relationRef) {
 		if ((targetRef == 0) || (relationRef == 0)) return STRState.EMPTY_REFS;
 		this.restore();
@@ -308,7 +329,8 @@ public class STRState implements Iterable2<STREdge> {
 		return REFSET.toArray(sourceVal);
 	}
 
-	// anzahl der als source bei target und rel vorkommenden knoten
+	/** Diese Methode liefert die Anzahl der als {@link STREdge#sourceRef()} vorkommenden Referenzen aller {@link STREdge Kanten} mit der gegebene
+	 * {@code targetRef} als {@link STREdge#targetRef()} und der gegebene {@code relationRef} als {@link STREdge#relationRef()} oder {@code 0}. */
 	public int getTargetRelationSourceCount(int targetRef, int relationRef) {
 		if ((targetRef == 0) || (relationRef == 0)) return 0;
 		this.restore();
@@ -322,8 +344,10 @@ public class STRState implements Iterable2<STREdge> {
 		return REFSET.size(sourceVal);
 	}
 
-	public boolean contains(int sourceRef, int relationRef, int targetRef) {
-		if ((sourceRef == 0) || (relationRef == 0) || (targetRef == 0)) return false;
+	/** Diese Methode liefert nur dann {@code true}, wenn die Kante mit der gegebene {@code sourceRef} als {@link STREdge#sourceRef()}, der gegebene
+	 * {@code targetRef} als {@link STREdge#targetRef()} und der gegebene {@code relationRef} als {@link STREdge#relationRef()} vorkommt. */
+	public boolean contains(int sourceRef, int targetRef, int relationRef) {
+		if ((sourceRef == 0) || (targetRef == 0) || (relationRef == 0)) return false;
 		this.restore();
 		var sourceIdx = REFMAP.getIdx(this.sourceMap, sourceRef);
 		if (sourceIdx == 0) return false;
@@ -373,9 +397,51 @@ public class STRState implements Iterable2<STREdge> {
 
 	@Override
 	public Iterator2<STREdge> iterator() {
-		// TODO auch für storage?
 		this.restore();
-		return iterator(this.sourceMap);
+		var sourceIter = REFMAP.iterator(this.sourceMap);
+		return Iterators.concatAll(Iterators.concatAll(new Iterator2<Iterator2<Iterator2<STREdge>>>() {
+
+			@Override
+			public Iterator2<Iterator2<STREdge>> next() {
+				var relationIter = REFMAP.iterator(STRState.asRefMap(sourceIter.nextVal()));
+				var sourceRef = sourceIter.nextRef();
+				return new Iterator2<>() {
+
+					@Override
+					public Iterator2<STREdge> next() {
+						var targetVal = STRState.asRefVal(relationIter.nextVal());
+						var relationRef = relationIter.nextRef();
+						if (STRState.isRef(targetVal)) return Iterators.fromItem(new STREdge(sourceRef, STRState.asRef(targetVal), relationRef));
+						var targetIter = REFSET.iterator(targetVal);
+						return new Iterator2<>() {
+
+							@Override
+							public STREdge next() {
+								return new STREdge(sourceRef, targetIter.nextRef(), relationRef);
+							}
+
+							@Override
+							public boolean hasNext() {
+								return targetIter.hasNext();
+							}
+
+						};
+					}
+
+					@Override
+					public boolean hasNext() {
+						return relationIter.hasNext();
+					}
+
+				};
+			}
+
+			@Override
+			public boolean hasNext() {
+				return sourceIter.hasNext();
+			}
+
+		}));
 	}
 
 	/** Diese Methode liefert ein kompakte Abschrift aller {@link STREdge Katen} dieser Menge als {@code int}-Array mit der Struktur
@@ -497,7 +563,7 @@ public class STRState implements Iterable2<STREdge> {
 	}
 
 	/** Diese Schnittstelle definiert den Empfänger der Referenzen für {@link STRState#forEach(RUN)}. */
-	public interface RUN {
+	public static interface RUN {
 
 		/** Diese Methode verarbeitet die gegebene Kante. */
 		void run(int sourceRef, int targetRef, int relationRef);
@@ -528,12 +594,12 @@ public class STRState implements Iterable2<STREdge> {
 
 	int rootRef;
 
-	/** Dieses Feld speichert die Referenzabbildung gemäß {@link REFMAP} von {@code source}-Referenzen auf Referenzabbildungen gemäß {@link REFMAP} von
-	 * {@code relation}-Referenzen auf {@code target}-Referenzen. Letztere sind dabei als {@code int[1]} oder gemäß {@link REFSET} abgebildet. */
+	/** Dieses Feld speichert die Referenzabbildung gemäß {@link REFMAP} von {@link STREdge#sourceRef} auf Referenzabbildungen gemäß {@link REFMAP} von
+	 * {@link STREdge#relationRef} auf {@link STREdge#targetRef}. Letztere sind dabei als {@code int[1]} oder gemäß {@link REFSET} abgebildet. */
 	Object[] sourceMap = REFMAP.EMPTY;
 
-	/** Dieses Feld speichert die Referenzabbildung gemäß {@link REFMAP} von {@code target}-Referenzen auf Referenzabbildungen gemäß {@link REFMAP} von
-	 * {@code relation}-Referenzen auf {@code source}-Referenzen. Letztere sind dabei als {@code int[1]} oder gemäß {@link REFSET} abgebildet. */
+	/** Dieses Feld speichert die Referenzabbildung gemäß {@link REFMAP} von {@link STREdge#targetRef} auf Referenzabbildungen gemäß {@link REFMAP} von
+	 * {@link STREdge#relationRef} auf {@link STREdge#sourceRef}. Letztere sind dabei als {@code int[1]} oder gemäß {@link REFSET} abgebildet. */
 	Object[] targetMap = REFMAP.EMPTY;
 
 	int[] storage;
@@ -565,7 +631,7 @@ public class STRState implements Iterable2<STREdge> {
 		try {
 			this.sourceMap = REFMAP.EMPTY;
 			this.targetMap = REFMAP.EMPTY;
-			this.select(this.storage, this::insert);
+			STRState.select(this.storage, this::insert);
 			this.storage = null;
 		} finally {
 			if (this.storage != null) {
@@ -577,7 +643,7 @@ public class STRState implements Iterable2<STREdge> {
 
 	private static final int[] EMPTY_REFS = new int[0];
 
-	private void select(int[] storage, RUN task) {
+	private static void select(int[] storage, RUN task) {
 		var storageIdx = 2;
 		var sourceCount = storage[storageIdx++];
 		while (0 < sourceCount--) {
@@ -600,7 +666,7 @@ public class STRState implements Iterable2<STREdge> {
 		}
 	}
 
-	private void select(Object[] sourceMap, RUN task) {
+	private static void select(Object[] sourceMap, RUN task) {
 		var sourceKeys = REFMAP.getKeys(sourceMap);
 		for (var sourceIdx = sourceMap.length - 1; 0 < sourceIdx; sourceIdx--) {
 			var relationMap = STRState.asRefMap(REFMAP.getVal(sourceMap, sourceIdx));
@@ -627,59 +693,7 @@ public class STRState implements Iterable2<STREdge> {
 		}
 	}
 
-	private void insert(int sourceRef, int relationRef, int targetRef) throws IllegalStateException {
-		this.sourceMap = this.insert(this.sourceMap, sourceRef, relationRef, targetRef);
-		this.targetMap = this.insert(this.targetMap, targetRef, relationRef, sourceRef);
-	}
-
-	private static Iterator2<STREdge> iterator(Object[] sourceMap2) {
-		var sourceIter = REFMAP.iterator(sourceMap2);
-		return Iterators.concatAll(Iterators.concatAll(new Iterator2<Iterator2<Iterator2<STREdge>>>() {
-	
-			@Override
-			public Iterator2<Iterator2<STREdge>> next() {
-				var relationIter = REFMAP.iterator(STRState.asRefMap(sourceIter.nextVal()));
-				var sourceRef = sourceIter.nextRef();
-				return new Iterator2<>() {
-	
-					@Override
-					public Iterator2<STREdge> next() {
-						var targetVal = STRState.asRefVal(relationIter.nextVal());
-						var relationRef = relationIter.nextRef();
-						if (STRState.isRef(targetVal)) return Iterators.fromItem(new STREdge(sourceRef, STRState.asRef(targetVal), relationRef));
-						var targetIter = REFSET.iterator(targetVal);
-						return new Iterator2<>() {
-	
-							@Override
-							public STREdge next() {
-								return new STREdge(sourceRef, targetIter.nextRef(), relationRef);
-							}
-	
-							@Override
-							public boolean hasNext() {
-								return targetIter.hasNext();
-							}
-	
-						};
-					}
-	
-					@Override
-					public boolean hasNext() {
-						return relationIter.hasNext();
-					}
-	
-				};
-			}
-	
-			@Override
-			public boolean hasNext() {
-				return sourceIter.hasNext();
-			}
-	
-		}));
-	}
-
-	private Object[] insert(Object[] sourceMap, int sourceRef, int relationRef, int targetRef) throws IllegalStateException {
+	private static Object[] insert(Object[] sourceMap, int sourceRef, int relationRef, int targetRef) throws IllegalStateException {
 
 		sourceMap = REFMAP.grow(sourceMap);
 
@@ -708,6 +722,11 @@ public class STRState implements Iterable2<STREdge> {
 		}
 
 		return sourceMap;
+	}
+
+	private void insert(int sourceRef, int relationRef, int targetRef) throws IllegalStateException {
+		this.sourceMap = STRState.insert(this.sourceMap, sourceRef, relationRef, targetRef);
+		this.targetMap = STRState.insert(this.targetMap, targetRef, relationRef, sourceRef);
 	}
 
 }
