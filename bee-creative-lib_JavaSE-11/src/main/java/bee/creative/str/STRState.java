@@ -3,64 +3,83 @@ package bee.creative.str;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
+import java.util.Arrays;
+import java.util.function.Consumer;
 import bee.creative.lang.Strings;
 import bee.creative.util.Iterable2;
 import bee.creative.util.Iterator2;
 import bee.creative.util.Iterators;
 
-/** Diese Klasse implementiert eine Menge {@link STREdge typisierter Kanten}, auf welche effizient sowohl von der {@link #getSourceRefs() Quellreferenzen} als
- * auch von den {@link #getTargetRefs() Zielreferenzen} zugegriffen werden kann.
+/** Diese Klasse implementiert eine Menge {@link STREdge typisierter Hyperkanten}, auf welche effizient sowohl von der {@link #getSourceRefs() Quellreferenzen}
+ * als auch von den {@link #getTargetRefs() Zielreferenzen} zugegriffen werden kann.
  *
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class STRState implements Iterable2<STREdge> {
 
-	/** Dieses Feld speichert die leere Menge. */
+	/** Dieses Feld speichert die leere {@link STRState Hyperkantenmenge}. */
 	public static final STRState EMPTY = new STRState();
 
-	/** Diese Methode liefert die Menge der Kanten zur gegebenen {@link #toInts() kompakten Abschrift}. */
+	/** Diese Methode liefert die {@link STRState Hyperkantenmenge} zur gegebenen {@link #toInts() kompakten Abschrift}. */
 	public static STRState from(int[] storage) {
 		return new STRState(storage.clone());
 	}
 
-	/** Diese Methode liefert die Menge der Kanten zur gegebenen {@link #toBytes() binarisierten kompakten Abschrift} mit nativer Bytereihenfolge. */
+	/** Diese Methode liefert die {@link STRState Hyperkantenmenge} zur gegebenen {@link #toBytes() binarisierten kompakten Abschrift} mit nativer
+	 * Bytereihenfolge. */
 	public static STRState from(byte[] bytes) {
 		return STRState.from(bytes, ByteOrder.nativeOrder());
 	}
 
-	/** Diese Methode liefert die Menge der Kanten zur gegebenen {@link #toBytes() binarisierten kompakten Abschrift} mit der gegebenen Bytereihenfolge. */
+	/** Diese Methode liefert die {@link STRState Hyperkantenmenge} zur gegebenen {@link #toBytes() binarisierten kompakten Abschrift} mit der gegebenen
+	 * Bytereihenfolge. */
 	public static STRState from(byte[] bytes, ByteOrder order) {
 		return STRState.from(ByteBuffer.wrap(bytes), order);
 	}
 
-	/** Diese Methode liefert die Menge der Kanten zur gegebenen {@link #toInts() kompakten Abschrift}. */
+	/** Diese Methode liefert die {@link STRState Hyperkantenmenge} zur gegebenen {@link #toInts() kompakten Abschrift}. */
 	public static STRState from(IntBuffer buffer) {
 		var storage = new int[buffer.remaining()];
 		buffer.duplicate().get(storage);
 		return new STRState(storage);
 	}
 
-	/** Diese Methode liefert die Menge der Kanten zur gegebenen {@link #toBytes() binarisierten kompakten Abschrift} mit nativer Bytereihenfolge. */
+	/** Diese Methode liefert die {@link STRState Hyperkantenmenge} zur gegebenen {@link #toBytes() binarisierten kompakten Abschrift} mit nativer
+	 * Bytereihenfolge. */
 	public static STRState from(ByteBuffer buffer) {
 		return STRState.from(buffer, ByteOrder.nativeOrder());
 	}
 
-	/** Diese Methode liefert die Menge der Kanten zur gegebenen {@link #toBytes() binarisierten kompakten Abschrift} mit der gegebenen Bytereihenfolge. */
+	/** Diese Methode liefert die {@link STRState Hyperkantenmenge} zur gegebenen {@link #toBytes() binarisierten kompakten Abschrift} mit der gegebenen
+	 * Bytereihenfolge. */
 	public static STRState from(ByteBuffer buffer, ByteOrder order) {
 		return STRState.from(buffer.duplicate().order(order).asIntBuffer());
 	}
 
-	/** Diese Methode liefert eine Kopie der gegebenen Kantenmenge udn ist eine Abkürzung von {@link #from(STRState, STRState) STRState.from(STRState.EMPTY,
-	 * newState)}. */
-	public static STRState from(STRState newState) {
-		return STRState.from(STRState.EMPTY, newState);
+	/** Diese Methode liefert die gegebenen {@link STREdge Hyperkanten} als {@link STRState Hyperkantenmenge}. */
+	public static STRState from(STREdge... edges) {
+		return STRState.from(Arrays.asList(edges));
 	}
 
-	/** Diese Methode liefert die Kanten des {@code newState} ohne denen des {@code oldState}, bspw. für {@link STRUpdate#getPutState()} und
+	/** Diese Methode liefert die gegebenen {@link STREdge Hyperkanten} als {@link STRState Hyperkantenmenge}. */
+	public static STRState from(Iterable<STREdge> edges) {
+		var result = new STRState();
+		edges.forEach(edge -> result.insert(edge.sourceRef, edge.targetRef, edge.relationRef));
+		return result;
+	}
+
+	/** Diese Methode liefert eine Kopie der gegebenen {@link STRState Hyperkantenmenge}. */
+	public static STRState from(STRStore edges) {
+		var result = new STRState();
+		edges.forEach(result::insert);
+		return result;
+	}
+
+	/** Diese Methode liefert die {@link STREdge Hyperkanten} des {@code newState} ohne denen des {@code oldState}, bspw. für {@link STRUpdate#getPutState()} und
 	 * {@link STRUpdate#getPopState()}.
 	 *
-	 * @param oldState alte Kantenmenge.
-	 * @param newState neue Kantenmenge.
-	 * @return Differenz der Kangenmengen. */
+	 * @param oldState alte Hyperkantenmenge.
+	 * @param newState neue Hyperkantenmenge.
+	 * @return Differenz der Hyperkantenmengen. */
 	public static STRState from(STRState oldState, STRState newState) {
 		var result = new STRState();
 		oldState.restore();
@@ -165,7 +184,7 @@ public class STRState implements Iterable2<STREdge> {
 		return result;
 	}
 
-	/** Diese Methode übergibt alle Kanten an {@link RUN#run(int, int, int) task.run()}. */
+	/** Diese Methode übergibt die Referenzen aller {@link STREdge Hyperkanten} an {@link RUN#run(int, int, int) task.run()}. */
 	public void forEach(RUN task) {
 		if (this.storage != null) {
 			STRState.select(this.storage, task);
@@ -198,8 +217,8 @@ public class STRState implements Iterable2<STREdge> {
 		return REFMAP.size(this.sourceMap);
 	}
 
-	/** Diese Methode liefert die als {@link STREdge#relationRef()} vorkommenden Referenzen aller {@link STREdge Kanten} mit der gegebene {@code sourceRef} als
-	 * {@link STREdge#sourceRef()}. */
+	/** Diese Methode liefert die als {@link STREdge#relationRef()} vorkommenden Referenzen aller {@link STREdge Hyperkanten} mit der gegebene {@code sourceRef}
+	 * als {@link STREdge#sourceRef()}. */
 	public int[] getSourceRelationRefs(int sourceRef) {
 		if (sourceRef == 0) return STRState.EMPTY_REFS;
 		this.restore();
@@ -209,7 +228,7 @@ public class STRState implements Iterable2<STREdge> {
 		return REFMAP.toArray(relationMap);
 	}
 
-	/** Diese Methode liefert die Anzahl der als {@link STREdge#relationRef()} vorkommenden Referenzen aller {@link STREdge Kanten} mit der gegebene
+	/** Diese Methode liefert die Anzahl der als {@link STREdge#relationRef()} vorkommenden Referenzen aller {@link STREdge Hyperkanten} mit der gegebene
 	 * {@code sourceRef} als {@link STREdge#sourceRef()}. */
 	public int getSourceRelationCount(int sourceRef) {
 		if (sourceRef == 0) return 0;
@@ -220,8 +239,8 @@ public class STRState implements Iterable2<STREdge> {
 		return REFMAP.size(relationMap);
 	}
 
-	/** Diese Methode liefert eine der als {@link STREdge#targetRef()} vorkommenden Referenzen aller {@link STREdge Kanten} mit der gegebene {@code sourceRef} als
-	 * {@link STREdge#sourceRef()} und der gegebene {@code relationRef} als {@link STREdge#relationRef()} oder {@code 0}. */
+	/** Diese Methode liefert eine der als {@link STREdge#targetRef()} vorkommenden Referenzen aller {@link STREdge Hyperkanten} mit der gegebene
+	 * {@code sourceRef} als {@link STREdge#sourceRef()} und der gegebene {@code relationRef} als {@link STREdge#relationRef()} oder {@code 0}. */
 	public int getSourceRelationTargetRef(int sourceRef, int relationRef) {
 		if ((sourceRef == 0) || (relationRef == 0)) return 0;
 		this.restore();
@@ -235,7 +254,7 @@ public class STRState implements Iterable2<STREdge> {
 		return REFSET.getRef(targetVal);
 	}
 
-	/** Diese Methode liefert die als {@link STREdge#targetRef()} vorkommenden Referenzen aller {@link STREdge Kanten} mit der gegebene {@code sourceRef} als
+	/** Diese Methode liefert die als {@link STREdge#targetRef()} vorkommenden Referenzen aller {@link STREdge Hyperkanten} mit der gegebene {@code sourceRef} als
 	 * {@link STREdge#sourceRef()} und der gegebene {@code relationRef} als {@link STREdge#relationRef()}. */
 	public int[] getSourceRelationTargetRefs(int sourceRef, int relationRef) {
 		if ((sourceRef == 0) || (relationRef == 0)) return STRState.EMPTY_REFS;
@@ -250,7 +269,7 @@ public class STRState implements Iterable2<STREdge> {
 		return REFSET.toArray(targetVal);
 	}
 
-	/** Diese Methode liefert die Anzahl der als {@link STREdge#targetRef()} vorkommenden Referenzen aller {@link STREdge Kanten} mit der gegebene
+	/** Diese Methode liefert die Anzahl der als {@link STREdge#targetRef()} vorkommenden Referenzen aller {@link STREdge Hyperkanten} mit der gegebene
 	 * {@code sourceRef} als {@link STREdge#sourceRef()} und der gegebene {@code relationRef} als {@link STREdge#relationRef()}. */
 	public int getSourceRelationTargetCount(int sourceRef, int relationRef) {
 		if ((sourceRef == 0) || (relationRef == 0)) return 0;
@@ -277,8 +296,8 @@ public class STRState implements Iterable2<STREdge> {
 		return REFMAP.size(this.targetMap);
 	}
 
-	/** Diese Methode liefert die als {@link STREdge#relationRef()} vorkommenden Referenzen aller {@link STREdge Kanten} mit der gegebene {@code targetRef} als
-	 * {@link STREdge#targetRef()}. */
+	/** Diese Methode liefert die als {@link STREdge#relationRef()} vorkommenden Referenzen aller {@link STREdge Hyperkanten} mit der gegebene {@code targetRef}
+	 * als {@link STREdge#targetRef()}. */
 	public int[] getTargetRelationRefs(int targetRef) {
 		if (targetRef == 0) return STRState.EMPTY_REFS;
 		this.restore();
@@ -288,7 +307,7 @@ public class STRState implements Iterable2<STREdge> {
 		return REFMAP.toArray(relationMap);
 	}
 
-	/** Diese Methode liefert die Anzahl der als {@link STREdge#relationRef()} vorkommenden Referenzen aller {@link STREdge Kanten} mit der gegebene
+	/** Diese Methode liefert die Anzahl der als {@link STREdge#relationRef()} vorkommenden Referenzen aller {@link STREdge Hyperkanten} mit der gegebene
 	 * {@code targetRef} als {@link STREdge#targetRef()}. */
 	public int getTargetRelationCount(int targetRef) {
 		if (targetRef == 0) return 0;
@@ -299,8 +318,8 @@ public class STRState implements Iterable2<STREdge> {
 		return REFMAP.size(relationMap);
 	}
 
-	/** Diese Methode liefert eine der als {@link STREdge#sourceRef()} vorkommenden Referenzen aller {@link STREdge Kanten} mit der gegebene {@code targetRef} als
-	 * {@link STREdge#targetRef()} und der gegebene {@code relationRef} als {@link STREdge#relationRef()} oder {@code 0}. */
+	/** Diese Methode liefert eine der als {@link STREdge#sourceRef()} vorkommenden Referenzen aller {@link STREdge Hyperkanten} mit der gegebene
+	 * {@code targetRef} als {@link STREdge#targetRef()} und der gegebene {@code relationRef} als {@link STREdge#relationRef()} oder {@code 0}. */
 	public int getTargetRelationSourceRef(int targetRef, int relationRef) {
 		if ((targetRef == 0) || (relationRef == 0)) return 0;
 		this.restore();
@@ -314,7 +333,7 @@ public class STRState implements Iterable2<STREdge> {
 		return REFSET.getRef(sourceVal);
 	}
 
-	/** Diese Methode liefert die als {@link STREdge#sourceRef()} vorkommenden Referenzen aller {@link STREdge Kanten} mit der gegebene {@code targetRef} als
+	/** Diese Methode liefert die als {@link STREdge#sourceRef()} vorkommenden Referenzen aller {@link STREdge Hyperkanten} mit der gegebene {@code targetRef} als
 	 * {@link STREdge#targetRef()} und der gegebene {@code relationRef} als {@link STREdge#relationRef()} oder {@code 0}. */
 	public int[] getTargetRelationSourceRefs(int targetRef, int relationRef) {
 		if ((targetRef == 0) || (relationRef == 0)) return STRState.EMPTY_REFS;
@@ -329,7 +348,7 @@ public class STRState implements Iterable2<STREdge> {
 		return REFSET.toArray(sourceVal);
 	}
 
-	/** Diese Methode liefert die Anzahl der als {@link STREdge#sourceRef()} vorkommenden Referenzen aller {@link STREdge Kanten} mit der gegebene
+	/** Diese Methode liefert die Anzahl der als {@link STREdge#sourceRef()} vorkommenden Referenzen aller {@link STREdge Hyperkanten} mit der gegebene
 	 * {@code targetRef} als {@link STREdge#targetRef()} und der gegebene {@code relationRef} als {@link STREdge#relationRef()} oder {@code 0}. */
 	public int getTargetRelationSourceCount(int targetRef, int relationRef) {
 		if ((targetRef == 0) || (relationRef == 0)) return 0;
@@ -344,8 +363,8 @@ public class STRState implements Iterable2<STREdge> {
 		return REFSET.size(sourceVal);
 	}
 
-	/** Diese Methode liefert nur dann {@code true}, wenn die Kante mit der gegebene {@code sourceRef} als {@link STREdge#sourceRef()}, der gegebene
-	 * {@code targetRef} als {@link STREdge#targetRef()} und der gegebene {@code relationRef} als {@link STREdge#relationRef()} vorkommt. */
+	/** Diese Methode liefert nur dann {@code true}, wenn die {@link STREdge Hyperkante} mit der gegebene {@code sourceRef} als {@link STREdge#sourceRef()}, der
+	 * gegebene {@code targetRef} als {@link STREdge#targetRef()} und der gegebene {@code relationRef} als {@link STREdge#relationRef()} vorkommt. */
 	public boolean contains(int sourceRef, int targetRef, int relationRef) {
 		if ((sourceRef == 0) || (targetRef == 0) || (relationRef == 0)) return false;
 		this.restore();
@@ -366,8 +385,8 @@ public class STRState implements Iterable2<STREdge> {
 		return REFMAP.getIdx(this.sourceMap, sourceRef) != 0;
 	}
 
-	/** Diese Methode liefert nur dann {@code true}, wenn die gegebene Referenzen {@code relationRef} als {@link STREdge#relationRef()} von {@link STREdge Kanten}
-	 * mit der gegebene {@code sourceRef} als {@link STREdge#sourceRef()} vorkommt. */
+	/** Diese Methode liefert nur dann {@code true}, wenn die gegebene Referenzen {@code relationRef} als {@link STREdge#relationRef()} von {@link STREdge
+	 * Hyperkanten} mit der gegebene {@code sourceRef} als {@link STREdge#sourceRef()} vorkommt. */
 	public boolean containsSourceRelationRef(int sourceRef, int relationRef) {
 		if ((sourceRef == 0) || (relationRef == 0)) return false;
 		this.restore();
@@ -384,8 +403,8 @@ public class STRState implements Iterable2<STREdge> {
 		return REFMAP.getIdx(this.targetMap, targetRef) != 0;
 	}
 
-	/** Diese Methode liefert nur dann {@code true}, wenn die gegebene Referenzen {@code relationRef} als {@link STREdge#relationRef()} von {@link STREdge Kanten}
-	 * mit der gegebene {@code relationRef} als {@link STREdge#relationRef()} vorkommt. */
+	/** Diese Methode liefert nur dann {@code true}, wenn die gegebene Referenzen {@code relationRef} als {@link STREdge#relationRef()} von {@link STREdge
+	 * Hyperkanten} mit der gegebene {@code relationRef} als {@link STREdge#relationRef()} vorkommt. */
 	public boolean containsTargetRelationRef(int targetRef, int relationRef) {
 		if ((targetRef == 0) || (relationRef == 0)) return false;
 		this.restore();
@@ -393,6 +412,11 @@ public class STRState implements Iterable2<STREdge> {
 		if (targetIdx == 0) return false;
 		var relationMap = STRState.asRefMap(REFMAP.getVal(this.targetMap, targetIdx));
 		return REFMAP.getIdx(relationMap, relationRef) != 0;
+	}
+
+	@Override
+	public void forEach(Consumer<? super STREdge> action) {
+		this.forEach((RUN)(sourceRef, targetRef, relationRef) -> action.accept(new STREdge(sourceRef, targetRef, relationRef)));
 	}
 
 	@Override
@@ -444,7 +468,7 @@ public class STRState implements Iterable2<STREdge> {
 		}));
 	}
 
-	/** Diese Methode liefert ein kompakte Abschrift aller {@link STREdge Katen} dieser Menge als {@code int}-Array mit der Struktur
+	/** Diese Methode liefert ein kompakte Abschrift aller {@link STREdge Hyperkanten} dieser Menge als {@code int}-Array mit der Struktur
 	 * {@code (nextRef, rootRef, sourceCount, (sourceRef, targetRefCount, (targetRef, relationRef)[targetRefCount], targetSetCount, (relationRef, targetCount, targetRef[targetCount])[targetSetCount])[sourceCount])}.
 	 *
 	 * @return kompakte Abschrift. */
@@ -565,7 +589,7 @@ public class STRState implements Iterable2<STREdge> {
 	/** Diese Schnittstelle definiert den Empfänger der Referenzen für {@link STRState#forEach(RUN)}. */
 	public static interface RUN {
 
-		/** Diese Methode verarbeitet die gegebene Kante. */
+		/** Diese Methode verarbeitet die gegebenen Referenzen einer {@link STREdge Hyperkante}. */
 		void run(int sourceRef, int targetRef, int relationRef);
 
 	}
@@ -624,7 +648,7 @@ public class STRState implements Iterable2<STREdge> {
 		this.storage = that.storage;
 	}
 
-	/** Diese Methode ersetzt {@link #sourceMap} und {@link #targetMap} nur dann mit den in {@link #storage} hinterlegten {@link STREdge Kanten}, wenn
+	/** Diese Methode ersetzt {@link #sourceMap} und {@link #targetMap} nur dann mit den in {@link #storage} hinterlegten {@link STREdge Hyperkanten}, wenn
 	 * {@link #storage} nicht {@code null} ist. Anschließend wird {@link #storage} auf {@code null} gesetzt. */
 	void restore() throws IllegalStateException {
 		if (this.storage == null) return;

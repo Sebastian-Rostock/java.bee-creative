@@ -27,43 +27,6 @@ public class STRStore extends STRState {
 		return nextRef;
 	}
 
-	/** Diese Methode gibt das zurück. ersetzt die als source von target und rel vorkommenden referenzen mit den > 0 gegebenen liefert die anzahl der
-	 * einzigartigen referenzen kopiert diese an den beginn von sourceRefs
-	 *
-	 * @param targetRef
-	 * @param relationRef
-	 * @param sourceRefs
-	 * @return */
-	int setSourceRefs(int targetRef, int relationRef, int[] sourceRefs) {
-		
-		
-		
-		// TODO
-		return 0;
-	}
-
-	int retainSourceRefs(int targetRef, int relationRef, int[] sourceRefs) {
-		// TODO
-		return 0;
-	}
-
-	
-	/** ergänzt die als source von target und rel vorkommenden referenzen mit den > 0 gegebenen liefert die anzahl der ergänzten referenzen kopiert diese an den
-	 * beginn von sourceRefs */
-	int addSourceRefs(int targetRef, int relationRef, int[] sourceRefs) {
-		// TODO
-		return 0;
-	}
-
-	/** entfernt von den als source von target und rel vorkommenden referenzen die > 0 gegebenen liefert die anzahl der entfernten referenzen kopiert diese an den
-	 * beginn von sourceRefs */
-	int removeSourceRefs(int targetRef, int relationRef, int[] sourceRefs) {
-		
-		
-		// TODO
-		return 0;
-	}
-
 	public boolean put(STREdge edge) {
 		this.backup();
 		return this.insert(edge.sourceRef, edge.targetRef, edge.relationRef);
@@ -88,6 +51,10 @@ public class STRStore extends STRState {
 		return res;
 	}
 
+	/**
+	 * Diese Methode {@link #putAll(Iterable) ergänzt} alle Hyperkanten das  zurück.
+	 * @param state
+	 */
 	public void putState(STRState state) {
 		this.backup();
 		state.forEach(this::insert);
