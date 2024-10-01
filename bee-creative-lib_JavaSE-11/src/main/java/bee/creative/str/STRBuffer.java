@@ -2,10 +2,14 @@ package bee.creative.str;
 
 import java.util.Arrays;
 
-/** Diese Klasse implementiert einen Speicher.
+/** Diese Klasse implementiert einen Hyperkantenpuffer als veränderbare {@link STRState Hyperkantenmenge}.
+ * <p>
+ * Der Hyperkantenpuffer macht vor der ersten Änderung grundsätzlich eine Sicherungskopie der aktuellen Hyperkantenmenge. Durch den Aufruf von {@link #commit()}
+ * bzw. {@link #rollback()} können dann alle bis dahin gemachten Änderungen angenommen bzw. verworfen werden. In beiden Fällen wird ein {@link STRUpdate
+ * Änderungsprotokoll} bereitgestellt.
  *
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public class STRStore extends STRState {
+public class STRBuffer extends STRState {
 
 	public void setNextRef(int nextRef) {
 		this.backup();
@@ -44,22 +48,20 @@ public class STRStore extends STRState {
 
 	public boolean putAll(Iterable<STREdge> edges) {
 		this.backup();
-		var res = false;
-		for (var edge: edges) {
-			res = this.insert(edge.sourceRef, edge.targetRef, edge.relationRef) | res;
+		var res = new boolean[1];
+		if (edges instanceof STRState) {
+			((STRState)edges).forEach((sourceRef, targetRef, relationRef) -> res[0] = this.insert(sourceRef, targetRef, relationRef) | res[0]);
+		} else {
+			edges.forEach(edge -> res[0] = this.insert(edge.sourceRef, edge.targetRef, edge.relationRef) | res[0]);
 		}
-		return res;
+		return res[0];
 	}
 
-	/**
-	 * Diese Methode {@link #putAll(Iterable) ergänzt} alle Hyperkanten das  zurück.
-	 * @param state
-	 */
-	public void putState(STRState state) {
+	public void putState(STRState putState) {
 		this.backup();
-		state.forEach(this::insert);
-		this.nextRef += state.nextRef;
-		this.rootRef += state.rootRef;
+		putState.forEach(this::insert);
+		this.nextRef += putState.nextRef;
+		this.rootRef += putState.rootRef;
 	}
 
 	public boolean pop(STREdge edge) {
@@ -79,18 +81,20 @@ public class STRStore extends STRState {
 
 	public boolean popAll(Iterable<STREdge> edges) {
 		this.backup();
-		var res = false;
-		for (var edge: edges) {
-			res = this.pop(edge) | res;
+		var res = new boolean[1];
+		if (edges instanceof STRState) {
+			((STRState)edges).forEach((sourceRef, targetRef, relationRef) -> res[0] = this.delete(sourceRef, targetRef, relationRef) | res[0]);
+		} else {
+			edges.forEach(edge -> res[0] = this.delete(edge.sourceRef, edge.targetRef, edge.relationRef) | res[0]);
 		}
-		return res;
+		return res[0];
 	}
 
-	public void popState(STRState state) {
+	public void popState(STRState popState) {
 		this.backup();
-		state.forEach(this::delete);
-		this.nextRef -= state.nextRef;
-		this.rootRef -= state.rootRef;
+		popState.forEach(this::delete);
+		this.nextRef -= popState.nextRef;
+		this.rootRef -= popState.rootRef;
 	}
 
 	public void clear() {
@@ -100,37 +104,22 @@ public class STRStore extends STRState {
 	}
 
 	public void replace(STRState state) {
-		if (state instanceof STRStore) {
-			state = new STRState(state.toInts()); // TODO bessere deep copy
-		} else {
-			state.restore();
-		}
-		this.clear();
+		state = STRState.from(state);
+		this.backup();
 		this.nextRef = state.nextRef;
 		this.rootRef = state.rootRef;
-		this.sourceMap = state.sourceMap; // hier deep copy einsetzen
-		this.targetMap = state.targetMap; // hier deep copy einsetzen
+		this.sourceMap = state.sourceMap;
+		this.targetMap = state.targetMap;
 	}
 
-	public void insertAll(STRState state) {
-		this.backup();
-		state.forEach(this::insert);
-		this.nextRef += state.nextRef;
-		this.rootRef += state.rootRef;
-	}
-
-	public void deleteAll(STRState state) {
-		this.backup();
-		state.forEach(this::delete);
-		this.nextRef -= state.nextRef;
-		this.rootRef -= state.rootRef;
-	}
-
+	/** Diese Methode übernimmt alle Anderungen seit dem letzten {@link #commit()}, {@link #rollback()} bzw. der erzeugung dieses Hyperkantenpuffers und liefert
+	 * den zugehörigen {@link STRUpdate Änderungsbericht}. */
 	public STRUpdate commit() {
 		return new STRUpdate(this, true);
 	}
 
-	/** verwirft die änderungen seit dem letzten commit. das betrifft getRootRef, getEntityRefs, getSource..., getTarget... */
+	/** Diese Methode verwirft alle Anderungen seit dem letzten {@link #commit()}, {@link #rollback()} bzw. der erzeugung dieses Hyperkantenpuffers und liefert
+	 * den zugehörigen {@link STRUpdate Änderungsbericht}. */
 	public STRUpdate rollback() {
 		return new STRUpdate(this, false);
 	}

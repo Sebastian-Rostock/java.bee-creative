@@ -1,23 +1,23 @@
 package bee.creative.str;
 
-/** Diese Klasse implementiert den Änderungsbericht zu {@link STRStore#commit()} und {@link STRStore#rollback()}.
+/** Diese Klasse implementiert den Änderungsbericht zu {@link STRBuffer#commit()} und {@link STRBuffer#rollback()}.
  *
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class STRUpdate {
 
-	/** Diese Methode liefet den {@link STRStore Kandenspeicher} einem {@link STRStore#commit()} die Kantenmenge vor der ersten Änderung. Bei einem
-	 * {@link STRStore#rollback()} liefert sie die Kantenmenge nach der letzten Änderung. */
-	public STRStore owner() {
+	/** Diese Methode liefet den {@link STRBuffer Kandenspeicher} einem {@link STRBuffer#commit()} die Kantenmenge vor der ersten Änderung. Bei einem
+	 * {@link STRBuffer#rollback()} liefert sie die Kantenmenge nach der letzten Änderung. */
+	public STRBuffer owner() {
 		return this.store;
 	}
 
-	/** Diese Methode liefet bei einem {@link STRStore#commit()} die Kantenmenge vor der ersten Änderung. Bei einem {@link STRStore#rollback()} liefert sie die
+	/** Diese Methode liefet bei einem {@link STRBuffer#commit()} die Kantenmenge vor der ersten Änderung. Bei einem {@link STRBuffer#rollback()} liefert sie die
 	 * Kantenmenge nach der letzten Änderung. */
 	public STRState getOldState() {
 		return this.oldState;
 	}
 
-	/** Diese Methode liefet bei einem {@link STRStore#commit()} die Kantenmenge nach der letzten Änderung. Bei einem {@link STRStore#rollback()} liefert sie die
+	/** Diese Methode liefet bei einem {@link STRBuffer#commit()} die Kantenmenge nach der letzten Änderung. Bei einem {@link STRBuffer#rollback()} liefert sie die
 	 * Kantenmenge vor der ersten Änderung. */
 	public STRState getNewState() {
 		return this.newState;
@@ -35,7 +35,7 @@ public final class STRUpdate {
 		return this.popState == null ? this.popState = STRState.from(this.newState, this.oldState) : this.popState;
 	}
 
-	STRUpdate(STRStore store, boolean commit) {
+	STRUpdate(STRBuffer store, boolean commit) {
 		this.store = store;
 		if (store.backup != null) {
 			if (commit) {
@@ -51,7 +51,7 @@ public final class STRUpdate {
 		}
 	}
 
-	private final STRStore store;
+	private final STRBuffer store;
 
 	private final STRState oldState;
 

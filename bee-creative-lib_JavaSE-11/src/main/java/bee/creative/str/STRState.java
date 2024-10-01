@@ -12,6 +12,12 @@ import bee.creative.util.Iterators;
 
 /** Diese Klasse implementiert eine Menge {@link STREdge typisierter Hyperkanten}, auf welche effizient sowohl von der {@link #getSourceRefs() Quellreferenzen}
  * als auch von den {@link #getTargetRefs() Zielreferenzen} zugegriffen werden kann.
+ * <p>
+ * Eine Hyperkantenmenge kann in eine {@link #toInts() kompakte Abschrift} überführt werden, die auch {@link #toBytes(ByteOrder) binarisiert} bereitgestellt
+ * werden kann. Wenn eine Hyperkantenmenge aus einer solchen kompakte Abschrift erzeugt wird, erfolgt deren Expansion grundsätzlich beim ersten Zugriff auf die
+ * Referenzen der {@link STREdge Hyperkanten}, außer bei {@link #toInts()}, {@link #forEach(RUN)} und {@link #forEach(Consumer)}.
+ * <p>
+ * Die über {@link #getNextRef()} und {@link #getRootRef()} bereitgestellten Referenzen haben Bedeutung für {@link STRBuffer} und {@link STRUpdate}.
  *
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class STRState implements Iterable2<STREdge> {
@@ -63,12 +69,16 @@ public class STRState implements Iterable2<STREdge> {
 	/** Diese Methode liefert die gegebenen {@link STREdge Hyperkanten} als {@link STRState Hyperkantenmenge}. */
 	public static STRState from(Iterable<STREdge> edges) {
 		var result = new STRState();
-		edges.forEach(edge -> result.insert(edge.sourceRef, edge.targetRef, edge.relationRef));
+		if (edges instanceof STRState) {
+			((STRState)edges).forEach(result::insert);
+		} else {
+			edges.forEach(edge -> result.insert(edge.sourceRef, edge.targetRef, edge.relationRef));
+		}
 		return result;
 	}
 
 	/** Diese Methode liefert eine Kopie der gegebenen {@link STRState Hyperkantenmenge}. */
-	public static STRState from(STRStore edges) {
+	public static STRState from(STRBuffer edges) {
 		var result = new STRState();
 		edges.forEach(result::insert);
 		return result;

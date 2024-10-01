@@ -10,7 +10,7 @@ class STR_TEST {
 		System.out.println("BEREdges2");
 		for (int a = 0; a < 10; a++) {
 			var r = new Random(a);
-			var s = new STRStore();
+			var s = new STRBuffer();
 			var l = new Tester(() -> {
 				for (int i = 0; i < 1000000;) {
 					for (int j = 0; j < 1000; i++, j++) {
