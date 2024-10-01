@@ -17,8 +17,8 @@ public final class STRUpdate {
 		return this.oldState;
 	}
 
-	/** Diese Methode liefet bei einem {@link STRBuffer#commit()} die Kantenmenge nach der letzten Änderung. Bei einem {@link STRBuffer#rollback()} liefert sie die
-	 * Kantenmenge vor der ersten Änderung. */
+	/** Diese Methode liefet bei einem {@link STRBuffer#commit()} die Kantenmenge nach der letzten Änderung. Bei einem {@link STRBuffer#rollback()} liefert sie
+	 * die Kantenmenge vor der ersten Änderung. */
 	public STRState getNewState() {
 		return this.newState;
 	}
@@ -37,13 +37,18 @@ public final class STRUpdate {
 
 	STRUpdate(STRBuffer store, boolean commit) {
 		this.store = store;
-		if (store.backup != null) {
+		var backup = store.backup;
+		if (backup != null) {
 			if (commit) {
-				this.oldState = new STRState(store.backup);
+				this.oldState = new STRState(backup);
 				this.newState = new STRState(store);
 			} else {
 				this.oldState = new STRState(store);
-				this.newState = new STRState(store.backup);
+				this.newState = new STRState(backup);
+				store.nextRef = backup.nextRef;
+				store.rootRef = backup.rootRef;
+				store.sourceMap = backup.sourceMap;
+				store.targetMap = backup.targetMap;
 			}
 			store.backup = null;
 		} else {

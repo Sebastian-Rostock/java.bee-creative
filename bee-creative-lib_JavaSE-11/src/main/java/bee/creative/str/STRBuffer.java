@@ -4,9 +4,9 @@ import java.util.Arrays;
 
 /** Diese Klasse implementiert einen Hyperkantenpuffer als veränderbare {@link STRState Hyperkantenmenge}.
  * <p>
- * Der Hyperkantenpuffer macht vor der ersten Änderung grundsätzlich eine Sicherungskopie der aktuellen Hyperkantenmenge. Durch den Aufruf von {@link #commit()}
- * bzw. {@link #rollback()} können dann alle bis dahin gemachten Änderungen angenommen bzw. verworfen werden. In beiden Fällen wird ein {@link STRUpdate
- * Änderungsprotokoll} bereitgestellt.
+ * Der Hyperkantenpuffer macht vor der ersten Änderung grundsätzlich eine Sicherungskopie der aktuellen Hyperkantenmenge und Referenzen. Durch den Aufruf von
+ * {@link #commit()} bzw. {@link #rollback()} können dann alle bis dahin gemachten Änderungen angenommen bzw. verworfen werden. In beiden Fällen wird ein
+ * {@link STRUpdate Änderungsprotokoll} bereitgestellt.
  *
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class STRBuffer extends STRState {
@@ -57,13 +57,6 @@ public class STRBuffer extends STRState {
 		return res[0];
 	}
 
-	public void putState(STRState putState) {
-		this.backup();
-		putState.forEach(this::insert);
-		this.nextRef += putState.nextRef;
-		this.rootRef += putState.rootRef;
-	}
-
 	public boolean pop(STREdge edge) {
 		this.backup();
 		return this.delete(edge.sourceRef, edge.targetRef, edge.relationRef);
@@ -90,20 +83,34 @@ public class STRBuffer extends STRState {
 		return res[0];
 	}
 
-	public void popState(STRState popState) {
-		this.backup();
-		popState.forEach(this::delete);
-		this.nextRef -= popState.nextRef;
-		this.rootRef -= popState.rootRef;
-	}
-
+	/** Diese Methode entfernt alle {@link STREdge Hyperkanten}. */
 	public void clear() {
 		this.backup();
 		this.sourceMap = REFMAP.EMPTY;
 		this.targetMap = REFMAP.EMPTY;
 	}
 
-	public void replace(STRState state) {
+	/** Diese Methode ergänzt alle {@link STREdge Hyperkanten} der gegebenen {@link STRState Hyperkantenmenge} {@code putState} und erhöht die Referenzen
+	 * {@link #getNextRef()} und {@link #getRootRef()} um die jeweiligen Zählerstände des {@code putState}. */
+	public void insertAll(STRState putState) {
+		this.backup();
+		putState.forEach(this::insert);
+		this.nextRef += putState.nextRef;
+		this.rootRef += putState.rootRef;
+	}
+
+	/** Diese Methode entfernt alle {@link STREdge Hyperkanten} der gegebenen {@link STRState Hyperkantenmenge} {@code popState} und verringert die Referenzen
+	 * {@link #getNextRef()} und {@link #getRootRef()} um die jeweiligen Zählerstände des {@code popState}. */
+	public void deleteAll(STRState popState) {
+		this.backup();
+		popState.forEach(this::delete);
+		this.nextRef -= popState.nextRef;
+		this.rootRef -= popState.rootRef;
+	}
+
+	/** Diese Methode ersetzt alle {@link STREdge Hyperkanten} soeie die Referenzen {@link #getNextRef()} und {@link #getRootRef()} mit denen der gegebenen
+	 * {@link STRState Hyperkantenmenge}. */
+	public void replaceAll(STRState state) {
 		state = STRState.from(state);
 		this.backup();
 		this.nextRef = state.nextRef;

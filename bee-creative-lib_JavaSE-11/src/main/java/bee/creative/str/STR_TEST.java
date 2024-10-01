@@ -12,25 +12,28 @@ class STR_TEST {
 			var r = new Random(a);
 			var s = new STRBuffer();
 			var l = new Tester(() -> {
-				for (int i = 0; i < 1000000;) {
+				for (int i = 0; i < 1000 * 1000;) {
 					for (int j = 0; j < 1000; i++, j++) {
 						s.put(r.nextInt(5000) + 1, r.nextInt(50) + 1, r.nextInt(5000) + 1);
 					}
-//					var ddd = s.commit();
-				//	System.out.println(ddd.getPutState());
+					// var ddd = s.commit();
+					var ddd = s.rollback();
+					// System.out.println(ddd.getPutState());
 				}
 			});
 			System.out.println(l);
-			int[] sc= {0};
-			s.forEach((x,b,c)->sc[0]++);
+			int[] sc = {0};
+			s.forEach((x, b, c) -> sc[0]++);
 			System.out.println(sc[0]);
-			int[] kc= {0};
+			int[] kc = {0};
 			var k = STRState.from(s.toBytes());
-			k.forEach((x,b,c)->kc[0]++);
+			k.forEach((x, b, c) -> kc[0]++);
 			System.out.println(kc[0]);
 			// l.cause.printStackTrace();
 		}
-
+		// 320 1000 add x 1000 => put = 320n
+		// 800 mit c => c = 480000n 
+		// 177 1000 add mit max 1000 cap
 	}
 
 }
