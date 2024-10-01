@@ -1,13 +1,15 @@
 package bee.creative.str;
 
+import bee.creative.lang.Objects;
+
 /** Diese Klasse implementiert eine mit {@link #relationRef() Beziehungsreferenz} typisierte Kante von einer {@link #sourceRef() Quellreferenz} zu einer
  * {@link #targetRef() Zielreferenz}.
- * 
+ *
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class STREdge {
 
 	/** Diese Methode liefert eine neue Kante mmit den gegebenen Refernezen, sofern diese ungleich {@code 0} sind.
-	 * 
+	 *
 	 * @param sourceRef Quellreferenz oder {@code 0}.
 	 * @param targetRef Zielreferenz oder {@code 0}.
 	 * @param relationRef Beziehungsreferenz oder {@code 0}.
@@ -30,6 +32,19 @@ public final class STREdge {
 	/** Diese Methode liefert die Beziehungsreferenz. */
 	public int relationRef() {
 		return this.relationRef;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hashPush(Objects.hashPush(Objects.hashPush(Objects.hashInit(), this.sourceRef), this.targetRef), this.relationRef);
+	}
+
+	@Override
+	public boolean equals(Object object) {
+		if (object == this) return true;
+		if (!(object instanceof STREdge)) return false;
+		var that = (STREdge)object;
+		return (this.sourceRef == that.sourceRef) && (this.targetRef == that.targetRef) && (this.relationRef == that.relationRef);
 	}
 
 	@Override

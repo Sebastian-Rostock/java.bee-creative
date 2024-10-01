@@ -8,7 +8,8 @@ import bee.creative.emu.Emuator;
 import bee.creative.util.AbstractIterator;
 
 /** Diese Klasse implementiert Methoden zur Verarbeitung einer steuwertbasierten Menge von Referenen ungleich {@code 0} mit durchschnittlich 4 Speicherzugriffen
- * zum {@link #getIdx(int[], int) Finden} einer vorhandenen Referenz. Die Menge ist als {@code int}-Array mit folgender Struktur umgesetzt:
+ * zum {@link #getIdx(int[], int) Finden} einer vorhandenen Referenz. Die Methoden verzichten weitgehend auf die Prüfung der Wertebereicht ihrer Argumente für
+ * maximale Effizienz. Die Menge ist als {@code int}-Array mit folgender Struktur umgesetzt:
  * <dl>
  * <dt>{@code (size, mask, free, (head, next, item)[mask + 1])}
  * <dd>
@@ -38,8 +39,7 @@ public final class REFSET {
 		return new int[]{0, 1, 1, 0, 2, 0, 0, 0, 0};
 	}
 
-	/** Diese Methode liefert eine neue Referenzmenge mit den gegebenen Referenzen {@code ref1} und {@code ref2}, wenn beide Referenzen ungleich {@code 0}
-	 * sind. */
+	/** Diese Methode liefert eine {@link #create() neue Referenzmenge}, {@link #putRef(int[], int) ergänzt} um die gegebenen Referenzen. */
 	public static int[] from(int ref1, int ref2) {
 		var refset = REFSET.create();
 		REFSET.putRef(refset, ref1);
@@ -263,8 +263,9 @@ public final class REFSET {
 	}
 
 	/** Diese Klasse implementiert {@link REFSET#iterator(int[])}. **/
-	static class ITER extends AbstractIterator<Integer> {
+	static final class ITER extends AbstractIterator<Integer> {
 
+		/** Diese Methode liefert {@link #nextRef()}. */
 		@Override
 		public Integer next() {
 			return this.nextRef();

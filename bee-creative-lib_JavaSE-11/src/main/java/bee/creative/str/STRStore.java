@@ -36,20 +36,30 @@ public class STRStore extends STRState {
 	 * @return */
 	int setSourceRefs(int targetRef, int relationRef, int[] sourceRefs) {
 		
+		
+		
 		// TODO
 		return 0;
 	}
 
+	int retainSourceRefs(int targetRef, int relationRef, int[] sourceRefs) {
+		// TODO
+		return 0;
+	}
+
+	
 	/** ergänzt die als source von target und rel vorkommenden referenzen mit den > 0 gegebenen liefert die anzahl der ergänzten referenzen kopiert diese an den
 	 * beginn von sourceRefs */
-	int putSourceRefs(int targetRef, int relationRef, int[] sourceRefs) {
+	int addSourceRefs(int targetRef, int relationRef, int[] sourceRefs) {
 		// TODO
 		return 0;
 	}
 
 	/** entfernt von den als source von target und rel vorkommenden referenzen die > 0 gegebenen liefert die anzahl der entfernten referenzen kopiert diese an den
 	 * beginn von sourceRefs */
-	int popSourceRefs(int targetRef, int relationRef, int[] sourceRefs) {
+	int removeSourceRefs(int targetRef, int relationRef, int[] sourceRefs) {
+		
+		
 		// TODO
 		return 0;
 	}

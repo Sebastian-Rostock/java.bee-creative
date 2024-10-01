@@ -159,11 +159,7 @@ public class STRState implements Iterable2<STREdge> {
 		return result;
 	}
 
-	/** Diese Methode übergibt alle Kanten an {@link STRTask#run(int) task.run()}. */
-
-	/** Diese Methode gibt das zurück.
-	 *
-	 * @param task */
+	/** Diese Methode übergibt alle Kanten an {@link RUN#run(int, int, int) task.run()}. */
 	public void forEach(RUN task) {
 		if (this.storage != null) {
 			this.select(this.storage, task);
@@ -184,15 +180,13 @@ public class STRState implements Iterable2<STREdge> {
 		return this.rootRef;
 	}
 
-	// als source vorkommende knoten
+	/** Diese Methode liefert die als {@link STREdge#sourceRef()} vorkommenden Referenzen. */
 	public int[] getSourceRefs() {
 		this.restore();
 		return REFMAP.toArray(this.sourceMap);
 	}
 
-	/** Diese Methode liefert die Anzahl der als {@code source} vorkommenden Entitäten.
-	 *
-	 * @return {@code source}-Anzahl. */
+	/** Diese Methode liefert die Anzahl der als {@link STREdge#sourceRef()} vorkommenden Referenzen. */
 	public int getSourceCount() {
 		this.restore();
 		return REFMAP.size(this.sourceMap);
@@ -341,12 +335,15 @@ public class STRState implements Iterable2<STREdge> {
 		return REFSET.getIdx(targetVal, targetRef) != 0;
 	}
 
+	/** Diese Methode liefert nur dann {@code true}, wenn die gegebene Referenzen {@code sourceRef} als {@link STREdge#sourceRef()} vorkommt. */
 	public boolean containsSourceRef(int sourceRef) {
 		if (sourceRef == 0) return false;
 		this.restore();
 		return REFMAP.getIdx(this.sourceMap, sourceRef) != 0;
 	}
 
+	/** Diese Methode liefert nur dann {@code true}, wenn die gegebene Referenzen {@code relationRef} als {@link STREdge#relationRef()} von {@link STREdge Kanten}
+	 * mit der gegebene {@code sourceRef} als {@link STREdge#sourceRef()} vorkommt. */
 	public boolean containsSourceRelationRef(int sourceRef, int relationRef) {
 		if ((sourceRef == 0) || (relationRef == 0)) return false;
 		this.restore();
@@ -356,12 +353,15 @@ public class STRState implements Iterable2<STREdge> {
 		return REFMAP.getIdx(relationMap, relationRef) != 0;
 	}
 
+	/** Diese Methode liefert nur dann {@code true}, wenn die gegebene Referenzen {@code targetRef} als {@link STREdge#targetRef()} vorkommt. */
 	public boolean containsTargetRef(int targetRef) {
 		if (targetRef == 0) return false;
 		this.restore();
 		return REFMAP.getIdx(this.targetMap, targetRef) != 0;
 	}
 
+	/** Diese Methode liefert nur dann {@code true}, wenn die gegebene Referenzen {@code relationRef} als {@link STREdge#relationRef()} von {@link STREdge Kanten}
+	 * mit der gegebene {@code relationRef} als {@link STREdge#relationRef()} vorkommt. */
 	public boolean containsTargetRelationRef(int targetRef, int relationRef) {
 		if ((targetRef == 0) || (relationRef == 0)) return false;
 		this.restore();
@@ -375,50 +375,7 @@ public class STRState implements Iterable2<STREdge> {
 	public Iterator2<STREdge> iterator() {
 		// TODO auch für storage?
 		this.restore();
-		var sourceIter = REFMAP.iterator(this.sourceMap);
-		return Iterators.concatAll(Iterators.concatAll(new Iterator2<Iterator2<Iterator2<STREdge>>>() {
-
-			@Override
-			public Iterator2<Iterator2<STREdge>> next() {
-				var relationIter = REFMAP.iterator(STRState.asRefMap(sourceIter.nextVal()));
-				var sourceRef = sourceIter.nextRef();
-				return new Iterator2<>() {
-
-					@Override
-					public Iterator2<STREdge> next() {
-						var targetVal = STRState.asRefVal(relationIter.nextVal());
-						var relationRef = relationIter.nextRef();
-						if (STRState.isRef(targetVal)) return Iterators.fromItem(new STREdge(sourceRef, STRState.asRef(targetVal), relationRef));
-						var targetIter = REFSET.iterator(targetVal);
-						return new Iterator2<>() {
-
-							@Override
-							public STREdge next() {
-								return new STREdge(sourceRef, targetIter.nextRef(), relationRef);
-							}
-
-							@Override
-							public boolean hasNext() {
-								return targetIter.hasNext();
-							}
-
-						};
-					}
-
-					@Override
-					public boolean hasNext() {
-						return relationIter.hasNext();
-					}
-
-				};
-			}
-
-			@Override
-			public boolean hasNext() {
-				return sourceIter.hasNext();
-			}
-
-		}));
+		return iterator(this.sourceMap);
 	}
 
 	/** Diese Methode liefert ein kompakte Abschrift aller {@link STREdge Katen} dieser Menge als {@code int}-Array mit der Struktur
@@ -673,6 +630,53 @@ public class STRState implements Iterable2<STREdge> {
 	private void insert(int sourceRef, int relationRef, int targetRef) throws IllegalStateException {
 		this.sourceMap = this.insert(this.sourceMap, sourceRef, relationRef, targetRef);
 		this.targetMap = this.insert(this.targetMap, targetRef, relationRef, sourceRef);
+	}
+
+	private static Iterator2<STREdge> iterator(Object[] sourceMap2) {
+		var sourceIter = REFMAP.iterator(sourceMap2);
+		return Iterators.concatAll(Iterators.concatAll(new Iterator2<Iterator2<Iterator2<STREdge>>>() {
+	
+			@Override
+			public Iterator2<Iterator2<STREdge>> next() {
+				var relationIter = REFMAP.iterator(STRState.asRefMap(sourceIter.nextVal()));
+				var sourceRef = sourceIter.nextRef();
+				return new Iterator2<>() {
+	
+					@Override
+					public Iterator2<STREdge> next() {
+						var targetVal = STRState.asRefVal(relationIter.nextVal());
+						var relationRef = relationIter.nextRef();
+						if (STRState.isRef(targetVal)) return Iterators.fromItem(new STREdge(sourceRef, STRState.asRef(targetVal), relationRef));
+						var targetIter = REFSET.iterator(targetVal);
+						return new Iterator2<>() {
+	
+							@Override
+							public STREdge next() {
+								return new STREdge(sourceRef, targetIter.nextRef(), relationRef);
+							}
+	
+							@Override
+							public boolean hasNext() {
+								return targetIter.hasNext();
+							}
+	
+						};
+					}
+	
+					@Override
+					public boolean hasNext() {
+						return relationIter.hasNext();
+					}
+	
+				};
+			}
+	
+			@Override
+			public boolean hasNext() {
+				return sourceIter.hasNext();
+			}
+	
+		}));
 	}
 
 	private Object[] insert(Object[] sourceMap, int sourceRef, int relationRef, int targetRef) throws IllegalStateException {

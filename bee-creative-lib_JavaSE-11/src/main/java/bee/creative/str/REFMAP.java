@@ -10,7 +10,8 @@ import bee.creative.util.AbstractIterator;
 import bee.creative.util.Entries;
 
 /** Diese Klasse implementiert Methoden zur Verarbeitung einer steuwertbasierten Abbildung von Referenen ungleich {@code 0} auf Elemente ungleich {@code null}.
- * Die Abbildung ist als {@code Object}-Array mit folgender Struktur umgesetzt:
+ * Die Methoden verzichten weitgehend auf die Prüfung der Wertebereicht ihrer Argumente für maximale Effizienz. Die Abbildung ist als {@code Object}-Array mit
+ * folgender Struktur umgesetzt:
  * <dl>
  * <dt>{@code (keys, value[keys.mask + 2])}
  * <dd>
@@ -179,7 +180,7 @@ public final class REFMAP {
 	}
 
 	/** Diese Klasse implementiert {@link REFMAP#iterator(Object[])}. */
-	static class ITER extends AbstractIterator<Entry<Integer, Object>> {
+	static final class ITER extends AbstractIterator<Entry<Integer, Object>> {
 
 		@Override
 		public Entry<Integer, Object> next() {
