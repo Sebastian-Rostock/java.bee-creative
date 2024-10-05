@@ -1,11 +1,12 @@
 package bee.creative.str;
 
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.NoSuchElementException;
 import bee.creative.emu.EMU;
 import bee.creative.emu.Emuator;
 import bee.creative.util.AbstractIterator;
+import bee.creative.util.Iterator2;
+import bee.creative.util.Iterators;
 
 /** Diese Klasse implementiert Methoden zur Verarbeitung einer steuwertbasierten Menge von Referenen ungleich {@code 0} mit durchschnittlich 4 Speicherzugriffen
  * zum {@link #getIdx(int[], int) Finden} einer vorhandenen Referenz. Die Methoden verzichten weitgehend auf die Prüfung der Wertebereicht ihrer Argumente für
@@ -175,9 +176,28 @@ public final class REFSET {
 		}
 	}
 
-	/** Diese Methode liefert den {@link Iterator} über die Referenzen der gegebenen Referenzmenge {@code refset}. */
+	/** Diese Methode liefert den {@link Iterator2} über die Referenzen der gegebenen Referenzmenge {@code refset}. */
 	public static ITER iterator(int[] refset) {
 		return new ITER(refset);
+	}
+
+	/** Diese Methode liefert den {@link Iterator2} über die Referenzen, die in mindestens einer der gegebenen Referenzmengen {@code refset1} und {@code refset2} enthalten sind. */
+	public static Iterator2<Integer> unionIterator(int[] refset1, int[] refset2) {
+		return REFSET.size(refset1) <= REFSET.size(refset2) //
+			? Iterators.concat(REFSET.exceptIterator(refset1, refset2), REFSET.iterator(refset2)) //
+			: Iterators.concat(REFSET.iterator(refset1), REFSET.exceptIterator(refset2, refset1));
+	}
+
+	/** Diese Methode liefert den {@link Iterator2} über die Referenzen der ersten gegebenen Referenzmenge {@code refset1}, die nicht in der zweiten  gegebenen Referenzmengen {@code refset2} enthalten sind. */
+	public static Iterator2<Integer> exceptIterator(int[] refset1, int[] refset2) {
+		return Iterators.filter(REFSET.iterator(refset1), ref -> REFSET.getIdx(refset2, ref) == 0);
+	}
+
+	/** Diese Methode liefert den {@link Iterator2} über die Referenzen, die zugleich in beiden gegebenen Referenzmengen {@code refset1} und {@code refset2} enthalten sind. */
+	public static Iterator2<Integer> intersectIterator(int[] refset1, int[] refset2) {
+		return REFSET.size(refset1) <= REFSET.size(refset2) //
+			? Iterators.filter(REFSET.iterator(refset1), ref -> REFSET.getIdx(refset2, ref) != 0) //
+			: Iterators.filter(REFSET.iterator(refset2), ref -> REFSET.getIdx(refset1, ref) != 0);
 	}
 
 	/** Diese Methode liefert alle Referenzen der gegebenen Referenzmenge {@code refset}. */
