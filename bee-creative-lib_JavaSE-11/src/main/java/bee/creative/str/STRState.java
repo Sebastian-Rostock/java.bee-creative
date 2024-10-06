@@ -1,12 +1,12 @@
 package bee.creative.str;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 import java.util.Arrays;
 import java.util.function.Consumer;
 import bee.creative.lang.Strings;
-import bee.creative.util.Iterable2;
 import bee.creative.util.Iterator2;
 import bee.creative.util.Iterators;
 
@@ -15,12 +15,12 @@ import bee.creative.util.Iterators;
  * <p>
  * Eine Hyperkantenmenge kann in eine {@link #toInts() kompakte Abschrift} überführt werden, die auch {@link #toBytes(ByteOrder) binarisiert} bereitgestellt
  * werden kann. Wenn eine Hyperkantenmenge aus einer solchen kompakte Abschrift erzeugt wird, erfolgt deren Expansion grundsätzlich beim ersten Zugriff auf die
- * Referenzen der {@link STREdge Hyperkanten}, außer bei {@link #toInts()}, {@link #forEach(RUN)} und {@link #forEach(Consumer)}.
+ * Referenzen der {@link STREdge Hyperkanten}, außer bei {@link #toInts()} und {@link #edges()}.
  * <p>
  * Die über {@link #getNextRef()} und {@link #getRootRef()} bereitgestellten Referenzen haben Bedeutung für {@link STRBuffer} und {@link STRUpdate}.
  *
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public class STRState implements Iterable2<STREdge> {
+public class STRState {
 
 	/** Dieses Feld speichert die leere {@link STRState Hyperkantenmenge}. */
 	public static final STRState EMPTY = new STRState();
@@ -69,18 +69,14 @@ public class STRState implements Iterable2<STREdge> {
 	/** Diese Methode liefert die gegebenen {@link STREdge Hyperkanten} als {@link STRState Hyperkantenmenge}. */
 	public static STRState from(Iterable<STREdge> edges) {
 		var result = new STRState();
-		if (edges instanceof STRState) {
-			((STRState)edges).forEach(result::insert);
-		} else {
-			edges.forEach(edge -> result.insert(edge.sourceRef, edge.targetRef, edge.relationRef));
-		}
+		edges.forEach(edge -> result.insert(edge.sourceRef, edge.targetRef, edge.relationRef));
 		return result;
 	}
 
 	/** Diese Methode liefert eine Kopie der gegebenen {@link STRState Hyperkantenmenge}. */
-	public static STRState from(STRBuffer edges) {
+	public static STRState from(STRState edges) {
 		var result = new STRState();
-		edges.forEach(result::insert);
+		edges.forEachEdge(result::insert);
 		return result;
 	}
 
@@ -194,13 +190,12 @@ public class STRState implements Iterable2<STREdge> {
 		return result;
 	}
 
-	/** Diese Methode übergibt die Referenzen aller {@link STREdge Hyperkanten} an {@link RUN#run(int, int, int) task.run()}. */
-	public void forEach(RUN task) {
-		if (this.storage != null) {
-			STRState.select(this.storage, task);
-		} else {
-			STRState.select(this.sourceMap, task);
-		}
+	public STREdges edges() {
+		return edges;
+	}
+
+	public STRValues values() {
+		return values;
 	}
 
 	/** Diese Methode liefert die Referenz auf die nächste neue Entität oder {@code 0}. Wenn dieses Objekt über {@link #from(STRState, STRState)} erzeugt wurde,
@@ -213,6 +208,32 @@ public class STRState implements Iterable2<STREdge> {
 	 * erzeugt wurde, liefert sie {@code newState.getRootRef() - oldState.getRootRef()}. */
 	public int getRootRef() {
 		return this.rootRef;
+	}
+
+	String TODO_getValue(int valueRef) {
+		if (valueRef == 0) return null;
+		this.restore();
+		// TODO
+		return null;
+	}
+
+	int TODO_getValueRef(String value) {
+		if (value == null) return 0;
+		this.restore();
+		// TODO
+		return 0;
+	}
+
+	int[] TODO_getValueRefs() {
+		this.restore();
+		// TODO
+		return STRState.EMPTY_REFS;
+	}
+
+	int TODO_getValueCount() {
+		this.restore();
+		// TODO
+		return 0;
 	}
 
 	/** Diese Methode liefert die als {@link STREdge#sourceRef()} vorkommenden Referenzen. */
@@ -373,9 +394,13 @@ public class STRState implements Iterable2<STREdge> {
 		return REFSET.size(sourceVal);
 	}
 
+	public boolean containsEdge(STREdge edge) {
+		return (edge != null) && this.containsEdge(edge.sourceRef, edge.targetRef, edge.relationRef);
+	}
+
 	/** Diese Methode liefert nur dann {@code true}, wenn die {@link STREdge Hyperkante} mit der gegebene {@code sourceRef} als {@link STREdge#sourceRef()}, der
 	 * gegebene {@code targetRef} als {@link STREdge#targetRef()} und der gegebene {@code relationRef} als {@link STREdge#relationRef()} vorkommt. */
-	public boolean contains(int sourceRef, int targetRef, int relationRef) {
+	public boolean containsEdge(int sourceRef, int targetRef, int relationRef) {
 		if ((sourceRef == 0) || (targetRef == 0) || (relationRef == 0)) return false;
 		this.restore();
 		var sourceIdx = REFMAP.getIdx(this.sourceMap, sourceRef);
@@ -386,6 +411,14 @@ public class STRState implements Iterable2<STREdge> {
 		var targetVal = STRState.asRefVal(REFMAP.getVal(relationMap, relationIdx));
 		if (STRState.isRef(targetVal)) return STRState.asRef(targetVal) == targetRef;
 		return REFSET.getIdx(targetVal, targetRef) != 0;
+	}
+
+	public boolean containsValue(String value) {
+		return this.TODO_getValueRef(value) != 0;
+	}
+
+	public boolean containsValueRef(int valueRef) {
+		return this.TODO_getValue(valueRef) != null;
 	}
 
 	/** Diese Methode liefert nur dann {@code true}, wenn die gegebene Referenzen {@code sourceRef} als {@link STREdge#sourceRef()} vorkommt. */
@@ -424,13 +457,20 @@ public class STRState implements Iterable2<STREdge> {
 		return REFMAP.getIdx(relationMap, relationRef) != 0;
 	}
 
-	@Override
-	public void forEach(Consumer<? super STREdge> action) {
-		this.forEach((RUN)(sourceRef, targetRef, relationRef) -> action.accept(new STREdge(sourceRef, targetRef, relationRef)));
+	/** Diese Methode übergibt die Referenzen aller {@link STREdge Hyperkanten} an {@link STREdges.RUN#run(int, int, int) task.run()}. */
+	void forEachEdge(STREdges.RUN task) {
+		if (this.storage != null) {
+			STRState.select(this.storage, task);
+		} else {
+			STRState.select(this.sourceMap, task);
+		}
 	}
 
-	@Override
-	public Iterator2<STREdge> iterator() {
+	void forEachEdge(Consumer<? super STREdge> action) {
+		this.forEachEdge((STREdges.RUN)(sourceRef, targetRef, relationRef) -> action.accept(new STREdge(sourceRef, targetRef, relationRef)));
+	}
+
+	Iterator2<STREdge> edgeIterator() {
 		this.restore();
 		var sourceIter = REFMAP.iterator(this.sourceMap);
 		return Iterators.concatAll(Iterators.concatAll(new Iterator2<Iterator2<Iterator2<STREdge>>>() {
@@ -476,6 +516,10 @@ public class STRState implements Iterable2<STREdge> {
 			}
 
 		}));
+	}
+
+	Iterator2<STREdge> edgeIterator(REFSET sourceRefs, REFSET targetRefs, REFSET relationRefs) {
+		return null; // TODO
 	}
 
 	/** Diese Methode liefert ein kompakte Abschrift aller {@link STREdge Hyperkanten} dieser Menge als {@code int}-Array mit der Struktur
@@ -589,19 +633,19 @@ public class STRState implements Iterable2<STREdge> {
 		return bytes.array();
 	}
 
+	public byte[] persist() throws IOException {
+		var o = new BINWRITER();
+		for (var i: this.toInts()) {
+			o.writeInt(i);
+		}
+		return o.getBytes();
+	}
+
 	@Override
 	public String toString() {
 		var res = new StringBuilder("{ ");
-		Strings.join(res, ", ", this);
+		Strings.join(res, ", ", this.edges());
 		return res.append(" }").toString();
-	}
-
-	/** Diese Schnittstelle definiert den Empfänger der Referenzen für {@link STRState#forEach(RUN)}. */
-	public static interface RUN {
-
-		/** Diese Methode verarbeitet die gegebenen Referenzen einer {@link STREdge Hyperkante}. */
-		void run(int sourceRef, int targetRef, int relationRef);
-
 	}
 
 	static boolean isRef(int[] val) {
@@ -635,6 +679,12 @@ public class STRState implements Iterable2<STREdge> {
 	/** Dieses Feld speichert die Referenzabbildung gemäß {@link REFMAP} von {@link STREdge#targetRef} auf Referenzabbildungen gemäß {@link REFMAP} von
 	 * {@link STREdge#relationRef} auf {@link STREdge#sourceRef}. Letztere sind dabei als {@code int[1]} oder gemäß {@link REFSET} abgebildet. */
 	Object[] targetMap = REFMAP.EMPTY;
+	
+	
+
+	final STREdges edges = new STREdges(this);
+
+	final STRValues values = new STRValues(this);
 
 	int[] storage;
 
@@ -677,7 +727,7 @@ public class STRState implements Iterable2<STREdge> {
 
 	private static final int[] EMPTY_REFS = new int[0];
 
-	private static void select(int[] storage, RUN task) {
+	static void select(int[] storage, STREdges.RUN task) {
 		var storageIdx = 2;
 		var sourceCount = storage[storageIdx++];
 		while (0 < sourceCount--) {
@@ -700,7 +750,7 @@ public class STRState implements Iterable2<STREdge> {
 		}
 	}
 
-	private static void select(Object[] sourceMap, RUN task) {
+	static void select(Object[] sourceMap, STREdges.RUN task) {
 		var sourceKeys = REFMAP.getKeys(sourceMap);
 		for (var sourceIdx = sourceMap.length - 1; 0 < sourceIdx; sourceIdx--) {
 			var relationMap = STRState.asRefMap(REFMAP.getVal(sourceMap, sourceIdx));
@@ -761,6 +811,11 @@ public class STRState implements Iterable2<STREdge> {
 	private void insert(int sourceRef, int relationRef, int targetRef) throws IllegalStateException {
 		this.sourceMap = STRState.insert(this.sourceMap, sourceRef, relationRef, targetRef);
 		this.targetMap = STRState.insert(this.targetMap, targetRef, relationRef, sourceRef);
+	}
+
+	String l(int[] a, int o, int l) {
+
+		return new String(a, o, l);
 	}
 
 }

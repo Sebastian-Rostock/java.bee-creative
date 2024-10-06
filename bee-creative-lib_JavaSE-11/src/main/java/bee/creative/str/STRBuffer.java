@@ -31,39 +31,43 @@ public class STRBuffer extends STRState {
 		return nextRef;
 	}
 
-	public boolean put(STREdge edge) {
-		this.backup();
-		return this.insert(edge.sourceRef, edge.targetRef, edge.relationRef);
+	public boolean putEdge(STREdge edge) {
+		return (edge != null) && this.putEdge(edge.sourceRef, edge.targetRef, edge.relationRef);
 	}
 
-	public boolean put(int sourceRef, int relationRef, int targetRef) {
-		if ((sourceRef == 0) || (relationRef == 0) || (targetRef == 0)) return false;
+	public boolean putEdge(int sourceRef, int relationRef, int targetRef) {
 		this.backup();
 		return this.insert(sourceRef, targetRef, relationRef);
 	}
 
-	public boolean putAll(STREdge... edges) {
-		return this.putAll(Arrays.asList(edges));
+	int TODO_putValue(String value) {
+		// TODO
+		return 0;
 	}
 
-	public boolean putAll(Iterable<STREdge> edges) {
+	public boolean putAllEdges(STREdge... edges) {
+		return this.putAllEdges(Arrays.asList(edges));
+	}
+
+	public boolean putAllEdges(Iterable<STREdge> edges) {
 		this.backup();
 		var res = new boolean[1];
-		if (edges instanceof STRState) {
-			((STRState)edges).forEach((sourceRef, targetRef, relationRef) -> res[0] = this.insert(sourceRef, targetRef, relationRef) | res[0]);
-		} else {
-			edges.forEach(edge -> res[0] = this.insert(edge.sourceRef, edge.targetRef, edge.relationRef) | res[0]);
-		}
+		edges.forEach(edge -> res[0] = this.insert(edge.sourceRef, edge.targetRef, edge.relationRef) | res[0]);
+		return res[0];
+	}
+
+	public boolean putAllEdges(STRState edges) {
+		this.backup();
+		var res = new boolean[1];
+		edges.forEachEdge((sourceRef, targetRef, relationRef) -> res[0] = this.insert(sourceRef, targetRef, relationRef) | res[0]);
 		return res[0];
 	}
 
 	public boolean pop(STREdge edge) {
-		this.backup();
-		return this.delete(edge.sourceRef, edge.targetRef, edge.relationRef);
+		return edge != null && this.pop(edge.sourceRef, edge.targetRef, edge.relationRef);
 	}
 
 	public boolean pop(int sourceRef, int relationRef, int targetRef) {
-		if ((sourceRef == 0) || (relationRef == 0) || (targetRef == 0)) return false;
 		this.backup();
 		return this.delete(sourceRef, targetRef, relationRef);
 	}
@@ -75,12 +79,40 @@ public class STRBuffer extends STRState {
 	public boolean popAll(Iterable<STREdge> edges) {
 		this.backup();
 		var res = new boolean[1];
-		if (edges instanceof STRState) {
-			((STRState)edges).forEach((sourceRef, targetRef, relationRef) -> res[0] = this.delete(sourceRef, targetRef, relationRef) | res[0]);
-		} else {
-			edges.forEach(edge -> res[0] = this.delete(edge.sourceRef, edge.targetRef, edge.relationRef) | res[0]);
-		}
+		edges.forEach(edge -> res[0] = this.delete(edge.sourceRef, edge.targetRef, edge.relationRef) | res[0]);
 		return res[0];
+	}
+
+	public boolean popAll(STRState edges) {
+		this.backup();
+		var res = new boolean[1];
+		edges.forEachEdge((sourceRef, targetRef, relationRef) -> res[0] = this.delete(sourceRef, targetRef, relationRef) | res[0]);
+		return res[0];
+	}
+
+	boolean TODO_popValue(int ref) {
+		// TODO
+		return false;
+	}
+
+	boolean TODO_popValue(String value) {
+		// TODO
+		return false;
+	}
+
+	boolean TODO_popAllValues(String... values) {
+		// TODO
+		return false;
+	}
+
+	boolean TODO_popAllValues(Iterable<String> values) {
+		// TODO
+		return false;
+	}
+
+	boolean TODO_popAllValues(STRState values) {
+		// TODO
+		return false;
 	}
 
 	/** Diese Methode entfernt alle {@link STREdge Hyperkanten}. */
@@ -94,7 +126,7 @@ public class STRBuffer extends STRState {
 	 * {@link #getNextRef()} und {@link #getRootRef()} um die jeweiligen Zählerstände des {@code putState}. */
 	public void insertAll(STRState putState) {
 		this.backup();
-		putState.forEach(this::insert);
+		putState.forEachEdge(this::insert);
 		this.nextRef += putState.nextRef;
 		this.rootRef += putState.rootRef;
 	}
@@ -103,7 +135,7 @@ public class STRBuffer extends STRState {
 	 * {@link #getNextRef()} und {@link #getRootRef()} um die jeweiligen Zählerstände des {@code popState}. */
 	public void deleteAll(STRState popState) {
 		this.backup();
-		popState.forEach(this::delete);
+		popState.forEachEdge(this::delete);
 		this.nextRef -= popState.nextRef;
 		this.rootRef -= popState.rootRef;
 	}
@@ -134,6 +166,7 @@ public class STRBuffer extends STRState {
 	STRState backup;
 
 	private boolean insert(int sourceRef, int targetRef, int relationRef) {
+		if ((sourceRef == 0) || (relationRef == 0) || (targetRef == 0)) return false;
 
 		var sourceMap = this.sourceMap;
 		var targetMap = this.targetMap;
@@ -321,6 +354,8 @@ public class STRBuffer extends STRState {
 	}
 
 	private boolean delete(int sourceRef, int targetRef, int relationRef) {
+		if ((sourceRef == 0) || (relationRef == 0) || (targetRef == 0)) return false;
+
 		// TODO prüfen
 		var nextSourceMap = this.sourceMap;
 		var nextSourceIdx = REFMAP.getIdx(nextSourceMap, sourceRef);
