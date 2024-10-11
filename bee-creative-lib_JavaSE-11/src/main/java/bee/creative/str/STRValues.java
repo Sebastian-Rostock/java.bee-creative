@@ -2,6 +2,8 @@ package bee.creative.str;
 
 import java.util.Map.Entry;
 import java.util.function.Consumer;
+import bee.creative.lang.Objects;
+import bee.creative.util.Entries;
 import bee.creative.util.Iterable2;
 import bee.creative.util.Iterator2;
 
@@ -13,23 +15,26 @@ public class STRValues implements Iterable2<Entry<Integer, String>> {
 
 	@Override
 	public void forEach(Consumer<? super Entry<Integer, String>> action) {
-		// TODO
-		Iterable2.super.forEach(action);
+		this.forEach((ref, str) -> action.accept(Entries.from(ref, str)));
 	}
 
 	public void forEach(RUN task) {
-		// TODO
+		this.owner.forEachValue(task);
 	}
 
 	@Override
 	public Iterator2<Entry<Integer, String>> iterator() {
-		// TODO
-		return null;
+		return this.owner.valueIterator();
+	}
+
+	@Override
+	public String toString() {
+		return Objects.printIterable(false, this);
 	}
 
 	public static interface RUN {
 
-		void run(int ref, String value);
+		void run(int ref, String str);
 
 	}
 

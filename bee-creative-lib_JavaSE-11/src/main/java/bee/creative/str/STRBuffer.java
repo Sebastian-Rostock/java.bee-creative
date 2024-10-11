@@ -1,6 +1,8 @@
 package bee.creative.str;
 
 import java.util.Arrays;
+import bee.creative.util.HashMapIO;
+import bee.creative.util.HashMapOI;
 
 /** Diese Klasse implementiert einen Hyperkantenpuffer als veränderbare {@link STRState Hyperkantenmenge}.
  * <p>
@@ -37,7 +39,7 @@ public class STRBuffer extends STRState {
 
 	public boolean putEdge(int sourceRef, int relationRef, int targetRef) {
 		this.backup();
-		return this.insert(sourceRef, targetRef, relationRef);
+		return this.insertEdge(sourceRef, targetRef, relationRef);
 	}
 
 	int TODO_putValue(String value) {
@@ -52,24 +54,24 @@ public class STRBuffer extends STRState {
 	public boolean putAllEdges(Iterable<STREdge> edges) {
 		this.backup();
 		var res = new boolean[1];
-		edges.forEach(edge -> res[0] = this.insert(edge.sourceRef, edge.targetRef, edge.relationRef) | res[0]);
+		edges.forEach(edge -> res[0] = this.insertEdge(edge.sourceRef, edge.targetRef, edge.relationRef) | res[0]);
 		return res[0];
 	}
 
 	public boolean putAllEdges(STRState edges) {
 		this.backup();
 		var res = new boolean[1];
-		edges.forEachEdge((sourceRef, targetRef, relationRef) -> res[0] = this.insert(sourceRef, targetRef, relationRef) | res[0]);
+		edges.forEachEdge((sourceRef, targetRef, relationRef) -> res[0] = this.insertEdge(sourceRef, targetRef, relationRef) | res[0]);
 		return res[0];
 	}
 
 	public boolean pop(STREdge edge) {
-		return edge != null && this.pop(edge.sourceRef, edge.targetRef, edge.relationRef);
+		return (edge != null) && this.pop(edge.sourceRef, edge.targetRef, edge.relationRef);
 	}
 
 	public boolean pop(int sourceRef, int relationRef, int targetRef) {
 		this.backup();
-		return this.delete(sourceRef, targetRef, relationRef);
+		return this.deleteEdge(sourceRef, targetRef, relationRef);
 	}
 
 	public boolean popAll(STREdge... edges) {
@@ -79,14 +81,14 @@ public class STRBuffer extends STRState {
 	public boolean popAll(Iterable<STREdge> edges) {
 		this.backup();
 		var res = new boolean[1];
-		edges.forEach(edge -> res[0] = this.delete(edge.sourceRef, edge.targetRef, edge.relationRef) | res[0]);
+		edges.forEach(edge -> res[0] = this.deleteEdge(edge.sourceRef, edge.targetRef, edge.relationRef) | res[0]);
 		return res[0];
 	}
 
 	public boolean popAll(STRState edges) {
 		this.backup();
 		var res = new boolean[1];
-		edges.forEachEdge((sourceRef, targetRef, relationRef) -> res[0] = this.delete(sourceRef, targetRef, relationRef) | res[0]);
+		edges.forEachEdge((sourceRef, targetRef, relationRef) -> res[0] = this.deleteEdge(sourceRef, targetRef, relationRef) | res[0]);
 		return res[0];
 	}
 
@@ -120,13 +122,15 @@ public class STRBuffer extends STRState {
 		this.backup();
 		this.sourceMap = REFMAP.EMPTY;
 		this.targetMap = REFMAP.EMPTY;
+		this.valueRefMap = new HashMapOI<>();
+		this.valueStrMap = new HashMapIO<>();
 	}
 
 	/** Diese Methode ergänzt alle {@link STREdge Hyperkanten} der gegebenen {@link STRState Hyperkantenmenge} {@code putState} und erhöht die Referenzen
 	 * {@link #getNextRef()} und {@link #getRootRef()} um die jeweiligen Zählerstände des {@code putState}. */
 	public void insertAll(STRState putState) {
 		this.backup();
-		putState.forEachEdge(this::insert);
+		putState.forEachEdge(this::insertEdge);
 		this.nextRef += putState.nextRef;
 		this.rootRef += putState.rootRef;
 	}
@@ -135,7 +139,7 @@ public class STRBuffer extends STRState {
 	 * {@link #getNextRef()} und {@link #getRootRef()} um die jeweiligen Zählerstände des {@code popState}. */
 	public void deleteAll(STRState popState) {
 		this.backup();
-		popState.forEachEdge(this::delete);
+		popState.forEachEdge(this::deleteEdge);
 		this.nextRef -= popState.nextRef;
 		this.rootRef -= popState.rootRef;
 	}
@@ -149,6 +153,8 @@ public class STRBuffer extends STRState {
 		this.rootRef = state.rootRef;
 		this.sourceMap = state.sourceMap;
 		this.targetMap = state.targetMap;
+		this.valueRefMap = state.valueRefMap;
+		this.valueStrMap = state.valueStrMap;
 	}
 
 	/** Diese Methode übernimmt alle Anderungen seit dem letzten {@link #commit()}, {@link #rollback()} bzw. der erzeugung dieses Hyperkantenpuffers und liefert
@@ -165,7 +171,7 @@ public class STRBuffer extends STRState {
 
 	STRState backup;
 
-	private boolean insert(int sourceRef, int targetRef, int relationRef) {
+	private boolean insertEdge(int sourceRef, int targetRef, int relationRef) {
 		if ((sourceRef == 0) || (relationRef == 0) || (targetRef == 0)) return false;
 
 		var sourceMap = this.sourceMap;
@@ -353,7 +359,7 @@ public class STRBuffer extends STRState {
 		return true;
 	}
 
-	private boolean delete(int sourceRef, int targetRef, int relationRef) {
+	private boolean deleteEdge(int sourceRef, int targetRef, int relationRef) {
 		if ((sourceRef == 0) || (relationRef == 0) || (targetRef == 0)) return false;
 
 		// TODO prüfen
@@ -463,6 +469,8 @@ public class STRBuffer extends STRState {
 		var backup = new STRState(this);
 		this.sourceMap = REFMAP.copy(this.sourceMap);
 		this.targetMap = REFMAP.copy(this.targetMap);
+		this.valueStrMap = this.valueStrMap.clone();
+		this.valueRefMap = this.valueRefMap.clone();
 		this.backup = backup;
 	}
 

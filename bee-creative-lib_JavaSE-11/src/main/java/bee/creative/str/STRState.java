@@ -5,8 +5,12 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 import java.util.Arrays;
-import java.util.function.Consumer;
+import java.util.Map.Entry;
+import bee.creative.fem.FEMString;
 import bee.creative.lang.Strings;
+import bee.creative.str.STRValues.RUN;
+import bee.creative.util.HashMapIO;
+import bee.creative.util.HashMapOI;
 import bee.creative.util.Iterator2;
 import bee.creative.util.Iterators;
 
@@ -69,14 +73,15 @@ public class STRState {
 	/** Diese Methode liefert die gegebenen {@link STREdge Hyperkanten} als {@link STRState Hyperkantenmenge}. */
 	public static STRState from(Iterable<STREdge> edges) {
 		var result = new STRState();
-		edges.forEach(edge -> result.insert(edge.sourceRef, edge.targetRef, edge.relationRef));
+		edges.forEach(edge -> result.insertEdge(edge.sourceRef, edge.targetRef, edge.relationRef));
 		return result;
 	}
 
 	/** Diese Methode liefert eine Kopie der gegebenen {@link STRState Hyperkantenmenge}. */
 	public static STRState from(STRState edges) {
 		var result = new STRState();
-		edges.forEachEdge(result::insert);
+		edges.forEachEdge(result::insertEdge);
+		edges.forEachValue(result::insertValue);
 		return result;
 	}
 
@@ -110,12 +115,12 @@ public class STRState {
 							// COPY newTargetVal
 							var relationRef = REFSET.getRef(newRelationKeys, newRelationIdx);
 							if (STRState.isRef(newTargetVal)) {
-								result.insert(sourceRef, relationRef, STRState.asRef(newTargetVal));
+								result.insertEdge(sourceRef, relationRef, STRState.asRef(newTargetVal));
 							} else {
 								for (var newTargetIdx = newTargetVal.length - 1; 3 < newTargetIdx; newTargetIdx -= 3) {
 									var newTargetRef = newTargetVal[newTargetIdx];
 									if (newTargetRef != 0) {
-										result.insert(sourceRef, relationRef, newTargetRef);
+										result.insertEdge(sourceRef, relationRef, newTargetRef);
 									}
 								}
 							}
@@ -133,12 +138,12 @@ public class STRState {
 								if (oldRelationIdx == 0) {
 									// COPY newTargetVal
 									if (STRState.isRef(newTargetVal)) {
-										result.insert(sourceRef, relationRef, STRState.asRef(newTargetVal));
+										result.insertEdge(sourceRef, relationRef, STRState.asRef(newTargetVal));
 									} else {
 										for (var newTargetIdx = newTargetVal.length - 1; 3 < newTargetIdx; newTargetIdx -= 3) {
 											var newTargetRef = newTargetVal[newTargetIdx];
 											if (newTargetRef != 0) {
-												result.insert(sourceRef, relationRef, newTargetRef);
+												result.insertEdge(sourceRef, relationRef, newTargetRef);
 											}
 										}
 									}
@@ -150,14 +155,14 @@ public class STRState {
 											if (STRState.isRef(newTargetVal)) {
 												var newTargetRef = STRState.asRef(newTargetVal);
 												if (oldTargetRef != newTargetRef) {
-													result.insert(sourceRef, relationRef, newTargetRef);
+													result.insertEdge(sourceRef, relationRef, newTargetRef);
 												}
 											} else {
 												for (var newTargetIdx = newTargetVal.length - 1; 3 < newTargetIdx; newTargetIdx -= 3) {
 													var newTargetRef = newTargetVal[newTargetIdx];
 													if (newTargetRef != 0) {
 														if (oldTargetRef != newTargetRef) {
-															result.insert(sourceRef, relationRef, newTargetRef);
+															result.insertEdge(sourceRef, relationRef, newTargetRef);
 														}
 													}
 												}
@@ -166,14 +171,14 @@ public class STRState {
 											if (STRState.isRef(newTargetVal)) {
 												var newTargetRef = STRState.asRef(newTargetVal);
 												if (REFSET.getIdx(oldTargetVal, newTargetRef) == 0) {
-													result.insert(sourceRef, relationRef, newTargetRef);
+													result.insertEdge(sourceRef, relationRef, newTargetRef);
 												}
 											} else {
 												for (var newTargetIdx = newTargetVal.length - 1; 3 < newTargetIdx; newTargetIdx -= 3) {
 													var newTargetRef = newTargetVal[newTargetIdx];
 													if (newTargetRef != 0) {
 														if (REFSET.getIdx(oldTargetVal, newTargetRef) == 0) {
-															result.insert(sourceRef, relationRef, newTargetRef);
+															result.insertEdge(sourceRef, relationRef, newTargetRef);
 														}
 													}
 												}
@@ -187,15 +192,22 @@ public class STRState {
 				}
 			}
 		}
+		var oldValueMap = oldState.valueStrMap;
+		var newValueMap = newState.valueStrMap;
+		newValueMap.forEach((ref, str) -> {
+			if (!oldValueMap.containsKey(ref)) {
+				result.insertValue(ref, str);
+			}
+		});
 		return result;
 	}
 
 	public STREdges edges() {
-		return edges;
+		return this.edges;
 	}
 
 	public STRValues values() {
-		return values;
+		return this.values;
 	}
 
 	/** Diese Methode liefert die Referenz auf die nächste neue Entität oder {@code 0}. Wenn dieses Objekt über {@link #from(STRState, STRState)} erzeugt wurde,
@@ -457,71 +469,6 @@ public class STRState {
 		return REFMAP.getIdx(relationMap, relationRef) != 0;
 	}
 
-	/** Diese Methode übergibt die Referenzen aller {@link STREdge Hyperkanten} an {@link STREdges.RUN#run(int, int, int) task.run()}. */
-	void forEachEdge(STREdges.RUN task) {
-		if (this.storage != null) {
-			STRState.select(this.storage, task);
-		} else {
-			STRState.select(this.sourceMap, task);
-		}
-	}
-
-	void forEachEdge(Consumer<? super STREdge> action) {
-		this.forEachEdge((STREdges.RUN)(sourceRef, targetRef, relationRef) -> action.accept(new STREdge(sourceRef, targetRef, relationRef)));
-	}
-
-	Iterator2<STREdge> edgeIterator() {
-		this.restore();
-		var sourceIter = REFMAP.iterator(this.sourceMap);
-		return Iterators.concatAll(Iterators.concatAll(new Iterator2<Iterator2<Iterator2<STREdge>>>() {
-
-			@Override
-			public Iterator2<Iterator2<STREdge>> next() {
-				var relationIter = REFMAP.iterator(STRState.asRefMap(sourceIter.nextVal()));
-				var sourceRef = sourceIter.nextRef();
-				return new Iterator2<>() {
-
-					@Override
-					public Iterator2<STREdge> next() {
-						var targetVal = STRState.asRefVal(relationIter.nextVal());
-						var relationRef = relationIter.nextRef();
-						if (STRState.isRef(targetVal)) return Iterators.fromItem(new STREdge(sourceRef, STRState.asRef(targetVal), relationRef));
-						var targetIter = REFSET.iterator(targetVal);
-						return new Iterator2<>() {
-
-							@Override
-							public STREdge next() {
-								return new STREdge(sourceRef, targetIter.nextRef(), relationRef);
-							}
-
-							@Override
-							public boolean hasNext() {
-								return targetIter.hasNext();
-							}
-
-						};
-					}
-
-					@Override
-					public boolean hasNext() {
-						return relationIter.hasNext();
-					}
-
-				};
-			}
-
-			@Override
-			public boolean hasNext() {
-				return sourceIter.hasNext();
-			}
-
-		}));
-	}
-
-	Iterator2<STREdge> edgeIterator(REFSET sourceRefs, REFSET targetRefs, REFSET relationRefs) {
-		return null; // TODO
-	}
-
 	/** Diese Methode liefert ein kompakte Abschrift aller {@link STREdge Hyperkanten} dieser Menge als {@code int}-Array mit der Struktur
 	 * {@code (nextRef, rootRef, sourceCount, (sourceRef, targetRefCount, (targetRef, relationRef)[targetRefCount], targetSetCount, (relationRef, targetCount, targetRef[targetCount])[targetSetCount])[sourceCount])}.
 	 *
@@ -530,7 +477,7 @@ public class STRState {
 		if (this.storage != null) return this.storage.clone();
 		var sourceMap = this.sourceMap;
 		var sourceCount = 0;
-		var storageSize = 3;
+		var edgesSize = 3;
 		for (var sourceIdx = sourceMap.length - 1; 0 < sourceIdx; sourceIdx--) {
 			var relationMap = STRState.asRefMap(sourceMap[sourceIdx]);
 			if (relationMap != null) {
@@ -551,12 +498,20 @@ public class STRState {
 					}
 				}
 				if (relationSize != 0) {
-					storageSize += /*sourceRef, targetRefCount, targetSetCount*/ 3 + relationSize;
+					edgesSize += /*sourceRef, targetRefCount, targetSetCount*/ 3 + relationSize;
 					sourceCount++;
 				}
 			}
 		}
-		var storage = new int[storageSize];
+		var value2Size=0;
+		for (var e: this.valueStrMap.entrySet()) {
+			var str = e.getValue();
+
+			FEMString.from(str).value();
+
+		}
+
+		var storage = new int[edgesSize];
 		var storageIdx = 0;
 		storage[storageIdx++] = this.rootRef;
 		storage[storageIdx++] = this.nextRef;
@@ -617,6 +572,7 @@ public class STRState {
 				}
 			}
 		}
+		// TODO values
 		return storage;
 	}
 
@@ -679,8 +635,10 @@ public class STRState {
 	/** Dieses Feld speichert die Referenzabbildung gemäß {@link REFMAP} von {@link STREdge#targetRef} auf Referenzabbildungen gemäß {@link REFMAP} von
 	 * {@link STREdge#relationRef} auf {@link STREdge#sourceRef}. Letztere sind dabei als {@code int[1]} oder gemäß {@link REFSET} abgebildet. */
 	Object[] targetMap = REFMAP.EMPTY;
-	
-	
+
+	HashMapIO<String> valueStrMap = new HashMapIO<>();
+
+	HashMapOI<String> valueRefMap = new HashMapOI<>();
 
 	final STREdges edges = new STREdges(this);
 
@@ -705,6 +663,8 @@ public class STRState {
 		this.nextRef = that.nextRef;
 		this.sourceMap = that.sourceMap;
 		this.targetMap = that.targetMap;
+		this.valueRefMap = that.valueRefMap;
+		this.valueStrMap = that.valueStrMap;
 		this.storage = that.storage;
 	}
 
@@ -715,19 +675,102 @@ public class STRState {
 		try {
 			this.sourceMap = REFMAP.EMPTY;
 			this.targetMap = REFMAP.EMPTY;
-			STRState.select(this.storage, this::insert);
+			this.valueRefMap = new HashMapOI<>();
+			this.valueStrMap = new HashMapIO<>();
+			STRState.selectEdges(this.storage, this::insertEdge);
+			STRState.selectValues(this.storage, this::insertValue);
 			this.storage = null;
 		} finally {
 			if (this.storage != null) {
 				this.sourceMap = REFMAP.EMPTY;
 				this.targetMap = REFMAP.EMPTY;
+				this.valueRefMap = new HashMapOI<>();
+				this.valueStrMap = new HashMapIO<>();
 			}
 		}
 	}
 
+	void forEachEdge(STREdges.RUN task) {
+		if (this.storage != null) {
+			STRState.selectEdges(this.storage, task);
+		} else {
+			STRState.selectEdges(this.sourceMap, task);
+		}
+	}
+
+	void forEachValue(STRValues.RUN task) {
+		if (this.storage != null) {
+			STRState.selectValues(this.storage, task);
+		} else {
+			STRState.selectValues(this.valueStrMap, task);
+		}
+	}
+
+	Iterator2<STREdge> edgeIterator() {
+		this.restore();
+		var sourceIter = REFMAP.iterator(this.sourceMap);
+		return Iterators.concatAll(Iterators.concatAll(new Iterator2<Iterator2<Iterator2<STREdge>>>() {
+
+			@Override
+			public Iterator2<Iterator2<STREdge>> next() {
+				var relationIter = REFMAP.iterator(STRState.asRefMap(sourceIter.nextVal()));
+				var sourceRef = sourceIter.nextRef();
+				return new Iterator2<>() {
+
+					@Override
+					public Iterator2<STREdge> next() {
+						var targetVal = STRState.asRefVal(relationIter.nextVal());
+						var relationRef = relationIter.nextRef();
+						if (STRState.isRef(targetVal)) return Iterators.fromItem(new STREdge(sourceRef, STRState.asRef(targetVal), relationRef));
+						var targetIter = REFSET.iterator(targetVal);
+						return new Iterator2<>() {
+
+							@Override
+							public STREdge next() {
+								return new STREdge(sourceRef, targetIter.nextRef(), relationRef);
+							}
+
+							@Override
+							public boolean hasNext() {
+								return targetIter.hasNext();
+							}
+
+						};
+					}
+
+					@Override
+					public boolean hasNext() {
+						return relationIter.hasNext();
+					}
+
+				};
+			}
+
+			@Override
+			public boolean hasNext() {
+				return sourceIter.hasNext();
+			}
+
+		}));
+	}
+
+	Iterator2<STREdge> edgeIterator(REFSET sourceRefs, REFSET targetRefs, REFSET relationRefs) {
+		return null; // TODO
+	}
+
+	Iterator2<Entry<Integer, String>> valueIterator() {
+		this.restore();
+		return this.valueStrMap.entrySet().iterator().unmodifiable();
+	}
+
+	String l(int[] a, int o, int l) {
+
+		return new String(a, o, l);
+	}
+
 	private static final int[] EMPTY_REFS = new int[0];
 
-	static void select(int[] storage, STREdges.RUN task) {
+	private static void selectEdges(int[] storage, STREdges.RUN task) {
 		var storageIdx = 2;
 		var sourceCount = storage[storageIdx++];
 		while (0 < sourceCount--) {
@@ -750,7 +793,7 @@ public class STRState {
 		}
 	}
 
-	static void select(Object[] sourceMap, STREdges.RUN task) {
+	private static void selectEdges(Object[] sourceMap, STREdges.RUN task) {
 		var sourceKeys = REFMAP.getKeys(sourceMap);
 		for (var sourceIdx = sourceMap.length - 1; 0 < sourceIdx; sourceIdx--) {
 			var relationMap = STRState.asRefMap(REFMAP.getVal(sourceMap, sourceIdx));
@@ -777,19 +820,27 @@ public class STRState {
 		}
 	}
 
-	private static Object[] insert(Object[] sourceMap, int sourceRef, int relationRef, int targetRef) throws IllegalStateException {
+	private static void selectValues(int[] storage, STRValues.RUN task) {
+		// TODO
+	}
+
+	private static void selectValues(HashMapIO<String> valueStrMap, RUN task) {
+		valueStrMap.forEach((ref, str) -> task.run(ref, str));
+	}
+
+	private static Object[] insertEdge(Object[] sourceMap, int sourceRef, int relationRef, int targetRef) {
 
 		sourceMap = REFMAP.grow(sourceMap);
 
 		var sourceIdx = REFMAP.putRef(sourceMap, sourceRef);
-		if (sourceIdx == 0) throw new IllegalStateException();
+		if (sourceIdx == 0) throw new OutOfMemoryError();
 
 		var sourceRelationMap = STRState.asRefMap(REFMAP.getVal(sourceMap, sourceIdx));
 		sourceRelationMap = sourceRelationMap == null ? REFMAP.create() : REFMAP.grow(sourceRelationMap);
 		REFMAP.setVal(sourceMap, sourceIdx, sourceRelationMap);
 
 		var sourceRelationIdx = REFMAP.putRef(sourceRelationMap, relationRef);
-		if (sourceRelationIdx == 0) throw new IllegalStateException();
+		if (sourceRelationIdx == 0) throw new OutOfMemoryError();
 
 		var sourceRelationTargetVal = STRState.asRefVal(REFMAP.getVal(sourceRelationMap, sourceRelationIdx));
 		if (sourceRelationTargetVal == null) {
@@ -802,20 +853,20 @@ public class STRState {
 			var sourceRelationTargetSet = REFSET.grow(sourceRelationTargetVal);
 			REFMAP.setVal(sourceRelationMap, sourceRelationIdx, sourceRelationTargetSet);
 			var targetIdx = REFSET.putRef(sourceRelationTargetSet, targetRef);
-			if (targetIdx == 0) throw new IllegalStateException();
+			if (targetIdx == 0) throw new OutOfMemoryError();
 		}
 
 		return sourceMap;
 	}
 
-	private void insert(int sourceRef, int relationRef, int targetRef) throws IllegalStateException {
-		this.sourceMap = STRState.insert(this.sourceMap, sourceRef, relationRef, targetRef);
-		this.targetMap = STRState.insert(this.targetMap, targetRef, relationRef, sourceRef);
+	private void insertEdge(int sourceRef, int relationRef, int targetRef) {
+		this.sourceMap = STRState.insertEdge(this.sourceMap, sourceRef, relationRef, targetRef);
+		this.targetMap = STRState.insertEdge(this.targetMap, targetRef, relationRef, sourceRef);
 	}
 
-	String l(int[] a, int o, int l) {
-
-		return new String(a, o, l);
+	private void insertValue(int valueRef, String valueStr) {
+		this.valueRefMap.put(valueStr, valueRef);
+		this.valueStrMap.put(valueRef, valueStr);
 	}
 
 }

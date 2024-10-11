@@ -7,12 +7,6 @@ import bee.creative.util.Iterator2;
 
 public class STREdges implements Iterable2<STREdge> {
 
-	private STRState owner;
-
-	STREdges(STRState owner) {
-		this.owner = owner;
-	}
-
 	public STRState owner() {
 		return this.owner;
 	}
@@ -40,6 +34,12 @@ public class STREdges implements Iterable2<STREdge> {
 	public String toString() {
 		return Objects.printIterable(false, this);
 	}
+
+	STREdges(STRState owner) {
+		this.owner = owner;
+	}
+
+	private STRState owner;
 
 	/** Diese Schnittstelle definiert den Empfänger der Referenzen für {@link #forEach(RUN)}. */
 	public static interface RUN {

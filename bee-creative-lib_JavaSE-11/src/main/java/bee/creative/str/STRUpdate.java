@@ -49,6 +49,8 @@ public final class STRUpdate {
 				store.rootRef = backup.rootRef;
 				store.sourceMap = backup.sourceMap;
 				store.targetMap = backup.targetMap;
+				store.valueRefMap = backup.valueRefMap;
+				store.valueStrMap = backup.valueStrMap;
 			}
 			store.backup = null;
 		} else {
