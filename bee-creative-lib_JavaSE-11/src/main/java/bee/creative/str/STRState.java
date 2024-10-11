@@ -194,9 +194,12 @@ public class STRState {
 		}
 		var oldValueMap = oldState.valueStrMap;
 		var newValueMap = newState.valueStrMap;
-		newValueMap.forEach((ref, str) -> {
-			if (!oldValueMap.containsKey(ref)) {
-				result.insertValue(ref, str);
+		newValueMap.forEach((valueRef, newValue) -> {
+			var oldValue = oldValueMap.get(valueRef);
+			if (oldValue == null) {
+				result.insertValue(valueRef, newValue);
+			} else {
+				if (!oldValue.equals(newValue)) throw new IllegalArgumentException();
 			}
 		});
 		return result;
@@ -470,14 +473,17 @@ public class STRState {
 	}
 
 	/** Diese Methode liefert ein kompakte Abschrift aller {@link STREdge Hyperkanten} dieser Menge als {@code int}-Array mit der Struktur
-	 * {@code (nextRef, rootRef, sourceCount, (sourceRef, targetRefCount, (targetRef, relationRef)[targetRefCount], targetSetCount, (relationRef, targetCount, targetRef[targetCount])[targetSetCount])[sourceCount])}.
+	 * {@code (nextRef, rootRef, valueCount, valueOffset, sourceCount, (sourceRef, targetRefCount, (targetRef, relationRef)[targetRefCount], targetSetCount,
+	 * (relationRef, targetCount, targetRef[targetCount])[targetSetCount])[sourceCount], (valueRef, valueSize, valueItem[valueSize])[valueCount])}. Dabei nennt
+	 * {@code valueOffset} die Position des ersten {@code valueRef}.
 	 *
 	 * @return kompakte Abschrift. */
 	public int[] toInts() {
 		if (this.storage != null) return this.storage.clone();
+
+		var edgesSize = 0;
 		var sourceMap = this.sourceMap;
 		var sourceCount = 0;
-		var edgesSize = 3;
 		for (var sourceIdx = sourceMap.length - 1; 0 < sourceIdx; sourceIdx--) {
 			var relationMap = STRState.asRefMap(sourceMap[sourceIdx]);
 			if (relationMap != null) {
@@ -503,19 +509,23 @@ public class STRState {
 				}
 			}
 		}
-		var value2Size=0;
-		for (var e: this.valueStrMap.entrySet()) {
-			var str = e.getValue();
 
-			FEMString.from(str).value();
-
+		var valuesSize = 0;
+		var valueMap = this.valueRefMap;
+		var valuesCount = valueMap.size();
+		var valueOffset = edgesSize + 5;
+		for (var valueStr: valueMap.keySet()) {
+			valuesSize += valueStr.length() + 2;
 		}
 
-		var storage = new int[edgesSize];
-		var storageIdx = 0;
-		storage[storageIdx++] = this.rootRef;
-		storage[storageIdx++] = this.nextRef;
-		storage[storageIdx++] = sourceCount;
+		var storage = new int[5 + edgesSize + valuesSize];
+		var storageIdx = 5;
+		storage[0] = this.rootRef;
+		storage[1] = this.nextRef;
+		storage[2] = valuesCount;
+		storage[3] = valueOffset;
+		storage[4] = sourceCount;
+
 		for (var sourceIdx = sourceMap.length - 1; 0 < sourceIdx; sourceIdx--) {
 			var relationMap = STRState.asRefMap(sourceMap[sourceIdx]);
 			if (relationMap != null) {
@@ -572,7 +582,17 @@ public class STRState {
 				}
 			}
 		}
-		// TODO values
+
+		for (var value: valueMap.entrySet()) {
+			var valueRef = value.getValue();
+			var valueStr = value.getKey();
+			var valueSize = valueStr.length();
+			storage[storageIdx++] = valueRef;
+			storage[storageIdx++] = valueSize;
+			valueStr.toInts(storage, storageIdx);
+			storageIdx += valueSize;
+		}
+
 		return storage;
 	}
 
@@ -590,11 +610,10 @@ public class STRState {
 	}
 
 	public byte[] persist() throws IOException {
-		var o = new BINWRITER();
-		for (var i: this.toInts()) {
-			o.writeInt(i);
+		try (var o = new BINWRITER()) {
+			o.write(this.toBytes());
+			return o.getBytes();
 		}
-		return o.getBytes();
 	}
 
 	@Override
@@ -636,9 +655,9 @@ public class STRState {
 	 * {@link STREdge#relationRef} auf {@link STREdge#sourceRef}. Letztere sind dabei als {@code int[1]} oder gemäß {@link REFSET} abgebildet. */
 	Object[] targetMap = REFMAP.EMPTY;
 
-	HashMapIO<String> valueStrMap = new HashMapIO<>();
+	HashMapIO<FEMString> valueStrMap = new HashMapIO<>();
 
-	HashMapOI<String> valueRefMap = new HashMapOI<>();
+	HashMapOI<FEMString> valueRefMap = new HashMapOI<>();
 
 	final STREdges edges = new STREdges(this);
 
@@ -702,7 +721,7 @@ public class STRState {
 		if (this.storage != null) {
 			STRState.selectValues(this.storage, task);
 		} else {
-			STRState.selectValues(this.valueStrMap, task);
+			STRState.selectValues(this.valueRefMap, task);
 		}
 	}
 
@@ -758,21 +777,16 @@ public class STRState {
 		return null; // TODO
 	}
 
-	Iterator2<Entry<Integer, String>> valueIterator() {
-		this.restore();
+	Iterator2<Entry<Integer, FEMString>> valueIterator() {
+		this.restore();// TODO über store
 		return this.valueStrMap.entrySet().iterator().unmodifiable();
-	}
-
-	String l(int[] a, int o, int l) {
-
-		return new String(a, o, l);
 	}
 
 	private static final int[] EMPTY_REFS = new int[0];
 
 	private static void selectEdges(int[] storage, STREdges.RUN task) {
-		var storageIdx = 2;
-		var sourceCount = storage[storageIdx++];
+		var storageIdx = 5;
+		var sourceCount = storage[4];
 		while (0 < sourceCount--) {
 			var sourceRef = storage[storageIdx++];
 			var targetRefCount = storage[storageIdx++];
@@ -821,11 +835,19 @@ public class STRState {
 	}
 
 	private static void selectValues(int[] storage, STRValues.RUN task) {
-		// TODO
+		var storageIdx = storage[3];
+		var valueCount = storage[2];
+		while (0 < valueCount--) {
+			var valueRef = storage[storageIdx++];
+			var valueSize = storage[storageIdx++];
+			var valueStr = FEMString.from(storage, storageIdx, valueSize);
+			storageIdx += valueSize;
+			task.run(valueRef, valueStr);
+		}
 	}
 
-	private static void selectValues(HashMapIO<String> valueStrMap, RUN task) {
-		valueStrMap.forEach((ref, str) -> task.run(ref, str));
+	private static void selectValues(HashMapOI<FEMString> valueStrMap, RUN task) {
+		valueStrMap.forEach((str, ref) -> task.run(ref, str));
 	}
 
 	private static Object[] insertEdge(Object[] sourceMap, int sourceRef, int relationRef, int targetRef) {
@@ -833,14 +855,14 @@ public class STRState {
 		sourceMap = REFMAP.grow(sourceMap);
 
 		var sourceIdx = REFMAP.putRef(sourceMap, sourceRef);
-		if (sourceIdx == 0) throw new OutOfMemoryError();
+		if (sourceIdx == 0) throw new STRError();
 
 		var sourceRelationMap = STRState.asRefMap(REFMAP.getVal(sourceMap, sourceIdx));
 		sourceRelationMap = sourceRelationMap == null ? REFMAP.create() : REFMAP.grow(sourceRelationMap);
 		REFMAP.setVal(sourceMap, sourceIdx, sourceRelationMap);
 
 		var sourceRelationIdx = REFMAP.putRef(sourceRelationMap, relationRef);
-		if (sourceRelationIdx == 0) throw new OutOfMemoryError();
+		if (sourceRelationIdx == 0) throw new STRError();
 
 		var sourceRelationTargetVal = STRState.asRefVal(REFMAP.getVal(sourceRelationMap, sourceRelationIdx));
 		if (sourceRelationTargetVal == null) {
@@ -853,7 +875,7 @@ public class STRState {
 			var sourceRelationTargetSet = REFSET.grow(sourceRelationTargetVal);
 			REFMAP.setVal(sourceRelationMap, sourceRelationIdx, sourceRelationTargetSet);
 			var targetIdx = REFSET.putRef(sourceRelationTargetSet, targetRef);
-			if (targetIdx == 0) throw new OutOfMemoryError();
+			if (targetIdx == 0) throw new STRError();
 		}
 
 		return sourceMap;
@@ -864,9 +886,19 @@ public class STRState {
 		this.targetMap = STRState.insertEdge(this.targetMap, targetRef, relationRef, sourceRef);
 	}
 
-	private void insertValue(int valueRef, String valueStr) {
-		this.valueRefMap.put(valueStr, valueRef);
-		this.valueStrMap.put(valueRef, valueStr);
+	private void insertValue(int valueRef, FEMString valueStr) {
+		var valueRef2 = this.valueRefMap.put(valueStr.data(), valueRef);
+		if (valueRef2 != null) {
+			if (valueRef2.intValue() == valueRef) return;
+			this.valueRefMap.put(valueStr, valueRef2);
+			throw new STRError();
+		}
+		var valueStr2 = this.valueStrMap.put(valueRef, valueStr);
+		if (valueStr2 != null) {
+			this.valueStrMap.put(valueRef, valueStr2);
+			this.valueRefMap.remove(valueStr);
+			throw new STRError();
+		}
 	}
 
 }

@@ -8,35 +8,7 @@ import bee.creative.util.Tester;
 
 class STR_TEST {
 
-	public static void main(String[] args) throws Exception {
-		var r = new Random();
-
-		var v1 = "yä€𝄞𤽜";
-		var v2 = FEMString.from(v1);
-		var v3 = v2.toString();
-		System.out.println(v3);
-
-		System.out.println(new Tester(() -> {
-			for (var i = 0; i < 4600000; i++) {
-				var a = r.ints(5).map(s-> s & 0x10fff).toArray();
-				var s = new String(a, 0, a.length);
-				s.codePoints().toArray();
-			}
-		}));
-		System.out.println(new Tester(() -> {
-		try {	for (var i = 0; i < 4600000; i++) {
-				var a = r.ints(5).map(s-> s & 0x10fff).toArray();
-				var s = FEMString.from(false, a, 0, a.length).toString();
-				FEMString.from(s).value();
-			}
-		}catch (Exception e) {
-			e.printStackTrace();
-			// TODO: handle exception
-		}
-		}));
-	}
-
-	public static void main_(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException {
 
 		System.out.println("BEREdges2");
 		for (var a = 0; a < 10; a++) {
@@ -53,8 +25,8 @@ class STR_TEST {
 				}
 			});
 			System.out.println(l);
-			System.out.println(Integers.printSize(s.toInts().length * 4));
-			System.out.println(Integers.printSize(s.persist().length));
+			System.out.println(Tester.get(() -> Integers.printSize(s.toInts().length * 4)));
+			System.out.println(Tester.get(() -> Integers.printSize(s.persist().length)));
 			int[] sc = {0};
 			s.edges().forEach((x, b, c) -> sc[0]++);
 			System.out.println(sc[0]);
