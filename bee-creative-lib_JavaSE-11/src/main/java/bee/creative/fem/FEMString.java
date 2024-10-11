@@ -201,7 +201,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, short[], int, int) FEMString.from(true, items, offset, length)}. *
-	 * 
+	 *
 	 * @param items 16-Bit-kodierte Codepoints.
 	 * @param offset Beginn des Abschnitts.
 	 * @param length Länge des Abschnitts.
@@ -562,25 +562,37 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 * @see #length()
 	 * @return {@link List}-Sicht. */
 	public final List<Integer> toList() {
-		return new ItemList(this);
+		return new ItemList();
 	}
 
 	/** Diese Methode gibt die 32-Bit-einzelwertkodierten Codepoint zurück.
 	 *
 	 * @return Array mit den Codepoints in 32-Bit-Kodierung. */
-	public int[] toInts() {
-		var encoder = new INT32Encoder(new int[this.length], 0);
+	public final int[] toInts() {
+		var items = new int[this.length];
+		this.toInts(items, 0);
+		return items;
+	}
+
+	public void toInts(int[] items, int offset) throws IndexOutOfBoundsException {
+		if ((offset < 0) || ((offset + this.length) > items.length)) throw new IllegalArgumentException();
+		var encoder = new INT32Encoder(items, offset);
 		this.collect(encoder);
-		return encoder.items;
 	}
 
 	/** Diese Methode gibt die 8-Bit-einzelwertkodierten Codepoint zurück. Codepoint größer als {@code 255} werden zu {@code 0}.
 	 *
 	 * @return Array mit den Codepoints in 8-Bit-Kodierung. */
-	public byte[] toBytes() {
-		var encoder = new INT8Encoder(new byte[this.length], 0);
+	public final byte[] toBytes() {
+		var items = new byte[this.length];
+		this.toBytes(items, 0);
+		return items;
+	}
+
+	public void toBytes(byte[] items, int offset) throws IndexOutOfBoundsException {
+		if ((offset < 0) || ((offset + this.length) > items.length)) throw new IllegalArgumentException();
+		var encoder = new INT8Encoder(items, offset);
 		this.collect(encoder);
-		return encoder.items;
 	}
 
 	/** Diese Methode gibt die Codepoint in 8-Bit-Kodierung zurück.
@@ -600,10 +612,16 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	/** Diese Methode gibt die 16-Bit-einzelwertkodierten Codepoint zurück. Codepoint größer als {@code 65535} werden zu {@code 0}.
 	 *
 	 * @return Array mit den Codepoints in 16-Bit-Kodierung. */
-	public short[] toShorts() {
-		var encoder = new INT16Encoder(new short[this.length], 0);
+	public final short[] toShorts() {
+		var items = new short[this.length];
+		this.toShorts(items, 0);
+		return items;
+	}
+
+	public void toShorts(short[] items, int offset) throws IndexOutOfBoundsException {
+		if ((offset < 0) || ((offset + this.length) > items.length)) throw new IllegalArgumentException();
+		var encoder = new INT16Encoder(items, offset);
 		this.collect(encoder);
-		return encoder.items;
 	}
 
 	/** Diese Methode gibt die Codepoint in UTF16-Kodierung zurück.
@@ -911,10 +929,8 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		}
 
 		@Override
-		public byte[] toBytes() {
-			var items = new byte[this.length];
-			System.arraycopy(this.items, this.offset, items, 0, this.length);
-			return items;
+		public void toBytes(byte[] items, int offset) throws IndexOutOfBoundsException {
+			System.arraycopy(this.items, this.offset, items, offset, this.length);
 		}
 
 		@Override
@@ -958,10 +974,8 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		}
 
 		@Override
-		public short[] toShorts() {
-			var items = new short[this.length];
-			System.arraycopy(this.items, this.offset, items, 0, this.length);
-			return items;
+		public void toShorts(short[] items, int offset) throws IndexOutOfBoundsException {
+			System.arraycopy(this.items, this.offset, items, offset, this.length);
 		}
 
 		@Override
@@ -1004,10 +1018,8 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		}
 
 		@Override
-		public int[] toInts() {
-			var items = new int[this.length];
-			System.arraycopy(this.items, this.offset, items, 0, this.length);
-			return items;
+		public void toInts(int[] items, int offset) throws IndexOutOfBoundsException {
+			System.arraycopy(this.items, this.offset, items, offset, this.length);
 		}
 
 		@Override
@@ -1163,7 +1175,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 *
 	 * @param length Länge.
 	 * @throws IllegalArgumentException Wenn {@code length < 0} ist. */
-	protected FEMString(final int length) throws IllegalArgumentException {
+	protected FEMString(int length) throws IllegalArgumentException {
 		if (length < 0) throw new IllegalArgumentException();
 		this.length = length;
 	}
@@ -1172,7 +1184,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 *
 	 * @param index Index.
 	 * @return {@code index}-ter Codepoint. */
-	protected int customGet(final int index) {
+	protected int customGet(int index) {
 		return 0;
 	}
 
@@ -1183,9 +1195,9 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 * @param offset Position, an der die Suche beginnt ({@code 0..this.length()}).
 	 * @return Position des ersten Vorkommens der gegebene Zeichenkette ({@code offset..this.length()-that.length()}) oder {@code -1}.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
-	protected int customFind(final FEMString that, final int offset) {
-		final var value = that.customGet(0);
-		final var count = (this.length - that.length) + 1;
+	protected int customFind(FEMString that, int offset) {
+		var value = that.customGet(0);
+		var count = (this.length - that.length) + 1;
 		for (var result = offset; true; result++) {
 			result = this.customFind(value, result, count - result, true);
 			if (result < 0) return -1;
@@ -1201,22 +1213,22 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 * @param length Anzahl der Zeichen im Abschnitt.
 	 * @return Position des ersten Vorkommens des gegebenen Zeichens oder {@code -1}.
 	 * @param foreward {@code true}, wenn die Reihenfolge vorwärts ist, bzw. {@code false}, wenn sie rückwärts ist. */
-	protected int customFind(final int that, final int offset, final int length, final boolean foreward) {
+	protected int customFind(int that, int offset, int length, boolean foreward) {
 		var finder = new GetIndex(that);
 		if (this.customCollect(finder, offset, length, foreward)) return -1;
 		return foreward ? (finder.index + offset) : (length - finder.index - 1);
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Bytefolge gleich der gegebenen ist. Sie Implementiert {@link #equals(Object)}. */
-	protected boolean customEquals(final FEMString that) throws NullPointerException {
-		final var length = this.length;
+	protected boolean customEquals(FEMString that) throws NullPointerException {
+		var length = this.length;
 		if ((length != that.length) || (this.hashCode() != that.hashCode())) return false;
 		return this.customEquals(that, 0);
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn die gegebenen Zeichenkette an der gegebenen Position in dieser Zeichenkette liegt. */
-	protected boolean customEquals(final FEMString that, final int offset) {
-		final var length = that.length;
+	protected boolean customEquals(FEMString that, int offset) {
+		var length = that.length;
 		for (var i = 0; i < length; i++) {
 			if (this.customGet(offset + i) != that.customGet(i)) return false;
 		}
@@ -1231,7 +1243,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 * @param length Anzahl der Werte im Abschnitt.
 	 * @param foreward {@code true}, wenn die Reihenfolge vorwärts ist, bzw. {@code false}, wenn sie rückwärts ist.
 	 * @return {@code false}, wenn das Anfügen vorzeitig abgebrochen wurde. */
-	protected boolean customCollect(final Collector target, int offset, int length, final boolean foreward) {
+	protected boolean customCollect(Collector target, int offset, int length, boolean foreward) {
 		if (foreward) {
 			for (length += offset; offset < length; offset++) {
 				if (!target.push(this.customGet(offset))) return false;
@@ -1249,14 +1261,8 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 * @param offset Position, an welcher der Abschnitt beginnt.
 	 * @param length Anzahl der Zeichen im Abschnitt.
 	 * @return {@link FEMString}-Sicht auf einen Abschnitt dieser Zeichenkette. */
-	protected FEMString customSection(final int offset, final int length) {
+	protected FEMString customSection(int offset, int length) {
 		return new SectionString(this, offset, length);
-	}
-
-	static FEMString concatAll(final FEMString[] values, final int min, final int max) throws NullPointerException {
-		if (min == max) return values[min];
-		final var mid = (min + max) >> 1;
-		return FEMString.concatAll(values, min, mid).concat(FEMString.concatAll(values, mid + 1, max));
 	}
 
 	/** Diese Methode gibt die Anzahl der Token für den UTF8-kodierten Codepoint zurück, der mit dem gegebenen Token beginnt.
@@ -1264,7 +1270,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 * @param item Token, mit dem ein UTF8-kodierter Codepoint beginnt.
 	 * @return Anzahl der Token für den UTF8-kodierten Codepoint.
 	 * @throws IllegalArgumentException Wenn der Token ungültig ist. */
-	static int utf8Size(final int item) throws IllegalArgumentException {
+	private static int utf8Size(int item) throws IllegalArgumentException {
 		switch ((item >> 4) & 15) {
 			case 0:
 			case 1:
@@ -1292,7 +1298,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 * @param offset Position des Tokens, an dem der UTF8-kodierte Codepoint beginnt.
 	 * @return Codepoint.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	static int utf8Value(final byte[] items, final int offset) throws IllegalArgumentException {
+	private static int utf8Value(byte[] items, int offset) throws IllegalArgumentException {
 		switch ((items[offset] >> 4) & 15) {
 			case 0:
 			case 1:
@@ -1321,7 +1327,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 * @param count Anzahl der Codepoints.
 	 * @return Position des ersten Tokens nach der gegebenen Anzahl an Codepoints.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	static int utf8Offset(final byte[] items, int offset, int count) throws IllegalArgumentException {
+	private static int utf8Offset(byte[] items, int offset, int count) throws IllegalArgumentException {
 		while (count > 0) {
 			count--;
 			offset += FEMString.utf8Size(items[offset]);
@@ -1336,9 +1342,9 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 * @param length Anzahl der Token.
 	 * @return Anzahl an UTF8-kodierten Codepoints.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	static int utf8Count(final byte[] items, final int offset, final int length) throws NullPointerException, IllegalArgumentException {
+	private static int utf8Count(byte[] items, int offset, int length) throws NullPointerException, IllegalArgumentException {
 		int result = 0, offset2 = offset;
-		final var length2 = offset + length;
+		var length2 = offset + length;
 		while (offset2 < length2) {
 			result++;
 			offset2 += FEMString.utf8Size(items[offset2]);
@@ -1351,7 +1357,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 *
 	 * @param item Token.
 	 * @return {@code true}, wenn ein UTF8-kodierter Codepoint am Token beginnt. */
-	static boolean utf8Header(final int item) {
+	private static boolean utf8Header(int item) {
 		return (item & 192) != 128;
 	}
 
@@ -1360,8 +1366,8 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 * @param item Token, mit dem ein UTF16-kodierter Codepoint beginnt.
 	 * @return Anzahl der Token für den UTF16-kodierten Codepoint.
 	 * @throws IllegalArgumentException Wenn der Token ungültig ist. */
-	static int utf16Size(final int item) throws IllegalArgumentException {
-		final var value = item & 64512;
+	private static int utf16Size(int item) throws IllegalArgumentException {
+		var value = item & 64512;
 		if (value == 55296) return 2;
 		if (value != 56320) return 1;
 		throw new IllegalArgumentException();
@@ -1373,15 +1379,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 * @param offset Position des Tokens, an dem der UTF16-kodierte Codepoint beginnt.
 	 * @return Codepoint.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	static int utf16Value(final short[] items, final int offset) throws IllegalArgumentException {
-		final int token = items[offset], value = token & 64512;
-		if (value == 55296) return (((token & 1023) << 10) | (items[offset + 1] & 1023)) + 65536;
-		if (value != 56320) return token & 65535;
-		throw new IllegalArgumentException();
-	}
-
-	/** @see #utf16Value(short[], int) */
-	static int utf16Value(char[] items, int offset) throws IllegalArgumentException {
+	private static int utf16Value(char[] items, int offset) throws IllegalArgumentException {
 		var token = items[offset];
 		var value = token & 64512;
 		if (value == 55296) return (((token & 1023) << 10) | (items[offset + 1] & 1023)) + 65536;
@@ -1396,16 +1394,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 * @param count Anzahl der Codepoints.
 	 * @return Position des ersten Tokens nach der gegebenen Anzahl an Codepoints.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	static int utf16Offset(final short[] items, int offset, int count) throws IllegalArgumentException {
-		while (count > 0) {
-			count--;
-			offset += FEMString.utf16Size(items[offset]);
-		}
-		return offset;
-	}
-
-	/** @see #utf16Offset(short[], int, int) */
-	static int utf16Offset(char[] items, int offset, int count) throws IllegalArgumentException {
+	private static int utf16Offset(char[] items, int offset, int count) throws IllegalArgumentException {
 		while (count > 0) {
 			count--;
 			offset += FEMString.utf16Size(items[offset]);
@@ -1420,18 +1409,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 * @param length Anzahl der Token.
 	 * @return Anzahl an UTF16-kodierten Codepoints.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	static int utf16Count(final short[] items, final int offset, final int length) throws NullPointerException, IllegalArgumentException {
-		int result = 0, offset2 = offset;
-		final var length2 = offset + length;
-		while (offset2 < length2) {
-			result++;
-			offset2 += FEMString.utf16Size(items[offset2]);
-		}
-		if (offset2 != length2) throw new IllegalArgumentException();
-		return result;
-	}
-
-	static int utf16Count(char[] items, int offset, int length) throws NullPointerException, IllegalArgumentException {
+	private static int utf16Count(char[] items, int offset, int length) throws NullPointerException, IllegalArgumentException {
 		var result = 0;
 		var offset2 = offset;
 		var length2 = offset + length;
@@ -1447,18 +1425,15 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 *
 	 * @param item Token.
 	 * @return {@code true}, wenn ein UTF16-kodierter Codepoint am Token beginnt. */
-	static boolean utf16Header(final int item) {
+	private static boolean utf16Header(int item) {
 		return (item & 64512) != 56320;
 	}
 
-	int findLast(final Object key) {
-		if ((this.length == 0) || !(key instanceof Integer)) return -1;
-		return this.customFind((Integer)key, 0, this.length, false);
-	}
-
-	int findFirst(final Object key) {
-		if ((this.length == 0) || !(key instanceof Integer)) return -1;
-		return this.customFind((Integer)key, 0, this.length, true);
+	/** Diese Methode implementiert {@link #concatAll(FEMString...)}. */
+	private static FEMString concatAll(FEMString[] values, int min, int max) throws NullPointerException {
+		if (min == max) return values[min];
+		var mid = (min + max) >> 1;
+		return FEMString.concatAll(values, min, mid).concat(FEMString.concatAll(values, mid + 1, max));
 	}
 
 	private final class ItemIter extends AbstractIterator<Integer> {
@@ -1477,27 +1452,21 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 	}
 
-	private static final class ItemList extends AbstractList<Integer> implements RandomAccess {
-
-		public final FEMString items;
-
-		public ItemList(FEMString items) {
-			this.items = items;
-		}
+	private final class ItemList extends AbstractList<Integer> implements RandomAccess {
 
 		@Override
 		public Integer get(int index) {
-			return this.items.get(index);
+			return FEMString.this.get(index);
 		}
 
 		@Override
 		public int size() {
-			return this.items.length;
+			return FEMString.this.length;
 		}
 
 		@Override
 		public Iterator<Integer> iterator() {
-			return this.items.iterator();
+			return FEMString.this.iterator();
 		}
 
 		@Override
@@ -1507,17 +1476,19 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 		@Override
 		public int indexOf(Object o) {
-			return this.items.findFirst(o);
+			if ((FEMString.this.length == 0) || !(o instanceof Integer)) return -1;
+			return FEMString.this.customFind((Integer)o, 0, FEMString.this.length, true);
 		}
 
 		@Override
 		public int lastIndexOf(Object o) {
-			return this.items.findLast(o);
+			if ((FEMString.this.length == 0) || !(o instanceof Integer)) return -1;
+			return FEMString.this.customFind((Integer)o, 0, FEMString.this.length, false);
 		}
 
 		@Override
 		public List<Integer> subList(int fromIndex, int toIndex) {
-			return this.items.section(fromIndex, toIndex - fromIndex).toList();
+			return FEMString.this.section(fromIndex, toIndex - fromIndex).toList();
 		}
 
 	}
