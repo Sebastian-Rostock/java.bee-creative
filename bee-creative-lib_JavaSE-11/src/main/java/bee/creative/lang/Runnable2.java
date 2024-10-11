@@ -8,6 +8,6 @@ public interface Runnable2 {
 	/** Diese Methode führt die Berechnung aus.
 	 *
 	 * @throws Exception Wenn während der Berechnung ein Fehler eintritt. */
-	public void run() throws Exception;
+	void run() throws Exception;
 
 }
