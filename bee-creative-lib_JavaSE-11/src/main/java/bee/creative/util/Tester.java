@@ -3,6 +3,7 @@ package bee.creative.util;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import bee.creative.lang.Gettable2;
 import bee.creative.lang.Objects;
 import bee.creative.lang.Runnable2;
 
@@ -19,109 +20,24 @@ import bee.creative.lang.Runnable2;
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Tester {
 
-	/** Diese Klasse implementiert den {@link Thread} zur parallelen Messung der maximale Speicherbelegung in Byte.
-	 *
-	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	static final class Sampler extends Thread {
-
-		/** Dieses Feld speichert das Interval in Millisekunden, in dem die Messung erfolgt. Es ist {@code 0}, wenn die Messung beendet werden soll. */
-		int millis;
-
-		/** Dieses Feld speichert die Rechenzeit in Nanosekunden, die zur Messung benötigt wurde.
-		 *
-		 * @see System#nanoTime() */
-		long usedTime;
-
-		/** Dieses Feld speichert die maximale Speicherbelegung in Byte, die während der Messung ermittelt wurde.
-		 *
-		 * @see Runtime#freeMemory()
-		 * @see Runtime#totalMemory() */
-		long usedMemory;
-
-		/** Dieser Konstruktor initialisiert das Interval in Millisekunden.
-		 *
-		 * @param millis Interval der Messung in Millisekunden.
-		 * @throws IllegalArgumentException Wenn {@code millis <= 0} ist. */
-		public Sampler(final int millis) throws IllegalArgumentException {
-			super("Tester-Thread");
-			if (millis <= 0) throw new IllegalArgumentException();
-			this.millis = millis;
-			this.setPriority(Math.min(Thread.currentThread().getPriority() + 1, Thread.MAX_PRIORITY));
-		}
-
-		/** Diese Methode aktiviert die periodische Messung.
-		 *
-		 * @see #start() */
-		public final void activate() {
-			this.start();
-		}
-
-		/** Diese Methode deaktiviert die periodische Messung.
-		 *
-		 * @see #join() */
-		public final void deactivate() {
-			synchronized (this) {
-				this.millis = 0;
-			}
-			try {
-				this.join();
-			} catch (final InterruptedException e) {}
-		}
-
-		@Override
-		public final void run() {
-			final Runtime runtime = Runtime.getRuntime();
-			int sleep;
-			long enterTime = 0, leaveTime = 0;
-			while (true) {
-				final long enterTime2 = System.nanoTime();
-				this.usedTime += leaveTime - enterTime;
-				runtime.gc();
-				this.usedMemory = Math.max(runtime.totalMemory() - runtime.freeMemory(), this.usedMemory);
-				enterTime = enterTime2;
-				leaveTime = System.nanoTime();
-				synchronized (this) {
-					sleep = this.millis;
-				}
-				if (sleep <= 0) {
-					break;
-				}
-				try {
-					Thread.sleep(sleep);
-				} catch (final InterruptedException pause) {
-					break;
-				}
-			}
-			this.usedTime += leaveTime - enterTime;
-		}
-
-	}
-
-	/** Diese Klasse implementiert {@link Tester#USED_TIME_ORDER}. */
-	static class UsedTimeComparator extends AbstractComparator<Tester> {
-
-		@Override
-		public int compare(final Tester tester1, final Tester tester2) {
-			return Comparators.compare(tester1.usedTime, tester2.usedTime);
-		}
-
-	}
-
-	/** Diese Klasse implementiert {@link Tester#USED_MEMORY_ORDER}. */
-	static class UsedMemoryComparator extends AbstractComparator<Tester> {
-
-		@Override
-		public int compare(final Tester tester1, final Tester tester2) {
-			return Comparators.compare(tester1.usedMemory, tester2.usedMemory);
-		}
-
-	}
-
 	/** Dieses Feld speichert den {@link Comparator} zu {@link #usedTime}. */
 	public static final Comparator<Tester> USED_TIME_ORDER = new UsedTimeComparator();
 
 	/** Dieses Feld speichert den {@link Comparator} zu {@link #usedMemory}. */
 	public static final Comparator<Tester> USED_MEMORY_ORDER = new UsedMemoryComparator();
+
+	public static <T> T get(Gettable2<T> task) {
+		var res = Properties.<T>fromValue(null);
+		Tester.run(() -> res.set(task.get()));
+		return res.get();
+	}
+
+	public static void run(Runnable2 task) {
+		var run = new Tester(task);
+		System.err.println(run);
+		if (run.cause == null) return;
+		run.cause.printStackTrace();
+	}
 
 	/** Diese Methode ist eine Abkürzung für liefert den {@link Tester} zum arithmetischen Mittel ({@link #usedTime} und {@link #usedMemory}) der gegebenen
 	 * Tester.
@@ -139,7 +55,7 @@ public class Tester {
 	 * @return {@code svg}-{@link Tester}.
 	 * @throws NullPointerException Wenn {@code testers} {@code null} ist oder enthält. */
 	public static Tester fromAvg(final List<Tester> testers) throws NullPointerException {
-		final int count = testers.size();
+		final var count = testers.size();
 		if (count == 0) return new Tester(0, 0);
 		long usedTime = 0, usedMemory = 0;
 		for (final Tester tester: testers) {
@@ -208,23 +124,13 @@ public class Tester {
 	/** Dieses Feld speichert die Fehlerursache, wenn die Testmethode eiene ausnahme auslöst, oder {@code null}. */
 	public final Throwable cause;
 
-	private Tester(final long usedTime, final long usedMemory) throws NullPointerException {
-		this.usedTime = usedTime;
-		this.usedMemory = usedMemory;
-		this.enterTime = 0;
-		this.enterMemory = 0;
-		this.leaveTime = usedTime;
-		this.leaveMemory = usedMemory;
-		this.cause = null;
-	}
-
 	/** Dieser Konstruktor ruft die gegebenen Testmethode auf und ermittelt die Messwerte. Die Messung der Speicherbelegung erfolgt synchron mit Bereinigung durch
 	 * {@link Runtime#gc()}.
 	 *
-	 * @param method Testmethode.
+	 * @param task Testmethode.
 	 * @throws NullPointerException Wenn {@code method} {@code null} ist. */
-	public Tester(final Runnable2 method) throws NullPointerException {
-		this(-1, method);
+	public Tester(final Runnable2 task) throws NullPointerException {
+		this(-1, task);
 	}
 
 	/** Dieser Konstruktor ruft die gegebenen Testmethode auf und ermittelt die Messwerte. Wenn das gegebene Interval größer als {@code 0} ist, wird ein
@@ -232,21 +138,21 @@ public class Tester {
 	 * {@link Runtime#gc()}.
 	 *
 	 * @param mode Interval der asynchronen Messung der Speicherbelegung in Millisekunden, nagativ bei synchroner Messung und {@code 0} bei deaktivierter.
-	 * @param method Testmethode.
+	 * @param task Testmethode.
 	 * @throws NullPointerException Wenn {@code method} {@code null} ist. */
-	public Tester(final int mode, final Runnable2 method) throws NullPointerException {
-		Objects.notNull(method);
-		final Runtime runtime = Runtime.getRuntime();
+	public Tester(final int mode, final Runnable2 task) throws NullPointerException {
+		Objects.notNull(task);
+		final var runtime = Runtime.getRuntime();
 		Throwable cause = null;
 		final long enterMemory, enterTime, leaveMemory, leaveTime;
 		if (mode > 0) {
-			final Sampler sampler = new Sampler(mode);
+			final var sampler = new Sampler(mode);
 			runtime.gc();
 			sampler.activate();
 			enterMemory = runtime.totalMemory() - runtime.freeMemory();
 			enterTime = System.nanoTime();
 			try {
-				method.run();
+				task.run();
 			} catch (final Throwable cause2) {
 				cause = cause2;
 			} finally {
@@ -265,7 +171,7 @@ public class Tester {
 			enterMemory = runtime.totalMemory() - runtime.freeMemory();
 			enterTime = System.nanoTime();
 			try {
-				method.run();
+				task.run();
 			} catch (final Throwable cause2) {
 				cause = cause2;
 			}
@@ -288,6 +194,114 @@ public class Tester {
 	@Override
 	public String toString() {
 		return String.format("usedTime: %4.3f ms  usedMemory: %+4.3f MB  cause: %s", this.usedTime / 1000000f, this.usedMemory / 1048576f, this.cause);
+	}
+
+	private Tester(final long usedTime, final long usedMemory) throws NullPointerException {
+		this.usedTime = usedTime;
+		this.usedMemory = usedMemory;
+		this.enterTime = 0;
+		this.enterMemory = 0;
+		this.leaveTime = usedTime;
+		this.leaveMemory = usedMemory;
+		this.cause = null;
+	}
+
+	/** Diese Klasse implementiert den {@link Thread} zur parallelen Messung der maximale Speicherbelegung in Byte.
+	 *
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
+	static final class Sampler extends Thread {
+
+		/** Dieses Feld speichert das Interval in Millisekunden, in dem die Messung erfolgt. Es ist {@code 0}, wenn die Messung beendet werden soll. */
+		int millis;
+
+		/** Dieses Feld speichert die Rechenzeit in Nanosekunden, die zur Messung benötigt wurde.
+		 *
+		 * @see System#nanoTime() */
+		long usedTime;
+
+		/** Dieses Feld speichert die maximale Speicherbelegung in Byte, die während der Messung ermittelt wurde.
+		 *
+		 * @see Runtime#freeMemory()
+		 * @see Runtime#totalMemory() */
+		long usedMemory;
+
+		/** Dieser Konstruktor initialisiert das Interval in Millisekunden.
+		 *
+		 * @param millis Interval der Messung in Millisekunden.
+		 * @throws IllegalArgumentException Wenn {@code millis <= 0} ist. */
+		public Sampler(final int millis) throws IllegalArgumentException {
+			super("Tester-Thread");
+			if (millis <= 0) throw new IllegalArgumentException();
+			this.millis = millis;
+			this.setPriority(Math.min(Thread.currentThread().getPriority() + 1, Thread.MAX_PRIORITY));
+		}
+
+		/** Diese Methode aktiviert die periodische Messung.
+		 *
+		 * @see #start() */
+		public final void activate() {
+			this.start();
+		}
+
+		/** Diese Methode deaktiviert die periodische Messung.
+		 *
+		 * @see #join() */
+		public final void deactivate() {
+			synchronized (this) {
+				this.millis = 0;
+			}
+			try {
+				this.join();
+			} catch (final InterruptedException e) {}
+		}
+
+		@Override
+		public final void run() {
+			final var runtime = Runtime.getRuntime();
+			int sleep;
+			long enterTime = 0, leaveTime = 0;
+			while (true) {
+				final var enterTime2 = System.nanoTime();
+				this.usedTime += leaveTime - enterTime;
+				runtime.gc();
+				this.usedMemory = Math.max(runtime.totalMemory() - runtime.freeMemory(), this.usedMemory);
+				enterTime = enterTime2;
+				leaveTime = System.nanoTime();
+				synchronized (this) {
+					sleep = this.millis;
+				}
+				if (sleep <= 0) {
+					break;
+				}
+				try {
+					Thread.sleep(sleep);
+				} catch (final InterruptedException pause) {
+					break;
+				}
+			}
+			this.usedTime += leaveTime - enterTime;
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link Tester#USED_TIME_ORDER}. */
+	static class UsedTimeComparator extends AbstractComparator<Tester> {
+
+		@Override
+		public int compare(final Tester tester1, final Tester tester2) {
+			return Comparators.compare(tester1.usedTime, tester2.usedTime);
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link Tester#USED_MEMORY_ORDER}. */
+	static class UsedMemoryComparator extends AbstractComparator<Tester> {
+
+		@Override
+		public int compare(final Tester tester1, final Tester tester2) {
+			return Comparators.compare(tester1.usedMemory, tester2.usedMemory);
+		}
+
 	}
 
 }
