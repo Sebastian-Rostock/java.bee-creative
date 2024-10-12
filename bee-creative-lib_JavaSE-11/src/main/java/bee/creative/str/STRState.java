@@ -78,10 +78,13 @@ public class STRState {
 	}
 
 	/** Diese Methode liefert eine Kopie der gegebenen {@link STRState Hyperkantenmenge}. */
-	public static STRState from(STRState edges) {
+	public static STRState from(STRState state) {
 		var result = new STRState();
-		edges.forEachEdge(result::insertEdge);
-		edges.forEachValue(result::insertValue);
+		result.nextRef = state.nextRef;
+		result.rootRef = state.rootRef;
+		result.valueRefMap = state.valueRefMap.clone();
+		result.valueStrMap = state.valueStrMap.clone();
+		state.forEachEdge(result::insertEdge);
 		return result;
 	}
 
@@ -199,7 +202,7 @@ public class STRState {
 			if (oldValue == null) {
 				result.insertValue(valueRef, newValue);
 			} else {
-				if (!oldValue.equals(newValue)) throw new IllegalArgumentException();
+				if (!oldValue.equals(newValue)) throw new STRError();
 			}
 		});
 		return result;
@@ -225,18 +228,17 @@ public class STRState {
 		return this.rootRef;
 	}
 
-	String TODO_getValue(int valueRef) {
+	FEMString getValue(int valueRef) {
 		if (valueRef == 0) return null;
 		this.restore();
-		// TODO
-		return null;
+		return this.valueStrMap.get(valueRef);
 	}
 
-	int TODO_getValueRef(String value) {
-		if (value == null) return 0;
+	int getValueRef(FEMString valueStr) {
+		if (valueStr == null) return 0;
 		this.restore();
-		// TODO
-		return 0;
+		var valueRef = this.valueRefMap.get(valueStr);
+		return valueRef != null ? valueRef : 0;
 	}
 
 	int[] TODO_getValueRefs() {
@@ -246,9 +248,9 @@ public class STRState {
 	}
 
 	int TODO_getValueCount() {
-		this.restore();
 		// TODO
-		return 0;
+		this.restore();
+		return valueRefMap.size();
 	}
 
 	/** Diese Methode liefert die als {@link STREdge#sourceRef()} vorkommenden Referenzen. */
@@ -428,12 +430,12 @@ public class STRState {
 		return REFSET.getIdx(targetVal, targetRef) != 0;
 	}
 
-	public boolean containsValue(String value) {
-		return this.TODO_getValueRef(value) != 0;
+	public boolean containsValue(FEMString value) {
+		return this.getValueRef(value) != 0;
 	}
 
 	public boolean containsValueRef(int valueRef) {
-		return this.TODO_getValue(valueRef) != null;
+		return this.getValue(valueRef) != null;
 	}
 
 	/** Diese Methode liefert nur dann {@code true}, wenn die gegebene Referenzen {@code sourceRef} als {@link STREdge#sourceRef()} vorkommt. */

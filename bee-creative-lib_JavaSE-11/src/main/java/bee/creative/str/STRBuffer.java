@@ -1,6 +1,7 @@
 package bee.creative.str;
 
 import java.util.Arrays;
+import bee.creative.fem.FEMString;
 import bee.creative.util.HashMapIO;
 import bee.creative.util.HashMapOI;
 
@@ -42,7 +43,7 @@ public class STRBuffer extends STRState {
 		return this.insertEdge(sourceRef, targetRef, relationRef);
 	}
 
-	int TODO_putValue(String value) {
+	int TODO_putValue(FEMString value) {
 		// TODO
 		return 0;
 	}
@@ -65,59 +66,62 @@ public class STRBuffer extends STRState {
 		return res[0];
 	}
 
-	public boolean pop(STREdge edge) {
-		return (edge != null) && this.pop(edge.sourceRef, edge.targetRef, edge.relationRef);
+	public boolean popEdge(STREdge edge) {
+		return (edge != null) && this.popEdge(edge.sourceRef, edge.targetRef, edge.relationRef);
 	}
 
-	public boolean pop(int sourceRef, int relationRef, int targetRef) {
+	public boolean popEdge(int sourceRef, int relationRef, int targetRef) {
 		this.backup();
 		return this.deleteEdge(sourceRef, targetRef, relationRef);
 	}
 
-	public boolean popAll(STREdge... edges) {
-		return this.popAll(Arrays.asList(edges));
+	public boolean popAllEdges(STREdge... edges) {
+		return this.popAllEdges(Arrays.asList(edges));
 	}
 
-	public boolean popAll(Iterable<STREdge> edges) {
+	public boolean popAllEdges(Iterable<STREdge> edges) {
 		this.backup();
 		var res = new boolean[1];
 		edges.forEach(edge -> res[0] = this.deleteEdge(edge.sourceRef, edge.targetRef, edge.relationRef) | res[0]);
 		return res[0];
 	}
 
-	public boolean popAll(STRState edges) {
+	public boolean popAllEdges(STRState edges) {
 		this.backup();
 		var res = new boolean[1];
 		edges.forEachEdge((sourceRef, targetRef, relationRef) -> res[0] = this.deleteEdge(sourceRef, targetRef, relationRef) | res[0]);
 		return res[0];
 	}
 
-	boolean TODO_popValue(int ref) {
-		// TODO
-		return false;
+	boolean popValue(int ref) {
+		this.backup();
+		return this.deleteValue(ref);
 	}
 
-	boolean TODO_popValue(String value) {
-		// TODO
-		return false;
+	boolean popValue(FEMString value) {
+		this.backup();
+		return this.deleteValue(value);
 	}
 
-	boolean TODO_popAllValues(String... values) {
-		// TODO
-		return false;
+	boolean popAllValues(FEMString... values) {
+		return this.popAllValues(Arrays.asList(values));
 	}
 
-	boolean TODO_popAllValues(Iterable<String> values) {
-		// TODO
-		return false;
+	boolean popAllValues(Iterable<FEMString> values) {
+		this.backup();
+		var res = new boolean[1];
+		values.forEach((valueStr) -> res[0] = this.deleteValue(valueStr) | res[0]);
+		return res[0];
 	}
 
-	boolean TODO_popAllValues(STRState values) {
-		// TODO
-		return false;
+	boolean popAllValues(STRState values) {
+		this.backup();
+		var res = new boolean[1];
+		values.forEachValue((valueRef, valueStr) -> res[0] = this.deleteValue(valueRef, valueStr) | res[0]);
+		return res[0];
 	}
 
-	/** Diese Methode entfernt alle {@link STREdge Hyperkanten}. */
+	/** Diese Methode entfernt alle {@link #edges() Hyperkanten} und {@link #values() Textwerte}. */
 	public void clear() {
 		this.backup();
 		this.sourceMap = REFMAP.EMPTY;
@@ -131,6 +135,7 @@ public class STRBuffer extends STRState {
 	public void insertAll(STRState putState) {
 		this.backup();
 		putState.forEachEdge(this::insertEdge);
+		putState.forEachValue(this::insertValue2);
 		this.nextRef += putState.nextRef;
 		this.rootRef += putState.rootRef;
 	}
@@ -140,6 +145,7 @@ public class STRBuffer extends STRState {
 	public void deleteAll(STRState popState) {
 		this.backup();
 		popState.forEachEdge(this::deleteEdge);
+		popState.forEachValue(this::deleteValue);
 		this.nextRef -= popState.nextRef;
 		this.rootRef -= popState.rootRef;
 	}
@@ -464,6 +470,25 @@ public class STRBuffer extends STRState {
 		return true;
 	}
 
+	private boolean deleteValue(int valueRef) {
+		var valueStr = this.valueStrMap.remove(valueRef);
+		if (valueStr == null) return false;
+		this.valueRefMap.remove(valueStr);
+		return true;
+	}
+
+	private boolean deleteValue(FEMString valueStr) {
+		var valueRef = this.valueRefMap.remove(valueStr);
+		if (valueRef == null) return false;
+		this.valueStrMap.remove(valueRef);
+		return true;
+	}
+
+	private boolean deleteValue(int valueRef, FEMString valueStr) {
+		// TODO
+		return false;
+	}
+
 	private void backup() {
 		if (this.backup != null) return;
 		var backup = new STRState(this);
@@ -472,6 +497,9 @@ public class STRBuffer extends STRState {
 		this.valueStrMap = this.valueStrMap.clone();
 		this.valueRefMap = this.valueRefMap.clone();
 		this.backup = backup;
+	}
+
+	private void insertValue2(int int1, FEMString femstring2) {
 	}
 
 }
