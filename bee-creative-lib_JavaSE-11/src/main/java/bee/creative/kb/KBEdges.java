@@ -10,12 +10,12 @@ import bee.creative.util.Iterator2;
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class KBEdges implements Iterable2<KBEdge> {
 
-	/** Diese Methode liefert den {@link KBState}, dessen {@link KBEdge Kanten} iteriert werden. */
+	/** Diese Methode liefert den {@link KBState Wissensstand}, dessen {@link KBEdge Kanten} iteriert werden. */
 	public KBState owner() {
 		return this.owner;
 	}
 
-	/** Diese Methode übergibt die Referenzen aller {@link KBEdge Hyperkanten} an {@link RUN#run(int, int, int) task.run()}. */
+	/** Diese Methode übergibt die Referenzen aller {@link KBEdge Kanten} an {@link RUN#run(int, int, int) task.run()}. */
 	public void forEach(RUN task) {
 		this.owner.forEachEdge(task);
 	}
@@ -42,7 +42,8 @@ public class KBEdges implements Iterable2<KBEdge> {
 	/** Diese Schnittstelle definiert den Empfänger der Referenzen für {@link KBEdges#forEach(RUN)}. */
 	public interface RUN {
 
-		/** Diese Methode verarbeitet die gegebenen Referenzen einer {@link KBEdge Hyperkante}. */
+		/** Diese Methode verarbeitet die gegebene Quellreferenz {@code sourceRef}, Zielreferenz {@code targetRef} und Beziehungsreferenz {@code relationRef} einer
+		 * {@link KBEdge Kante}. */
 		void run(int sourceRef, int targetRef, int relationRef);
 
 	}
@@ -51,6 +52,6 @@ public class KBEdges implements Iterable2<KBEdge> {
 		this.owner = owner;
 	}
 
-	private final KBState owner;
+	final KBState owner;
 
 }
