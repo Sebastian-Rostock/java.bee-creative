@@ -210,12 +210,6 @@ public class KBState {
 		return result;
 	}
 
-	public static KBState restore(byte[] b) throws IOException {
-		try (var a = new ZIPDIS(b)) {
-			return KBState.from(a.getBytes());
-		}
-	}
-
 	public KBEdges edges() {
 		return this.edges;
 	}
@@ -621,13 +615,6 @@ public class KBState {
 		var bytes = ByteBuffer.allocate(ints.length * 4);
 		bytes.order(order).asIntBuffer().put(ints);
 		return bytes.array();
-	}
-
-	public byte[] persist() throws IOException {
-		try (var o = new ZIPDOS()) {
-			o.write(this.toBytes());
-			return o.getBytes();
-		}
 	}
 
 	@Override
