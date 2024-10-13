@@ -8,6 +8,7 @@ import bee.creative.emu.Emuator;
 import bee.creative.lang.Objects;
 import bee.creative.util.AbstractIterator;
 import bee.creative.util.Entries;
+import bee.creative.util.Iterator2;
 
 /** Diese Klasse implementiert Methoden zur Verarbeitung einer steuwertbasierten Abbildung von Referenen ungleich {@code 0} auf Elemente ungleich {@code null}.
  * Die Methoden verzichten weitgehend auf die Prüfung der Wertebereicht ihrer Argumente für maximale Effizienz. Die Abbildung ist als {@code Object}-Array mit
@@ -135,7 +136,14 @@ public final class REFMAP {
 
 	/** Diese Methode liefert den {@link Iterator} über die Referenzen und Elemente der gegebenen Referenzabbildung {@code refmap}. */
 	public static ITER iterator(Object[] refmap) {
-		return new ITER(refmap);
+		return new ITER(refmap, null, null);
+	}
+
+	/** Diese Methode liefert den {@link Iterator2} über die Referenzen und Elemente der gegebenen Referenzabbildung {@code refmap}, deren Referenzen in der
+	 * ersten gegebenen {@link REFSET Referenzmenge} {@code accept_refset_or_null} und nicht in der zweiten gegebenen {@link REFSET Referenzmenge}
+	 * {@code refuse_refset_or_null} enthalten sind. */
+	public static ITER iterator(Object[] refmap, int[] accept_refset_or_null, int[] refuse_refset_or_null) {
+		return new ITER(refmap, accept_refset_or_null, refuse_refset_or_null);
 	}
 
 	/** Diese Methode liefert alle Schlüssel der gegebenen Referenzabbildung {@code refmap}. */
@@ -191,8 +199,8 @@ public final class REFMAP {
 		/** Diese Methode liefert die nächsten Referenz oder {@code 0}. */
 		public int nextRef() {
 			if (!this.hasNext()) throw new NoSuchElementException();
-			var ref = REFSET.getRef(this.refset, this.index);
-			while ((0 < this.index) && ((this.val = this.refmap[--this.index]) == null)) {}
+			var ref = this.iterator.nextRef();
+			this.val = this.refmap[this.iterator.index];
 			return ref;
 		}
 
@@ -203,28 +211,24 @@ public final class REFMAP {
 
 		/** Diese Methode liefert die 1-basierte Position der nächsten von {@link #nextRef()} gelieferten Referenz oder {@code 0}. */
 		public int nextIdx() {
-			return this.index;
+			return this.iterator.index;
 		}
 
 		@Override
 		public boolean hasNext() {
-			return 0 < this.index;
+			return this.iterator.hasNext();
 		}
 
 		Object val;
 
-		int index;
-
-		final int[] refset;
-
 		final Object[] refmap;
 
-		ITER(Object[] refmap) {
-			this.index = (this.refmap = refmap).length - 1;
-			this.refset = REFMAP.getKeys(refmap);
-			if (this.hasNext()) {
-				this.nextRef();
-			}
+		final REFSET.ITER iterator;
+
+		ITER(Object[] refmap, int[] accept, int[] refuse) {
+			this.iterator = new REFSET.ITER(REFMAP.getKeys(this.refmap = refmap), accept, refuse);
+			if (!this.hasNext()) return;
+			this.val = this.refmap[this.iterator.index];
 		}
 
 	}

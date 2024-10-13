@@ -187,11 +187,11 @@ public final class REFSET {
 
 	/** Diese Methode liefert den {@link Iterator2} über die Referenzen der gegebenen Referenzmenge {@code refset}. */
 	public static ITER iterator(int[] refset) {
-		return new ITER(refset, refset, REFSET.EMPTY);
+		return new ITER(refset, null, null);
 	}
 
-	/** Diese Methode liefert den {@link Iterator2} über die Referenzen der gegebenen Referenzmenge {@code refset}, die in der zweiten gegebenen Referenzmengen
-	 * {@code accept_refset_or_null} und nicht in der dritten gegebenen Referenzmengen {@code refuse_refset_or_null} enthalten sind. */
+	/** Diese Methode liefert den {@link Iterator2} über die Referenzen der gegebenen Referenzmenge {@code refset}, die in der zweiten gegebenen Referenzmenge
+	 * {@code accept_refset_or_null} und nicht in der dritten gegebenen Referenzmenge {@code refuse_refset_or_null} enthalten sind. */
 	public static ITER iterator(int[] refset, int[] accept_refset_or_null, int[] refuse_refset_or_null) {
 		return new ITER(refset, accept_refset_or_null, refuse_refset_or_null);
 	}
@@ -291,12 +291,13 @@ public final class REFSET {
 		public int nextRef() {
 			if (!this.hasNext()) throw new NoSuchElementException();
 			var ref = this.ref;
-			while ((3 < this.index)) {
+			while (3 < this.index) {
 				this.ref = this.refset[this.index];
 				this.index -= 3;
-				if ((this.ref != 0) //
-					&& ((this.accept == null) || (REFSET.getIdx(this.accept, this.ref) != 0)) //
-					&& ((this.refuse == null) || (REFSET.getIdx(this.refuse, this.ref) == 0))) return ref;
+				if (this.ref != 0) {
+					if ((this.accept == null) || (REFSET.getIdx(this.accept, this.ref) != 0) //
+						&& ((this.refuse == null) || (REFSET.getIdx(this.refuse, this.ref) == 0))) return ref;
+				}
 			}
 			return ref;
 		}
