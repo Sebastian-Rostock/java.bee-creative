@@ -3,7 +3,7 @@ package bee.creative.kb;
 import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert eine mit {@link #relationRef() Beziehungsreferenz} typisierte und von einer {@link #sourceRef() Quellreferenz} zu einer
- * {@link #targetRef() Zielreferenz} gerichtete Kante einer Wissensbasis.
+ * {@link #targetRef() Zielreferenz} gerichtete Kante eines {@link KBState Wissensstandes}.
  *
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class KBEdge {
