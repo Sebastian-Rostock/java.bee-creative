@@ -13,6 +13,13 @@ import java.util.zip.InflaterInputStream;
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class ZIPDIS extends DataInputStream {
 
+	/** Diese Methode liefert die aus der gegebene Bytefolge {@code bytes} entpackte Bytefolge. */
+	public static byte[] inflate(byte[] bytes) throws IOException {
+		try (var stream = new ZIPDIS(bytes)) {
+			return stream.getBytes();
+		}
+	}
+
 	/** Dieser Konstruktor initialisiert den {@link InputStream} über {@link ByteArrayInputStream#ByteArrayInputStream(byte[]) new
 	 * ByteArrayInputStream(bytes)}. */
 	public ZIPDIS(byte[] bytes) throws IOException {
