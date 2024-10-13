@@ -1,4 +1,4 @@
-package bee.creative.str;
+package bee.creative.kb;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -7,18 +7,22 @@ import java.io.OutputStream;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 
-public class BINWRITER extends DataOutputStream {
+public class ZIPDOS extends DataOutputStream {
 
-	public BINWRITER() throws IOException {
-		this(512 * 1024);
+	public ZIPDOS() throws IOException {
+		this(524288);
 	}
 
-	public BINWRITER(int size) throws IOException {
+	public ZIPDOS(int size) throws IOException {
 		this(new ByteArrayOutputStream(size));
 	}
 
-	public BINWRITER(ByteArrayOutputStream target) throws IOException {
-		super(new DeflaterOutputStream(target, new Deflater(Deflater.BEST_SPEED, true), 512 * 1024, false));
+	public ZIPDOS(ByteArrayOutputStream target) throws IOException {
+		this(target, Deflater.BEST_SPEED);
+	}
+
+	public ZIPDOS(ByteArrayOutputStream target, int level) throws IOException {
+		super(new DeflaterOutputStream(target, new Deflater(level, true), 524288, false));
 		this.target = target;
 	}
 

@@ -1,4 +1,4 @@
-package bee.creative.str;
+package bee.creative.kb;
 
 import java.util.Iterator;
 import java.util.Map.Entry;
@@ -13,7 +13,7 @@ import bee.creative.util.Entries;
  * Die Methoden verzichten weitgehend auf die Prüfung der Wertebereicht ihrer Argumente für maximale Effizienz. Die Abbildung ist als {@code Object}-Array mit
  * folgender Struktur umgesetzt:
  * <dl>
- * <dt>{@code (keys, value[keys.mask + 2])}
+ * <dt>{@code (keys, value[keys.mask + 1])}
  * <dd>
  * <dl>
  * <dt>{@code keys}</dt>
@@ -211,15 +211,15 @@ public final class REFMAP {
 			return 0 < this.index;
 		}
 
-		private Object val;
+		Object val;
 
-		private int index;
+		int index;
 
-		private int[] refset;
+		final int[] refset;
 
-		private Object[] refmap;
+		final Object[] refmap;
 
-		private ITER(Object[] refmap) {
+		ITER(Object[] refmap) {
 			this.index = (this.refmap = refmap).length - 1;
 			this.refset = REFMAP.getKeys(refmap);
 			if (this.hasNext()) {

@@ -1,4 +1,4 @@
-package bee.creative.str;
+package bee.creative.kb;
 
 import java.io.IOException;
 import java.util.Random;
@@ -6,14 +6,14 @@ import bee.creative.fem.FEMString;
 import bee.creative.lang.Integers;
 import bee.creative.util.Tester;
 
-class STR_TEST {
+class TEST {
 
 	public static void main(String[] args) throws IOException {
 
 		System.out.println("BEREdges2");
 		for (var a = 0; a < 10; a++) {
 			var r = new Random(a);
-			var s = new STRBuffer();
+			var s = new KBBuffer();
 			var l = new Tester(() -> {
 				for (var i = 0; i < (1000 * 1000);) {
 					for (var j = 0; j < 1000; i++, j++) {
@@ -31,7 +31,7 @@ class STR_TEST {
 			s.edges().forEach((x, b, c) -> sc[0]++);
 			System.out.println(sc[0]);
 			int[] kc = {0};
-			var k = STRState.from(s.toBytes());
+			var k = KBState.from(s.toBytes());
 			k.edges().forEach((x, b, c) -> kc[0]++);
 			System.out.println(kc[0]);
 			// l.cause.printStackTrace();

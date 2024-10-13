@@ -1,18 +1,18 @@
-package bee.creative.str;
+package bee.creative.kb;
 
 import java.util.Arrays;
 import bee.creative.fem.FEMString;
 import bee.creative.util.HashMapIO;
 import bee.creative.util.HashMapOI;
 
-/** Diese Klasse implementiert einen Hyperkantenpuffer als veränderbare {@link STRState Hyperkantenmenge}.
+/** Diese Klasse implementiert einen Hyperkantenpuffer als veränderbare {@link KBState Hyperkantenmenge}.
  * <p>
  * Der Hyperkantenpuffer macht vor der ersten Änderung grundsätzlich eine Sicherungskopie der aktuellen Hyperkantenmenge und Referenzen. Durch den Aufruf von
  * {@link #commit()} bzw. {@link #rollback()} können dann alle bis dahin gemachten Änderungen angenommen bzw. verworfen werden. In beiden Fällen wird ein
- * {@link STRUpdate Änderungsprotokoll} bereitgestellt.
+ * {@link KBUpdate Änderungsprotokoll} bereitgestellt.
  *
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public class STRBuffer extends STRState {
+public class KBBuffer extends KBState {
 
 	public void setNextRef(int nextRef) {
 		this.backup();
@@ -34,7 +34,7 @@ public class STRBuffer extends STRState {
 		return nextRef;
 	}
 
-	public boolean putEdge(STREdge edge) {
+	public boolean putEdge(KBEdge edge) {
 		return (edge != null) && this.putEdge(edge.sourceRef, edge.targetRef, edge.relationRef);
 	}
 
@@ -48,25 +48,25 @@ public class STRBuffer extends STRState {
 		return 0;
 	}
 
-	public boolean putAllEdges(STREdge... edges) {
+	public boolean putAllEdges(KBEdge... edges) {
 		return this.putAllEdges(Arrays.asList(edges));
 	}
 
-	public boolean putAllEdges(Iterable<STREdge> edges) {
+	public boolean putAllEdges(Iterable<KBEdge> edges) {
 		this.backup();
 		var res = new boolean[1];
 		edges.forEach(edge -> res[0] = this.insertEdge(edge.sourceRef, edge.targetRef, edge.relationRef) | res[0]);
 		return res[0];
 	}
 
-	public boolean putAllEdges(STRState edges) {
+	public boolean putAllEdges(KBState edges) {
 		this.backup();
 		var res = new boolean[1];
 		edges.forEachEdge((sourceRef, targetRef, relationRef) -> res[0] = this.insertEdge(sourceRef, targetRef, relationRef) | res[0]);
 		return res[0];
 	}
 
-	public boolean popEdge(STREdge edge) {
+	public boolean popEdge(KBEdge edge) {
 		return (edge != null) && this.popEdge(edge.sourceRef, edge.targetRef, edge.relationRef);
 	}
 
@@ -75,18 +75,18 @@ public class STRBuffer extends STRState {
 		return this.deleteEdge(sourceRef, targetRef, relationRef);
 	}
 
-	public boolean popAllEdges(STREdge... edges) {
+	public boolean popAllEdges(KBEdge... edges) {
 		return this.popAllEdges(Arrays.asList(edges));
 	}
 
-	public boolean popAllEdges(Iterable<STREdge> edges) {
+	public boolean popAllEdges(Iterable<KBEdge> edges) {
 		this.backup();
 		var res = new boolean[1];
 		edges.forEach(edge -> res[0] = this.deleteEdge(edge.sourceRef, edge.targetRef, edge.relationRef) | res[0]);
 		return res[0];
 	}
 
-	public boolean popAllEdges(STRState edges) {
+	public boolean popAllEdges(KBState edges) {
 		this.backup();
 		var res = new boolean[1];
 		edges.forEachEdge((sourceRef, targetRef, relationRef) -> res[0] = this.deleteEdge(sourceRef, targetRef, relationRef) | res[0]);
@@ -114,7 +114,7 @@ public class STRBuffer extends STRState {
 		return res[0];
 	}
 
-	boolean popAllValues(STRState values) {
+	boolean popAllValues(KBState values) {
 		this.backup();
 		var res = new boolean[1];
 		values.forEachValue((valueRef, valueStr) -> res[0] = this.deleteValue(valueRef, valueStr) | res[0]);
@@ -130,30 +130,30 @@ public class STRBuffer extends STRState {
 		this.valueStrMap = new HashMapIO<>();
 	}
 
-	/** Diese Methode ergänzt alle {@link STREdge Hyperkanten} der gegebenen {@link STRState Hyperkantenmenge} {@code putState} und erhöht die Referenzen
+	/** Diese Methode ergänzt alle {@link KBEdge Hyperkanten} der gegebenen {@link KBState Hyperkantenmenge} {@code putState} und erhöht die Referenzen
 	 * {@link #getNextRef()} und {@link #getRootRef()} um die jeweiligen Zählerstände des {@code putState}. */
-	public void insertAll(STRState putState) {
+	public void insertAll(KBState inserts) {
 		this.backup();
-		putState.forEachEdge(this::insertEdge);
-		putState.forEachValue(this::insertValue2);
-		this.nextRef += putState.nextRef;
-		this.rootRef += putState.rootRef;
+		inserts.forEachEdge(this::insertEdge);
+		inserts.forEachValue(this::insertValue);
+		this.nextRef += inserts.nextRef;
+		this.rootRef += inserts.rootRef;
 	}
 
-	/** Diese Methode entfernt alle {@link STREdge Hyperkanten} der gegebenen {@link STRState Hyperkantenmenge} {@code popState} und verringert die Referenzen
+	/** Diese Methode entfernt alle {@link KBEdge Hyperkanten} der gegebenen {@link KBState Hyperkantenmenge} {@code popState} und verringert die Referenzen
 	 * {@link #getNextRef()} und {@link #getRootRef()} um die jeweiligen Zählerstände des {@code popState}. */
-	public void deleteAll(STRState popState) {
+	public void deleteAll(KBState deletes) {
 		this.backup();
-		popState.forEachEdge(this::deleteEdge);
-		popState.forEachValue(this::deleteValue);
-		this.nextRef -= popState.nextRef;
-		this.rootRef -= popState.rootRef;
+		deletes.forEachEdge(this::deleteEdge);
+		deletes.forEachValue(this::deleteValue);
+		this.nextRef -= deletes.nextRef;
+		this.rootRef -= deletes.rootRef;
 	}
 
-	/** Diese Methode ersetzt alle {@link STREdge Hyperkanten} soeie die Referenzen {@link #getNextRef()} und {@link #getRootRef()} mit denen der gegebenen
-	 * {@link STRState Hyperkantenmenge}. */
-	public void replaceAll(STRState state) {
-		state = STRState.from(state);
+	/** Diese Methode ersetzt alle {@link KBEdge Hyperkanten} soeie die Referenzen {@link #getNextRef()} und {@link #getRootRef()} mit denen der gegebenen
+	 * {@link KBState Hyperkantenmenge}. */
+	public void replaceAll(KBState state) {
+		state = KBState.from(state);
 		this.backup();
 		this.nextRef = state.nextRef;
 		this.rootRef = state.rootRef;
@@ -164,18 +164,18 @@ public class STRBuffer extends STRState {
 	}
 
 	/** Diese Methode übernimmt alle Anderungen seit dem letzten {@link #commit()}, {@link #rollback()} bzw. der erzeugung dieses Hyperkantenpuffers und liefert
-	 * den zugehörigen {@link STRUpdate Änderungsbericht}. */
-	public STRUpdate commit() {
-		return new STRUpdate(this, true);
+	 * den zugehörigen {@link KBUpdate Änderungsbericht}. */
+	public KBUpdate commit() {
+		return new KBUpdate(this, true);
 	}
 
 	/** Diese Methode verwirft alle Anderungen seit dem letzten {@link #commit()}, {@link #rollback()} bzw. der erzeugung dieses Hyperkantenpuffers und liefert
-	 * den zugehörigen {@link STRUpdate Änderungsbericht}. */
-	public STRUpdate rollback() {
-		return new STRUpdate(this, false);
+	 * den zugehörigen {@link KBUpdate Änderungsbericht}. */
+	public KBUpdate rollback() {
+		return new KBUpdate(this, false);
 	}
 
-	STRState backup;
+	KBState backup;
 
 	private boolean insertEdge(int sourceRef, int targetRef, int relationRef) {
 		if ((sourceRef == 0) || (relationRef == 0) || (targetRef == 0)) return false;
@@ -196,7 +196,7 @@ public class STRBuffer extends STRState {
 		if (nextSourceIdx == 0) throw new IllegalStateException();
 
 		// GET sourceRelationMap
-		var sourceRelationMap = STRState.asRefMap(REFMAP.getVal(sourceMap, nextSourceIdx));
+		var sourceRelationMap = KBState.asRefMap(REFMAP.getVal(sourceMap, nextSourceIdx));
 		Object[] backupSourceRelationMap = null;
 
 		if (sourceRelationMap == null) {
@@ -206,7 +206,7 @@ public class STRBuffer extends STRState {
 		} else {
 			var backupSourceMap = this.backup.sourceMap;
 			var backupSourceIdx = REFMAP.getIdx(backupSourceMap, sourceRef);
-			backupSourceRelationMap = backupSourceIdx != 0 ? STRState.asRefMap(REFMAP.getVal(backupSourceMap, backupSourceIdx)) : null;
+			backupSourceRelationMap = backupSourceIdx != 0 ? KBState.asRefMap(REFMAP.getVal(backupSourceMap, backupSourceIdx)) : null;
 			if (sourceRelationMap == backupSourceRelationMap) {
 				// COW sourceRelationMap
 				sourceRelationMap = REFMAP.grow(backupSourceRelationMap);
@@ -227,7 +227,7 @@ public class STRBuffer extends STRState {
 		if (targetIdx == 0) throw new IllegalStateException();
 
 		// GET targetRelationMap
-		var targetRelationMap = STRState.asRefMap(REFMAP.getVal(targetMap, targetIdx));
+		var targetRelationMap = KBState.asRefMap(REFMAP.getVal(targetMap, targetIdx));
 		Object[] backupTargetRelationMap = null;
 
 		if (targetRelationMap == null) {
@@ -237,7 +237,7 @@ public class STRBuffer extends STRState {
 		} else {
 			var backupTargetMap = this.backup.targetMap;
 			var backupTargetIdx = REFMAP.getIdx(backupTargetMap, targetRef);
-			backupTargetRelationMap = backupTargetIdx != 0 ? STRState.asRefMap(REFMAP.getVal(backupTargetMap, backupTargetIdx)) : null;
+			backupTargetRelationMap = backupTargetIdx != 0 ? KBState.asRefMap(REFMAP.getVal(backupTargetMap, backupTargetIdx)) : null;
 			if (targetRelationMap == backupTargetRelationMap) {
 				// COW targetRelationMap
 				targetRelationMap = REFMAP.grow(backupTargetRelationMap);
@@ -258,24 +258,24 @@ public class STRBuffer extends STRState {
 		if (sourceRelationIdx == 0) throw new IllegalStateException();
 
 		// GET sourceRelationTargetVal
-		var sourceRelationTargetSet = STRState.asRefVal(REFMAP.getVal(sourceRelationMap, sourceRelationIdx));
+		var sourceRelationTargetSet = KBState.asRefVal(REFMAP.getVal(sourceRelationMap, sourceRelationIdx));
 		var sourceRelationTargetSet2 = sourceRelationTargetSet;
 
 		if (sourceRelationTargetSet == null) {
 			// NEW sourceRelationTargetVal
-			REFMAP.setVal(sourceRelationMap, sourceRelationIdx, REFSET.EMPTY);
-			sourceRelationTargetSet = STRState.toRef(targetRef);
+//			REFMAP.setVal(sourceRelationMap, sourceRelationIdx, REFSET.EMPTY);
+			sourceRelationTargetSet = KBState.toRef(targetRef);
 			REFMAP.setVal(sourceRelationMap, sourceRelationIdx, sourceRelationTargetSet);
-		} else if (STRState.isRef(sourceRelationTargetSet)) {
+		} else if (KBState.isRef(sourceRelationTargetSet)) {
 			// ADD sourceRelationTargetVal
-			var targetRef2 = STRState.asRef(sourceRelationTargetSet);
+			var targetRef2 = KBState.asRef(sourceRelationTargetSet);
 			if (targetRef == targetRef2) return false; // OLD
 			sourceRelationTargetSet = REFSET.from(targetRef, targetRef2);
 			REFMAP.setVal(sourceRelationMap, sourceRelationIdx, sourceRelationTargetSet);
 		} else {
 			var backupSourceRelationIdx = backupSourceRelationMap != null ? REFMAP.getIdx(backupSourceRelationMap, relationRef) : 0;
 			var backupSourceRelationTargetVal =
-				backupSourceRelationIdx != 0 ? STRState.asRefVal(REFMAP.getVal(backupSourceRelationMap, backupSourceRelationIdx)) : null;
+				backupSourceRelationIdx != 0 ? KBState.asRefVal(REFMAP.getVal(backupSourceRelationMap, backupSourceRelationIdx)) : null;
 			if (sourceRelationTargetSet == backupSourceRelationTargetVal) {
 				// COW sourceRelationTargetVal
 				sourceRelationTargetSet = REFSET.grow(backupSourceRelationTargetVal);
@@ -301,9 +301,9 @@ public class STRBuffer extends STRState {
 
 		// MAX targetRelationMap
 		if (targetRelationIdx == 0) {
-			if (STRState.isRef(sourceRelationTargetSet)) {
+			if (KBState.isRef(sourceRelationTargetSet)) {
 				REFMAP.setVal(sourceRelationMap, REFMAP.popRef(sourceRelationMap, relationRef), null);
-			} else if (STRState.isRef(sourceRelationTargetSet2)) {
+			} else if (KBState.isRef(sourceRelationTargetSet2)) {
 				REFMAP.setVal(sourceRelationMap, sourceRelationIdx, sourceRelationTargetSet2);
 			} else {
 				REFSET.popRef(sourceRelationTargetSet, targetRef);
@@ -311,23 +311,23 @@ public class STRBuffer extends STRState {
 			throw new IllegalStateException();
 		}
 
-		var targetRelationSourceVal = STRState.asRefVal(REFMAP.getVal(targetRelationMap, targetRelationIdx));
+		var targetRelationSourceVal = KBState.asRefVal(REFMAP.getVal(targetRelationMap, targetRelationIdx));
 		var targetRelationSourceSet2 = targetRelationSourceVal;
 
 		try {
 			if (targetRelationSourceVal == null) {
-				REFMAP.setVal(targetRelationMap, targetRelationIdx, REFSET.EMPTY);
-				targetRelationSourceVal = STRState.toRef(sourceRef);
+//				REFMAP.setVal(targetRelationMap, targetRelationIdx, REFSET.EMPTY);
+				targetRelationSourceVal = KBState.toRef(sourceRef);
 				REFMAP.setVal(targetRelationMap, targetRelationIdx, targetRelationSourceVal);
-			} else if (STRState.isRef(targetRelationSourceVal)) {
+			} else if (KBState.isRef(targetRelationSourceVal)) {
 				// ADD targetRelationSourceVal
-				var sourceRef2 = STRState.asRef(targetRelationSourceVal);
+				var sourceRef2 = KBState.asRef(targetRelationSourceVal);
 				targetRelationSourceVal = REFSET.from(sourceRef, sourceRef2);
 				REFMAP.setVal(targetRelationMap, targetRelationIdx, targetRelationSourceVal);
 			} else {
 				var backupTargetRelationIdx = backupTargetRelationMap != null ? REFMAP.getIdx(backupTargetRelationMap, relationRef) : 0;
 				var backupTargetRelationSourceVal =
-					backupTargetRelationIdx != 0 ? STRState.asRefVal(REFMAP.getVal(backupTargetRelationMap, backupTargetRelationIdx)) : null;
+					backupTargetRelationIdx != 0 ? KBState.asRefVal(REFMAP.getVal(backupTargetRelationMap, backupTargetRelationIdx)) : null;
 				if (targetRelationSourceVal == backupTargetRelationSourceVal) {
 					// COW targetRelationSourceVal
 					targetRelationSourceVal = REFSET.grow(backupTargetRelationSourceVal);
@@ -346,16 +346,16 @@ public class STRBuffer extends STRState {
 			targetRelationIdx = 0;
 		} finally {
 			if (targetRelationIdx != 0) {
-				if (STRState.isRef(sourceRelationTargetSet)) {
+				if (KBState.isRef(sourceRelationTargetSet)) {
 					REFMAP.setVal(sourceRelationMap, REFMAP.popRef(sourceRelationMap, relationRef), null);
-				} else if (STRState.isRef(sourceRelationTargetSet2)) {
+				} else if (KBState.isRef(sourceRelationTargetSet2)) {
 					REFMAP.setVal(sourceRelationMap, sourceRelationIdx, sourceRelationTargetSet2);
 				} else {
 					REFSET.popRef(sourceRelationTargetSet, targetRef);
 				}
-				if (STRState.isRef(targetRelationSourceVal)) {
+				if (KBState.isRef(targetRelationSourceVal)) {
 					REFMAP.setVal(targetRelationMap, REFMAP.popRef(targetRelationMap, relationRef), null);
-				} else if (STRState.isRef(targetRelationSourceSet2)) {
+				} else if (KBState.isRef(targetRelationSourceSet2)) {
 					REFMAP.setVal(targetRelationMap, targetRelationIdx, targetRelationSourceSet2);
 				}
 				throw new IllegalStateException();
@@ -381,16 +381,16 @@ public class STRBuffer extends STRState {
 		var prevTargetMap = this.backup.targetMap;
 
 		var prevSourceIdx = REFMAP.getIdx(prevSourceMap, sourceRef);
-		var prevSourceRelationMap = prevSourceIdx != 0 ? STRState.asRefMap(REFMAP.getVal(prevSourceMap, prevSourceIdx)) : null;
-		var nextSourceRelationMap = STRState.asRefMap(REFMAP.getVal(nextSourceMap, nextSourceIdx));
+		var prevSourceRelationMap = prevSourceIdx != 0 ? KBState.asRefMap(REFMAP.getVal(prevSourceMap, prevSourceIdx)) : null;
+		var nextSourceRelationMap = KBState.asRefMap(REFMAP.getVal(nextSourceMap, nextSourceIdx));
 		if (nextSourceRelationMap == prevSourceRelationMap) {
 			nextSourceRelationMap = REFMAP.copy(nextSourceRelationMap);
 			REFMAP.setVal(nextSourceMap, nextSourceIdx, nextSourceRelationMap);
 		}
 
 		var prevTargetIdx = REFMAP.getIdx(prevTargetMap, targetRef);
-		var prevTargetRelationMap = prevTargetIdx != 0 ? STRState.asRefMap(REFMAP.getVal(prevTargetMap, prevTargetIdx)) : null;
-		var nextTargetRelationMap = STRState.asRefMap(REFMAP.getVal(nextTargetMap, nextTargetIdx));
+		var prevTargetRelationMap = prevTargetIdx != 0 ? KBState.asRefMap(REFMAP.getVal(prevTargetMap, prevTargetIdx)) : null;
+		var nextTargetRelationMap = KBState.asRefMap(REFMAP.getVal(nextTargetMap, nextTargetIdx));
 		if (nextTargetRelationMap == prevTargetRelationMap) {
 			nextTargetRelationMap = REFMAP.copy(nextTargetRelationMap);
 			REFMAP.setVal(nextTargetMap, nextTargetIdx, nextTargetRelationMap);
@@ -398,14 +398,14 @@ public class STRBuffer extends STRState {
 
 		var nextSourceRelationIdx = REFMAP.getIdx(nextSourceRelationMap, relationRef);
 		if (nextSourceRelationIdx == 0) return false;
-		var nextSourceRelationTargetVal = STRState.asRefVal(REFMAP.getVal(nextSourceRelationMap, nextSourceRelationIdx));
+		var nextSourceRelationTargetVal = KBState.asRefVal(REFMAP.getVal(nextSourceRelationMap, nextSourceRelationIdx));
 
 		var nextTargetRelationIdx = REFMAP.putRef(nextTargetRelationMap, relationRef);
 		if (nextTargetRelationIdx == 0) return false; // IllegalState
-		var nextTargetRelationSourceVal = STRState.asRefVal(REFMAP.getVal(nextTargetRelationMap, nextTargetRelationIdx));
+		var nextTargetRelationSourceVal = KBState.asRefVal(REFMAP.getVal(nextTargetRelationMap, nextTargetRelationIdx));
 
-		if (STRState.isRef(nextSourceRelationTargetVal)) {
-			var targetRef2 = STRState.asRef(nextSourceRelationTargetVal);
+		if (KBState.isRef(nextSourceRelationTargetVal)) {
+			var targetRef2 = KBState.asRef(nextSourceRelationTargetVal);
 			if (targetRef != targetRef2) return false;
 			REFMAP.setVal(nextSourceRelationMap, REFMAP.popRef(nextSourceRelationMap, relationRef), null);
 			if (REFMAP.size(nextSourceRelationMap) == 0) {
@@ -436,7 +436,7 @@ public class STRBuffer extends STRState {
 			}
 		}
 
-		if (STRState.isRef(nextTargetRelationSourceVal)) {
+		if (KBState.isRef(nextTargetRelationSourceVal)) {
 			// var sourceRef2 = BEREdges.asRef(nextTargetRelationSourceVal);
 			// if (sourceRef != sourceRef2) return false;
 			REFMAP.setVal(nextTargetRelationMap, REFMAP.popRef(nextTargetRelationMap, relationRef), null);
@@ -491,7 +491,7 @@ public class STRBuffer extends STRState {
 
 	private void backup() {
 		if (this.backup != null) return;
-		var backup = new STRState(this);
+		var backup = new KBState(this);
 		this.sourceMap = REFMAP.copy(this.sourceMap);
 		this.targetMap = REFMAP.copy(this.targetMap);
 		this.valueStrMap = this.valueStrMap.clone();
@@ -499,7 +499,8 @@ public class STRBuffer extends STRState {
 		this.backup = backup;
 	}
 
-	private void insertValue2(int int1, FEMString femstring2) {
+	private void insertValue(int valueRef, FEMString valueStr) {
+		// TODO
 	}
 
 }
