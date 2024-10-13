@@ -62,6 +62,6 @@ public class ZIPDOS extends DataOutputStream {
 		return this.target.toByteArray();
 	}
 
-	private ByteArrayOutputStream target;
+	ByteArrayOutputStream target;
 
 }

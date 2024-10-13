@@ -196,6 +196,9 @@ public final class REFSET {
 		return new ITER(refset, acceptRefset_or_null, refuseRefset_or_null);
 	}
 
+	/** Diese Methode liefert nur dann {@code true}, wenn die gegebene Referenz {@code ref} nicht {@code 0} ist, in der gegebenen Referenzmenge
+	 * {@code acceptRefset_or_null} enthalten ist bzw. diese {@code null} ist und nicht in der gegebenen Referenzmenge {@code refuseRefset_or_null} enthalten ist
+	 * bzw. diese {@code null} ist. Sie wird im {@link ITER} verwendet. */
 	public static boolean isValid(int ref, int[] acceptRefset_or_null, int[] refuseRefset_or_null) {
 		return (ref != 0) //
 			&& ((acceptRefset_or_null == null) || (REFSET.getIdx(acceptRefset_or_null, ref) != 0)) //
@@ -312,6 +315,8 @@ public final class REFSET {
 		return /* refset.free */ refset[2] = free;
 	}
 
+	/** Diese Methode liefert die gegebene Referenzmenge {@code refset}, wenn ihre {@link #getMask(int[]) Bitmaske} gleich der gegebenen {@code mask} ist.
+	 * Andernfalls liefert sie eine Kopie mit der Bitmaske {@code mask}. */
 	static int[] tryCopy(int[] refset, int mask) {
 		if (mask == REFSET.getMask(refset)) return refset;
 		var free = 1;

@@ -166,13 +166,13 @@ public final class REFMAP {
 
 	/** Diese Klasse implementiert {@link REFMAP#iterator(Object[])}. */
 	public static final class ITER extends AbstractIterator<Entry<Integer, Object>> {
-	
+
 		@Override
 		public Entry<Integer, Object> next() {
 			var val = this.val;
 			return Entries.from(this.nextRef(), val);
 		}
-	
+
 		/** Diese Methode liefert die nächsten Referenz oder {@code 0}. */
 		public int nextRef() {
 			if (!this.hasNext()) throw new NoSuchElementException();
@@ -180,33 +180,33 @@ public final class REFMAP {
 			this.val = this.refmap[this.nextIdx()];
 			return ref;
 		}
-	
+
 		/** Diese Methode liefert das Element der nächsten von {@link #nextRef()} gelieferten Referenz oder {@code null}. */
 		public Object nextVal() {
 			return this.val;
 		}
-	
+
 		/** Diese Methode liefert die 1-basierte Position der nächsten von {@link #nextRef()} gelieferten Referenz oder {@code 0}. */
 		public int nextIdx() {
 			return this.iterator.nextIdx();
 		}
-	
+
 		@Override
 		public boolean hasNext() {
 			return this.iterator.hasNext();
 		}
-	
+
 		Object val;
-	
+
 		final Object[] refmap;
-	
+
 		final REFSET.ITER iterator;
-	
+
 		ITER(Object[] refmap, int[] accept, int[] refuse) {
 			this.iterator = REFSET.iterator(REFMAP.getKeys(this.refmap = refmap), accept, refuse);
 			this.val = this.refmap[this.nextIdx()];
 		}
-	
+
 	}
 
 	static final Object[] EMPTY = new Object[]{REFSET.EMPTY};
@@ -219,6 +219,8 @@ public final class REFMAP {
 		/* refmap.keys */ refmap[0] = keys;
 	}
 
+	/** Diese Methode liefert die gegebene Referenzabbildung {@code refmap1}, wenn ihre {@link #getKeys(Object[]) Schlüsselmenge} {@code keys1} gleich der
+	 * gegebenen {@code keys2} ist. Andernfalls liefert sie eine Kopie mit der Schlüsselmenge {@code keys2}. */
 	static Object[] tryCopy(Object[] refmap1, int[] keys1, int[] keys2) {
 		if (keys1 == keys2) return refmap1;
 		var refmap2 = new Object[REFSET.getMask(keys2) + 2];
