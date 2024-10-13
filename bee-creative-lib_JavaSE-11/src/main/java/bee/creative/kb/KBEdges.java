@@ -27,11 +27,7 @@ public class KBEdges implements Iterable2<KBEdge> {
 
 	@Override
 	public Iterator2<KBEdge> iterator() {
-		return this.owner.edgeIterator();
-	}
-
-	Iterator2<KBEdge> iterator(REFSET sourceRefs, REFSET targetRefs, REFSET relationRefs) {
-		return this.owner.edgeIterator(sourceRefs, targetRefs, relationRefs);
+		return this.owner.edgeIterator(null, null, null, null, null, null);
 	}
 
 	@Override

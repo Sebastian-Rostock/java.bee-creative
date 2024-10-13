@@ -2,6 +2,7 @@ package bee.creative.kb;
 
 import java.io.IOException;
 import java.util.Random;
+import java.util.zip.Deflater;
 import bee.creative.fem.FEMString;
 import bee.creative.lang.Integers;
 import bee.creative.util.Tester;
@@ -25,8 +26,8 @@ class TEST {
 				}
 			});
 			System.out.println(l);
-			System.out.println(Tester.get(() -> Integers.printSize(s.toInts().length * 4)));
-			System.out.println(Tester.get(() -> Integers.printSize(s.persist().length)));
+			System.out.println("toInts " + Tester.get(() -> Integers.printSize(s.toInts().length * 4)));
+			System.out.println("deflate(toBytes) " + Tester.get(() -> Integers.printSize(ZIPDOS.deflate(s.toBytes(),Deflater.BEST_SPEED).length)));
 			int[] sc = {0};
 			s.edges().forEach((x, b, c) -> sc[0]++);
 			System.out.println(sc[0]);

@@ -30,7 +30,7 @@ public class KBValues implements Iterable2<Entry<Integer, FEMString>> {
 
 	@Override
 	public Iterator2<Entry<Integer, FEMString>> iterator() {
-		return this.owner.valueIterator();
+		return this.owner.valueIterator(null, null);
 	}
 
 	@Override
