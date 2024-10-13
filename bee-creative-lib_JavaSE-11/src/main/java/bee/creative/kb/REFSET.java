@@ -6,7 +6,6 @@ import bee.creative.emu.EMU;
 import bee.creative.emu.Emuator;
 import bee.creative.util.AbstractIterator;
 import bee.creative.util.Iterator2;
-import bee.creative.util.Iterators;
 
 /** Diese Klasse implementiert Methoden zur Verarbeitung einer steuwertbasierten Menge von Referenen ungleich {@code 0} mit durchschnittlich vier
  * Speicherzugriffen zum {@link #getIdx(int[], int) Finden} einer vorhandenen Referenz. Die Methoden verzichten für maximale Effizienz weitgehend auf die
@@ -38,6 +37,16 @@ public final class REFSET {
 	/** Diese Methode liefert eine neue leere Referenzmenge mit Kapazität 2. */
 	public static int[] create() {
 		return new int[]{0, 1, 1, 0, 2, 0, 0, 0, 0};
+	}
+
+	/** Diese Methode liefert eine {@link #create() neue Referenzmenge}, {@link #putRef(int[], int) ergänzt} um die gegebenen Referenzen. */
+	public static int[] from(int... refs) {
+		var refset = REFSET.create();
+		for (var ref: refs) {
+			refset = REFSET.grow(refset);
+			REFSET.putRef(refset, ref);
+		}
+		return refset;
 	}
 
 	/** Diese Methode liefert eine {@link #create() neue Referenzmenge}, {@link #putRef(int[], int) ergänzt} um die gegebenen Referenzen. */
@@ -178,29 +187,13 @@ public final class REFSET {
 
 	/** Diese Methode liefert den {@link Iterator2} über die Referenzen der gegebenen Referenzmenge {@code refset}. */
 	public static ITER iterator(int[] refset) {
-		return new ITER(refset);
+		return new ITER(refset, refset, REFSET.EMPTY);
 	}
 
-	/** Diese Methode liefert den {@link Iterator2} über die Referenzen, die in mindestens einer der gegebenen Referenzmengen {@code refset1} und {@code refset2}
-	 * enthalten sind. */
-	public static Iterator2<Integer> unionIterator(int[] refset1, int[] refset2) {
-		return REFSET.size(refset1) <= REFSET.size(refset2) //
-			? Iterators.concat(REFSET.exceptIterator(refset1, refset2), REFSET.iterator(refset2)) //
-			: Iterators.concat(REFSET.iterator(refset1), REFSET.exceptIterator(refset2, refset1));
-	}
-
-	/** Diese Methode liefert den {@link Iterator2} über die Referenzen der ersten gegebenen Referenzmenge {@code refset1}, die nicht in der zweiten gegebenen
-	 * Referenzmengen {@code refset2} enthalten sind. */
-	public static Iterator2<Integer> exceptIterator(int[] refset1, int[] refset2) {
-		return Iterators.filter(REFSET.iterator(refset1), ref -> REFSET.getIdx(refset2, ref) == 0);
-	}
-
-	/** Diese Methode liefert den {@link Iterator2} über die Referenzen, die zugleich in beiden gegebenen Referenzmengen {@code refset1} und {@code refset2}
-	 * enthalten sind. */
-	public static Iterator2<Integer> intersectIterator(int[] refset1, int[] refset2) {
-		return REFSET.size(refset1) <= REFSET.size(refset2) //
-			? Iterators.filter(REFSET.iterator(refset1), ref -> REFSET.getIdx(refset2, ref) != 0) //
-			: Iterators.filter(REFSET.iterator(refset2), ref -> REFSET.getIdx(refset1, ref) != 0);
+	/** Diese Methode liefert den {@link Iterator2} über die Referenzen der gegebenen Referenzmenge {@code refset}, die in der zweiten gegebenen Referenzmengen
+	 * {@code accept_refset_or_null} und nicht in der dritten gegebenen Referenzmengen {@code refuse_refset_or_null} enthalten sind. */
+	public static ITER iterator(int[] refset, int[] accept_refset_or_null, int[] refuse_refset_or_null) {
+		return new ITER(refset, accept_refset_or_null, refuse_refset_or_null);
 	}
 
 	/** Diese Methode liefert alle Referenzen der gegebenen Referenzmenge {@code refset}. */
@@ -285,7 +278,7 @@ public final class REFSET {
 		return refset2;
 	}
 
-	/** Diese Klasse implementiert {@link REFSET#iterator(int[])}. **/
+	/** Diese Klasse implementiert {@link REFSET#iterator(int[], int[], int[])}. **/
 	static final class ITER extends AbstractIterator<Integer> {
 
 		/** Diese Methode liefert {@link #nextRef()}. */
@@ -301,7 +294,9 @@ public final class REFSET {
 			while ((3 < this.index)) {
 				this.ref = this.refset[this.index];
 				this.index -= 3;
-				if (this.ref != 0) return ref;
+				if ((this.ref != 0) //
+					&& ((this.accept == null) || (REFSET.getIdx(this.accept, this.ref) != 0)) //
+					&& ((this.refuse == null) || (REFSET.getIdx(this.refuse, this.ref) == 0))) return ref;
 			}
 			return ref;
 		}
@@ -322,8 +317,14 @@ public final class REFSET {
 
 		final int[] refset;
 
-		ITER(int[] refset) {
+		final int[] accept;
+
+		final int[] refuse;
+
+		ITER(int[] refset, int[] accept, int[] refuse) {
 			this.index = (this.refset = refset).length - 1;
+			this.accept = accept;
+			this.refuse = refuse;
 			if (!this.hasNext()) return;
 			this.nextRef();
 		}
