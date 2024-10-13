@@ -140,10 +140,10 @@ public final class REFMAP {
 	}
 
 	/** Diese Methode liefert den {@link Iterator2} über die Referenzen und Elemente der gegebenen Referenzabbildung {@code refmap}, deren Referenzen in der
-	 * ersten gegebenen {@link REFSET Referenzmenge} {@code accept_refset_or_null} und nicht in der zweiten gegebenen {@link REFSET Referenzmenge}
-	 * {@code refuse_refset_or_null} enthalten sind. */
-	public static ITER iterator(Object[] refmap, int[] accept_refset_or_null, int[] refuse_refset_or_null) {
-		return new ITER(refmap, accept_refset_or_null, refuse_refset_or_null);
+	 * ersten gegebenen {@link REFSET Referenzmenge} {@code acceptRefset_or_null} und nicht in der zweiten gegebenen {@link REFSET Referenzmenge}
+	 * {@code refuseRefset_or_null} enthalten sind. */
+	public static ITER iterator(Object[] refmap, int[] acceptRefset_or_null, int[] refuseRefset_or_null) {
+		return new ITER(refmap, acceptRefset_or_null, refuseRefset_or_null);
 	}
 
 	/** Diese Methode liefert alle Schlüssel der gegebenen Referenzabbildung {@code refmap}. */
@@ -162,6 +162,51 @@ public final class REFMAP {
 		/** Diese Methode verarbeitet die gegebene Referenz {@code ref} und das gegebene Elemente {@code val}. */
 		void run(int ref, Object val);
 
+	}
+
+	/** Diese Klasse implementiert {@link REFMAP#iterator(Object[])}. */
+	public static final class ITER extends AbstractIterator<Entry<Integer, Object>> {
+	
+		@Override
+		public Entry<Integer, Object> next() {
+			var val = this.val;
+			return Entries.from(this.nextRef(), val);
+		}
+	
+		/** Diese Methode liefert die nächsten Referenz oder {@code 0}. */
+		public int nextRef() {
+			if (!this.hasNext()) throw new NoSuchElementException();
+			var ref = this.iterator.nextRef();
+			this.val = this.refmap[this.nextIdx()];
+			return ref;
+		}
+	
+		/** Diese Methode liefert das Element der nächsten von {@link #nextRef()} gelieferten Referenz oder {@code null}. */
+		public Object nextVal() {
+			return this.val;
+		}
+	
+		/** Diese Methode liefert die 1-basierte Position der nächsten von {@link #nextRef()} gelieferten Referenz oder {@code 0}. */
+		public int nextIdx() {
+			return this.iterator.nextIdx();
+		}
+	
+		@Override
+		public boolean hasNext() {
+			return this.iterator.hasNext();
+		}
+	
+		Object val;
+	
+		final Object[] refmap;
+	
+		final REFSET.ITER iterator;
+	
+		ITER(Object[] refmap, int[] accept, int[] refuse) {
+			this.iterator = REFSET.iterator(REFMAP.getKeys(this.refmap = refmap), accept, refuse);
+			this.val = this.refmap[this.nextIdx()];
+		}
+	
 	}
 
 	static final Object[] EMPTY = new Object[]{REFSET.EMPTY};
@@ -185,52 +230,6 @@ public final class REFMAP {
 			}
 		}
 		return refmap2;
-	}
-
-	/** Diese Klasse implementiert {@link REFMAP#iterator(Object[])}. */
-	static final class ITER extends AbstractIterator<Entry<Integer, Object>> {
-
-		@Override
-		public Entry<Integer, Object> next() {
-			var val = this.val;
-			return Entries.from(this.nextRef(), val);
-		}
-
-		/** Diese Methode liefert die nächsten Referenz oder {@code 0}. */
-		public int nextRef() {
-			if (!this.hasNext()) throw new NoSuchElementException();
-			var ref = this.iterator.nextRef();
-			this.val = this.refmap[this.iterator.index];
-			return ref;
-		}
-
-		/** Diese Methode liefert das Element der nächsten von {@link #nextRef()} gelieferten Referenz oder {@code null}. */
-		public Object nextVal() {
-			return this.val;
-		}
-
-		/** Diese Methode liefert die 1-basierte Position der nächsten von {@link #nextRef()} gelieferten Referenz oder {@code 0}. */
-		public int nextIdx() {
-			return this.iterator.index;
-		}
-
-		@Override
-		public boolean hasNext() {
-			return this.iterator.hasNext();
-		}
-
-		Object val;
-
-		final Object[] refmap;
-
-		final REFSET.ITER iterator;
-
-		ITER(Object[] refmap, int[] accept, int[] refuse) {
-			this.iterator = new REFSET.ITER(REFMAP.getKeys(this.refmap = refmap), accept, refuse);
-			if (!this.hasNext()) return;
-			this.val = this.refmap[this.iterator.index];
-		}
-
 	}
 
 }

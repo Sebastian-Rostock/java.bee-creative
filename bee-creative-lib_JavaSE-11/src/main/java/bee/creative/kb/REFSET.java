@@ -191,9 +191,15 @@ public final class REFSET {
 	}
 
 	/** Diese Methode liefert den {@link Iterator2} über die Referenzen der gegebenen Referenzmenge {@code refset}, die in der zweiten gegebenen Referenzmenge
-	 * {@code accept_refset_or_null} und nicht in der dritten gegebenen Referenzmenge {@code refuse_refset_or_null} enthalten sind. */
-	public static ITER iterator(int[] refset, int[] accept_refset_or_null, int[] refuse_refset_or_null) {
-		return new ITER(refset, accept_refset_or_null, refuse_refset_or_null);
+	 * {@code acceptRefset_or_null} und nicht in der dritten gegebenen Referenzmenge {@code refuseRefset_or_null} enthalten sind. */
+	public static ITER iterator(int[] refset, int[] acceptRefset_or_null, int[] refuseRefset_or_null) {
+		return new ITER(refset, acceptRefset_or_null, refuseRefset_or_null);
+	}
+
+	public static boolean isValid(int ref, int[] acceptRefset_or_null, int[] refuseRefset_or_null) {
+		return (ref != 0) //
+			&& ((acceptRefset_or_null == null) || (REFSET.getIdx(acceptRefset_or_null, ref) != 0)) //
+			&& ((refuseRefset_or_null == null) || (REFSET.getIdx(refuseRefset_or_null, ref) == 0));
 	}
 
 	/** Diese Methode liefert alle Referenzen der gegebenen Referenzmenge {@code refset}. */
@@ -226,6 +232,57 @@ public final class REFSET {
 
 		/** Diese Methode verarbeitet die gegebene Referenz {@code ref}. */
 		void run(int ref);
+
+	}
+
+	/** Diese Klasse implementiert {@link REFSET#iterator(int[], int[], int[])}. **/
+	public static final class ITER extends AbstractIterator<Integer> {
+
+		/** Diese Methode liefert {@link #nextRef()}. */
+		@Override
+		public Integer next() {
+			return this.nextRef();
+		}
+
+		/** Diese Methode liefert die nächsten Referenz oder {@code 0}. */
+		public int nextRef() {
+			if (!this.hasNext()) throw new NoSuchElementException();
+			var ref = this.ref;
+			while (3 < this.index) {
+				this.ref = this.refset[this.index];
+				this.index -= 3;
+				if (REFSET.isValid(this.ref, this.accept, this.refuse)) return ref;
+			}
+			return ref;
+		}
+
+		/** Diese Methode liefert die 1-basierte Position der nächsten von {@link #nextRef()} gelieferten Referenz oder {@code 0}. */
+		public int nextIdx() {
+			return this.index / 3;
+		}
+
+		@Override
+		public boolean hasNext() {
+			return 3 < this.index;
+		}
+
+		int ref;
+
+		int index;
+
+		final int[] refset;
+
+		final int[] accept;
+
+		final int[] refuse;
+
+		ITER(int[] refset, int[] accept, int[] refuse) {
+			this.index = (this.refset = refset).length - 1;
+			this.accept = accept;
+			this.refuse = refuse;
+			if (!this.hasNext()) return;
+			this.nextRef();
+		}
 
 	}
 
@@ -276,60 +333,6 @@ public final class REFSET {
 			/* refset2.head_item_next[free-1].next */ refset2[(free * 3) + 1] = ++free;
 		}
 		return refset2;
-	}
-
-	/** Diese Klasse implementiert {@link REFSET#iterator(int[], int[], int[])}. **/
-	static final class ITER extends AbstractIterator<Integer> {
-
-		/** Diese Methode liefert {@link #nextRef()}. */
-		@Override
-		public Integer next() {
-			return this.nextRef();
-		}
-
-		/** Diese Methode liefert die nächsten Referenz oder {@code 0}. */
-		public int nextRef() {
-			if (!this.hasNext()) throw new NoSuchElementException();
-			var ref = this.ref;
-			while (3 < this.index) {
-				this.ref = this.refset[this.index];
-				this.index -= 3;
-				if (this.ref != 0) {
-					if ((this.accept == null) || (REFSET.getIdx(this.accept, this.ref) != 0) //
-						&& ((this.refuse == null) || (REFSET.getIdx(this.refuse, this.ref) == 0))) return ref;
-				}
-			}
-			return ref;
-		}
-
-		/** Diese Methode liefert die 1-basierte Position der nächsten von {@link #nextRef()} gelieferten Referenz oder {@code 0}. */
-		public int nextIdx() {
-			return this.index / 3;
-		}
-
-		@Override
-		public boolean hasNext() {
-			return 3 < this.index;
-		}
-
-		int ref;
-
-		int index;
-
-		final int[] refset;
-
-		final int[] accept;
-
-		final int[] refuse;
-
-		ITER(int[] refset, int[] accept, int[] refuse) {
-			this.index = (this.refset = refset).length - 1;
-			this.accept = accept;
-			this.refuse = refuse;
-			if (!this.hasNext()) return;
-			this.nextRef();
-		}
-
 	}
 
 }
