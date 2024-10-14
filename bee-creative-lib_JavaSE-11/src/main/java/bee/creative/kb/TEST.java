@@ -14,40 +14,33 @@ class TEST {
 		{
 			System.out.println("texttest");
 			var s = new KBBuffer();
-			s.putEdge(1, 2, 3);
-			s.putEdge(4, 5, 6);
 			s.putValue(FEMString.from("ABC"));
 			s.putValue(FEMString.from("DEF"));
+			s.putEdge(1, 2, 3);
+			s.putEdge(4, 5, 6);
 			System.out.println(s.toString());
 			System.out.println(s.values().exceptValueRefs(2) );
 		}
 		
 		
-		for (var a = 0; a < 1; a++) {
+		for (var a = 0; a < 3; a++) {
 			System.out.println("KBBuffer " + a);
 			var r = new Random(a);
 			var s = new KBBuffer();
 			var l = new Tester(() -> {
 				for (var i = 0; i < (1000 * 1000);) {
-					
-					
 					for (var j = 0; j < 1000; i++, j++) {
-						s.putEdge(r.nextInt(1000) + 1, r.nextInt(20) + 1, r.nextInt(1000) + 1);
+						s.putEdge(r.nextInt(1000) + 1, r.nextInt(50) + 1, r.nextInt(1000) + 1);
 					}
 					// var ddd = s.commit();
-					  var ddd = s.rollback();
+					 // var ddd = s.rollback();
 					//  System.out.println(ddd.getInserts());
 				}
 			});
 			System.out.println(l);
-			System.out.println("toInts " + Tester.get(() -> Integers.printSize(s.toInts().length * 4)));
-			System.out.println("deflate(toBytes) " + Tester.get(() -> Integers.printSize(ZIPDOS.deflate(s.toBytes(),Deflater.BEST_SPEED).length)));
 			 
-			// l.cause.printStackTrace();
 		}
-		// 320 1000 add x 1000 => put = 320n
-		// 800 mit c => c = 480000n
-		// 177 1000 add mit max 1000 cap
+	 
 	}
 
 }
