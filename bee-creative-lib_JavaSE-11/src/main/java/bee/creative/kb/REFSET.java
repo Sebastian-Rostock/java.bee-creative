@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.NoSuchElementException;
 import bee.creative.emu.EMU;
 import bee.creative.emu.Emuator;
+import bee.creative.lang.Objects;
 import bee.creative.util.AbstractIterator;
 import bee.creative.util.Iterator2;
 
@@ -41,12 +42,7 @@ public final class REFSET {
 
 	/** Diese Methode liefert eine {@link #create() neue Referenzmenge}, {@link #putRef(int[], int) ergänzt} um die gegebenen Referenzen. */
 	public static int[] from(int... refs) {
-		var refset = REFSET.create();
-		for (var ref: refs) {
-			refset = REFSET.grow(refset);
-			REFSET.putRef(refset, ref);
-		}
-		return refset;
+		return refs.length != 0 ? REFSET.putAllRefs(REFSET.create(), refs) : REFSET.EMPTY;
 	}
 
 	/** Diese Methode liefert eine {@link #create() neue Referenzmenge}, {@link #putRef(int[], int) ergänzt} um die gegebenen Referenzen. */
@@ -105,6 +101,17 @@ public final class REFSET {
 		return res;
 	}
 
+	/** Diese Methode fügt die gegebenen Referenzen {@code refs} in die gegebene Referenzmenge {@code refset} ein, erweitert bei Bedarf deren Kapazität und gibt
+	 * die geänderte Referenzmenge zurück. **/
+	public static int[] putAllRefs(int[] refset, int[] refs) {
+		Objects.notNull(refset);
+		for (var ref: refs) {
+			refset = REFSET.grow(refset);
+			REFSET.putRef(refset, ref);
+		}
+		return refset;
+	}
+
 	/** Diese Methode entfernt die gegebenen Referenz {@code ref} aus der gegebenen Referenzmenge {@code refset} und liefert die 1-basierte Position der Referenz,
 	 * wenn die Referenz ungleich {@code 0} ist. Wenn die Referenz nicht in der Referenzmenge enthalten ist, wird {@code 0} geliefert. **/
 	public static int popRef(int[] refset, int ref) {
@@ -135,6 +142,53 @@ public final class REFSET {
 		}
 	}
 
+	/** Diese Methode entfernt die gegebenen Referenzen {@code refs} aud der gegebenen Referenzmenge {@code refset}, reduziert bei Bedarf deren Kapazität und gibt
+	 * die geänderte Referenzmenge zurück. **/
+	public static int[] popAllRefs(int[] refset, int[] refs) {
+		Objects.notNull(refset);
+		for (var ref: refs) {
+			REFSET.popRef(refset, ref);
+		}
+		return REFSET.trim(refset);
+	}
+
+	/** Diese Methode fügt die Referenzen der gegebenen Referenzmenge {@code refset2} in die gegebene Referenzmenge {@code refset1} ein, erweitert bei Bedarf
+	 * deren Kapazität und gibt die geänderte Referenzmenge zurück. **/
+	public static int[] unite(int[] refset1, int[] refset2) {
+		for (var off2 = refset2.length - 1; 3 < off2; off2 -= 3) {
+			var ref2 = refset2[off2];
+			if (ref2 != 0) {
+				refset1 = REFSET.grow(refset1);
+				REFSET.putRef(refset1, ref2);
+			}
+		}
+		return refset1;
+	}
+
+	/** Diese Methode entfernt aus der gegebenen Referenzmenge {@code refset1} alle Referenzen, die in der gegebenen Referenzmenge {@code refset2} enthalten sind,
+	 * und gibt die geänderte Referenzmenge mit minimaler Kapazität zurück. **/
+	public static int[] except(int[] refset1, int[] refset2) {
+		for (var off = refset1.length - 1; 3 < off; off -= 3) {
+			var ref = refset1[off];
+			if ((ref != 0) && (REFSET.getIdx(refset2, ref) != 0)) {
+				REFSET.popRef(refset1, ref);
+			}
+		}
+		return REFSET.trim(refset1);
+	}
+
+	/** Diese Methode entfernt aus der gegebenen Referenzmenge {@code refset1} alle Referenzen, die nicht in der gegebenen Referenzmenge {@code refset2} enthalten
+	 * sind, und gibt die geänderte Referenzmenge mit minimaler Kapazität zurück. **/
+	public static int[] intersect(int[] refset1, int[] refset2) {
+		for (var off = refset1.length - 1; 3 < off; off -= 3) {
+			var ref = refset1[off];
+			if ((ref != 0) && (REFSET.getIdx(refset2, ref) == 0)) {
+				REFSET.popRef(refset1, ref);
+			}
+		}
+		return REFSET.trim(refset1);
+	}
+
 	/** Diese Methode liefert die Anzahl der Referenzen in der gegebenen Referenzmenge {@code refset}. */
 	public static int size(int[] refset) {
 		return REFSET.getSize(refset);
@@ -157,6 +211,16 @@ public final class REFSET {
 		var mask = REFSET.getMask(refset) >> 1;
 		if ((mask == 0) || (size > mask)) return refset;
 		return REFSET.tryCopy(refset, mask);
+	}
+
+	/** Diese Methode liefert die gegebenen Referenzmenge {@code refset}, wenn sie die minimale Kapazität besitzt oder darin bei halber Kapazität kein Platz für
+	 * eine weitere Referenz ist. Andernfalls liefert sie eine Kopie mit minimaler Kapazität. */
+	public static int[] trim(int[] refset) {
+		while (true) {
+			var refset2 = REFSET.pack(refset);
+			if (refset == refset2) return refset;
+			refset = refset2;
+		}
 	}
 
 	/** Diese Methode liefert eine Kopie der gegebenen Referenzmenge {@code refset}. */
