@@ -5,11 +5,6 @@ package bee.creative.kb;
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class KBUpdate {
 
-	/** Diese Methode liefet den {@link KBBuffer Wissenspuffer}, über dessen Änderungen berichtet wird. */
-	public KBBuffer owner() {
-		return this.owner;
-	}
-
 	/** Diese Methode liefet bei einem {@link KBBuffer#commit()} den {@link KBState Wissensstand} vor der ersten Änderung. Bei einem {@link KBBuffer#rollback()}
 	 * liefert sie den Wissensstand nach der letzten Änderung. */
 	public KBState getOldState() {
@@ -34,8 +29,6 @@ public final class KBUpdate {
 		return this.deletes == null ? this.deletes = KBState.from(this.newState, this.oldState) : this.deletes;
 	}
 
-	final KBBuffer owner;
-
 	final KBState oldState;
 
 	final KBState newState;
@@ -46,26 +39,25 @@ public final class KBUpdate {
 
 	/** Dieser Konstruktor initialisiert das Änderungsprotokoll und schließt die Änderung ab. Wenn {@code commit} {@code true} ist, werden alle Änderungen
 	 * angenommen. Andernfalls werden sie verworfen. */
-	KBUpdate(KBBuffer owner, boolean commit) {
-		this.owner = owner;
-		var backup = owner.backup;
+	KBUpdate(KBBuffer buffer, boolean commit) {
+		var backup = buffer.backup;
 		if (backup != null) {
 			if (commit) {
 				this.oldState = new KBState(backup);
-				this.newState = new KBState(owner);
+				this.newState = new KBState(buffer);
 			} else {
-				this.oldState = new KBState(owner);
+				this.oldState = new KBState(buffer);
 				this.newState = new KBState(backup);
-				owner.nextRef = backup.nextRef;
-				owner.rootRef = backup.rootRef;
-				owner.sourceMap = backup.sourceMap;
-				owner.targetMap = backup.targetMap;
-				owner.valueRefMap = backup.valueRefMap;
-				owner.valueStrMap = backup.valueStrMap;
+				buffer.nextRef = backup.nextRef;
+				buffer.rootRef = backup.rootRef;
+				buffer.sourceMap = backup.sourceMap;
+				buffer.targetMap = backup.targetMap;
+				buffer.valueRefMap = backup.valueRefMap;
+				buffer.valueStrMap = backup.valueStrMap;
 			}
-			owner.backup = null;
+			buffer.backup = null;
 		} else {
-			this.newState = this.oldState = new KBState(owner);
+			this.newState = this.oldState = new KBState(buffer);
 		}
 	}
 
