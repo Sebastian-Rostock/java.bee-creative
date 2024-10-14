@@ -9,7 +9,7 @@ import bee.creative.util.Iterable2;
 import bee.creative.util.Iterator2;
 
 /** Diese Klasse implementiert das {@link Iterable2} der Textwerte eines {@link KBState}.
- * 
+ *
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class KBValues implements Iterable2<Entry<Integer, FEMString>> {
 
@@ -25,12 +25,12 @@ public class KBValues implements Iterable2<Entry<Integer, FEMString>> {
 
 	/** Diese Methode übergibt die Rextwerte und deren Referenzen an {@link RUN#run(int, FEMString) task.run()}. */
 	public void forEach(RUN task) {
-		this.owner.forEachValue(task);
+		this.owner.forEachValue(this.acceptValueRefset, this.refuseValueRefset, task);
 	}
 
 	@Override
 	public Iterator2<Entry<Integer, FEMString>> iterator() {
-		return this.owner.valueIterator(null, null);
+		return this.owner.valueIterator(this.acceptValueRefset, this.refuseValueRefset);
 	}
 
 	@Override
@@ -51,5 +51,9 @@ public class KBValues implements Iterable2<Entry<Integer, FEMString>> {
 	}
 
 	private final KBState owner;
+
+	int[] acceptValueRefset; // TODO select/except
+
+	int[] refuseValueRefset;
 
 }
