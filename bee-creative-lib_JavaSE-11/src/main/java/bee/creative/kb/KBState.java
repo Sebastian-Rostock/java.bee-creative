@@ -74,7 +74,7 @@ public class KBState {
 	/** Diese Methode liefert die gegebenen {@link KBEdge Hyperkanten} als {@link KBState Hyperkantenmenge}. */
 	public static KBState from(Iterable<KBEdge> edges) {
 		var result = new KBState();
-		edges.forEach(edge -> result.insertEdge(edge.sourceRef, edge.targetRef, edge.relationRef));
+		edges.forEach(edge -> result.insertEdgeIntoState(edge.sourceRef, edge.targetRef, edge.relationRef));
 		return result;
 	}
 
@@ -85,7 +85,7 @@ public class KBState {
 		result.rootRef = state.rootRef;
 		result.valueRefMap = state.valueRefMap.clone();
 		result.valueStrMap = state.valueStrMap.clone();
-		state.forEachEdge(result::insertEdge);
+		state.forEachEdge(result::insertEdgeIntoState);
 		return result;
 	}
 
@@ -119,12 +119,12 @@ public class KBState {
 							// COPY newTargetVal
 							var relationRef = REFSET.getRef(newRelationKeys, newRelationIdx);
 							if (KBState.isRef(newTargetVal)) {
-								result.insertEdge(sourceRef, KBState.asRef(newTargetVal), relationRef);
+								result.insertEdgeIntoState(sourceRef, KBState.asRef(newTargetVal), relationRef);
 							} else {
 								for (var newTargetIdx = newTargetVal.length - 1; 3 < newTargetIdx; newTargetIdx -= 3) {
 									var newTargetRef = newTargetVal[newTargetIdx];
 									if (newTargetRef != 0) {
-										result.insertEdge(sourceRef, newTargetRef, relationRef);
+										result.insertEdgeIntoState(sourceRef, newTargetRef, relationRef);
 									}
 								}
 							}
@@ -142,12 +142,12 @@ public class KBState {
 								if (oldRelationIdx == 0) {
 									// COPY newTargetVal
 									if (KBState.isRef(newTargetVal)) {
-										result.insertEdge(sourceRef, KBState.asRef(newTargetVal), relationRef);
+										result.insertEdgeIntoState(sourceRef, KBState.asRef(newTargetVal), relationRef);
 									} else {
 										for (var newTargetIdx = newTargetVal.length - 1; 3 < newTargetIdx; newTargetIdx -= 3) {
 											var newTargetRef = newTargetVal[newTargetIdx];
 											if (newTargetRef != 0) {
-												result.insertEdge(sourceRef, newTargetRef, relationRef);
+												result.insertEdgeIntoState(sourceRef, newTargetRef, relationRef);
 											}
 										}
 									}
@@ -159,14 +159,14 @@ public class KBState {
 											if (KBState.isRef(newTargetVal)) {
 												var newTargetRef = KBState.asRef(newTargetVal);
 												if (oldTargetRef != newTargetRef) {
-													result.insertEdge(sourceRef, newTargetRef, relationRef);
+													result.insertEdgeIntoState(sourceRef, newTargetRef, relationRef);
 												}
 											} else {
 												for (var newTargetIdx = newTargetVal.length - 1; 3 < newTargetIdx; newTargetIdx -= 3) {
 													var newTargetRef = newTargetVal[newTargetIdx];
 													if (newTargetRef != 0) {
 														if (oldTargetRef != newTargetRef) {
-															result.insertEdge(sourceRef, newTargetRef, relationRef);
+															result.insertEdgeIntoState(sourceRef, newTargetRef, relationRef);
 														}
 													}
 												}
@@ -175,14 +175,14 @@ public class KBState {
 											if (KBState.isRef(newTargetVal)) {
 												var newTargetRef = KBState.asRef(newTargetVal);
 												if (REFSET.getIdx(oldTargetVal, newTargetRef) == 0) {
-													result.insertEdge(sourceRef, newTargetRef, relationRef);
+													result.insertEdgeIntoState(sourceRef, newTargetRef, relationRef);
 												}
 											} else {
 												for (var newTargetIdx = newTargetVal.length - 1; 3 < newTargetIdx; newTargetIdx -= 3) {
 													var newTargetRef = newTargetVal[newTargetIdx];
 													if (newTargetRef != 0) {
 														if (REFSET.getIdx(oldTargetVal, newTargetRef) == 0) {
-															result.insertEdge(sourceRef, newTargetRef, relationRef);
+															result.insertEdgeIntoState(sourceRef, newTargetRef, relationRef);
 														}
 													}
 												}
@@ -201,7 +201,7 @@ public class KBState {
 		newValueStrMap.forEach((valueRef, newValueStr) -> {
 			var oldValueStr = oldValueStrMap.get(valueRef);
 			if (oldValueStr == null) {
-				result.insertValue(valueRef, newValueStr);
+				result.insertValueIntoState(valueRef, newValueStr);
 			} else {
 				if (!oldValueStr.equals(newValueStr)) throw new IllegalArgumentException();
 			}
@@ -229,13 +229,13 @@ public class KBState {
 		return this.rootRef;
 	}
 
-	FEMString getValue(int valueRef) {
+	public FEMString getValue(int valueRef) {
 		if (valueRef == 0) return null;
 		this.restore();
 		return this.valueStrMap.get(valueRef);
 	}
 
-	int getValueRef(FEMString valueStr) {
+	public int getValueRef(FEMString valueStr) {
 		if (valueStr == null) return 0;
 		this.restore();
 		var valueRef = this.valueRefMap.get(valueStr);
@@ -243,15 +243,17 @@ public class KBState {
 	}
 
 	int[] TODO_getValueRefs() {
+		if (this.storage != null) {
+
+		}
+
 		this.restore();
 		// TODO
 		return KBState.EMPTY_REFS;
 	}
 
-	int TODO_getValueCount() {
-		// TODO
-		this.restore();
-		return this.valueRefMap.size();
+	public int getValueCount() {
+		return this.storage != null ? this.storage[2] : this.valueRefMap.size();
 	}
 
 	/** Diese Methode liefert die als {@link KBEdge#sourceRef()} vorkommenden Referenzen. */
@@ -690,56 +692,34 @@ public class KBState {
 		this.storage = that.storage;
 	}
 
-	/** Diese Methode ersetzt {@link #sourceMap} und {@link #targetMap} nur dann mit den in {@link #storage} hinterlegten {@link KBEdge Hyperkanten}, wenn
-	 * {@link #storage} nicht {@code null} ist. Anschließend wird {@link #storage} auf {@code null} gesetzt. */
-	void restore() throws IllegalStateException {
-		if (this.storage == null) return;
-		try {
-			this.sourceMap = REFMAP.EMPTY;
-			this.targetMap = REFMAP.EMPTY;
-			this.valueRefMap = new HashMapOI<>();
-			this.valueStrMap = new HashMapIO<>();
-			KBState.selectEdges(this.storage, this::insertEdge);
-			KBState.selectValues(this.storage, this::insertValue);
-			this.storage = null;
-		} finally {
-			if (this.storage != null) {
-				this.sourceMap = REFMAP.EMPTY;
-				this.targetMap = REFMAP.EMPTY;
-				this.valueRefMap = new HashMapOI<>();
-				this.valueStrMap = new HashMapIO<>();
-			}
-		}
-	}
-
-	void forEachEdge(KBEdges.RUN task) {
+	final void forEachEdge(KBEdges.RUN task) {
 		this.forEachEdge(null, null, null, null, null, null, task);
 	}
 
-	void forEachEdge(int[] acceptSourceRefset_or_null, int[] refuseSourceRefset_or_null, int[] acceptTargetRefset_or_null, int[] refuseTargetRefset_or_null,
+	final void forEachEdge(int[] acceptSourceRefset_or_null, int[] refuseSourceRefset_or_null, int[] acceptTargetRefset_or_null, int[] refuseTargetRefset_or_null,
 		int[] acceptRelationRefset_or_null, int[] refuseRelationRefset_or_null, KBEdges.RUN task) {
 		if (this.storage != null) {
-			KBState.selectEdges(this.storage, acceptSourceRefset_or_null, refuseSourceRefset_or_null, acceptTargetRefset_or_null, refuseTargetRefset_or_null,
+			KBState.selectEdgesFromInts(this.storage, acceptSourceRefset_or_null, refuseSourceRefset_or_null, acceptTargetRefset_or_null, refuseTargetRefset_or_null,
 				acceptRelationRefset_or_null, refuseRelationRefset_or_null, task);
 		} else {
-			KBState.selectEdges(this.sourceMap, this.targetMap, acceptSourceRefset_or_null, refuseSourceRefset_or_null, acceptTargetRefset_or_null,
+			KBState.selectEdgesFromMap(this.sourceMap, this.targetMap, acceptSourceRefset_or_null, refuseSourceRefset_or_null, acceptTargetRefset_or_null,
 				refuseTargetRefset_or_null, acceptRelationRefset_or_null, refuseRelationRefset_or_null, task);
 		}
 	}
 
-	void forEachValue(KBValues.RUN task) {
+	final void forEachValue(KBValues.RUN task) {
 		this.forEachValue(null, null, task);
 	}
 
-	void forEachValue(int[] acceptValueRefset_or_null, int[] refuseValueRefset_or_null, KBValues.RUN task) {
+	final void forEachValue(int[] acceptValueRefset_or_null, int[] refuseValueRefset_or_null, KBValues.RUN task) {
 		if (this.storage != null) {
-			KBState.selectValues(this.storage, acceptValueRefset_or_null, refuseValueRefset_or_null, task);
+			KBState.selectValuesFromInts(this.storage, acceptValueRefset_or_null, refuseValueRefset_or_null, task);
 		} else {
-			KBState.selectValues(this.valueRefMap, acceptValueRefset_or_null, refuseValueRefset_or_null, task);
+			KBState.selectValuesFromMap(this.valueRefMap, acceptValueRefset_or_null, refuseValueRefset_or_null, task);
 		}
 	}
 
-	Iterator2<KBEdge> edgeIterator(int[] acceptSourceRefset_or_null, int[] refuseSourceRefset_or_null, int[] acceptTargetRefset_or_null,
+	final Iterator2<KBEdge> edgeIterator(int[] acceptSourceRefset_or_null, int[] refuseSourceRefset_or_null, int[] acceptTargetRefset_or_null,
 		int[] refuseTargetRefset_or_null, int[] acceptRelationRefset_or_null, int[] refuseRelationRefset_or_null) {
 		this.restore();
 		var sourceIter = REFMAP.iterator(this.sourceMap, acceptSourceRefset_or_null, refuseSourceRefset_or_null);
@@ -792,14 +772,89 @@ public class KBState {
 		}));
 	}
 
-	Iterator2<Entry<Integer, FEMString>> valueIterator(int[] acceptValueRefset_or_null, int[] refuseValueRefset_or_null) {
+	final Iterator2<Entry<Integer, FEMString>> valueIterator(int[] acceptValueRefset_or_null, int[] refuseValueRefset_or_null) {
 		this.restore();// TODO über store und mit filter
 		return this.valueStrMap.entrySet().iterator().unmodifiable();
 	}
 
+	final void insertEdgeIntoState(int sourceRef, int targetRef, int relationRef) {
+		this.sourceMap = KBState.insertEdgeIntoMap(this.sourceMap, sourceRef, targetRef, relationRef);
+		this.targetMap = KBState.insertEdgeIntoMap(this.targetMap, targetRef, sourceRef, relationRef);
+	}
+
+	final void insertValueIntoState(int valueRef, FEMString valueStr) {
+		var newValueRef = valueRef;
+		var newValueStr = valueStr.data();
+		var oldValueRef = this.valueRefMap.put(newValueStr, newValueRef);
+		if (oldValueRef != null) {
+			if (oldValueRef.intValue() == valueRef) return;
+			this.valueRefMap.put(valueStr, oldValueRef);
+			throw new IllegalArgumentException();
+		}
+		var oldValueStr = this.valueStrMap.put(newValueRef, newValueStr);
+		if (oldValueStr != null) {
+			this.valueStrMap.put(newValueRef, oldValueStr);
+			this.valueRefMap.remove(newValueStr);
+			throw new IllegalArgumentException();
+		}
+	}
+
+	/** Diese Methode ersetzt {@link #sourceMap} und {@link #targetMap} nur dann mit den in {@link #storage} hinterlegten {@link KBEdge Wissensstand}, wenn
+	 * {@link #storage} nicht {@code null} ist. Anschließend wird {@link #storage} auf {@code null} gesetzt. */
+	final void restore() throws IllegalStateException {
+		if (this.storage == null) return;
+		try {
+			this.sourceMap = REFMAP.EMPTY;
+			this.targetMap = REFMAP.EMPTY;
+			this.valueRefMap = new HashMapOI<>();
+			this.valueStrMap = new HashMapIO<>();
+			KBState.selectEdgesFromInts(this.storage, this::insertEdgeIntoState);
+			KBState.selectValuesFromInts(this.storage, this::insertValueIntoState);
+			this.storage = null;
+		} finally {
+			if (this.storage != null) {
+				this.sourceMap = REFMAP.EMPTY;
+				this.targetMap = REFMAP.EMPTY;
+				this.valueRefMap = new HashMapOI<>();
+				this.valueStrMap = new HashMapIO<>();
+			}
+		}
+	}
+
 	private static final int[] EMPTY_REFS = new int[0];
 
-	private static void selectEdges(int[] storage, KBEdges.RUN task) {
+	private static Object[] insertEdgeIntoMap(Object[] sourceMap, int sourceRef, int targetRef, int relationRef) {
+
+		sourceMap = REFMAP.grow(sourceMap);
+
+		var sourceIdx = REFMAP.putRef(sourceMap, sourceRef);
+		if (sourceIdx == 0) throw new OutOfMemoryError();
+
+		var sourceRelationMap = KBState.asRefMap(REFMAP.getVal(sourceMap, sourceIdx));
+		sourceRelationMap = sourceRelationMap == null ? REFMAP.create() : REFMAP.grow(sourceRelationMap);
+		REFMAP.setVal(sourceMap, sourceIdx, sourceRelationMap);
+
+		var sourceRelationIdx = REFMAP.putRef(sourceRelationMap, relationRef);
+		if (sourceRelationIdx == 0) throw new OutOfMemoryError();
+
+		var sourceRelationTargetVal = KBState.asRefVal(REFMAP.getVal(sourceRelationMap, sourceRelationIdx));
+		if (sourceRelationTargetVal == null) {
+			REFMAP.setVal(sourceRelationMap, sourceRelationIdx, KBState.toRef(targetRef));
+		} else if (KBState.isRef(sourceRelationTargetVal)) {
+			var targetRef2 = KBState.asRef(sourceRelationTargetVal);
+			if (targetRef == targetRef2) return sourceMap;
+			REFMAP.setVal(sourceRelationMap, sourceRelationIdx, REFSET.from(targetRef, targetRef2));
+		} else {
+			var sourceRelationTargetSet = REFSET.grow(sourceRelationTargetVal);
+			REFMAP.setVal(sourceRelationMap, sourceRelationIdx, sourceRelationTargetSet);
+			var targetIdx = REFSET.putRef(sourceRelationTargetSet, targetRef);
+			if (targetIdx == 0) throw new OutOfMemoryError();
+		}
+
+		return sourceMap;
+	}
+
+	private static void selectEdgesFromInts(int[] storage, KBEdges.RUN task) {
 		var storageIdx = 5;
 		var sourceCount = storage[4];
 		while (0 < sourceCount--) {
@@ -822,14 +877,14 @@ public class KBState {
 		}
 	}
 
-	private static void selectEdges(int[] storage, int[] acceptSourceRefset_or_null, int[] refuseSourceRefset_or_null, int[] acceptTargetRefset_or_null,
+	private static void selectEdgesFromInts(int[] storage, int[] acceptSourceRefset_or_null, int[] refuseSourceRefset_or_null, int[] acceptTargetRefset_or_null,
 		int[] refuseTargetRefset_or_null, int[] acceptRelationRefset_or_null, int[] refuseRelationRefset_or_null, KBEdges.RUN task) {
 		if ((acceptSourceRefset_or_null == null) && (refuseSourceRefset_or_null == null)) {
 			if ((acceptTargetRefset_or_null == null) && (refuseTargetRefset_or_null == null)) {
 				if ((acceptRelationRefset_or_null == null) && (refuseRelationRefset_or_null == null)) {
-					KBState.selectEdges(storage, task);
+					KBState.selectEdgesFromInts(storage, task);
 				} else {
-					KBState.selectEdges(storage, (sourceRef, targetRef, relationRef) -> {
+					KBState.selectEdgesFromInts(storage, (sourceRef, targetRef, relationRef) -> {
 						if (REFSET.isValid(relationRef, acceptRelationRefset_or_null, refuseRelationRefset_or_null)) {
 							task.run(sourceRef, targetRef, relationRef);
 						}
@@ -837,13 +892,13 @@ public class KBState {
 				}
 			} else {
 				if ((acceptRelationRefset_or_null == null) && (refuseRelationRefset_or_null == null)) {
-					KBState.selectEdges(storage, (sourceRef, targetRef, relationRef) -> {
+					KBState.selectEdgesFromInts(storage, (sourceRef, targetRef, relationRef) -> {
 						if (REFSET.isValid(targetRef, acceptTargetRefset_or_null, refuseTargetRefset_or_null)) {
 							task.run(sourceRef, targetRef, relationRef);
 						}
 					});
 				} else {
-					KBState.selectEdges(storage, (sourceRef, targetRef, relationRef) -> {
+					KBState.selectEdgesFromInts(storage, (sourceRef, targetRef, relationRef) -> {
 						if (REFSET.isValid(targetRef, acceptTargetRefset_or_null, refuseTargetRefset_or_null)) {
 							if (REFSET.isValid(relationRef, acceptRelationRefset_or_null, refuseRelationRefset_or_null)) {
 								task.run(sourceRef, targetRef, relationRef);
@@ -855,13 +910,13 @@ public class KBState {
 		} else {
 			if ((acceptTargetRefset_or_null == null) && (refuseTargetRefset_or_null == null)) {
 				if ((acceptRelationRefset_or_null == null) && (refuseRelationRefset_or_null == null)) {
-					KBState.selectEdges(storage, (sourceRef, targetRef, relationRef) -> {
+					KBState.selectEdgesFromInts(storage, (sourceRef, targetRef, relationRef) -> {
 						if (REFSET.isValid(sourceRef, acceptSourceRefset_or_null, refuseSourceRefset_or_null)) {
 							task.run(sourceRef, targetRef, relationRef);
 						}
 					});
 				} else {
-					KBState.selectEdges(storage, (sourceRef, targetRef, relationRef) -> {
+					KBState.selectEdgesFromInts(storage, (sourceRef, targetRef, relationRef) -> {
 						if (REFSET.isValid(sourceRef, acceptSourceRefset_or_null, refuseSourceRefset_or_null)) {
 							if (REFSET.isValid(relationRef, acceptRelationRefset_or_null, refuseRelationRefset_or_null)) {
 								task.run(sourceRef, targetRef, relationRef);
@@ -871,7 +926,7 @@ public class KBState {
 				}
 			} else {
 				if ((acceptRelationRefset_or_null == null) && (refuseRelationRefset_or_null == null)) {
-					KBState.selectEdges(storage, (sourceRef, targetRef, relationRef) -> {
+					KBState.selectEdgesFromInts(storage, (sourceRef, targetRef, relationRef) -> {
 						if (REFSET.isValid(sourceRef, acceptSourceRefset_or_null, refuseSourceRefset_or_null)) {
 							if (REFSET.isValid(targetRef, acceptTargetRefset_or_null, refuseTargetRefset_or_null)) {
 								task.run(sourceRef, targetRef, relationRef);
@@ -879,7 +934,7 @@ public class KBState {
 						}
 					});
 				} else {
-					KBState.selectEdges(storage, (sourceRef, targetRef, relationRef) -> {
+					KBState.selectEdgesFromInts(storage, (sourceRef, targetRef, relationRef) -> {
 						if (REFSET.isValid(sourceRef, acceptSourceRefset_or_null, refuseSourceRefset_or_null)) {
 							if (REFSET.isValid(relationRef, acceptRelationRefset_or_null, refuseRelationRefset_or_null)) {
 								if (REFSET.isValid(relationRef, acceptRelationRefset_or_null, refuseRelationRefset_or_null)) {
@@ -893,22 +948,22 @@ public class KBState {
 		}
 	}
 
-	private static void selectEdges(Object[] sourceMap, Object[] targetMap, int[] acceptSourceRefset_or_null, int[] refuseSourceRefset_or_null,
+	private static void selectEdgesFromMap(Object[] sourceMap, Object[] targetMap, int[] acceptSourceRefset_or_null, int[] refuseSourceRefset_or_null,
 		int[] acceptTargetRefset_or_null, int[] refuseTargetRefset_or_null, int[] acceptRelationRefset_or_null, int[] refuseRelationRefset_or_null,
 		KBEdges.RUN task) {
 		var allSources = (acceptSourceRefset_or_null == null) && (refuseSourceRefset_or_null == null);
 		var allTargets = (acceptTargetRefset_or_null == null) && (refuseTargetRefset_or_null == null);
 		var moreSources = REFMAP.size(sourceMap) >= REFMAP.size(targetMap);
 		if (allSources ? (allTargets & moreSources) : (allTargets | moreSources)) {
-			KBState.selectEdgesBySource(sourceMap, acceptSourceRefset_or_null, refuseSourceRefset_or_null, acceptTargetRefset_or_null, refuseTargetRefset_or_null,
-				acceptRelationRefset_or_null, refuseRelationRefset_or_null, task);
+			KBState.selectEdgesFromSourceMap(sourceMap, acceptSourceRefset_or_null, refuseSourceRefset_or_null, acceptTargetRefset_or_null,
+				refuseTargetRefset_or_null, acceptRelationRefset_or_null, refuseRelationRefset_or_null, task);
 		} else {
-			KBState.selectEdgesByTarget(targetMap, acceptSourceRefset_or_null, refuseSourceRefset_or_null, acceptTargetRefset_or_null, refuseTargetRefset_or_null,
-				acceptRelationRefset_or_null, refuseRelationRefset_or_null, task);
+			KBState.selectEdgesFromTargetMap(targetMap, acceptSourceRefset_or_null, refuseSourceRefset_or_null, acceptTargetRefset_or_null,
+				refuseTargetRefset_or_null, acceptRelationRefset_or_null, refuseRelationRefset_or_null, task);
 		}
 	}
 
-	private static void selectEdgesBySource(Object[] sourceMap, int[] acceptSourceRefset_or_null, int[] refuseSourceRefset_or_null,
+	private static void selectEdgesFromSourceMap(Object[] sourceMap, int[] acceptSourceRefset_or_null, int[] refuseSourceRefset_or_null,
 		int[] acceptTargetRefset_or_null, int[] refuseTargetRefset_or_null, int[] acceptRelationRefset_or_null, int[] refuseRelationRefset_or_null,
 		KBEdges.RUN task) {
 		var sourceKeys = REFMAP.getKeys(sourceMap);
@@ -944,7 +999,7 @@ public class KBState {
 		}
 	}
 
-	private static void selectEdgesByTarget(Object[] targetMap, int[] acceptSourceRefset_or_null, int[] refuseSourceRefset_or_null,
+	private static void selectEdgesFromTargetMap(Object[] targetMap, int[] acceptSourceRefset_or_null, int[] refuseSourceRefset_or_null,
 		int[] acceptTargetRefset_or_null, int[] refuseTargetRefset_or_null, int[] acceptRelationRefset_or_null, int[] refuseRelationRefset_or_null,
 		KBEdges.RUN task) {
 		var targetKeys = REFMAP.getKeys(targetMap);
@@ -980,11 +1035,11 @@ public class KBState {
 		}
 	}
 
-	private static void selectValues(int[] storage, KBValues.RUN task) {
-		KBState.selectValues(storage, null, null, task);
+	private static void selectValuesFromInts(int[] storage, KBValues.RUN task) {
+		KBState.selectValuesFromInts(storage, null, null, task);
 	}
 
-	private static void selectValues(int[] storage, int[] acceptValueRefset_or_null, int[] refuseValueRefset_or_null, KBValues.RUN task) {
+	private static void selectValuesFromInts(int[] storage, int[] acceptValueRefset_or_null, int[] refuseValueRefset_or_null, KBValues.RUN task) {
 		var storageIdx = storage[3];
 		var valueCount = storage[2];
 		while (0 < valueCount--) {
@@ -998,7 +1053,7 @@ public class KBState {
 		}
 	}
 
-	private static void selectValues(HashMapOI<FEMString> valueStrMap, int[] acceptValueRefset_or_null, int[] refuseValueRefset_or_null, RUN task) {
+	private static void selectValuesFromMap(HashMapOI<FEMString> valueStrMap, int[] acceptValueRefset_or_null, int[] refuseValueRefset_or_null, RUN task) {
 		if ((acceptValueRefset_or_null == null) && (refuseValueRefset_or_null == null)) {
 			valueStrMap.forEach((valueStr, valueRef2) -> {
 				int valueRef = valueRef2;
@@ -1011,57 +1066,6 @@ public class KBState {
 					task.run(valueRef, valueStr);
 				}
 			});
-		}
-	}
-
-	private static Object[] insertEdge(Object[] sourceMap, int sourceRef, int targetRef, int relationRef) {
-
-		sourceMap = REFMAP.grow(sourceMap);
-
-		var sourceIdx = REFMAP.putRef(sourceMap, sourceRef);
-		if (sourceIdx == 0) throw new OutOfMemoryError();
-
-		var sourceRelationMap = KBState.asRefMap(REFMAP.getVal(sourceMap, sourceIdx));
-		sourceRelationMap = sourceRelationMap == null ? REFMAP.create() : REFMAP.grow(sourceRelationMap);
-		REFMAP.setVal(sourceMap, sourceIdx, sourceRelationMap);
-
-		var sourceRelationIdx = REFMAP.putRef(sourceRelationMap, relationRef);
-		if (sourceRelationIdx == 0) throw new OutOfMemoryError();
-
-		var sourceRelationTargetVal = KBState.asRefVal(REFMAP.getVal(sourceRelationMap, sourceRelationIdx));
-		if (sourceRelationTargetVal == null) {
-			REFMAP.setVal(sourceRelationMap, sourceRelationIdx, KBState.toRef(targetRef));
-		} else if (KBState.isRef(sourceRelationTargetVal)) {
-			var targetRef2 = KBState.asRef(sourceRelationTargetVal);
-			if (targetRef == targetRef2) return sourceMap;
-			REFMAP.setVal(sourceRelationMap, sourceRelationIdx, REFSET.from(targetRef, targetRef2));
-		} else {
-			var sourceRelationTargetSet = REFSET.grow(sourceRelationTargetVal);
-			REFMAP.setVal(sourceRelationMap, sourceRelationIdx, sourceRelationTargetSet);
-			var targetIdx = REFSET.putRef(sourceRelationTargetSet, targetRef);
-			if (targetIdx == 0) throw new OutOfMemoryError();
-		}
-
-		return sourceMap;
-	}
-
-	private void insertEdge(int sourceRef, int targetRef, int relationRef) {
-		this.sourceMap = KBState.insertEdge(this.sourceMap, sourceRef, targetRef, relationRef);
-		this.targetMap = KBState.insertEdge(this.targetMap, targetRef, sourceRef, relationRef);
-	}
-
-	private void insertValue(int valueRef, FEMString valueStr) {
-		var valueRef2 = this.valueRefMap.put(valueStr.data(), valueRef);
-		if (valueRef2 != null) {
-			if (valueRef2.intValue() == valueRef) return;
-			this.valueRefMap.put(valueStr, valueRef2);
-			throw new IllegalArgumentException();
-		}
-		var valueStr2 = this.valueStrMap.put(valueRef, valueStr);
-		if (valueStr2 != null) {
-			this.valueStrMap.put(valueRef, valueStr2);
-			this.valueRefMap.remove(valueStr);
-			throw new IllegalArgumentException();
 		}
 	}
 

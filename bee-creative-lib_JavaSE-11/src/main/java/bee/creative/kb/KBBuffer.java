@@ -5,11 +5,10 @@ import bee.creative.fem.FEMString;
 import bee.creative.util.HashMapIO;
 import bee.creative.util.HashMapOI;
 
-/** Diese Klasse implementiert einen Hyperkantenpuffer als veränderbare {@link KBState Hyperkantenmenge}.
- * <p>
- * Der Hyperkantenpuffer macht vor der ersten Änderung grundsätzlich eine Sicherungskopie der aktuellen Hyperkantenmenge und Referenzen. Durch den Aufruf von
- * {@link #commit()} bzw. {@link #rollback()} können dann alle bis dahin gemachten Änderungen angenommen bzw. verworfen werden. In beiden Fällen wird ein
- * {@link KBUpdate Änderungsprotokoll} bereitgestellt.
+/** Diese Klasse implementiert einen Wissenspuffer als veränderlichen {@link KBState Wissensstand}. Der Wissenspuffer ist nicht <em>thread-safe</em> und macht
+ * vor der ersten Änderung grundsätzlich eine Sicherungskopie des aktuellen Wissensstands. Durch den Aufruf von {@link #commit()} bzw. {@link #rollback()}
+ * können dann alle bis dahin gemachten Änderungen angenommen bzw. verworfen werden. In beiden Fällen wird ein {@link KBUpdate Änderungsprotokoll}
+ * bereitgestellt.
  *
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class KBBuffer extends KBState {
@@ -26,12 +25,7 @@ public class KBBuffer extends KBState {
 
 	public int newNextRef() {
 		this.backup();
-		var nextRef = this.getNextRef();
-		while (this.containsSourceRef(nextRef) || this.containsTargetRef(nextRef)) {
-			nextRef++;
-		}
-		this.nextRef = nextRef + 1;
-		return nextRef;
+		return this.createNextRef();
 	}
 
 	public boolean putEdge(KBEdge edge) {
@@ -40,12 +34,13 @@ public class KBBuffer extends KBState {
 
 	public boolean putEdge(int sourceRef, int relationRef, int targetRef) {
 		this.backup();
-		return this.insertEdge(sourceRef, targetRef, relationRef);
+		return this.insertEdgeIntoBuffer(sourceRef, targetRef, relationRef);
 	}
 
 	int TODO_putValue(FEMString value) {
-		// TODO
-		return 0;
+		var valueStr = value.data();
+		this.backup();
+		return this.insertValueIntoBuffer(valueStr);
 	}
 
 	public boolean putAllEdges(KBEdge... edges) {
@@ -55,14 +50,14 @@ public class KBBuffer extends KBState {
 	public boolean putAllEdges(Iterable<KBEdge> edges) {
 		this.backup();
 		var res = new boolean[1];
-		edges.forEach(edge -> res[0] = this.insertEdge(edge.sourceRef, edge.targetRef, edge.relationRef) | res[0]);
+		edges.forEach(edge -> res[0] = this.insertEdgeIntoBuffer(edge.sourceRef, edge.targetRef, edge.relationRef) | res[0]);
 		return res[0];
 	}
 
 	public boolean putAllEdges(KBState edges) {
 		this.backup();
 		var res = new boolean[1];
-		edges.forEachEdge((sourceRef, targetRef, relationRef) -> res[0] = this.insertEdge(sourceRef, targetRef, relationRef) | res[0]);
+		edges.forEachEdge((sourceRef, targetRef, relationRef) -> res[0] = this.insertEdgeIntoBuffer(sourceRef, targetRef, relationRef) | res[0]);
 		return res[0];
 	}
 
@@ -72,7 +67,7 @@ public class KBBuffer extends KBState {
 
 	public boolean popEdge(int sourceRef, int relationRef, int targetRef) {
 		this.backup();
-		return this.deleteEdge(sourceRef, targetRef, relationRef);
+		return this.deleteEdgeFromBuffer(sourceRef, targetRef, relationRef);
 	}
 
 	public boolean popAllEdges(KBEdge... edges) {
@@ -82,14 +77,14 @@ public class KBBuffer extends KBState {
 	public boolean popAllEdges(Iterable<KBEdge> edges) {
 		this.backup();
 		var res = new boolean[1];
-		edges.forEach(edge -> res[0] = this.deleteEdge(edge.sourceRef, edge.targetRef, edge.relationRef) | res[0]);
+		edges.forEach(edge -> res[0] = this.deleteEdgeFromBuffer(edge.sourceRef, edge.targetRef, edge.relationRef) | res[0]);
 		return res[0];
 	}
 
 	public boolean popAllEdges(KBState edges) {
 		this.backup();
 		var res = new boolean[1];
-		edges.forEachEdge((sourceRef, targetRef, relationRef) -> res[0] = this.deleteEdge(sourceRef, targetRef, relationRef) | res[0]);
+		edges.forEachEdge((sourceRef, targetRef, relationRef) -> res[0] = this.deleteEdgeFromBuffer(sourceRef, targetRef, relationRef) | res[0]);
 		return res[0];
 	}
 
@@ -134,20 +129,20 @@ public class KBBuffer extends KBState {
 	 * {@link #getNextRef()} und {@link #getRootRef()} um die jeweiligen Zählerstände des {@code putState}. */
 	public void insertAll(KBState inserts) {
 		this.backup();
-		inserts.forEachEdge(this::insertEdge);
-		inserts.forEachValue(this::insertValue);
 		this.nextRef += inserts.nextRef;
 		this.rootRef += inserts.rootRef;
+		inserts.forEachEdge(this::insertEdgeIntoBuffer);
+		inserts.forEachValue(this::insertValueIntoState);
 	}
 
 	/** Diese Methode entfernt alle {@link KBEdge Hyperkanten} der gegebenen {@link KBState Hyperkantenmenge} {@code popState} und verringert die Referenzen
 	 * {@link #getNextRef()} und {@link #getRootRef()} um die jeweiligen Zählerstände des {@code popState}. */
 	public void deleteAll(KBState deletes) {
 		this.backup();
-		deletes.forEachEdge(this::deleteEdge);
-		deletes.forEachValue(this::deleteValue);
 		this.nextRef -= deletes.nextRef;
 		this.rootRef -= deletes.rootRef;
+		deletes.forEachEdge(this::deleteEdgeFromBuffer);
+		deletes.forEachValue(this::deleteValue);
 	}
 
 	/** Diese Methode ersetzt alle {@link KBEdge Hyperkanten} soeie die Referenzen {@link #getNextRef()} und {@link #getRootRef()} mit denen der gegebenen
@@ -177,7 +172,7 @@ public class KBBuffer extends KBState {
 
 	KBState backup;
 
-	private boolean insertEdge(int sourceRef, int targetRef, int relationRef) {
+	final boolean insertEdgeIntoBuffer(int sourceRef, int targetRef, int relationRef) {
 		if ((sourceRef == 0) || (relationRef == 0) || (targetRef == 0)) return false;
 
 		var sourceMap = this.sourceMap;
@@ -263,7 +258,7 @@ public class KBBuffer extends KBState {
 
 		if (sourceRelationTargetSet == null) {
 			// NEW sourceRelationTargetVal
-//			REFMAP.setVal(sourceRelationMap, sourceRelationIdx, REFSET.EMPTY);
+			// REFMAP.setVal(sourceRelationMap, sourceRelationIdx, REFSET.EMPTY);
 			sourceRelationTargetSet = KBState.toRef(targetRef);
 			REFMAP.setVal(sourceRelationMap, sourceRelationIdx, sourceRelationTargetSet);
 		} else if (KBState.isRef(sourceRelationTargetSet)) {
@@ -316,7 +311,7 @@ public class KBBuffer extends KBState {
 
 		try {
 			if (targetRelationSourceVal == null) {
-//				REFMAP.setVal(targetRelationMap, targetRelationIdx, REFSET.EMPTY);
+				// REFMAP.setVal(targetRelationMap, targetRelationIdx, REFSET.EMPTY);
 				targetRelationSourceVal = KBState.toRef(sourceRef);
 				REFMAP.setVal(targetRelationMap, targetRelationIdx, targetRelationSourceVal);
 			} else if (KBState.isRef(targetRelationSourceVal)) {
@@ -365,7 +360,16 @@ public class KBBuffer extends KBState {
 		return true;
 	}
 
-	private boolean deleteEdge(int sourceRef, int targetRef, int relationRef) {
+	final int insertValueIntoBuffer(FEMString valueStr) {
+		var valueRef = this.valueRefMap.get(valueStr.data());
+		if (valueRef != null) return valueRef;
+		valueRef = this.createNextRef();
+		this.valueRefMap.put(valueStr, valueRef);
+		this.valueStrMap.put(valueRef, valueStr);
+		return valueRef;
+	}
+
+	private boolean deleteEdgeFromBuffer(int sourceRef, int targetRef, int relationRef) {
 		if ((sourceRef == 0) || (relationRef == 0) || (targetRef == 0)) return false;
 
 		// TODO prüfen
@@ -489,6 +493,14 @@ public class KBBuffer extends KBState {
 		return false;
 	}
 
+	int createNextRef() {
+		var nextRef = this.nextRef;
+		while (this.valueStrMap.containsKey(nextRef) || (REFMAP.getIdx(this.sourceMap, nextRef) != 0) || (REFMAP.getIdx(this.targetMap, nextRef) != 0)) {
+			nextRef++;
+		}
+		return this.nextRef = nextRef;
+	}
+
 	private void backup() {
 		if (this.backup != null) return;
 		var backup = new KBState(this);
@@ -497,10 +509,6 @@ public class KBBuffer extends KBState {
 		this.valueStrMap = this.valueStrMap.clone();
 		this.valueRefMap = this.valueRefMap.clone();
 		this.backup = backup;
-	}
-
-	private void insertValue(int valueRef, FEMString valueStr) {
-		// TODO
 	}
 
 }
