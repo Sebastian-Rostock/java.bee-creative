@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.Map.Entry;
 import bee.creative.fem.FEMString;
 import bee.creative.kb.KBValues.RUN;
-import bee.creative.lang.Strings;
+import bee.creative.lang.Objects;
 import bee.creative.util.HashMapIO;
 import bee.creative.util.HashMapOI;
 import bee.creative.util.Iterator2;
@@ -196,14 +196,14 @@ public class KBState {
 				}
 			}
 		}
-		var oldValueMap = oldState.valueStrMap;
-		var newValueMap = newState.valueStrMap;
-		newValueMap.forEach((valueRef, newValue) -> {
-			var oldValue = oldValueMap.get(valueRef);
-			if (oldValue == null) {
-				result.insertValue(valueRef, newValue);
+		var oldValueStrMap = oldState.valueStrMap;
+		var newValueStrMap = newState.valueStrMap;
+		newValueStrMap.forEach((valueRef, newValueStr) -> {
+			var oldValueStr = oldValueStrMap.get(valueRef);
+			if (oldValueStr == null) {
+				result.insertValue(valueRef, newValueStr);
 			} else {
-				if (!oldValue.equals(newValue)) throw new IllegalArgumentException();
+				if (!oldValueStr.equals(newValueStr)) throw new IllegalArgumentException();
 			}
 		});
 		return result;
@@ -479,12 +479,12 @@ public class KBState {
 		return REFMAP.getIdx(relationMap, relationRef) != 0;
 	}
 
-	/** Diese Methode liefert ein kompakte Abschrift aller {@link KBEdge Hyperkanten} dieser Menge als {@code int}-Array mit der Struktur
+	/** Diese Methode liefert ein Wissensabschrift aller {@link KBEdge Kanten} und {@link FEMString Textwerte} als {@code int}-Array mit der Struktur
 	 * {@code (nextRef, rootRef, valueCount, valueOffset, sourceCount, (sourceRef, targetRefCount, (targetRef, relationRef)[targetRefCount], targetSetCount,
-	 * (relationRef, targetCount, targetRef[targetCount])[targetSetCount])[sourceCount], (valueRef, valueSize, valueItem[valueSize])[valueCount])}. Dabei nennt
-	 * {@code valueOffset} die Position des ersten {@code valueRef}.
+	 * (relationRef, targetCount, targetRef[targetCount])[targetSetCount])[sourceCount], (valueRef, valueSize, valueItem[valueSize])[valueCount])}, wobei
+	 * {@code valueOffset} die Position des ersten {@code valueRef} nennt.
 	 *
-	 * @return kompakte Abschrift. */
+	 * @return Wissensabschrift. */
 	public int[] toInts() {
 		if (this.storage != null) return this.storage.clone();
 
@@ -603,12 +603,12 @@ public class KBState {
 		return storage;
 	}
 
-	/** Diese Methode liefert die {@link #toInts()} als {@code byte}-Array mit nativer Bytereihenfolge. */
+	/** Diese Methode liefert die {@link #toInts() Wissensabschrift} als {@code byte}-Array mit nativer Bytereihenfolge. */
 	public byte[] toBytes() {
 		return this.toBytes(ByteOrder.nativeOrder());
 	}
 
-	/** Diese Methode liefert die {@link #toInts()} als {@code byte}-Array mit der gegebenen Bytereihenfolge {@code order}. */
+	/** Diese Methode liefert die {@link #toInts() Wissensabschrift} als {@code byte}-Array mit der gegebenen Bytereihenfolge {@code order}. */
 	public byte[] toBytes(ByteOrder order) {
 		var ints = this.toInts();
 		var bytes = ByteBuffer.allocate(ints.length * 4);
@@ -618,9 +618,7 @@ public class KBState {
 
 	@Override
 	public String toString() {
-		var res = new StringBuilder("{ ");
-		Strings.join(res, ", ", this.edges());
-		return res.append(" }").toString();
+		return Objects.toStringCall(false, true, this, "edges", this.edges, "values", this.values);
 	}
 
 	static boolean isRef(int[] val) {
@@ -649,15 +647,15 @@ public class KBState {
 
 	/** Dieses Feld speichert die Referenzabbildung gemäß {@link REFMAP} von {@link KBEdge#sourceRef} auf Referenzabbildungen gemäß {@link REFMAP} von
 	 * {@link KBEdge#relationRef} auf {@link KBEdge#targetRef}. Letztere sind dabei als {@code int[1]} oder gemäß {@link REFSET} abgebildet. */
-	Object[] sourceMap = REFMAP.EMPTY;
+	Object[] sourceMap;
 
 	/** Dieses Feld speichert die Referenzabbildung gemäß {@link REFMAP} von {@link KBEdge#targetRef} auf Referenzabbildungen gemäß {@link REFMAP} von
 	 * {@link KBEdge#relationRef} auf {@link KBEdge#sourceRef}. Letztere sind dabei als {@code int[1]} oder gemäß {@link REFSET} abgebildet. */
-	Object[] targetMap = REFMAP.EMPTY;
+	Object[] targetMap;
 
-	HashMapIO<FEMString> valueStrMap = new HashMapIO<>();
+	HashMapIO<FEMString> valueStrMap; // TODO ggf schneller for each
 
-	HashMapOI<FEMString> valueRefMap = new HashMapOI<>();
+	HashMapOI<FEMString> valueRefMap; // TODO ggf schneller for each
 
 	final KBEdges edges = new KBEdges(this);
 
@@ -667,16 +665,21 @@ public class KBState {
 
 	/** Dieser Konstruktor erzeugt einen leeren Wissensstand. */
 	KBState() {
+		this.sourceMap = REFMAP.EMPTY;
+		this.targetMap = REFMAP.EMPTY;
+		this.valueStrMap = new HashMapIO<>();
+		this.valueRefMap = new HashMapOI<>();
 	}
 
-	/** Dieser Konstruktor übernimmt die Merkmale der gegebenen {@link #toInts() kompakten Abschrift}. */
+	/** Dieser Konstruktor übernimmt die Merkmale der gegebenen {@link #toInts() Wissensabschrift}. */
 	KBState(int[] storage) {
+		this();
 		this.nextRef = storage[0];
 		this.rootRef = storage[1];
 		this.storage = storage;
 	}
 
-	/** Dieser Konstruktor übernimmt die Merkmale des gegebenen {@link KBState}. */
+	/** Dieser Konstruktor übernimmt die Merkmale des gegebenen {@link KBState Wissensstands}. */
 	KBState(KBState that) {
 		this.rootRef = that.rootRef;
 		this.nextRef = that.nextRef;
