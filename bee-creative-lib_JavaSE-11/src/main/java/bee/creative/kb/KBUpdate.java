@@ -5,18 +5,6 @@ package bee.creative.kb;
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class KBUpdate {
 
-	/** Diese Methode liefet bei einem {@link KBBuffer#commit()} den {@link KBState Wissensstand} vor der ersten Änderung. Bei einem {@link KBBuffer#rollback()}
-	 * liefert sie den Wissensstand nach der letzten Änderung. */
-	public KBState getOldState() {
-		return this.oldState;
-	}
-
-	/** Diese Methode liefet bei einem {@link KBBuffer#commit()} den {@link KBState Wissensstand} nach der letzten Änderung. Bei einem {@link KBBuffer#rollback()}
-	 * liefert sie den Wissensstand vor der ersten Änderung. */
-	public KBState getNewState() {
-		return this.newState;
-	}
-
 	/** Diese Methode liefet die {@link KBState Wissensmenge}, die durch die Änderung ergänzt wurde und bei Bedarf über {@link KBState#from(KBState, KBState)
 	 * KBState.from(this.getOldState(), this.getNewState())} erzeugt wird. */
 	public synchronized KBState getInserts() {
@@ -29,13 +17,25 @@ public final class KBUpdate {
 		return this.deletes == null ? this.deletes = KBState.from(this.newState, this.oldState) : this.deletes;
 	}
 
-	final KBState oldState;
+	/** Diese Methode liefet bei einem {@link KBBuffer#commit()} den {@link KBState Wissensstand} vor der ersten Änderung. Bei einem {@link KBBuffer#rollback()}
+	 * liefert sie den Wissensstand nach der letzten Änderung. */
+	public KBState getOldState() {
+		return this.oldState;
+	}
 
-	final KBState newState;
+	/** Diese Methode liefet bei einem {@link KBBuffer#commit()} den {@link KBState Wissensstand} nach der letzten Änderung. Bei einem {@link KBBuffer#rollback()}
+	 * liefert sie den Wissensstand vor der ersten Änderung. */
+	public KBState getNewState() {
+		return this.newState;
+	}
 
 	KBState inserts;
 
 	KBState deletes;
+
+	final KBState oldState;
+
+	final KBState newState;
 
 	/** Dieser Konstruktor initialisiert das Änderungsprotokoll und schließt die Änderung ab. Wenn {@code commit} {@code true} ist, werden alle Änderungen
 	 * angenommen. Andernfalls werden sie verworfen. */

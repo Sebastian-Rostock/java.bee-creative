@@ -221,7 +221,7 @@ public final class REFMAP {
 		private Object[] refmap;
 
 		ITER(Object[] refmap, int[] accept, int[] refuse) {
-			this.nextIdx = refmap.length + 1;
+			this.nextIdx = refmap.length;
 			this.accept = accept;
 			this.refuse = refuse;
 			this.refset = REFMAP.getKeys(refmap);
