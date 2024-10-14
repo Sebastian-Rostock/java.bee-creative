@@ -20,7 +20,7 @@ public class KBValues implements Iterable2<Entry<Integer, FEMString>> {
 
 	@Override
 	public void forEach(Consumer<? super Entry<Integer, FEMString>> action) {
-		this.owner.forEachValue((valueRef, valueStr) -> action.accept(Entries.from(valueRef, valueStr)));
+		this.forEach((valueRef, valueStr) -> action.accept(Entries.from(valueRef, valueStr)));
 	}
 
 	/** Diese Methode übergibt die Rextwerte und deren Referenzen an {@link RUN#run(int, FEMString) task.run()}. */
@@ -38,6 +38,16 @@ public class KBValues implements Iterable2<Entry<Integer, FEMString>> {
 		return Objects.printIterable(false, this);
 	}
 
+	public KBValues selectValueRefs(int[] selectValueRefs) {
+		return KBBuffer.computeSelect(this.acceptValueRefset, this.refuseValueRefset, selectValueRefs,
+			acceptValueRefset -> new KBValues(this.owner, acceptValueRefset, null));
+	}
+
+	public KBValues exceptValueRefs(int[] exceptValueRefs) {
+		return KBBuffer.computeExcept(this.acceptValueRefset, this.refuseValueRefset, exceptValueRefs,
+			acceptValueRefset -> new KBValues(this.owner, acceptValueRefset, null), refuseValueRefset -> new KBValues(this.owner, null, refuseValueRefset));
+	}
+
 	/** Diese Schnittstelle definiert den Empfänger für {@link KBValues#forEach(RUN)}. */
 	public interface RUN {
 
@@ -47,13 +57,19 @@ public class KBValues implements Iterable2<Entry<Integer, FEMString>> {
 	}
 
 	KBValues(KBState owner) {
+		this(owner, null, null);
+	}
+
+	KBValues(KBState owner, int[] acceptValueRefset, int[] refuseValueRefset) {
 		this.owner = owner;
+		this.acceptValueRefset = acceptValueRefset;
+		this.refuseValueRefset = refuseValueRefset;
 	}
 
 	private final KBState owner;
 
-	int[] acceptValueRefset; // TODO select/except
+	private final int[] acceptValueRefset;
 
-	int[] refuseValueRefset;
+	private final int[] refuseValueRefset;
 
 }

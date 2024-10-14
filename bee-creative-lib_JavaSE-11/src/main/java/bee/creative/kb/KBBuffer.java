@@ -2,6 +2,7 @@ package bee.creative.kb;
 
 import java.util.Arrays;
 import bee.creative.fem.FEMString;
+import bee.creative.util.Getter;
 import bee.creative.util.HashMapIO;
 import bee.creative.util.HashMapOI;
 
@@ -509,6 +510,25 @@ public class KBBuffer extends KBState {
 		this.valueStrMap = this.valueStrMap.clone();
 		this.valueRefMap = this.valueRefMap.clone();
 		this.backup = backup;
+	}
+
+	static <T> T computeSelect(int[] acceptRefset, int[] refuseRefset, int[] selectRefs, Getter<int[], T> useAcceptRefs) {
+		if (refuseRefset != null) return useAcceptRefs.get(REFSET.except(REFSET.from(selectRefs), refuseRefset));
+		if (acceptRefset != null) return useAcceptRefs.get(REFSET.intersect(REFSET.from(selectRefs), acceptRefset));
+		return useAcceptRefs.get(REFSET.from(selectRefs));
+	}
+
+	static <T> T computeExcept(int[] acceptRefset, int[] refuseRefset, int[] exceptRefs, Getter<int[], T> useAcceptRefs, Getter<int[], T> useRefuseRefs) {
+		if (exceptRefs.length == 0) return acceptRefset != null ? useAcceptRefs.get(acceptRefset) : useRefuseRefs.get(refuseRefset);
+		if (acceptRefset != null) {
+			var acceptRefset2 = REFSET.popAllRefs(REFSET.copy(acceptRefset), exceptRefs);
+			return useAcceptRefs.get(REFSET.size(acceptRefset2) == REFSET.size(acceptRefset) ? acceptRefset : acceptRefset2);
+		}
+		if (refuseRefset != null) {
+			var refuseRefset2 = REFSET.putAllRefs(REFSET.copy(refuseRefset), exceptRefs);
+			return useRefuseRefs.get(REFSET.size(refuseRefset2) == REFSET.size(refuseRefset) ? refuseRefset : refuseRefset2);
+		}
+		return useRefuseRefs.get(REFSET.from(exceptRefs));
 	}
 
 }
