@@ -18,7 +18,7 @@ import bee.creative.util.Iterator2;
  * <dd>Anzahl der verwalteten Elemente.</dd>
  * <dt>{@code mask}</dt>
  * <dd>Bitmaske zur Umrechnung eines Elements in die Position des zugehörigen Listenkopfes.<br>
- * Die Bitmaske ist stets kleiner als eine Milliarde und eins kleiner als eine Potenz von Zwei.</dd>
+ * Die Bitmaske ist stets eins kleiner als eine Potenz von Zwei und kleiner als eine Milliarde.</dd>
  * <dt>{@code free}</dt>
  * <dd>1-basierte Position des nächsten unbenutzten {@code item} oder {@code 0}.</dd>
  * <dt>{@code head}</dt>
@@ -143,14 +143,20 @@ public final class REFSET {
 	/** Diese Methode liefert die gegebenen Referenzmenge {@code refset}, wenn sie die maximale Kapazität besitzt oder darin noch Platz für mindestens eine
 	 * weitere Referenz ist. Andernfalls liefert sie eine Kopie mit doppelter Kapazität. */
 	public static int[] grow(int[] refset) {
-		return REFSET.getFree(refset) != 0 ? refset : REFSET.tryCopy(refset, ((REFSET.getMask(refset) << 1) & 536870911) | 1);
+		if (REFSET.getFree(refset) != 0) return refset;
+		var mask = REFSET.getMask(refset) << 1;
+		if (mask > 536870911) return refset;
+		return REFSET.tryCopy(refset, mask);
 	}
 
 	/** Diese Methode liefert die gegebenen Referenzmenge {@code refset}, wenn sie die minimale Kapazität besitzt oder darin bei halber Kapazität kein Platz für
 	 * eine weitere Referenz ist. Andernfalls liefert sie eine Kopie mit halber Kapazität. */
 	public static int[] pack(int[] refset) {
+		var size = REFSET.size(refset);
+		if (size == 0) return REFSET.EMPTY;
 		var mask = REFSET.getMask(refset) >> 1;
-		return REFSET.size(refset) > mask ? refset : REFSET.tryCopy(refset, mask | 1);
+		if ((mask == 0) || (size > mask)) return refset;
+		return REFSET.tryCopy(refset, mask);
 	}
 
 	/** Diese Methode liefert eine Kopie der gegebenen Referenzmenge {@code refset}. */
@@ -247,43 +253,43 @@ public final class REFSET {
 			return this.nextRef();
 		}
 
-		/** Diese Methode liefert die nächsten Referenz oder {@code 0}. */
+		/** Diese Methode liefert die nächsten Referenz. */
 		public int nextRef() {
-			if (!this.hasNext()) throw new NoSuchElementException();
-			var ref = this.ref;
-			while (3 < this.index) {
-				this.ref = this.refset[this.index];
-				this.index -= 3;
-				if (REFSET.isValid(this.ref, this.accept, this.refuse)) return ref;
+			if (this.nextOff < 3) throw new NoSuchElementException();
+			var result = this.nextRef;
+			while (true) {
+				this.nextOff -= 3;
+				if (this.nextOff < 3) return result;
+				this.nextRef = this.refset[this.nextOff];
+				if (REFSET.isValid(this.nextRef, this.accept, this.refuse)) return result;
 			}
-			return ref;
 		}
 
 		/** Diese Methode liefert die 1-basierte Position der nächsten von {@link #nextRef()} gelieferten Referenz oder {@code 0}. */
 		public int nextIdx() {
-			return this.index / 3;
+			return this.nextOff / 3;
 		}
 
 		@Override
 		public boolean hasNext() {
-			return 3 < this.index;
+			return 3 < this.nextOff;
 		}
 
-		int ref;
+		int nextOff;
 
-		int index;
-
-		final int[] refset;
+		int nextRef;
 
 		final int[] accept;
 
 		final int[] refuse;
 
+		final int[] refset;
+
 		ITER(int[] refset, int[] accept, int[] refuse) {
-			this.index = (this.refset = refset).length - 1;
+			this.nextOff = refset.length + 2;
 			this.accept = accept;
 			this.refuse = refuse;
-			if (!this.hasNext()) return;
+			this.refset = refset;
 			this.nextRef();
 		}
 

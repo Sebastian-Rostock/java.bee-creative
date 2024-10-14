@@ -169,42 +169,64 @@ public final class REFMAP {
 
 		@Override
 		public Entry<Integer, Object> next() {
-			var val = this.val;
-			return Entries.from(this.nextRef(), val);
+			var nextVal = this.nextVal;
+			return Entries.from(this.nextRef(), nextVal);
 		}
 
-		/** Diese Methode liefert die nächsten Referenz oder {@code 0}. */
+		/** Diese Methode liefert die nächsten Referenz. */
 		public int nextRef() {
-			if (!this.hasNext()) throw new NoSuchElementException();
-			var ref = this.iterator.nextRef();
-			this.val = this.refmap[this.nextIdx()];
-			return ref;
+			if (this.nextIdx <= 0) throw new NoSuchElementException();
+			var result = this.nextRef;
+			while (true) {
+				this.nextIdx--;
+				if (this.nextIdx <= 0) {
+					this.nextVal = null;
+					return result;
+				}
+				this.nextVal = this.refmap[this.nextIdx];
+				if (this.nextVal != null) {
+					this.nextRef = REFSET.getRef(this.refset, this.nextIdx);
+					if (REFSET.isValid(this.nextRef, this.accept, this.refuse)) return result;
+				}
+			}
 		}
 
 		/** Diese Methode liefert das Element der nächsten von {@link #nextRef()} gelieferten Referenz oder {@code null}. */
 		public Object nextVal() {
-			return this.val;
+			return this.nextVal;
 		}
 
 		/** Diese Methode liefert die 1-basierte Position der nächsten von {@link #nextRef()} gelieferten Referenz oder {@code 0}. */
 		public int nextIdx() {
-			return this.iterator.nextIdx();
+			return this.nextIdx;
 		}
 
 		@Override
 		public boolean hasNext() {
-			return this.iterator.hasNext();
+			return 0 < this.nextIdx;
 		}
 
-		Object val;
+		int nextIdx;
 
-		final Object[] refmap;
+		int nextRef;
 
-		final REFSET.ITER iterator;
+		Object nextVal;
+
+		private int[] accept;
+
+		private int[] refuse;
+
+		private int[] refset;
+
+		private Object[] refmap;
 
 		ITER(Object[] refmap, int[] accept, int[] refuse) {
-			this.iterator = REFSET.iterator(REFMAP.getKeys(this.refmap = refmap), accept, refuse);
-			this.val = this.refmap[this.nextIdx()];
+			this.nextIdx = refmap.length + 1;
+			this.accept = accept;
+			this.refuse = refuse;
+			this.refset = REFMAP.getKeys(refmap);
+			this.refmap = refmap;
+			this.nextRef();
 		}
 
 	}
