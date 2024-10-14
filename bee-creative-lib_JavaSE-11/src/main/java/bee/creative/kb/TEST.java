@@ -16,13 +16,14 @@ class TEST {
 			var s = new KBBuffer();
 			s.putEdge(1, 2, 3);
 			s.putEdge(4, 5, 6);
-			s.TODO_putValue(FEMString.from("ABC"));
-			s.TODO_putValue(FEMString.from("DEF"));
+			s.putValue(FEMString.from("ABC"));
+			s.putValue(FEMString.from("DEF"));
 			System.out.println(s.toString());
+			System.out.println(s.values().exceptValueRefs(2) );
 		}
 		
 		
-		for (var a = 0; a < 3; a++) {
+		for (var a = 0; a < 1; a++) {
 			System.out.println("KBBuffer " + a);
 			var r = new Random(a);
 			var s = new KBBuffer();
@@ -30,12 +31,12 @@ class TEST {
 				for (var i = 0; i < (1000 * 1000);) {
 					
 					
-					for (var j = 0; j < 100; i++, j++) {
+					for (var j = 0; j < 1000; i++, j++) {
 						s.putEdge(r.nextInt(1000) + 1, r.nextInt(20) + 1, r.nextInt(1000) + 1);
 					}
 					// var ddd = s.commit();
-					// var ddd = s.rollback();
-					// System.out.println(ddd.getPutState());
+					  var ddd = s.rollback();
+					//  System.out.println(ddd.getInserts());
 				}
 			});
 			System.out.println(l);

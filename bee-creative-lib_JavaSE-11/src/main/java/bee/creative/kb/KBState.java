@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 import bee.creative.fem.FEMString;
 import bee.creative.kb.KBValues.RUN;
 import bee.creative.lang.Objects;
+import bee.creative.util.Entries;
 import bee.creative.util.HashMapIO;
 import bee.creative.util.HashMapOI;
 import bee.creative.util.Iterator2;
@@ -692,6 +693,28 @@ public class KBState {
 		this.storage = that.storage;
 	}
 
+	/** Diese Methode ersetzt {@link #sourceMap} und {@link #targetMap} nur dann mit den in {@link #storage} hinterlegten {@link KBEdge Wissensstand}, wenn
+	 * {@link #storage} nicht {@code null} ist. Anschließend wird {@link #storage} auf {@code null} gesetzt. */
+	final void restore() throws IllegalStateException {
+		if (this.storage == null) return;
+		try {
+			this.sourceMap = REFMAP.EMPTY;
+			this.targetMap = REFMAP.EMPTY;
+			this.valueRefMap = new HashMapOI<>();
+			this.valueStrMap = new HashMapIO<>();
+			KBState.selectEdgesFromInts(this.storage, this::insertEdgeIntoState);
+			KBState.selectValuesFromInts(this.storage, this::insertValueIntoState);
+			this.storage = null;
+		} finally {
+			if (this.storage != null) {
+				this.sourceMap = REFMAP.EMPTY;
+				this.targetMap = REFMAP.EMPTY;
+				this.valueRefMap = new HashMapOI<>();
+				this.valueStrMap = new HashMapIO<>();
+			}
+		}
+	}
+
 	final void forEachEdge(KBEdges.RUN task) {
 		this.forEachEdge(null, null, null, null, null, null, task);
 	}
@@ -773,8 +796,11 @@ public class KBState {
 	}
 
 	final Iterator2<Entry<Integer, FEMString>> valueIterator(int[] acceptValueRefset_or_null, int[] refuseValueRefset_or_null) {
-		this.restore();// TODO über store und mit filter
-		return this.valueStrMap.entrySet().iterator().unmodifiable();
+		this.restore();
+		var iterator = this.valueStrMap.entrySet().iterator();
+		return ((acceptValueRefset_or_null != null) || (refuseValueRefset_or_null != null)
+			? iterator.filter(entry -> REFSET.isValid(entry.getKey(), acceptValueRefset_or_null, refuseValueRefset_or_null)) : iterator)
+				.translate(entry -> (Entry<Integer, FEMString>)Entries.from(entry.getKey(), entry.getValue())).unmodifiable();
 	}
 
 	final void insertEdgeIntoState(int sourceRef, int targetRef, int relationRef) {
@@ -796,28 +822,6 @@ public class KBState {
 			this.valueStrMap.put(newValueRef, oldValueStr);
 			this.valueRefMap.remove(newValueStr);
 			throw new IllegalArgumentException();
-		}
-	}
-
-	/** Diese Methode ersetzt {@link #sourceMap} und {@link #targetMap} nur dann mit den in {@link #storage} hinterlegten {@link KBEdge Wissensstand}, wenn
-	 * {@link #storage} nicht {@code null} ist. Anschließend wird {@link #storage} auf {@code null} gesetzt. */
-	final void restore() throws IllegalStateException {
-		if (this.storage == null) return;
-		try {
-			this.sourceMap = REFMAP.EMPTY;
-			this.targetMap = REFMAP.EMPTY;
-			this.valueRefMap = new HashMapOI<>();
-			this.valueStrMap = new HashMapIO<>();
-			KBState.selectEdgesFromInts(this.storage, this::insertEdgeIntoState);
-			KBState.selectValuesFromInts(this.storage, this::insertValueIntoState);
-			this.storage = null;
-		} finally {
-			if (this.storage != null) {
-				this.sourceMap = REFMAP.EMPTY;
-				this.targetMap = REFMAP.EMPTY;
-				this.valueRefMap = new HashMapOI<>();
-				this.valueStrMap = new HashMapIO<>();
-			}
 		}
 	}
 

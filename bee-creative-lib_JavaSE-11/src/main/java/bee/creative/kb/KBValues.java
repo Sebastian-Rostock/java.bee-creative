@@ -38,12 +38,12 @@ public class KBValues implements Iterable2<Entry<Integer, FEMString>> {
 		return Objects.printIterable(false, this);
 	}
 
-	public KBValues selectValueRefs(int[] selectValueRefs) {
+	public KBValues selectValueRefs(int... selectValueRefs) {
 		return KBBuffer.computeSelect(this.acceptValueRefset, this.refuseValueRefset, selectValueRefs,
 			acceptValueRefset -> new KBValues(this.owner, acceptValueRefset, null));
 	}
 
-	public KBValues exceptValueRefs(int[] exceptValueRefs) {
+	public KBValues exceptValueRefs(int... exceptValueRefs) {
 		return KBBuffer.computeExcept(this.acceptValueRefset, this.refuseValueRefset, exceptValueRefs,
 			acceptValueRefset -> new KBValues(this.owner, acceptValueRefset, null), refuseValueRefset -> new KBValues(this.owner, null, refuseValueRefset));
 	}

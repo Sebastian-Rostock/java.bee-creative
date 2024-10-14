@@ -35,13 +35,24 @@ public class KBBuffer extends KBState {
 
 	public boolean putEdge(int sourceRef, int relationRef, int targetRef) {
 		this.backup();
-		return this.insertEdgeIntoBuffer(sourceRef, targetRef, relationRef);
+		return this.insertEdge(sourceRef, targetRef, relationRef);
 	}
 
-	int TODO_putValue(FEMString value) {
+	public int putValue(FEMString value) {
 		var valueStr = value.data();
 		this.backup();
-		return this.insertValueIntoBuffer(valueStr);
+		return this.insertValueStr(valueStr);
+	}
+
+	public HashMapOI<FEMString> putAllValue(FEMString... values) {
+		return this.putAllValue(Arrays.asList(values));
+	}
+
+	public HashMapOI<FEMString> putAllValue(Iterable<FEMString> values) {
+		this.backup();
+		var result = new HashMapOI<FEMString>();
+		values.forEach(valueStr -> result.put(valueStr, this.insertValueStr(valueStr)));
+		return result;
 	}
 
 	public boolean putAllEdges(KBEdge... edges) {
@@ -51,14 +62,14 @@ public class KBBuffer extends KBState {
 	public boolean putAllEdges(Iterable<KBEdge> edges) {
 		this.backup();
 		var res = new boolean[1];
-		edges.forEach(edge -> res[0] = this.insertEdgeIntoBuffer(edge.sourceRef, edge.targetRef, edge.relationRef) | res[0]);
+		edges.forEach(edge -> res[0] = this.insertEdge(edge.sourceRef, edge.targetRef, edge.relationRef) | res[0]);
 		return res[0];
 	}
 
 	public boolean putAllEdges(KBState edges) {
 		this.backup();
 		var res = new boolean[1];
-		edges.forEachEdge((sourceRef, targetRef, relationRef) -> res[0] = this.insertEdgeIntoBuffer(sourceRef, targetRef, relationRef) | res[0]);
+		edges.forEachEdge((sourceRef, targetRef, relationRef) -> res[0] = this.insertEdge(sourceRef, targetRef, relationRef) | res[0]);
 		return res[0];
 	}
 
@@ -68,7 +79,7 @@ public class KBBuffer extends KBState {
 
 	public boolean popEdge(int sourceRef, int relationRef, int targetRef) {
 		this.backup();
-		return this.deleteEdgeFromBuffer(sourceRef, targetRef, relationRef);
+		return this.deleteEdge(sourceRef, targetRef, relationRef);
 	}
 
 	public boolean popAllEdges(KBEdge... edges) {
@@ -78,39 +89,39 @@ public class KBBuffer extends KBState {
 	public boolean popAllEdges(Iterable<KBEdge> edges) {
 		this.backup();
 		var res = new boolean[1];
-		edges.forEach(edge -> res[0] = this.deleteEdgeFromBuffer(edge.sourceRef, edge.targetRef, edge.relationRef) | res[0]);
+		edges.forEach(edge -> res[0] = this.deleteEdge(edge.sourceRef, edge.targetRef, edge.relationRef) | res[0]);
 		return res[0];
 	}
 
 	public boolean popAllEdges(KBState edges) {
 		this.backup();
 		var res = new boolean[1];
-		edges.forEachEdge((sourceRef, targetRef, relationRef) -> res[0] = this.deleteEdgeFromBuffer(sourceRef, targetRef, relationRef) | res[0]);
+		edges.forEachEdge((sourceRef, targetRef, relationRef) -> res[0] = this.deleteEdge(sourceRef, targetRef, relationRef) | res[0]);
 		return res[0];
 	}
 
-	boolean popValue(int ref) {
+	public boolean popValue(FEMString valueStr) {
 		this.backup();
-		return this.deleteValue(ref);
+		return this.deleteValueStr(valueStr);
 	}
 
-	boolean popValue(FEMString value) {
+	public boolean popValueRef(int valueRef) {
 		this.backup();
-		return this.deleteValue(value);
+		return this.deleteValueRef(valueRef);
 	}
 
-	boolean popAllValues(FEMString... values) {
-		return this.popAllValues(Arrays.asList(values));
+	public boolean popAllValues(FEMString... valueStrs) {
+		return this.popAllValues(Arrays.asList(valueStrs));
 	}
 
-	boolean popAllValues(Iterable<FEMString> values) {
+	public boolean popAllValues(Iterable<FEMString> valueStrs) {
 		this.backup();
 		var res = new boolean[1];
-		values.forEach((valueStr) -> res[0] = this.deleteValue(valueStr) | res[0]);
+		valueStrs.forEach((valueStr) -> res[0] = this.deleteValueStr(valueStr) | res[0]);
 		return res[0];
 	}
 
-	boolean popAllValues(KBState values) {
+	public boolean popAllValues(KBState values) {
 		this.backup();
 		var res = new boolean[1];
 		values.forEachValue((valueRef, valueStr) -> res[0] = this.deleteValue(valueRef, valueStr) | res[0]);
@@ -132,7 +143,7 @@ public class KBBuffer extends KBState {
 		this.backup();
 		this.nextRef += inserts.nextRef;
 		this.rootRef += inserts.rootRef;
-		inserts.forEachEdge(this::insertEdgeIntoBuffer);
+		inserts.forEachEdge(this::insertEdge);
 		inserts.forEachValue(this::insertValueIntoState);
 	}
 
@@ -142,7 +153,7 @@ public class KBBuffer extends KBState {
 		this.backup();
 		this.nextRef -= deletes.nextRef;
 		this.rootRef -= deletes.rootRef;
-		deletes.forEachEdge(this::deleteEdgeFromBuffer);
+		deletes.forEachEdge(this::deleteEdge);
 		deletes.forEachValue(this::deleteValue);
 	}
 
@@ -173,7 +184,26 @@ public class KBBuffer extends KBState {
 
 	KBState backup;
 
-	final boolean insertEdgeIntoBuffer(int sourceRef, int targetRef, int relationRef) {
+	static <T> T computeSelect(int[] acceptRefset, int[] refuseRefset, int[] selectRefs, Getter<int[], T> useAcceptRefs) {
+		if (refuseRefset != null) return useAcceptRefs.get(REFSET.except(REFSET.from(selectRefs), refuseRefset));
+		if (acceptRefset != null) return useAcceptRefs.get(REFSET.intersect(REFSET.from(selectRefs), acceptRefset));
+		return useAcceptRefs.get(REFSET.from(selectRefs));
+	}
+
+	static <T> T computeExcept(int[] acceptRefset, int[] refuseRefset, int[] exceptRefs, Getter<int[], T> useAcceptRefs, Getter<int[], T> useRefuseRefs) {
+		if (exceptRefs.length == 0) return acceptRefset != null ? useAcceptRefs.get(acceptRefset) : useRefuseRefs.get(refuseRefset);
+		if (acceptRefset != null) {
+			var acceptRefset2 = REFSET.popAllRefs(REFSET.copy(acceptRefset), exceptRefs);
+			return useAcceptRefs.get(REFSET.size(acceptRefset2) == REFSET.size(acceptRefset) ? acceptRefset : acceptRefset2);
+		}
+		if (refuseRefset != null) {
+			var refuseRefset2 = REFSET.putAllRefs(REFSET.copy(refuseRefset), exceptRefs);
+			return useRefuseRefs.get(REFSET.size(refuseRefset2) == REFSET.size(refuseRefset) ? refuseRefset : refuseRefset2);
+		}
+		return useRefuseRefs.get(REFSET.from(exceptRefs));
+	}
+
+	private boolean insertEdge(int sourceRef, int targetRef, int relationRef) {
 		if ((sourceRef == 0) || (relationRef == 0) || (targetRef == 0)) return false;
 
 		var sourceMap = this.sourceMap;
@@ -361,7 +391,7 @@ public class KBBuffer extends KBState {
 		return true;
 	}
 
-	final int insertValueIntoBuffer(FEMString valueStr) {
+	private int insertValueStr(FEMString valueStr) {
 		var valueRef = this.valueRefMap.get(valueStr.data());
 		if (valueRef != null) return valueRef;
 		valueRef = this.createNextRef();
@@ -370,7 +400,7 @@ public class KBBuffer extends KBState {
 		return valueRef;
 	}
 
-	private boolean deleteEdgeFromBuffer(int sourceRef, int targetRef, int relationRef) {
+	private boolean deleteEdge(int sourceRef, int targetRef, int relationRef) {
 		if ((sourceRef == 0) || (relationRef == 0) || (targetRef == 0)) return false;
 
 		// TODO prüfen
@@ -475,28 +505,31 @@ public class KBBuffer extends KBState {
 		return true;
 	}
 
-	private boolean deleteValue(int valueRef) {
+	private boolean deleteValue(int valueRef, FEMString valueStr) {
+		// TODO
+		return false;
+	}
+
+	private boolean deleteValueRef(int valueRef) {
 		var valueStr = this.valueStrMap.remove(valueRef);
 		if (valueStr == null) return false;
 		this.valueRefMap.remove(valueStr);
 		return true;
 	}
 
-	private boolean deleteValue(FEMString valueStr) {
+	private boolean deleteValueStr(FEMString valueStr) {
 		var valueRef = this.valueRefMap.remove(valueStr);
 		if (valueRef == null) return false;
 		this.valueStrMap.remove(valueRef);
 		return true;
 	}
 
-	private boolean deleteValue(int valueRef, FEMString valueStr) {
-		// TODO
-		return false;
-	}
-
-	int createNextRef() {
+	private int createNextRef() {
 		var nextRef = this.nextRef;
-		while (this.valueStrMap.containsKey(nextRef) || (REFMAP.getIdx(this.sourceMap, nextRef) != 0) || (REFMAP.getIdx(this.targetMap, nextRef) != 0)) {
+		while ((nextRef == 0) //
+			|| this.valueStrMap.containsKey(nextRef) //
+			|| (REFMAP.getIdx(this.sourceMap, nextRef) != 0) //
+			|| (REFMAP.getIdx(this.targetMap, nextRef) != 0)) {
 			nextRef++;
 		}
 		return this.nextRef = nextRef;
@@ -510,25 +543,6 @@ public class KBBuffer extends KBState {
 		this.valueStrMap = this.valueStrMap.clone();
 		this.valueRefMap = this.valueRefMap.clone();
 		this.backup = backup;
-	}
-
-	static <T> T computeSelect(int[] acceptRefset, int[] refuseRefset, int[] selectRefs, Getter<int[], T> useAcceptRefs) {
-		if (refuseRefset != null) return useAcceptRefs.get(REFSET.except(REFSET.from(selectRefs), refuseRefset));
-		if (acceptRefset != null) return useAcceptRefs.get(REFSET.intersect(REFSET.from(selectRefs), acceptRefset));
-		return useAcceptRefs.get(REFSET.from(selectRefs));
-	}
-
-	static <T> T computeExcept(int[] acceptRefset, int[] refuseRefset, int[] exceptRefs, Getter<int[], T> useAcceptRefs, Getter<int[], T> useRefuseRefs) {
-		if (exceptRefs.length == 0) return acceptRefset != null ? useAcceptRefs.get(acceptRefset) : useRefuseRefs.get(refuseRefset);
-		if (acceptRefset != null) {
-			var acceptRefset2 = REFSET.popAllRefs(REFSET.copy(acceptRefset), exceptRefs);
-			return useAcceptRefs.get(REFSET.size(acceptRefset2) == REFSET.size(acceptRefset) ? acceptRefset : acceptRefset2);
-		}
-		if (refuseRefset != null) {
-			var refuseRefset2 = REFSET.putAllRefs(REFSET.copy(refuseRefset), exceptRefs);
-			return useRefuseRefs.get(REFSET.size(refuseRefset2) == REFSET.size(refuseRefset) ? refuseRefset : refuseRefset2);
-		}
-		return useRefuseRefs.get(REFSET.from(exceptRefs));
 	}
 
 }
