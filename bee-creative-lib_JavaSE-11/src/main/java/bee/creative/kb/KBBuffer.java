@@ -2,8 +2,6 @@ package bee.creative.kb;
 
 import java.util.Arrays;
 import bee.creative.fem.FEMString;
-import bee.creative.util.Getter;
-import bee.creative.util.HashMapIO;
 import bee.creative.util.HashMapOI;
 
 /** Diese Klasse implementiert einen Wissenspuffer als veränderlichen {@link KBState Wissensstand}. Der Wissenspuffer ist nicht <em>thread-safe</em> und macht
@@ -93,10 +91,10 @@ public class KBBuffer extends KBState {
 		return res[0];
 	}
 
-	public boolean popAllEdges(KBState edges) {
+	public boolean popAllEdges(KBEdges edges) {
 		this.backup();
 		var res = new boolean[1];
-		edges.forEachEdge((sourceRef, targetRef, relationRef) -> res[0] = this.deleteEdge(sourceRef, targetRef, relationRef) | res[0]);
+		edges.forEach((sourceRef, targetRef, relationRef) -> res[0] = this.deleteEdge(sourceRef, targetRef, relationRef) | res[0]);
 		return res[0];
 	}
 
@@ -121,20 +119,17 @@ public class KBBuffer extends KBState {
 		return res[0];
 	}
 
-	public boolean popAllValues(KBState values) {
+	public boolean popAllValues(KBValues values) {
 		this.backup();
 		var res = new boolean[1];
-		values.forEachValue((valueRef, valueStr) -> res[0] = this.deleteValue(valueRef, valueStr) | res[0]);
+		values.forEach((valueRef, valueStr) -> res[0] = this.deleteValue(valueRef, valueStr) | res[0]);
 		return res[0];
 	}
 
 	/** Diese Methode entfernt alle {@link #edges() Hyperkanten} und {@link #values() Textwerte}. */
 	public void clear() {
 		this.backup();
-		this.sourceMap = REFMAP.EMPTY;
-		this.targetMap = REFMAP.EMPTY;
-		this.valueRefMap = new HashMapOI<>();
-		this.valueStrMap = new HashMapIO<>();
+		this.reset();
 	}
 
 	/** Diese Methode ergänzt alle {@link KBEdge Hyperkanten} der gegebenen {@link KBState Hyperkantenmenge} {@code putState} und erhöht die Referenzen
@@ -144,7 +139,7 @@ public class KBBuffer extends KBState {
 		this.nextRef += inserts.nextRef;
 		this.rootRef += inserts.rootRef;
 		inserts.forEachEdge(this::insertEdge);
-		inserts.forEachValue(this::insertValueIntoState);
+		inserts.forEachValue(this::insertValue);
 	}
 
 	/** Diese Methode entfernt alle {@link KBEdge Hyperkanten} der gegebenen {@link KBState Hyperkantenmenge} {@code popState} und verringert die Referenzen
@@ -184,23 +179,14 @@ public class KBBuffer extends KBState {
 
 	KBState backup;
 
-	static <T> T computeSelect(int[] acceptRefset, int[] refuseRefset, int[] selectRefs, Getter<int[], T> useAcceptRefs) {
-		if (refuseRefset != null) return useAcceptRefs.get(REFSET.except(REFSET.from(selectRefs), refuseRefset));
-		if (acceptRefset != null) return useAcceptRefs.get(REFSET.intersect(REFSET.from(selectRefs), acceptRefset));
-		return useAcceptRefs.get(REFSET.from(selectRefs));
-	}
-
-	static <T> T computeExcept(int[] acceptRefset, int[] refuseRefset, int[] exceptRefs, Getter<int[], T> useAcceptRefs, Getter<int[], T> useRefuseRefs) {
-		if (exceptRefs.length == 0) return acceptRefset != null ? useAcceptRefs.get(acceptRefset) : useRefuseRefs.get(refuseRefset);
-		if (acceptRefset != null) {
-			var acceptRefset2 = REFSET.popAllRefs(REFSET.copy(acceptRefset), exceptRefs);
-			return useAcceptRefs.get(REFSET.size(acceptRefset2) == REFSET.size(acceptRefset) ? acceptRefset : acceptRefset2);
-		}
-		if (refuseRefset != null) {
-			var refuseRefset2 = REFSET.putAllRefs(REFSET.copy(refuseRefset), exceptRefs);
-			return useRefuseRefs.get(REFSET.size(refuseRefset2) == REFSET.size(refuseRefset) ? refuseRefset : refuseRefset2);
-		}
-		return useRefuseRefs.get(REFSET.from(exceptRefs));
+	private void backup() {
+		if (this.backup != null) return;
+		var backup = new KBState(this);
+		this.sourceMap = REFMAP.copy(this.sourceMap);
+		this.targetMap = REFMAP.copy(this.targetMap);
+		this.valueStrMap = (ValueStrMap)this.valueStrMap.clone();
+		this.valueRefMap = (ValueRefMap)this.valueRefMap.clone();
+		this.backup = backup;
 	}
 
 	private boolean insertEdge(int sourceRef, int targetRef, int relationRef) {
@@ -533,16 +519,6 @@ public class KBBuffer extends KBState {
 			nextRef++;
 		}
 		return this.nextRef = nextRef;
-	}
-
-	private void backup() {
-		if (this.backup != null) return;
-		var backup = new KBState(this);
-		this.sourceMap = REFMAP.copy(this.sourceMap);
-		this.targetMap = REFMAP.copy(this.targetMap);
-		this.valueStrMap = this.valueStrMap.clone();
-		this.valueRefMap = this.valueRefMap.clone();
-		this.backup = backup;
 	}
 
 }

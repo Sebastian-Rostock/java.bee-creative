@@ -21,14 +21,14 @@ public class KBValues implements Iterable2<Entry<Integer, FEMString>> {
 	/** Diese Methode liefert einen {@link KBValues Textwertauswahl}, die nur {@link FEMString Textwerte} mit den Referenzen liefert, die in den gegebenen
 	 * Referenzen {@code selectValueRefs} enthalten sind. */
 	public KBValues selectValueRefs(int... selectValueRefs) {
-		return KBBuffer.computeSelect(this.acceptValueRefset, this.refuseValueRefset, selectValueRefs,
+		return KBState.computeSelect(this.acceptValueRefset, this.refuseValueRefset, selectValueRefs,
 			acceptValueRefset -> new KBValues(this.owner, acceptValueRefset, null));
 	}
 
 	/** Diese Methode liefert einen {@link KBValues Textwertauswahl}, die nur {@link FEMString Textwerte} mit den Referenzen liefert, die nicht in den gegebenen
 	 * Referenzen {@code exceptValueRefs} enthalten sind. */
 	public KBValues exceptValueRefs(int... exceptValueRefs) {
-		return KBBuffer.computeExcept(this.acceptValueRefset, this.refuseValueRefset, exceptValueRefs,
+		return KBState.computeExcept(this.acceptValueRefset, this.refuseValueRefset, exceptValueRefs,
 			acceptValueRefset -> new KBValues(this.owner, acceptValueRefset, null), refuseValueRefset -> new KBValues(this.owner, null, refuseValueRefset));
 	}
 

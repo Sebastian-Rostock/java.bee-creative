@@ -15,6 +15,23 @@ public class KBEdges implements Iterable2<KBEdge> {
 		return this.owner;
 	}
 
+	/** Diese Methode liefert einen {@link KBEdges Kantenauswahl}, die nur {@link KBEdge Kanten} mit den {@link KBEdge#sourceRef() Quellreferenzen} liefert, die
+	 * in den gegebenen Referenzen {@code selectSourceRefs} enthalten sind. */
+	public KBEdges selectSourceRefs(int... selectSourceRefs) {
+		return KBState.computeSelect(this.acceptSourceRefset, this.refuseSourceRefset, selectSourceRefs, acceptSourceRefset -> new KBEdges(this.owner,
+			acceptSourceRefset, null, this.acceptTargetRefset, this.refuseTargetRefset, this.acceptRelationRefset, this.refuseRelationRefset));
+	}
+
+	/** Diese Methode liefert einen {@link KBEdges Kantenauswahl}, die nur {@link KBEdge Kanten} mit den {@link KBEdge#sourceRef() Quellreferenzen} liefert, die
+	 * nicht in den gegebenen Referenzen {@code exceptSourceRefs} enthalten sind. */
+	public KBEdges exceptSourceRefs(int... exceptSourceRefs) {
+		return KBState.computeExcept(this.acceptSourceRefset, this.refuseSourceRefset, exceptSourceRefs,
+			acceptSourceRefset -> new KBEdges(this.owner, acceptSourceRefset, null, this.acceptTargetRefset, this.refuseTargetRefset, this.acceptRelationRefset,
+				this.refuseRelationRefset),
+			refuseSourceRefset -> new KBEdges(this.owner, null, refuseSourceRefset, this.acceptTargetRefset, this.refuseTargetRefset, this.acceptRelationRefset,
+				this.refuseRelationRefset));
+	}
+
 	/** Diese Methode übergibt die Referenzen der {@link KBEdge Kanten} an {@link RUN#run(int, int, int) task.run()}. */
 	public void forEach(RUN task) {
 		this.owner.forEachEdge(this.acceptSourceRefset, this.refuseSourceRefset, this.acceptTargetRefset, this.refuseTargetRefset, this.acceptRelationRefset,
