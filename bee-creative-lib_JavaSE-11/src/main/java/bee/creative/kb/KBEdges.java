@@ -22,6 +22,20 @@ public class KBEdges implements Iterable2<KBEdge> {
 			acceptSourceRefset, null, this.acceptTargetRefset, this.refuseTargetRefset, this.acceptRelationRefset, this.refuseRelationRefset));
 	}
 
+	/** Diese Methode liefert einen {@link KBEdges Kantenauswahl}, die nur {@link KBEdge Kanten} mit den {@link KBEdge#targetRef() Zielreferenzen} liefert, die in
+	 * den gegebenen Referenzen {@code selectTargetRefs} enthalten sind. */
+	public KBEdges selectTargetRefs(int... selectTargetRefs) {
+		return KBState.computeSelect(this.acceptTargetRefset, this.refuseTargetRefset, selectTargetRefs, acceptTargetRefset -> new KBEdges(this.owner,
+			this.acceptSourceRefset, this.refuseSourceRefset, acceptTargetRefset, null, this.acceptRelationRefset, this.refuseRelationRefset));
+	}
+
+	/** Diese Methode liefert einen {@link KBEdges Kantenauswahl}, die nur {@link KBEdge Kanten} mit den {@link KBEdge#relationRef() Beziehungsreferenzen}
+	 * liefert, die in den gegebenen Referenzen {@code selectRelationRefs} enthalten sind. */
+	public KBEdges selectRelationRefs(int... selectRelationRefs) {
+		return KBState.computeSelect(this.acceptRelationRefset, this.refuseRelationRefset, selectRelationRefs, acceptRelationRefset -> new KBEdges(this.owner,
+			this.acceptSourceRefset, this.refuseSourceRefset, this.acceptTargetRefset, this.refuseTargetRefset, null, acceptRelationRefset));
+	}
+
 	/** Diese Methode liefert einen {@link KBEdges Kantenauswahl}, die nur {@link KBEdge Kanten} mit den {@link KBEdge#sourceRef() Quellreferenzen} liefert, die
 	 * nicht in den gegebenen Referenzen {@code exceptSourceRefs} enthalten sind. */
 	public KBEdges exceptSourceRefs(int... exceptSourceRefs) {
@@ -30,6 +44,26 @@ public class KBEdges implements Iterable2<KBEdge> {
 				this.refuseRelationRefset),
 			refuseSourceRefset -> new KBEdges(this.owner, null, refuseSourceRefset, this.acceptTargetRefset, this.refuseTargetRefset, this.acceptRelationRefset,
 				this.refuseRelationRefset));
+	}
+
+	/** Diese Methode liefert einen {@link KBEdges Kantenauswahl}, die nur {@link KBEdge Kanten} mit den {@link KBEdge#targetRef() Zielreferenzen} liefert, die
+	 * nicht in den gegebenen Referenzen {@code exceptTargetRefs} enthalten sind. */
+	public KBEdges exceptTargetRefs(int... exceptTargetRefs) {
+		return KBState.computeExcept(this.acceptTargetRefset, this.refuseTargetRefset, exceptTargetRefs,
+			acceptTargetRefset -> new KBEdges(this.owner, this.acceptSourceRefset, this.refuseSourceRefset, acceptTargetRefset, null, this.acceptRelationRefset,
+				this.refuseRelationRefset),
+			refuseTargetRefset -> new KBEdges(this.owner, this.acceptSourceRefset, this.refuseSourceRefset, null, refuseTargetRefset, this.acceptRelationRefset,
+				this.refuseRelationRefset));
+	}
+
+	/** Diese Methode liefert einen {@link KBEdges Kantenauswahl}, die nur {@link KBEdge Kanten} mit den {@link KBEdge#relationRef() Beziehungsreferenzen}
+	 * liefert, die nicht in den gegebenen Referenzen {@code exceptRelationRefs} enthalten sind. */
+	public KBEdges exceptRelationRefs(int... exceptRelationRefs) {
+		return KBState.computeExcept(this.acceptRelationRefset, this.refuseRelationRefset, exceptRelationRefs,
+			acceptRelationRefset -> new KBEdges(this.owner, this.acceptSourceRefset, this.refuseSourceRefset, this.acceptTargetRefset, this.refuseTargetRefset,
+				acceptRelationRefset, null),
+			refuseRelationRefset -> new KBEdges(this.owner, this.acceptSourceRefset, this.refuseSourceRefset, this.acceptTargetRefset, this.refuseTargetRefset, null,
+				refuseRelationRefset));
 	}
 
 	/** Diese Methode übergibt die Referenzen der {@link KBEdge Kanten} an {@link RUN#run(int, int, int) task.run()}. */
