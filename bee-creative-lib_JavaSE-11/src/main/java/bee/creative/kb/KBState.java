@@ -84,7 +84,7 @@ public class KBState {
 	/** Diese Methode liefert eine Kopie der gegebenen {@link KBState Hyperkantenmenge}. */
 	public static KBState from(KBState state) {
 		var result = new KBState();
-		result.nextRef = state.nextRef;
+		result.entityRef = state.entityRef;
 		result.rootRef = state.rootRef;
 		result.valueRefMap = (ValueRefMap)state.valueRefMap.clone();
 		result.valueStrMap = (ValueStrMap)state.valueStrMap.clone();
@@ -103,7 +103,7 @@ public class KBState {
 		oldState.restore();
 		newState.restore();
 		if (oldState == newState) return result;
-		result.nextRef = newState.nextRef - oldState.nextRef;
+		result.entityRef = newState.entityRef - oldState.entityRef;
 		result.rootRef = newState.rootRef - oldState.rootRef;
 		var oldSourceMap = oldState.sourceMap;
 		var newSourceMap = newState.sourceMap;
@@ -201,14 +201,16 @@ public class KBState {
 		}
 		var oldValueStrMap = oldState.valueStrMap;
 		var newValueStrMap = newState.valueStrMap;
-		newValueStrMap.fastForEach((KBValues.RUN)(valueRef, newValueStr) -> {
-			var oldValueStr = oldValueStrMap.get(valueRef);
-			if (oldValueStr == null) {
-				result.insertValue(valueRef, newValueStr);
-			} else {
-				if (!oldValueStr.equals(newValueStr)) throw new IllegalArgumentException(); // stimmt das?
-			}
-		});
+		if (oldValueStrMap != newValueStrMap) {
+			newValueStrMap.fastForEach((KBValues.RUN)(valueRef, newValueStr) -> {
+				var oldValueStr = oldValueStrMap.get(valueRef);
+				if (oldValueStr == null) {
+					result.insertValue(valueRef, newValueStr);
+				} else {
+					if (!oldValueStr.equals(newValueStr)) throw new IllegalArgumentException(); // stimmt das?
+				}
+			});
+		}
 		return result;
 	}
 
@@ -220,18 +222,24 @@ public class KBState {
 		return this.values;
 	}
 
-	/** Diese Methode liefert die Referenz auf die nächste neue Entität oder {@code 0}. Wenn dieses Objekt über {@link #from(KBState, KBState)} erzeugt wurde,
-	 * liefert sie {@code newState.getNextRef() - oldState.getNextRef()}. */
-	public int getNextRef() {
-		return this.nextRef;
-	}
-
 	/** Diese Methode liefert die Referenz auf die Entität des Inhaltsverzeichnisses oder {@code 0}. Wenn dieses Objekt über {@link #from(KBState, KBState)}
 	 * erzeugt wurde, liefert sie {@code newState.getRootRef() - oldState.getRootRef()}. */
 	public int getRootRef() {
 		return this.rootRef;
 	}
+	
+	/** Diese Methode liefert die Referenz auf den nächsten neuen Textwert oder {@code 0}. Wenn dieses Objekt über {@link #from(KBState, KBState)} erzeugt wurde,
+	 * liefert sie {@code newState.getNextRef() - oldState.getNextRef()}. */
+	public int getValueRef() {
+		return this.valueRef;
+	}
 
+	/** Diese Methode liefert die Referenz auf die nächste neue Entität oder {@code 0}. Wenn dieses Objekt über {@link #from(KBState, KBState)} erzeugt wurde,
+	 * liefert sie {@code newState.getNextRef() - oldState.getNextRef()}. */
+	public int getNextRef() {
+		return this.entityRef;
+	}
+	
 	public FEMString getValue(int valueRef) {
 		if (valueRef == 0) return null;
 		this.restore();
@@ -535,7 +543,7 @@ public class KBState {
 		var storage = new int[5 + edgesSize + valuesSize];
 		var storageIdx = 5;
 		storage[0] = this.rootRef;
-		storage[1] = this.nextRef;
+		storage[1] = this.entityRef;
 		storage[2] = valuesCount;
 		storage[3] = valueOffset;
 		storage[4] = sourceCount;
@@ -667,9 +675,11 @@ public class KBState {
 		return useRefuseRefs.get(REFSET.from(exceptRefs));
 	}
 
-	int nextRef;
-
 	int rootRef;
+
+	int valueRef;
+	
+	int entityRef;
 
 	/** Dieses Feld speichert die Referenzabbildung gemäß {@link REFMAP} von {@link KBEdge#sourceRef} auf Referenzabbildungen gemäß {@link REFMAP} von
 	 * {@link KBEdge#relationRef} auf {@link KBEdge#targetRef}. Letztere sind dabei als {@code int[1]} oder gemäß {@link REFSET} abgebildet. */
@@ -700,7 +710,7 @@ public class KBState {
 	/** Dieser Konstruktor übernimmt die Merkmale der gegebenen {@link #toInts() Wissensabschrift}. */
 	KBState(int[] storage) {
 		this();
-		this.nextRef = storage[0];
+		this.entityRef = storage[0];
 		this.rootRef = storage[1];
 		this.storage = storage;
 	}
@@ -708,7 +718,7 @@ public class KBState {
 	/** Dieser Konstruktor übernimmt die Merkmale des gegebenen {@link KBState Wissensstands}. */
 	KBState(KBState that) {
 		this.rootRef = that.rootRef;
-		this.nextRef = that.nextRef;
+		this.entityRef = that.entityRef;
 		this.sourceMap = that.sourceMap;
 		this.targetMap = that.targetMap;
 		this.valueRefMap = that.valueRefMap;
@@ -826,7 +836,7 @@ public class KBState {
 			: this.valueStrMap.fastIterator().filter(entry -> REFSET.isValid(entry.getKey(), acceptValueRefset_or_null, refuseValueRefset_or_null)));
 	}
 
-	final void insertValue(int valueRef, FEMString valueStr) {
+private	void insertValue(int valueRef, FEMString valueStr) {
 		var newValueRef = valueRef;
 		var newValueStr = valueStr.data();
 		var oldValueRef = this.valueRefMap.put(newValueStr, newValueRef);

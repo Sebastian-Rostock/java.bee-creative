@@ -48,7 +48,7 @@ public final class KBUpdate {
 			} else {
 				this.oldState = new KBState(buffer);
 				this.newState = new KBState(backup);
-				buffer.nextRef = backup.nextRef;
+				buffer.entityRef = backup.entityRef;
 				buffer.rootRef = backup.rootRef;
 				buffer.sourceMap = backup.sourceMap;
 				buffer.targetMap = backup.targetMap;
@@ -56,6 +56,8 @@ public final class KBUpdate {
 				buffer.valueStrMap = backup.valueStrMap;
 			}
 			buffer.backup = null;
+			buffer.backupEdges = false;
+			buffer.backupValues = false;
 		} else {
 			this.newState = this.oldState = new KBState(buffer);
 		}
