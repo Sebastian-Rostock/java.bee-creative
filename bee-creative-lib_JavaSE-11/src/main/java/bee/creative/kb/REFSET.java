@@ -162,7 +162,7 @@ public final class REFSET {
 				REFSET.putRef(refset1, ref2);
 			}
 		}
-		return refset1;
+		return REFSET.trim(refset1);
 	}
 
 	/** Diese Methode entfernt aus der gegebenen Referenzmenge {@code refset1} alle Referenzen, die in der gegebenen Referenzmenge {@code refset2} enthalten sind,
@@ -225,6 +225,7 @@ public final class REFSET {
 
 	/** Diese Methode liefert eine Kopie der gegebenen Referenzmenge {@code refset}. */
 	public static int[] copy(int[] refset) {
+		if (refset == REFSET.EMPTY) return refset;
 		var refset2 = refset.clone();
 		return refset2;
 	}

@@ -95,6 +95,7 @@ public final class REFMAP {
 
 	/** Diese Methode liefert eine Kopie der gegebenen Referenzabbildung {@code refmap}. */
 	public static Object[] copy(Object[] refmap) {
+		if (refmap == REFMAP.EMPTY) return refmap;
 		var refmap2 = refmap.clone();
 		refmap2[0] = REFSET.copy(REFMAP.getKeys(refmap));
 		return refmap2;
