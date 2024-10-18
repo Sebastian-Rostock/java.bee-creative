@@ -25,7 +25,10 @@ import bee.creative.util.Iterators;
  * werden kann. Wenn eine Hyperkantenmenge aus einer solchen kompakte Abschrift erzeugt wird, erfolgt deren Expansion grundsätzlich beim ersten Zugriff auf die
  * Referenzen der {@link KBEdge Hyperkanten}, außer bei {@link #toInts()} und {@link #edges()}.
  * <p>
- * Die über {@link #getNextRef()} und {@link #getRootRef()} bereitgestellten Referenzen haben Bedeutung für {@link KBBuffer} und {@link KBUpdate}.
+ * Die über {@link #getIndexRef()}, {@link #getCurrentExternalRef()} und {@link #getCurrentInternalRef()} und bereitgestellten Referenzen haben Bedeutung für
+ * {@link KBBuffer} und {@link KBUpdate}.
+ * <p>
+ * ({@link KBEdge#sourceRef()}, {@link KBEdge#relationRef()} und {@link KBEdge#targetRef()})
  *
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class KBState {
@@ -84,8 +87,10 @@ public class KBState {
 	/** Diese Methode liefert eine Kopie der gegebenen {@link KBState Hyperkantenmenge}. */
 	public static KBState from(KBState state) {
 		var result = new KBState();
-		result.entityRef = state.entityRef;
-		result.rootRef = state.rootRef;
+		state.restore();
+		result.indexRef = state.indexRef;
+		result.currentInternalRef = state.currentInternalRef;
+		result.currentExternalRef = state.currentExternalRef;
 		result.valueRefMap = (ValueRefMap)state.valueRefMap.clone();
 		result.valueStrMap = (ValueStrMap)state.valueStrMap.clone();
 		state.forEachEdge(result::insertEdge);
@@ -103,8 +108,9 @@ public class KBState {
 		oldState.restore();
 		newState.restore();
 		if (oldState == newState) return result;
-		result.entityRef = newState.entityRef - oldState.entityRef;
-		result.rootRef = newState.rootRef - oldState.rootRef;
+		result.indexRef = newState.indexRef - oldState.indexRef;
+		result.currentInternalRef = newState.currentInternalRef - oldState.currentInternalRef;
+		result.currentExternalRef = newState.currentExternalRef - oldState.currentExternalRef;
 		var oldSourceMap = oldState.sourceMap;
 		var newSourceMap = newState.sourceMap;
 		var newSourceKeys = REFMAP.getKeys(newSourceMap);
@@ -222,24 +228,6 @@ public class KBState {
 		return this.values;
 	}
 
-	/** Diese Methode liefert die Referenz auf die Entität des Inhaltsverzeichnisses oder {@code 0}. Wenn dieses Objekt über {@link #from(KBState, KBState)}
-	 * erzeugt wurde, liefert sie {@code newState.getRootRef() - oldState.getRootRef()}. */
-	public int getRootRef() {
-		return this.rootRef;
-	}
-	
-	/** Diese Methode liefert die Referenz auf den nächsten neuen Textwert oder {@code 0}. Wenn dieses Objekt über {@link #from(KBState, KBState)} erzeugt wurde,
-	 * liefert sie {@code newState.getNextRef() - oldState.getNextRef()}. */
-	public int getValueRef() {
-		return this.valueRef;
-	}
-
-	/** Diese Methode liefert die Referenz auf die nächste neue Entität oder {@code 0}. Wenn dieses Objekt über {@link #from(KBState, KBState)} erzeugt wurde,
-	 * liefert sie {@code newState.getNextRef() - oldState.getNextRef()}. */
-	public int getNextRef() {
-		return this.entityRef;
-	}
-	
 	public FEMString getValue(int valueRef) {
 		if (valueRef == 0) return null;
 		this.restore();
@@ -253,20 +241,14 @@ public class KBState {
 		return valueRef != null ? valueRef : 0;
 	}
 
-	int[] TODO_getValueRefs() {
-		if (this.storage != null) {
-
-		} else {
-
-		}
-
+	public int[] getValueRefs() {
 		this.restore();
-		// TODO
-		return KBState.EMPTY_REFS;
+		return this.valueStrMap.fastKeys();
 	}
 
 	public int getValueCount() {
-		return this.storage != null ? this.storage[2] : this.valueStrMap.size();
+		this.restore();
+		return this.valueStrMap.size();
 	}
 
 	/** Diese Methode liefert die als {@link KBEdge#sourceRef()} vorkommenden Referenzen. */
@@ -427,6 +409,24 @@ public class KBState {
 		return REFSET.size(sourceVal);
 	}
 
+	/** Diese Methode liefert die Referenz auf die Entität des Inhaltsverzeichnisses oder {@code 0}. Wenn dieses Objekt über {@link #from(KBState, KBState)}
+	 * erzeugt wurde, liefert sie {@code newState.getRootRef() - oldState.getRootRef()}. */
+	public int getIndexRef() {
+		return this.indexRef;
+	}
+
+	/** Diese Methode liefert die Referenz, von der aus die nächste für eine neue interne Entität ohne Textwert verfügbare Referenz gesucht wird. Wenn dieses
+	 * Objekt über {@link #from(KBState, KBState)} erzeugt wurde, liefert sie {@code newState.getCurrentInternalRef() - oldState.getCurrentInternalRef()}. */
+	public int getCurrentInternalRef() {
+		return this.currentInternalRef;
+	}
+
+	/** Diese Methode liefert die Referenz, von der aus die nächste für eine neue externe Entität mit Textwert verfügbare Referenz gesucht wird. Wenn dieses
+	 * Objekt über {@link #from(KBState, KBState)} erzeugt wurde, liefert sie {@code newState.getCurrentExternalRef() - oldState.getCurrentExternalRef()}. */
+	public int getCurrentExternalRef() {
+		return this.currentExternalRef;
+	}
+
 	public boolean containsEdge(KBEdge edge) {
 		return (edge != null) && this.containsEdge(edge.sourceRef, edge.targetRef, edge.relationRef);
 	}
@@ -495,9 +495,11 @@ public class KBState {
 	}
 
 	/** Diese Methode liefert ein Wissensabschrift aller {@link KBEdge Kanten} und {@link FEMString Textwerte} als {@code int}-Array mit der Struktur
-	 * {@code (nextRef, rootRef, valueCount, valueOffset, sourceCount, (sourceRef, targetRefCount, (targetRef, relationRef)[targetRefCount], targetSetCount,
-	 * (relationRef, targetCount, targetRef[targetCount])[targetSetCount])[sourceCount], (valueRef, valueSize, valueItem[valueSize])[valueCount])}, wobei
-	 * {@code valueOffset} die Position des ersten {@code valueRef} nennt.
+	 * {@code (indexRef, currentInternalRef, currentExternalRef, valueOffset,
+	 * sourceCount, (sourceRef, targetRefCount, (targetRef, relationRef)[targetRefCount],
+	 * targetSetCount, (relationRef,
+	 * targetCount, targetRef[targetCount])[targetSetCount])[sourceCount],
+	 * valueCount, (valueRef, valueSize, valueItem[valueSize])[valueCount])}, wobei {@code valueOffset} die Position von {@code valueCount} nennt.
 	 *
 	 * @return Wissensabschrift. */
 	public int[] toInts() {
@@ -535,19 +537,19 @@ public class KBState {
 		var valuesSize = 0;
 		var valueMap = this.valueStrMap;
 		var valuesCount = valueMap.size();
-		var valueOffset = edgesSize + 5;
 		for (var entry: valueMap.fastEntries()) {
 			valuesSize += entry.getValue().length() + 2;
 		}
 
-		var storage = new int[5 + edgesSize + valuesSize];
-		var storageIdx = 5;
-		storage[0] = this.rootRef;
-		storage[1] = this.entityRef;
-		storage[2] = valuesCount;
-		storage[3] = valueOffset;
-		storage[4] = sourceCount;
+		var result = new int[4 + 1 + edgesSize + 1 + valuesSize];
+		var cursor = 5;
 
+		result[0] = this.indexRef;
+		result[1] = this.currentInternalRef;
+		result[2] = this.currentExternalRef;
+		result[3] = edgesSize + 5;
+
+		result[4] = sourceCount;
 		for (var sourceIdx = sourceMap.length - 1; 0 < sourceIdx; sourceIdx--) {
 			var relationMap = KBState.asRefMap(sourceMap[sourceIdx]);
 			if (relationMap != null) {
@@ -569,18 +571,18 @@ public class KBState {
 					}
 				}
 				if ((targetRefCount != 0) || (targetSetCount != 0)) {
-					storage[storageIdx++] = REFSET.getRef(REFMAP.getKeys(sourceMap), sourceIdx);
-					storage[storageIdx++] = targetRefCount;
+					result[cursor++] = REFSET.getRef(REFMAP.getKeys(sourceMap), sourceIdx);
+					result[cursor++] = targetRefCount;
 					if (targetRefCount != 0) {
 						for (var relationIdx = relationMap.length - 1; 0 < relationIdx; relationIdx--) {
 							var targetVal = KBState.asRefVal(relationMap[relationIdx]);
 							if ((targetVal != null) && (KBState.isRef(targetVal) || (REFSET.size(targetVal) == 1))) {
-								storage[storageIdx++] = KBState.asRef(targetVal);
-								storage[storageIdx++] = REFSET.getRef(REFMAP.getKeys(relationMap), relationIdx);
+								result[cursor++] = KBState.asRef(targetVal);
+								result[cursor++] = REFSET.getRef(REFMAP.getKeys(relationMap), relationIdx);
 							}
 						}
 					}
-					storage[storageIdx++] = targetSetCount;
+					result[cursor++] = targetSetCount;
 					if (targetSetCount != 0) {
 						for (var relationIdx = relationMap.length - 1; 0 < relationIdx; relationIdx--) {
 							var targetVal = KBState.asRefVal(relationMap[relationIdx]);
@@ -588,12 +590,12 @@ public class KBState {
 								if (!KBState.isRef(targetVal)) {
 									var targetCount = REFSET.size(targetVal);
 									if (targetCount > 1) {
-										storage[storageIdx++] = REFSET.getRef(REFMAP.getKeys(relationMap), relationIdx);
-										storage[storageIdx++] = targetCount;
+										result[cursor++] = REFSET.getRef(REFMAP.getKeys(relationMap), relationIdx);
+										result[cursor++] = targetCount;
 										for (var targetIdx = targetVal.length - 1; 3 < targetIdx; targetIdx -= 3) {
 											var targetRef = targetVal[targetIdx];
 											if (targetRef != 0) {
-												storage[storageIdx++] = targetRef;
+												result[cursor++] = targetRef;
 											}
 										}
 									}
@@ -605,17 +607,18 @@ public class KBState {
 			}
 		}
 
+		result[cursor++] = valuesCount;
 		for (var value: valueMap.fastEntries()) {
 			var valueRef = value.getKey();
 			var valueStr = value.getValue();
 			var valueSize = valueStr.length();
-			storage[storageIdx++] = valueRef;
-			storage[storageIdx++] = valueSize;
-			valueStr.toInts(storage, storageIdx);
-			storageIdx += valueSize;
+			result[cursor++] = valueRef;
+			result[cursor++] = valueSize;
+			valueStr.toInts(result, cursor);
+			cursor += valueSize;
 		}
 
-		return storage;
+		return result;
 	}
 
 	/** Diese Methode liefert die {@link #toInts() Wissensabschrift} als {@code byte}-Array mit nativer Bytereihenfolge. */
@@ -636,24 +639,24 @@ public class KBState {
 		return Objects.toStringCall(false, true, this, "edges", this.edges, "values", this.values);
 	}
 
-	static boolean isRef(int[] val) {
-		return val.length == 1;
+	static boolean isRef(int[] ref_or_refset) {
+		return ref_or_refset.length == 1;
 	}
 
 	static int[] toRef(int ref) {
 		return new int[]{ref};
 	}
 
-	static int asRef(int[] val) {
-		return val[0];
+	static int asRef(int[] ref) {
+		return ref[0];
 	}
 
-	static int[] asRefVal(Object val) {
-		return (int[])val;
+	static int[] asRefVal(Object ref_or_refset) {
+		return (int[])ref_or_refset;
 	}
 
-	static Object[] asRefMap(Object val) {
-		return (Object[])val;
+	static Object[] asRefMap(Object refmap) {
+		return (Object[])refmap;
 	}
 
 	static <T> T computeSelect(int[] acceptRefset, int[] refuseRefset, int[] selectRefs, Getter<int[], T> useAcceptRefs) {
@@ -675,11 +678,11 @@ public class KBState {
 		return useRefuseRefs.get(REFSET.from(exceptRefs));
 	}
 
-	int rootRef;
+	int indexRef;
 
-	int valueRef;
-	
-	int entityRef;
+	int currentExternalRef;
+
+	int currentInternalRef;
 
 	/** Dieses Feld speichert die Referenzabbildung gemäß {@link REFMAP} von {@link KBEdge#sourceRef} auf Referenzabbildungen gemäß {@link REFMAP} von
 	 * {@link KBEdge#relationRef} auf {@link KBEdge#targetRef}. Letztere sind dabei als {@code int[1]} oder gemäß {@link REFSET} abgebildet. */
@@ -701,29 +704,21 @@ public class KBState {
 
 	/** Dieser Konstruktor erzeugt einen leeren Wissensstand. */
 	KBState() {
-		this.sourceMap = REFMAP.EMPTY;
-		this.targetMap = REFMAP.EMPTY;
-		this.valueStrMap = new ValueStrMap();
-		this.valueRefMap = new ValueRefMap();
+		this.reset();
 	}
 
 	/** Dieser Konstruktor übernimmt die Merkmale der gegebenen {@link #toInts() Wissensabschrift}. */
 	KBState(int[] storage) {
 		this();
-		this.entityRef = storage[0];
-		this.rootRef = storage[1];
+		this.indexRef = storage[0];
+		this.currentInternalRef = storage[1];
+		this.currentExternalRef = storage[2];
 		this.storage = storage;
 	}
 
 	/** Dieser Konstruktor übernimmt die Merkmale des gegebenen {@link KBState Wissensstands}. */
 	KBState(KBState that) {
-		this.rootRef = that.rootRef;
-		this.entityRef = that.entityRef;
-		this.sourceMap = that.sourceMap;
-		this.targetMap = that.targetMap;
-		this.valueRefMap = that.valueRefMap;
-		this.valueStrMap = that.valueStrMap;
-		this.storage = that.storage;
+		this.reset(that);
 	}
 
 	/** Diese Methode leert {@link #sourceMap}, {@link #targetMap}, {@link #valueRefMap} und {@link #valueStrMap}. */
@@ -732,6 +727,17 @@ public class KBState {
 		this.targetMap = REFMAP.EMPTY;
 		this.valueRefMap = new ValueRefMap();
 		this.valueStrMap = new ValueStrMap();
+	}
+
+	final void reset(KBState that) {
+		this.indexRef = that.indexRef;
+		this.currentInternalRef = that.currentInternalRef;
+		this.currentExternalRef = that.currentExternalRef;
+		this.sourceMap = that.sourceMap;
+		this.targetMap = that.targetMap;
+		this.valueRefMap = that.valueRefMap;
+		this.valueStrMap = that.valueStrMap;
+		this.storage = that.storage;
 	}
 
 	/** Diese Methode ersetzt {@link #sourceMap} und {@link #targetMap} nur dann mit den in {@link #storage} hinterlegten {@link KBEdge Wissensstand}, wenn
@@ -836,27 +842,23 @@ public class KBState {
 			: this.valueStrMap.fastIterator().filter(entry -> REFSET.isValid(entry.getKey(), acceptValueRefset_or_null, refuseValueRefset_or_null)));
 	}
 
-private	void insertValue(int valueRef, FEMString valueStr) {
-		var newValueRef = valueRef;
-		var newValueStr = valueStr.data();
-		var oldValueRef = this.valueRefMap.put(newValueStr, newValueRef);
-		if (oldValueRef != null) {
-			if (oldValueRef.intValue() == valueRef) return;
-			this.valueRefMap.put(valueStr, oldValueRef);
-			throw new IllegalArgumentException();
-		}
-		var oldValueStr = this.valueStrMap.put(newValueRef, newValueStr);
-		if (oldValueStr != null) {
-			this.valueStrMap.put(newValueRef, oldValueStr);
-			this.valueRefMap.remove(newValueStr);
-			throw new IllegalArgumentException();
-		}
-	}
-
 	static final class ValueStrMap extends HashMapIO<FEMString> {
 
 		public void pack() {
-			// TODO
+			var capacity = this.capacity() >> 1;
+			if (this.size() > capacity) return;
+			this.allocate(capacity);
+		}
+
+		public int[] fastKeys() {
+			var result = new int[this.size()];
+			var cursor = 0;
+			for (var index = this.capacity() - 1; 0 <= index; index--) {
+				if (this.customGetValue(index) != null) {
+					result[cursor++] = this.customGetKeyInt(index);
+				}
+			}
+			return result;
 		}
 
 		public Iterable2<Entry<Integer, FEMString>> fastEntries() {
@@ -871,15 +873,13 @@ private	void insertValue(int valueRef, FEMString valueStr) {
 			for (var index = this.capacityImpl() - 1; 0 <= index; index--) {
 				var valueStr = this.customGetValue(index);
 				if (valueStr != null) {
-					task.run(this.customGetKey(index), valueStr);
+					task.run(this.customGetKeyInt(index), valueStr);
 				}
 			}
 		}
 
 		@SuppressWarnings ("synthetic-access")
 		final class ITER implements Iterator2<Entry<Integer, FEMString>> {
-
-			Entry<Integer, FEMString> next;
 
 			@Override
 			public Entry<Integer, FEMString> next() {
@@ -907,6 +907,8 @@ private	void insertValue(int valueRef, FEMString valueStr) {
 				this.next();
 			}
 
+			private Entry<Integer, FEMString> next;
+
 			private int index;
 
 		}
@@ -918,7 +920,9 @@ private	void insertValue(int valueRef, FEMString valueStr) {
 	static final class ValueRefMap extends HashMapOI<FEMString> {
 
 		public void pack() {
-			// TODO
+			var capacity = this.capacity() >> 1;
+			if (this.size() > capacity) return;
+			this.allocate(capacity);
 		}
 
 		private static final long serialVersionUID = -4828467604110047839L;
@@ -959,22 +963,22 @@ private	void insertValue(int valueRef, FEMString valueStr) {
 	}
 
 	private static void selectEdges(int[] storage, KBEdges.RUN task) {
-		var storageIdx = 5;
-		var sourceCount = storage[4];
+		var cursor = 4;
+		var sourceCount = storage[cursor++];
 		while (0 < sourceCount--) {
-			var sourceRef = storage[storageIdx++];
-			var targetRefCount = storage[storageIdx++];
+			var sourceRef = storage[cursor++];
+			var targetRefCount = storage[cursor++];
 			while (0 < targetRefCount--) {
-				var targetRef = storage[storageIdx++];
-				var relationRef = storage[storageIdx++];
+				var targetRef = storage[cursor++];
+				var relationRef = storage[cursor++];
 				task.run(sourceRef, targetRef, relationRef);
 			}
-			var targetSetCount = storage[storageIdx++];
+			var targetSetCount = storage[cursor++];
 			while (0 < targetSetCount--) {
-				var relationRef = storage[storageIdx++];
-				var targetCount = storage[storageIdx++];
+				var relationRef = storage[cursor++];
+				var targetCount = storage[cursor++];
 				while (0 < targetCount--) {
-					var targetRef = storage[storageIdx++];
+					var targetRef = storage[cursor++];
 					task.run(sourceRef, targetRef, relationRef);
 				}
 			}
@@ -1130,16 +1134,16 @@ private	void insertValue(int valueRef, FEMString valueStr) {
 	}
 
 	private static void selectValues(int[] storage, int[] acceptValueRefset_or_null, int[] refuseValueRefset_or_null, KBValues.RUN task) {
-		var storageIdx = storage[3];
-		var valueCount = storage[2];
+		var cursor = storage[4];
+		var valueCount = storage[cursor++];
 		while (0 < valueCount--) {
-			var valueRef = storage[storageIdx++];
-			var valueSize = storage[storageIdx++];
+			var valueRef = storage[cursor++];
+			var valueSize = storage[cursor++];
 			if (REFSET.isValid(valueRef, acceptValueRefset_or_null, refuseValueRefset_or_null)) {
-				var valueStr = FEMString.from(storage, storageIdx, valueSize);
+				var valueStr = FEMString.from(storage, cursor, valueSize);
 				task.run(valueRef, valueStr);
 			}
-			storageIdx += valueSize;
+			cursor += valueSize;
 		}
 	}
 
@@ -1158,6 +1162,23 @@ private	void insertValue(int valueRef, FEMString valueStr) {
 	private void insertEdge(int sourceRef, int targetRef, int relationRef) {
 		this.sourceMap = KBState.insertEdge(this.sourceMap, sourceRef, targetRef, relationRef);
 		this.targetMap = KBState.insertEdge(this.targetMap, targetRef, sourceRef, relationRef);
+	}
+
+	private void insertValue(int valueRef, FEMString valueStr) {
+		var newValueRef = valueRef;
+		var newValueStr = valueStr.data();
+		var oldValueRef = this.valueRefMap.put(newValueStr, newValueRef);
+		if (oldValueRef != null) {
+			if (oldValueRef.intValue() == valueRef) return;
+			this.valueRefMap.put(valueStr, oldValueRef);
+			throw new IllegalArgumentException();
+		}
+		var oldValueStr = this.valueStrMap.put(newValueRef, newValueStr);
+		if (oldValueStr != null) {
+			this.valueStrMap.put(newValueRef, oldValueStr);
+			this.valueRefMap.remove(newValueStr);
+			throw new IllegalArgumentException();
+		}
 	}
 
 }
