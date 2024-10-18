@@ -22,7 +22,7 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 	 * @throws NullPointerException Wenn {@code section == null} oder {@code section.array() == null}.
 	 * @throws IndexOutOfBoundsException Wenn {@code section.startIndex() < 0} oder {@code section.finalIndex() > section.arrayLength()}.
 	 * @throws IllegalArgumentException Wenn {@code section.finalIndex() < section.startIndex()}. */
-	public static <GSection extends ArraySection<?>> GSection validate(final GSection section)
+	public static <GSection extends ArraySection<?>> GSection validate(GSection section)
 		throws NullPointerException, IndexOutOfBoundsException, IllegalArgumentException {
 		Objects.notNull(section.array());
 		if (section.startIndex() < 0) throw new IndexOutOfBoundsException("startIndex < 0");
@@ -35,12 +35,13 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 	 *
 	 * @param data Abschnitt.
 	 * @return {@code true}, wenn dieser Abschnitt gleich dem das gegebenen ist. */
-	protected final boolean defaultEquals(final ArraySection<GArray> data) {
-		int index = this.startIndex();
-		final int delta = data.startIndex() - index;
-		final int finalIndex = this.finalIndex();
+	protected final boolean defaultEquals(ArraySection<GArray> data) {
+		var index = this.startIndex();
+		var delta = data.startIndex() - index;
+		var finalIndex = this.finalIndex();
 		if ((finalIndex - index) != (((data.finalIndex() - index) - delta))) return false;
-		final GArray array1 = this.array(), array2 = data.array();
+		var array1 = this.array();
+		var array2 = data.array();
 		while (index < finalIndex) {
 			if (!this.customEquals(array1, array2, index, index + delta)) return false;
 			index++;
@@ -127,23 +128,24 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 	public abstract int finalIndex();
 
 	@Override
-	public int compareTo(final ArraySection<GArray> section) {
-		final GArray array1 = this.array(), array2 = section.array();
-		int startIndex1 = this.startIndex();
-		int startIndex2 = section.startIndex();
-		final int finalIndex1 = this.finalIndex();
-		final int finalIndex2 = section.finalIndex();
-		final int size1 = this.finalIndex() - startIndex1;
-		final int size2 = section.finalIndex() - startIndex2;
+	public int compareTo(ArraySection<GArray> section) {
+		var array1 = this.array();
+		var array2 = section.array();
+		var startIndex1 = this.startIndex();
+		var startIndex2 = section.startIndex();
+		var finalIndex1 = this.finalIndex();
+		var finalIndex2 = section.finalIndex();
+		var size1 = this.finalIndex() - startIndex1;
+		var size2 = section.finalIndex() - startIndex2;
 		if (size1 < size2) {
-			for (final int delta = startIndex2 - startIndex1; startIndex1 < finalIndex1; startIndex1++) {
-				final int comp = this.customCompare(array1, array2, startIndex1, startIndex1 + delta);
+			for (var delta = startIndex2 - startIndex1; startIndex1 < finalIndex1; startIndex1++) {
+				var comp = this.customCompare(array1, array2, startIndex1, startIndex1 + delta);
 				if (comp != 0) return comp;
 			}
 			return -1;
 		} else {
-			for (final int delta = startIndex1 - startIndex2; startIndex2 < finalIndex2; startIndex2++) {
-				final int comp = this.customCompare(array1, array2, startIndex2 + delta, startIndex2);
+			for (var delta = startIndex1 - startIndex2; startIndex2 < finalIndex2; startIndex2++) {
+				var comp = this.customCompare(array1, array2, startIndex2 + delta, startIndex2);
 				if (comp != 0) return comp;
 			}
 			if (size1 == size2) return 0;
@@ -153,9 +155,10 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 
 	@Override
 	public int hashCode() {
-		int hash = 1;
-		final GArray array = this.array();
-		for (int index = this.startIndex(), finalIndex = this.finalIndex(); index < finalIndex; index++) {
+		var hash = 1;
+		var array = this.array();
+		var finalIndex = this.finalIndex();
+		for (var index = this.startIndex(); index < finalIndex; index++) {
 			hash = (31 * hash) + this.customHash(array, index);
 		}
 		return hash;
@@ -163,12 +166,12 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 
 	@Override
 	public String toString() {
-		int index = this.startIndex();
-		final int finalIndex = this.finalIndex();
+		var index = this.startIndex();
+		var finalIndex = this.finalIndex();
 		if (index == finalIndex) return "[]";
-		final StringBuilder builder = new StringBuilder();
+		var builder = new StringBuilder();
 		builder.append('[');
-		final GArray array = this.array();
+		var array = this.array();
 		this.customPrint(array, index++, builder);
 		for (; index < finalIndex; index++) {
 			this.customPrint(array, index, builder.append(", "));

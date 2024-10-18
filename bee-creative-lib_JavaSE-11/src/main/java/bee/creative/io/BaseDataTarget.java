@@ -114,6 +114,14 @@ public abstract class BaseDataTarget extends BaseObject implements DataTarget {
 				BaseDataTarget.this.write(b, off, len);
 			}
 
+			@Override
+			public void flush() throws IOException {
+			}
+
+			@Override
+			public void close() throws IOException {
+			}
+
 		}.writeUTF(s);
 	}
 

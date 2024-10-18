@@ -33,7 +33,7 @@ public abstract class ArrayData<GArray> {
 	 * @see ArrayData#customSetCapacity(int)
 	 * @param space Anzahl der nicht belegten Elemente.
 	 * @return Position zur Ausrichtung ({@code 0..space}). */
-	protected int customNewFrom(final int space) {
+	protected int customNewFrom(int space) {
 		return space / 2;
 	}
 
@@ -57,7 +57,7 @@ public abstract class ArrayData<GArray> {
 	 *
 	 * @param startIndex Index des ersten Elements im Bereich.
 	 * @param finalIndex Index des ersten Elements nach dem Bereich. */
-	protected void customClearArray(final int startIndex, final int finalIndex) {
+	protected void customClearArray(int startIndex, int finalIndex) {
 	}
 
 	/** Diese Methode gibt die Länge des Arrays zurück.
@@ -71,13 +71,13 @@ public abstract class ArrayData<GArray> {
 	 * @see ArrayData#customNewFrom(int)
 	 * @param length neue Größe.
 	 * @throws IllegalArgumentException Wenn die Eingaben zu einem Zugriff außerhalb des Arrays führen würden. */
-	protected void customSetCapacity(final int length) throws IllegalArgumentException {
-		final int size = this.size;
+	protected void customSetCapacity(int length) throws IllegalArgumentException {
+		var size = this.size;
 		if (size > length) throw new IllegalArgumentException("size > length");
-		final int from2 = this.customNewFrom(length - size);
+		var from2 = this.customNewFrom(length - size);
 		if (length != this.customGetCapacity()) {
-			final GArray array = this.customGetArray();
-			final GArray array2 = this.customNewArray(length);
+			var array = this.customGetArray();
+			var array2 = this.customNewArray(length);
 			System.arraycopy(array, this.from, array2, from2, size);
 			this.customSetArray(array2);
 		}
@@ -88,10 +88,10 @@ public abstract class ArrayData<GArray> {
 	 *
 	 * @param count Anzahl.
 	 * @return Länge. */
-	protected int customNewCapacity(final int count) {
-		final int oldLength = this.customGetCapacity();
+	protected int customNewCapacity(int count) {
+		var oldLength = this.customGetCapacity();
 		if (oldLength >= count) return oldLength;
-		final int newLength = oldLength + (oldLength >> 1);
+		var newLength = oldLength + (oldLength >> 1);
 		if (newLength >= count) return newLength;
 		return count;
 	}
@@ -107,22 +107,22 @@ public abstract class ArrayData<GArray> {
 	 * @param index Index des ersten neuen Elements.
 	 * @param count Anzahl der neuen Elemente.
 	 * @throws IllegalArgumentException Wenn die Eingaben zu einem Zugriff außerhalb des Arrays führen würden. */
-	protected void customInsert(final int index, final int count) throws IllegalArgumentException {
-		final int from = this.from;
-		final int index2 = index - from;
+	protected void customInsert(int index, int count) throws IllegalArgumentException {
+		var from = this.from;
+		var index2 = index - from;
 		if (index2 < 0) throw new IllegalArgumentException("index < from");
-		final int size = this.size;
+		var size = this.size;
 		if (index2 > size) throw new IllegalArgumentException("index > from + size");
 		if (count == 0) return;
 		if (count < 0) throw new IllegalArgumentException("count < 0");
-		final int size2 = size + count;
-		final GArray array = this.customGetArray();
-		final int arrayLength = this.customGetCapacity();
-		final int array2Length = this.customNewCapacity(size2);
+		var size2 = size + count;
+		var array = this.customGetArray();
+		var arrayLength = this.customGetCapacity();
+		var array2Length = this.customNewCapacity(size2);
 		this.size = size2;
 		if (arrayLength != array2Length) {
-			final int from2 = this.customNewFrom(array2Length - size2);
-			final GArray array2 = this.customNewArray(array2Length);
+			var from2 = this.customNewFrom(array2Length - size2);
+			var array2 = this.customNewArray(array2Length);
 			System.arraycopy(array, from, array2, from2, index2);
 			System.arraycopy(array, index, array2, from2 + index2 + count, size - index2);
 			this.from = from2;
@@ -136,18 +136,19 @@ public abstract class ArrayData<GArray> {
 			}
 		} else {
 			if (from >= count) {
-				final int from2 = from - count;
+				var from2 = from - count;
 				this.from = from2;
 				System.arraycopy(array, from, array, from2, index2);
 				return;
 			}
 		}
-		final int from2 = this.customNewFrom(array2Length - size2);
+		var from2 = this.customNewFrom(array2Length - size2);
 		this.from = from2;
 		if (from2 < from) {
 			System.arraycopy(array, from, array, from2, index2);
 			System.arraycopy(array, index, array, from2 + index2 + count, size - index2);
-			final int last = from + size, last2 = from2 + size2;
+			var last = from + size;
+			var last2 = from2 + size2;
 			if (last2 < last) {
 				this.customClearArray(last2, last);
 			}
@@ -168,16 +169,16 @@ public abstract class ArrayData<GArray> {
 	 * @param count Anzahl der entfallende Elemente.
 	 * @throws IllegalArgumentException Wenn die Eingaben zu einem Zugriff außerhalb des Arrays führen würden. */
 	protected void customRemove(final int index, final int count) throws IllegalArgumentException {
-		final int from = this.from;
-		final int index2 = index - from;
+		var from = this.from;
+		var index2 = index - from;
 		if (index2 < 0) throw new IllegalArgumentException("index < from");
-		final int size = this.size;
+		var size = this.size;
 		if (index2 > size) throw new IllegalArgumentException("index > from + size");
 		if (count == 0) return;
 		if (count < 0) throw new IllegalArgumentException("count < 0");
-		final int size2 = size - count;
+		var size2 = size - count;
 		if (size2 < 0) throw new IllegalArgumentException("count > size");
-		final GArray array = this.customGetArray();
+		var array = this.customGetArray();
 		this.size = size2;
 		if (size2 == 0) {
 			this.from = this.customNewFrom(this.customGetCapacity());
@@ -186,7 +187,7 @@ public abstract class ArrayData<GArray> {
 			System.arraycopy(array, index + count, array, index, size2 - index2);
 			this.customClearArray(from + size2, from + size);
 		} else {
-			final int from2 = from + count;
+			var from2 = from + count;
 			this.from = from2;
 			System.arraycopy(array, from, array, from2, index2);
 			this.customClearArray(from, from2);
@@ -204,7 +205,7 @@ public abstract class ArrayData<GArray> {
 	 *
 	 * @param capacity Anzahl.
 	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als {@code 0} ist. */
-	public final void allocate(final int capacity) throws IllegalArgumentException {
+	public final void allocate(int capacity) throws IllegalArgumentException {
 		if (capacity < 0) throw new IllegalArgumentException("capacity < 0");
 		this.customSetCapacity(this.customNewCapacity(capacity));
 	}
