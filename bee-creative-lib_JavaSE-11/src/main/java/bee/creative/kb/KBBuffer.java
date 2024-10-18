@@ -587,14 +587,15 @@ public class KBBuffer extends KBState {
 			if (valueRef2 == null) return;
 			this.valueRefMap.put(valueStr, valueRef2);
 			throw new IllegalArgumentException();
-		} else if (valueRef2 == null) {
+		}
+		if (valueRef2 == null) {
 			this.valueStrMap.put(valueRef, valueStr2);
 			throw new IllegalArgumentException();
-		} else {
-
-			// TODO
 		}
-
+		if (valueRef == valueRef2.intValue()) return;
+		this.valueRefMap.put(valueStr, valueRef2);
+		this.valueStrMap.put(valueRef, valueStr2);
+		throw new IllegalArgumentException();
 	}
 
 	private boolean deleteValueRef(int valueRef) {
