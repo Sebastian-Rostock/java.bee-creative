@@ -16,15 +16,6 @@ import bee.creative.lang.Objects;
  * @param <GValue> Typ der Werte. */
 public class HashMapIO<GValue> extends AbstractHashMap<Integer, GValue> implements Serializable, Cloneable {
 
-	/** Dieses Feld speichert das serialVersionUID. */
-	private static final long serialVersionUID = -5082256600102090233L;
-
-	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Schlüssel ab. */
-	transient int[] keys = AbstractHashData.EMPTY_INTEGERS;
-
-	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Wert ab oder ist {@code null}. Für alle anderen Indizes bildet es auf {@code null} ab. */
-	transient Object[] values = AbstractHashData.EMPTY_OBJECTS;
-
 	/** Dieser Konstruktor initialisiert die Kapazität mit {@code 0}. */
 	public HashMapIO() {
 	}
@@ -32,64 +23,72 @@ public class HashMapIO<GValue> extends AbstractHashMap<Integer, GValue> implemen
 	/** Dieser Konstruktor initialisiert die Kapazität.
 	 *
 	 * @param capacity Kapazität. */
-	public HashMapIO(final int capacity) {
+	public HashMapIO(int capacity) {
 		this.allocateImpl(capacity);
 	}
 
 	/** Dieser Konstruktor initialisiert die {@link HashMapIO} mit dem Inhalt der gegebenen {@link Map}.
 	 *
 	 * @param source gegebene Einträge. */
-	public HashMapIO(final Map<? extends Integer, ? extends GValue> source) {
+	public HashMapIO(Map<? extends Integer, ? extends GValue> source) {
 		this(source.size());
 		this.putAll(source);
 	}
 
-	@SuppressWarnings ("unchecked")
-	private void readObject(final ObjectInputStream stream) throws IOException, ClassNotFoundException {
-		final int count = stream.readInt();
-		this.allocateImpl(count);
-		for (int i = 0; i < count; i++) {
-			final int key = stream.readInt();
-			final Object value = stream.readObject();
-			this.putImpl(key, (GValue)value);
-		}
-	}
-
-	private void writeObject(final ObjectOutputStream stream) throws IOException {
-		stream.writeInt(this.countImpl());
-		for (final Entry<Integer, GValue> entry: this.newEntriesImpl()) {
-			stream.writeInt(entry.getKey());
-			stream.writeObject(entry.getValue());
-		}
+	@Override
+	public GValue put(Integer key, GValue value) {
+		return super.put(Objects.notNull(key), value);
 	}
 
 	@Override
-	protected Integer customGetKey(final int entryIndex) {
+	public long emu() {
+		return super.emu() + EMU.fromArray(this.keys) + EMU.fromArray(this.values);
+	}
+
+	@Override
+	public HashMapIO<GValue> clone() {
+		var result = (HashMapIO<GValue>)super.clone();
+		if (this.capacityImpl() == 0) return result;
+		result.keys = this.keys.clone();
+		result.values = this.values.clone();
+		return result;
+	}
+
+	@Override
+	protected Integer customGetKey(int entryIndex) {
+		return this.keys[entryIndex];
+	}
+
+	protected int customGetKeyInt(int entryIndex) {
 		return this.keys[entryIndex];
 	}
 
 	@Override
 	@SuppressWarnings ("unchecked")
-	protected GValue customGetValue(final int entryIndex) {
+	protected GValue customGetValue(int entryIndex) {
 		return (GValue)this.values[entryIndex];
 	}
 
 	@Override
-	protected void customSetKey(final int entryIndex, final Integer key) {
+	protected void customSetKey(int entryIndex, Integer key) {
+		this.keys[entryIndex] = key;
+	}
+
+	protected void customSetKeyInt(int entryIndex, int key) {
 		this.keys[entryIndex] = key;
 	}
 
 	@Override
 	@SuppressWarnings ("unchecked")
-	protected GValue customSetValue(final int entryIndex, final GValue value) {
-		final Object[] values = this.values;
-		final Object result = values[entryIndex];
+	protected GValue customSetValue(int entryIndex, GValue value) {
+		var values = this.values;
+		var result = values[entryIndex];
 		values[entryIndex] = value;
 		return (GValue)result;
 	}
 
 	@Override
-	protected boolean customEqualsKey(final int entryIndex, final Object key) {
+	protected boolean customEqualsKey(int entryIndex, Object key) {
 		return (key instanceof Integer) && (((Integer)key).intValue() == this.keys[entryIndex]);
 	}
 
@@ -99,25 +98,18 @@ public class HashMapIO<GValue> extends AbstractHashMap<Integer, GValue> implemen
 	}
 
 	@Override
-	protected void customClearValue(final int entryIndex) {
+	protected void customClearValue(int entryIndex) {
 		this.values[entryIndex] = null;
 	}
 
 	@Override
-	protected HashAllocator customAllocator(final int capacity) {
-		final int[] keys2;
-		final Object[] values2;
-		if (capacity == 0) {
-			keys2 = AbstractHashData.EMPTY_INTEGERS;
-			values2 = AbstractHashData.EMPTY_OBJECTS;
-		} else {
-			keys2 = new int[capacity];
-			values2 = new Object[capacity];
-		}
+	protected HashAllocator customAllocator(int capacity) {
+		var keys2 = capacity == 0 ? AbstractHashData.EMPTY_INTEGERS : new int[capacity];
+		var values2 = capacity == 0 ? AbstractHashData.EMPTY_OBJECTS : new Object[capacity];
 		return new HashAllocator() {
 
 			@Override
-			public void copy(final int sourceIndex, final int targetIndex) {
+			public void copy(int sourceIndex, int targetIndex) {
 				keys2[targetIndex] = HashMapIO.this.keys[sourceIndex];
 				values2[targetIndex] = HashMapIO.this.values[sourceIndex];
 			}
@@ -131,23 +123,31 @@ public class HashMapIO<GValue> extends AbstractHashMap<Integer, GValue> implemen
 		};
 	}
 
-	@Override
-	public GValue put(final Integer key, final GValue value) {
-		return super.put(Objects.notNull(key), value);
+	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Schlüssel ab. */
+	transient int[] keys = AbstractHashData.EMPTY_INTEGERS;
+
+	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Wert ab oder ist {@code null}. Für alle anderen Indizes bildet es auf {@code null} ab. */
+	transient Object[] values = AbstractHashData.EMPTY_OBJECTS;
+
+	@SuppressWarnings ("unchecked")
+	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
+		var count = stream.readInt();
+		this.allocateImpl(count);
+		for (var i = 0; i < count; i++) {
+			var key = stream.readInt();
+			var value = stream.readObject();
+			this.putImpl(key, (GValue)value);
+		}
 	}
 
-	@Override
-	public long emu() {
-		return super.emu() + EMU.fromArray(this.keys) + EMU.fromArray(this.values);
+	private void writeObject(ObjectOutputStream stream) throws IOException {
+		stream.writeInt(this.countImpl());
+		for (var entry: this.newEntriesImpl()) {
+			stream.writeInt(entry.getKey());
+			stream.writeObject(entry.getValue());
+		}
 	}
 
-	@Override
-	public HashMapIO<GValue> clone() {
-		final HashMapIO<GValue> result = (HashMapIO<GValue>)super.clone();
-		if (this.capacityImpl() == 0) return result;
-		result.keys = this.keys.clone();
-		result.values = this.values.clone();
-		return result;
-	}
+	private static final long serialVersionUID = -5082256600102090233L;
 
 }

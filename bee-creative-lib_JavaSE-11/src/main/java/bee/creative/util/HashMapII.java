@@ -61,7 +61,11 @@ public class HashMapII extends AbstractHashMap<Integer, Integer> implements Seri
 	}
 
 	@Override
-	protected Integer customGetKey(final int entryIndex) {
+	protected Integer customGetKey(int entryIndex) {
+		return this.keys[entryIndex];
+	}
+
+	protected int customGetKeyInt(int entryIndex) {
 		return this.keys[entryIndex];
 	}
 
@@ -70,8 +74,16 @@ public class HashMapII extends AbstractHashMap<Integer, Integer> implements Seri
 		return this.values[entryIndex];
 	}
 
+	protected int customGetValueInt(int entryIndex) {
+		return this.values[entryIndex];
+	}
+
 	@Override
-	protected void customSetKey(final int entryIndex, final Integer key) {
+	protected void customSetKey(int entryIndex, Integer key) {
+		this.keys[entryIndex] = key;
+	}
+
+	protected void customSetKeyInt(int entryIndex, int key) {
 		this.keys[entryIndex] = key;
 	}
 
@@ -79,6 +91,13 @@ public class HashMapII extends AbstractHashMap<Integer, Integer> implements Seri
 	protected Integer customSetValue(final int entryIndex, final Integer value) {
 		final int[] values = this.values;
 		final Integer result = values[entryIndex];
+		values[entryIndex] = value;
+		return result;
+	}
+
+	protected int customSetValueInt(int entryIndex, int value) {
+		var values = this.values;
+		var result = values[entryIndex];
 		values[entryIndex] = value;
 		return result;
 	}
