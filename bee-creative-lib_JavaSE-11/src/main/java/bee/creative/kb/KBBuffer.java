@@ -127,9 +127,22 @@ public class KBBuffer extends KBState {
 		return result != this.getValueCount();
 	}
 
+	/** Diese Methode setzt die Referenz auf die Entität des Inhaltsverzeichnisses. */
 	public void setIndexRef(int indexRef) {
 		this.backup();
 		this.indexRef = indexRef;
+	}
+
+	/** Diese Methode setzt die Referenz, von der aus die nächste für eine neue interne Entität ohne Textwert verfügbare Referenz gesucht wird. */
+	public void setInternalRef(int internalRef) {
+		this.backup();
+		this.internalRef = internalRef;
+	}
+
+	/** Diese Methode setzt die Referenz, von der aus die nächste für eine neue externe Entität mit Textwert verfügbare Referenz gesucht wird. */
+	public void setExternalRef(int externalRef) {
+		this.backup();
+		this.externalRef = externalRef;
 	}
 
 	public int getNextInternalRef() {
@@ -142,63 +155,53 @@ public class KBBuffer extends KBState {
 		return this.nextExternalRef();
 	}
 
-	public void setCurrentInternalRef(int currentInternalRef) {
-		this.backup();
-		this.currentInternalRef = currentInternalRef;
-	}
-
-	public void setCurrentExternalRef(int currentExternalRef) {
-		this.backup();
-		this.currentExternalRef = currentExternalRef;
-	}
-
-	/** Diese Methode entfernt alle {@link #edges() Hyperkanten} und {@link #values() Textwerte}. */
+	/** Diese Methode entfernt alle {@link #edges() Kanten} und {@link #values() Textwerte}. */
 	public void clear() {
 		this.backupEdges();
+		this.backupValues();
 		this.reset();
 	}
 
-	/** Diese Methode ergänzt alle {@link KBEdge Hyperkanten} der gegebenen {@link KBState Hyperkantenmenge} {@code putState} und erhöht die Referenzen
-	 * {@link #getCurrentInternalRef()} und {@link #getIndexRef()} um die jeweiligen Zählerstände des {@code putState}. */
+	/** Diese Methode füt diesem Wissenspuffer alle {@link #edges() Kanten} und {@link #values() Textwerte} des gegebenen {@link KBState Wissensstandes} hinzu und
+	 * übernimmt dessen Referenzen {@link #getIndexRef()}, {@link #getInternalRef()} und {@link #getExternalRef()}. */
 	public void insertAll(KBState inserts) {
 		this.backupEdges();
 		this.backupValues();
-		this.indexRef += inserts.indexRef;
-		this.currentInternalRef += inserts.currentInternalRef;
-		this.currentExternalRef += inserts.currentExternalRef;
+		this.indexRef = inserts.indexRef;
+		this.internalRef = inserts.internalRef;
+		this.externalRef = inserts.externalRef;
 		inserts.forEachEdge(this::insertEdge);
 		inserts.forEachValue(this::insertValue);
 	}
 
-	/** Diese Methode entfernt alle {@link KBEdge Hyperkanten} der gegebenen {@link KBState Hyperkantenmenge} {@code popState} und verringert die Referenzen
-	 * {@link #getCurrentInternalRef()} und {@link #getIndexRef()} um die jeweiligen Zählerstände des {@code popState}. */
+	/** Diese Methode entfernt aus diesem Wissenspuffer alle {@link #edges() Kanten} und {@link #values() Textwerte} des gegebenen {@link KBState Wissensstandes}.
+	 * Die Referenzen {@link #getIndexRef()}, {@link #getInternalRef()} und {@link #getExternalRef()} bleiben unverändert. */
 	public void deleteAll(KBState deletes) {
 		this.backupEdges();
 		this.backupValues();
-		this.indexRef -= deletes.indexRef;
-		this.currentExternalRef -= deletes.currentExternalRef;
-		this.currentInternalRef -= deletes.currentInternalRef;
 		deletes.forEachEdge(this::deleteEdge);
 		deletes.forEachValue(this::deleteValue);
 		this.valueStrMap.pack();
 		this.valueRefMap.pack();
 	}
 
-	/** Diese Methode ersetzt alle {@link KBEdge Hyperkanten} soeie die Referenzen {@link #getCurrentInternalRef()} und {@link #getIndexRef()} mit denen der
-	 * gegebenen {@link KBState Hyperkantenmenge}. */
+	/** Diese Methode ersetzt in diesem Wissenspuffer alle {@link #edges() Kanten}, {@link #values() Textwerte} sowie die Referenzen {@link #getIndexRef()},
+	 * {@link #getInternalRef()} und {@link #getExternalRef()} durch die des gegebenen {@link KBState Wissensstandes}. */
 	public void replaceAll(KBState state) {
 		this.backup();
+		this.backupEdges = true;
+		this.backupValues = true;
 		this.reset(KBState.from(state));
 	}
 
-	/** Diese Methode übernimmt alle Anderungen seit dem letzten {@link #commit()}, {@link #rollback()} bzw. der erzeugung dieses Hyperkantenpuffers und liefert
-	 * den zugehörigen {@link KBUpdate Änderungsbericht}. */
+	/** Diese Methode übernimmt alle Anderungen seit dem letzten {@link #commit()}, {@link #rollback()} bzw. der erzeugung dieses Wissenspuffers und liefert den
+	 * zugehörigen {@link KBUpdate Änderungsbericht}. */
 	public KBUpdate commit() {
 		return new KBUpdate(this, true);
 	}
 
-	/** Diese Methode verwirft alle Anderungen seit dem letzten {@link #commit()}, {@link #rollback()} bzw. der erzeugung dieses Hyperkantenpuffers und liefert
-	 * den zugehörigen {@link KBUpdate Änderungsbericht}. */
+	/** Diese Methode verwirft alle Anderungen seit dem letzten {@link #commit()}, {@link #rollback()} bzw. der erzeugung dieses Wissenspuffers und liefert den
+	 * zugehörigen {@link KBUpdate Änderungsbericht}. */
 	public KBUpdate rollback() {
 		return new KBUpdate(this, false);
 	}
@@ -209,7 +212,7 @@ public class KBBuffer extends KBState {
 	/** Dieses Feld speichert nur dann {@code true}, wenn {@link #backupEdges()} aufgerufen wurde. */
 	boolean backupEdges;
 
-	/** Dieses Feld speichert nur dann {@code true}, wenn {@link #backupValues} aufgerufen wurde. */
+	/** Dieses Feld speichert nur dann {@code true}, wenn {@link #backupValues()} aufgerufen wurde. */
 	boolean backupValues;
 
 	private void backup() {
@@ -237,8 +240,8 @@ public class KBBuffer extends KBState {
 	}
 
 	private int nextExternalRef() {
-		var result = this.nextExternalRef(Math.min(-1, this.currentExternalRef));
-		return this.currentExternalRef = result < 0 ? this.nextExternalRef(-1) : result;
+		var result = this.nextExternalRef(Math.min(-1, this.externalRef));
+		return this.externalRef = result < 0 ? this.nextExternalRef(-1) : result;
 	}
 
 	private int nextExternalRef(int result) {
@@ -249,8 +252,8 @@ public class KBBuffer extends KBState {
 	}
 
 	private int nextInternalRef() {
-		var result = this.nextInternalRef(Math.max(1, this.currentInternalRef));
-		return this.currentInternalRef = result < 0 ? this.nextInternalRef(1) : result;
+		var result = this.nextInternalRef(Math.max(1, this.internalRef));
+		return this.internalRef = result < 0 ? this.nextInternalRef(1) : result;
 	}
 
 	private int nextInternalRef(int result) {

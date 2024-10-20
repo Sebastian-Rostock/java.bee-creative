@@ -11,7 +11,7 @@ import bee.creative.util.Entries;
 import bee.creative.util.Iterator2;
 
 /** Diese Klasse implementiert Methoden zur Verarbeitung einer steuwertbasierten Abbildung von Referenen ungleich {@code 0} auf Elemente ungleich {@code null}.
- * Die Methoden verzichten weitgehend auf die Prüfung der Wertebereicht ihrer Argumente für maximale Effizienz. Die Abbildung ist als {@code Object}-Array mit
+ * Die Methoden verzichten für maximale Effizienz weitgehend auf diePrüfung der Wertebereiche ihrer Argumente. Die Abbildung ist als {@code Object[]} mit
  * folgender Struktur umgesetzt:
  * <dl>
  * <dt>{@code (keys, value[keys.mask + 1])}

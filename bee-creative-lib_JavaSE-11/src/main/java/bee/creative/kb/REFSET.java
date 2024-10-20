@@ -10,7 +10,7 @@ import bee.creative.util.Iterator2;
 
 /** Diese Klasse implementiert Methoden zur Verarbeitung einer steuwertbasierten Menge von Referenen ungleich {@code 0} mit durchschnittlich vier
  * Speicherzugriffen zum {@link #getIdx(int[], int) Finden} einer vorhandenen Referenz. Die Methoden verzichten für maximale Effizienz weitgehend auf die
- * Prüfung der Wertebereiche ihrer Argumente. Eine Referenzmenge ist als {@code int}-Array mit folgender Struktur umgesetzt:
+ * Prüfung der Wertebereiche ihrer Argumente. Eine Referenzmenge ist als {@code int[]} mit folgender Struktur umgesetzt:
  * <dl>
  * <dt>{@code (size, mask, free, (head, next, item)[mask + 1])}
  * <dd>

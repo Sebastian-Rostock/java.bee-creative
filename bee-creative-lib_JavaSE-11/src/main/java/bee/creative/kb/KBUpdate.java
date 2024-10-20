@@ -1,6 +1,11 @@
 package bee.creative.kb;
 
 /** Diese Klasse implementiert den Änderungsbericht für {@link KBBuffer#commit()} und {@link KBBuffer#rollback()}.
+ * <p>
+ * Um die Änderung an einem {@link KBBuffer Wissenspuffer} {@code buffer} rückgängig zu machen, muss erst {@link KBBuffer#deleteAll(KBState)
+ * buffer.deleteAll(this.getInserts())} und dann {@link KBBuffer#insertAll(KBState) buffer.insertAll(this.getDeletes())} aufgerufen werden. Um sie zu
+ * wiederholen, muss dagegen erst {@link KBBuffer#deleteAll(KBState) buffer.deleteAll(this.getDeletes())} und dann {@link KBBuffer#insertAll(KBState)
+ * buffer.insertAll(this.getInserts())} aufgerufen werden.
  *
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class KBUpdate {

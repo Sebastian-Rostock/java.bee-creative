@@ -8,7 +8,8 @@ import java.io.OutputStream;
 import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
 
-/** Diese Klasse implementiert einen {@link DataInputStream}, der einen gegebenen {@link InputStream} über einen {@link Inflater} entpackt.
+/** Diese Klasse implementiert einen {@link DataInputStream}, der einen gegebenen {@link InputStream} über einen {@link Inflater} dekomprimiert und dessen
+ * dekomprimierte Bytefolge als {@link #getBytes() Kopie} und zum {@link #getBytes(OutputStream) Lesen} bereitstellen kann.
  * 
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class ZIPDIS extends DataInputStream {
@@ -31,14 +32,14 @@ public class ZIPDIS extends DataInputStream {
 		super(new InflaterInputStream(source, new Inflater(true), 524288));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #transferTo(OutputStream) this.transferTo(result)}. */
-	public void getBytes(OutputStream result) throws IOException {
-		this.transferTo(result);
-	}
-
 	/** Diese Methode ist eine Abkürzung für {@link #readAllBytes() this.readAllBytes()}. */
 	public byte[] getBytes() throws IOException {
 		return this.readAllBytes();
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #transferTo(OutputStream) this.transferTo(result)}. */
+	public void getBytes(OutputStream result) throws IOException {
+		this.transferTo(result);
 	}
 
 }

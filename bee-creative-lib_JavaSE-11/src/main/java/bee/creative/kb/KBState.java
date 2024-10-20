@@ -17,100 +17,96 @@ import bee.creative.util.Iterator2;
 import bee.creative.util.Iterators;
 
 /** Diese Klasse implementiert einen Wissensstand (<em>knowledge-base state</em>) als Menge {@link KBEdge typisierter gerichteter Kanen} zwischen Knoten mit
- * optinalem eineindeutigem {@link #getValue(int) Textwert}. , auf welche effizient sowohl von der{@link #getSourceRefs() Quellreferenzen} als auch von den
- * {@link #getTargetRefs() Zielreferenzen} zugegriffen werden kann. Jedem Textwert ist eineindeutig eine {@link #getValueRef(FEMString) Textreferenz}
- * zugeordnet.
+ * optinalem eineindeutigem {@link #getValue(int) Textwert}, auf welche sowohl von der {@link #getSourceRefs() Quellreferenzen} als auch von den
+ * {@link #getTargetRefs() Zielreferenzen} aus effizient zugegriffen werden kann. Jedem Textwert ist eineindeutig eine {@link #getValueRef(FEMString)
+ * Textreferenz} zugeordnet.
  * <p>
- * Eine Hyperkantenmenge kann in eine {@link #toInts() kompakte Abschrift} überführt werden, die auch {@link #toBytes(ByteOrder) binarisiert} bereitgestellt
- * werden kann. Wenn eine Hyperkantenmenge aus einer solchen kompakte Abschrift erzeugt wird, erfolgt deren Expansion grundsätzlich beim ersten Zugriff auf die
+ * Eine Wissensstand kann in eine {@link #toInts() kompakte Abschrift} überführt werden, die auch {@link #toBytes(ByteOrder) binarisiert} bereitgestellt werden
+ * kann. Wenn eine Hyperkantenmenge aus einer solchen kompakte Abschrift erzeugt wird, erfolgt deren Expansion grundsätzlich beim ersten Zugriff auf die
  * Referenzen der {@link KBEdge Hyperkanten}, außer bei {@link #toInts()} und {@link #edges()}.
  * <p>
- * Die über {@link #getIndexRef()}, {@link #getCurrentExternalRef()} und {@link #getCurrentInternalRef()} und bereitgestellten Referenzen haben Bedeutung für
- * {@link KBBuffer} und {@link KBUpdate}.
+ * Die über {@link #getIndexRef()}, {@link #getExternalRef()} und {@link #getInternalRef()} und bereitgestellten Referenzen haben Bedeutung für {@link KBBuffer}
+ * und {@link KBUpdate}.
  * <p>
  * ({@link KBEdge#sourceRef()}, {@link KBEdge#relationRef()} und {@link KBEdge#targetRef()})
  *
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class KBState {
 
-	/** Dieses Feld speichert die leere {@link KBState Hyperkantenmenge}. */
+	/** Dieses Feld speichert den leeren {@link KBState Wissensstand}. */
 	public static final KBState EMPTY = new KBState();
 
-	/** Diese Methode liefert die {@link KBState Hyperkantenmenge} zur gegebenen {@link #toInts() kompakten Abschrift}. */
+	/** Diese Methode liefert einen neuen {@link KBState Wissensstand} mit er gegebenen {@link #toInts() Wissensabschrift}. */
 	public static KBState from(int[] storage) {
 		return new KBState(storage.clone());
 	}
 
-	/** Diese Methode liefert die {@link KBState Hyperkantenmenge} zur gegebenen {@link #toBytes() binarisierten kompakten Abschrift} mit nativer
-	 * Bytereihenfolge. */
+	/** Diese Methode liefert einen neuen {@link KBState Wissensstand} zur gegebenen {@link #toBytes() Wissensabschrift} mit nativer Bytereihenfolge. */
 	public static KBState from(byte[] bytes) {
 		return KBState.from(bytes, ByteOrder.nativeOrder());
 	}
 
-	/** Diese Methode liefert die {@link KBState Hyperkantenmenge} zur gegebenen {@link #toBytes() binarisierten kompakten Abschrift} mit der gegebenen
-	 * Bytereihenfolge. */
+	/** Diese Methode liefert einen neuen {@link KBState Wissensstand} zur gegebenen {@link #toBytes() Wissensabschrift} mit der gegebenen Bytereihenfolge. */
 	public static KBState from(byte[] bytes, ByteOrder order) {
 		return KBState.from(ByteBuffer.wrap(bytes), order);
 	}
 
-	/** Diese Methode liefert die {@link KBState Hyperkantenmenge} zur gegebenen {@link #toInts() kompakten Abschrift}. */
+	/** Diese Methode liefert einen neuen {@link KBState Wissensstand} zur gegebenen {@link #toInts() Wissensabschrift}. */
 	public static KBState from(IntBuffer buffer) {
 		var storage = new int[buffer.remaining()];
 		buffer.duplicate().get(storage);
 		return new KBState(storage);
 	}
 
-	/** Diese Methode liefert die {@link KBState Hyperkantenmenge} zur gegebenen {@link #toBytes() binarisierten kompakten Abschrift} mit nativer
-	 * Bytereihenfolge. */
+	/** Diese Methode liefert einen neuen {@link KBState Wissensstand} zur gegebenen {@link #toBytes() Wissensabschrift} mit nativer Bytereihenfolge. */
 	public static KBState from(ByteBuffer buffer) {
 		return KBState.from(buffer, ByteOrder.nativeOrder());
 	}
 
-	/** Diese Methode liefert die {@link KBState Hyperkantenmenge} zur gegebenen {@link #toBytes() binarisierten kompakten Abschrift} mit der gegebenen
-	 * Bytereihenfolge. */
+	/** Diese Methode liefert einen neuen {@link KBState Wissensstand} zur gegebenen {@link #toBytes() Wissensabschrift} mit der gegebenen Bytereihenfolge. */
 	public static KBState from(ByteBuffer buffer, ByteOrder order) {
 		return KBState.from(buffer.duplicate().order(order).asIntBuffer());
 	}
 
-	/** Diese Methode liefert die gegebenen {@link KBEdge Hyperkanten} als {@link KBState Hyperkantenmenge}. */
+	/** Diese Methode liefert einen neuen {@link KBState Wissensstand} mit den gegebenen {@link KBEdge Kanten}. */
 	public static KBState from(KBEdge... edges) {
 		return KBState.from(Arrays.asList(edges));
 	}
 
-	/** Diese Methode liefert die gegebenen {@link KBEdge Hyperkanten} als {@link KBState Hyperkantenmenge}. */
+	/** Diese Methode liefert einen neuen {@link KBState Wissensstand} mit den gegebenen {@link KBEdge Kanten}. */
 	public static KBState from(Iterable<KBEdge> edges) {
 		var result = new KBState();
 		edges.forEach(edge -> result.insertEdge(edge.sourceRef, edge.targetRef, edge.relationRef));
 		return result;
 	}
 
-	/** Diese Methode liefert eine Kopie der gegebenen {@link KBState Hyperkantenmenge}. */
+	/** Diese Methode liefert eine Kopie des gegebenen {@link KBState Wissensstands}. */
 	public static KBState from(KBState state) {
 		var result = new KBState();
 		state.restore();
 		result.indexRef = state.indexRef;
-		result.currentInternalRef = state.currentInternalRef;
-		result.currentExternalRef = state.currentExternalRef;
+		result.internalRef = state.internalRef;
+		result.externalRef = state.externalRef;
 		result.valueRefMap = (ValueRefMap)state.valueRefMap.clone();
 		result.valueStrMap = (ValueStrMap)state.valueStrMap.clone();
 		state.forEachEdge(result::insertEdge);
 		return result;
 	}
 
-	/** Diese Methode liefert die {@link KBEdge Hyperkanten} des {@code newState} ohne denen des {@code oldState}, bspw. für {@link KBUpdate#getInserts()} und
-	 * {@link KBUpdate#getDeletes()}.
+	/** Diese Methode liefert einen neuen {@link KBState Wissensstand} mit den {@link #edges() Kanten} und {@link #values() Textwerte} des Wissensstands
+	 * {@code newState} ohne denen des Wissensstands {@code oldState}, bspw. für {@link KBUpdate#getInserts()} und {@link KBUpdate#getDeletes()}.
 	 *
-	 * @param oldState alte Hyperkantenmenge.
-	 * @param newState neue Hyperkantenmenge.
-	 * @return Differenz der Hyperkantenmengen. */
+	 * @param oldState alter Wissensstands.
+	 * @param newState neuer Wissensstands.
+	 * @return Wissensstand mit neuem und ohne altem Wissen. */
 	public static KBState from(KBState oldState, KBState newState) {
 		var result = new KBState();
 		oldState.restore();
 		newState.restore();
 		if (oldState == newState) return result;
-		result.indexRef = newState.indexRef - oldState.indexRef;
-		result.currentInternalRef = newState.currentInternalRef - oldState.currentInternalRef;
-		result.currentExternalRef = newState.currentExternalRef - oldState.currentExternalRef;
+		result.indexRef = newState.indexRef;
+		result.internalRef = newState.internalRef;
+		result.externalRef = newState.externalRef;
 		var oldSourceMap = oldState.sourceMap;
 		var newSourceMap = newState.sourceMap;
 		var newSourceKeys = REFMAP.getKeys(newSourceMap);
@@ -208,32 +204,33 @@ public class KBState {
 		var oldValueStrMap = oldState.valueStrMap;
 		var newValueStrMap = newState.valueStrMap;
 		if (oldValueStrMap != newValueStrMap) {
-			newValueStrMap.fastForEach((KBValues.RUN)(valueRef, newValueStr) -> {
-				var oldValueStr = oldValueStrMap.get(valueRef);
-				if (oldValueStr == null) {
-					result.insertValue(valueRef, newValueStr);
-				} else {
-					if (!oldValueStr.equals(newValueStr)) throw new IllegalArgumentException(); // stimmt das?
+			newValueStrMap.fastForEach((KBValues.RUN)(valueRef, valueStr) -> {
+				if (!valueStr.equals(oldValueStrMap.get(valueRef))) {
+					result.insertValue(valueRef, valueStr);
 				}
 			});
 		}
 		return result;
 	}
 
+	/** Diese Methode liefert die filterbare Sicht auf die {@link KBEdge Kanten} dieses Wissensstands. */
 	public KBEdges edges() {
 		return this.edges;
 	}
 
+	/** Diese Methode liefert die filterbare Sicht auf die {@link FEMString Textwerte} dieses Wissensstands. */
 	public KBValues values() {
 		return this.values;
 	}
 
+	/** Diese Methode liefert den {@link FEMString Textwert} mit der gegebenen Textreferenz {@code valueRef} oder {@code null}. */
 	public FEMString getValue(int valueRef) {
 		if (valueRef == 0) return null;
 		this.restore();
 		return this.valueStrMap.get(valueRef);
 	}
 
+	/** Diese Methode liefert die Textreferenz zum gegebenen {@link FEMString Textwert} {@code valueStr} oder {@code 0}. */
 	public int getValueRef(FEMString valueStr) {
 		if (valueStr == null) return 0;
 		this.restore();
@@ -241,30 +238,28 @@ public class KBState {
 		return valueRef != null ? valueRef : 0;
 	}
 
+	/** Diese Methode liefert eine Kopie der Textreferenzen dieses Wissenstands. */
 	public int[] getValueRefs() {
 		this.restore();
 		return this.valueStrMap.fastKeys();
 	}
 
+	/** Diese Methode liefert die Anzahl der Textreferenzen dieses Wissenstands. */
 	public int getValueCount() {
 		this.restore();
 		return this.valueStrMap.size();
 	}
 
-	/** Diese Methode liefert die als {@link KBEdge#sourceRef()} vorkommenden Referenzen. */
 	public int[] getSourceRefs() {
 		this.restore();
 		return REFMAP.toArray(this.sourceMap);
 	}
 
-	/** Diese Methode liefert die Anzahl der als {@link KBEdge#sourceRef()} vorkommenden Referenzen. */
 	public int getSourceCount() {
 		this.restore();
 		return REFMAP.size(this.sourceMap);
 	}
 
-	/** Diese Methode liefert die als {@link KBEdge#relationRef()} vorkommenden Referenzen aller {@link KBEdge Hyperkanten} mit der gegebene {@code sourceRef} als
-	 * {@link KBEdge#sourceRef()}. */
 	public int[] getSourceRelationRefs(int sourceRef) {
 		if (sourceRef == 0) return KBState.EMPTY_REFS;
 		this.restore();
@@ -274,8 +269,6 @@ public class KBState {
 		return REFMAP.toArray(relationMap);
 	}
 
-	/** Diese Methode liefert die Anzahl der als {@link KBEdge#relationRef()} vorkommenden Referenzen aller {@link KBEdge Hyperkanten} mit der gegebene
-	 * {@code sourceRef} als {@link KBEdge#sourceRef()}. */
 	public int getSourceRelationCount(int sourceRef) {
 		if (sourceRef == 0) return 0;
 		this.restore();
@@ -285,8 +278,6 @@ public class KBState {
 		return REFMAP.size(relationMap);
 	}
 
-	/** Diese Methode liefert eine der als {@link KBEdge#targetRef()} vorkommenden Referenzen aller {@link KBEdge Hyperkanten} mit der gegebene {@code sourceRef}
-	 * als {@link KBEdge#sourceRef()} und der gegebene {@code relationRef} als {@link KBEdge#relationRef()} oder {@code 0}. */
 	public int getSourceRelationTargetRef(int sourceRef, int relationRef) {
 		if ((sourceRef == 0) || (relationRef == 0)) return 0;
 		this.restore();
@@ -300,8 +291,6 @@ public class KBState {
 		return REFSET.getRef(targetVal);
 	}
 
-	/** Diese Methode liefert die als {@link KBEdge#targetRef()} vorkommenden Referenzen aller {@link KBEdge Hyperkanten} mit der gegebene {@code sourceRef} als
-	 * {@link KBEdge#sourceRef()} und der gegebene {@code relationRef} als {@link KBEdge#relationRef()}. */
 	public int[] getSourceRelationTargetRefs(int sourceRef, int relationRef) {
 		if ((sourceRef == 0) || (relationRef == 0)) return KBState.EMPTY_REFS;
 		this.restore();
@@ -315,8 +304,6 @@ public class KBState {
 		return REFSET.toArray(targetVal);
 	}
 
-	/** Diese Methode liefert die Anzahl der als {@link KBEdge#targetRef()} vorkommenden Referenzen aller {@link KBEdge Hyperkanten} mit der gegebene
-	 * {@code sourceRef} als {@link KBEdge#sourceRef()} und der gegebene {@code relationRef} als {@link KBEdge#relationRef()}. */
 	public int getSourceRelationTargetCount(int sourceRef, int relationRef) {
 		if ((sourceRef == 0) || (relationRef == 0)) return 0;
 		this.restore();
@@ -330,20 +317,16 @@ public class KBState {
 		return REFSET.size(targetVal);
 	}
 
-	/** Diese Methode liefert die als {@link KBEdge#targetRef()} vorkommenden Referenzen. */
 	public int[] getTargetRefs() {
 		this.restore();
 		return REFMAP.toArray(this.targetMap);
 	}
 
-	/** Diese Methode liefert die Anzahl der als {@link KBEdge#targetRef()} vorkommenden Referenzen. */
 	public int getTargetCount() {
 		this.restore();
 		return REFMAP.size(this.targetMap);
 	}
 
-	/** Diese Methode liefert die als {@link KBEdge#relationRef()} vorkommenden Referenzen aller {@link KBEdge Hyperkanten} mit der gegebene {@code targetRef} als
-	 * {@link KBEdge#targetRef()}. */
 	public int[] getTargetRelationRefs(int targetRef) {
 		if (targetRef == 0) return KBState.EMPTY_REFS;
 		this.restore();
@@ -353,8 +336,6 @@ public class KBState {
 		return REFMAP.toArray(relationMap);
 	}
 
-	/** Diese Methode liefert die Anzahl der als {@link KBEdge#relationRef()} vorkommenden Referenzen aller {@link KBEdge Hyperkanten} mit der gegebene
-	 * {@code targetRef} als {@link KBEdge#targetRef()}. */
 	public int getTargetRelationCount(int targetRef) {
 		if (targetRef == 0) return 0;
 		this.restore();
@@ -364,8 +345,6 @@ public class KBState {
 		return REFMAP.size(relationMap);
 	}
 
-	/** Diese Methode liefert eine der als {@link KBEdge#sourceRef()} vorkommenden Referenzen aller {@link KBEdge Hyperkanten} mit der gegebene {@code targetRef}
-	 * als {@link KBEdge#targetRef()} und der gegebene {@code relationRef} als {@link KBEdge#relationRef()} oder {@code 0}. */
 	public int getTargetRelationSourceRef(int targetRef, int relationRef) {
 		if ((targetRef == 0) || (relationRef == 0)) return 0;
 		this.restore();
@@ -379,8 +358,8 @@ public class KBState {
 		return REFSET.getRef(sourceVal);
 	}
 
-	/** Diese Methode liefert die als {@link KBEdge#sourceRef()} vorkommenden Referenzen aller {@link KBEdge Hyperkanten} mit der gegebene {@code targetRef} als
-	 * {@link KBEdge#targetRef()} und der gegebene {@code relationRef} als {@link KBEdge#relationRef()} oder {@code 0}. */
+	/** Diese Methode liefert die {@link KBEdge#sourceRef() Quellreferenzen} aller {@link KBEdge Kanten} mit der gegebenen {@link KBEdge#targetRef() Zielreferenz}
+	 * {@code targetRef} und der gegebenen {@link KBEdge#relationRef() Beziehungsreferenz} {@code relationRef}. */
 	public int[] getTargetRelationSourceRefs(int targetRef, int relationRef) {
 		if ((targetRef == 0) || (relationRef == 0)) return KBState.EMPTY_REFS;
 		this.restore();
@@ -394,8 +373,8 @@ public class KBState {
 		return REFSET.toArray(sourceVal);
 	}
 
-	/** Diese Methode liefert die Anzahl der als {@link KBEdge#sourceRef()} vorkommenden Referenzen aller {@link KBEdge Hyperkanten} mit der gegebene
-	 * {@code targetRef} als {@link KBEdge#targetRef()} und der gegebene {@code relationRef} als {@link KBEdge#relationRef()} oder {@code 0}. */
+	/** Diese Methode liefert die Anzahl der {@link KBEdge#sourceRef() Quellreferenzen} aller {@link KBEdge Kanten} mit der gegebenen {@link KBEdge#targetRef()
+	 * Zielreferenz} {@code targetRef} und der gegebenen {@link KBEdge#relationRef() Beziehungsreferenz} {@code relationRef}. */
 	public int getTargetRelationSourceCount(int targetRef, int relationRef) {
 		if ((targetRef == 0) || (relationRef == 0)) return 0;
 		this.restore();
@@ -410,29 +389,31 @@ public class KBState {
 	}
 
 	/** Diese Methode liefert die Referenz auf die Entität des Inhaltsverzeichnisses oder {@code 0}. Wenn dieses Objekt über {@link #from(KBState, KBState)}
-	 * erzeugt wurde, liefert sie {@code newState.getRootRef() - oldState.getRootRef()}. */
+	 * erzeugt wurde, liefert sie {@code newState.getIndexRef()}. */
 	public int getIndexRef() {
 		return this.indexRef;
 	}
 
 	/** Diese Methode liefert die Referenz, von der aus die nächste für eine neue interne Entität ohne Textwert verfügbare Referenz gesucht wird. Wenn dieses
-	 * Objekt über {@link #from(KBState, KBState)} erzeugt wurde, liefert sie {@code newState.getCurrentInternalRef() - oldState.getCurrentInternalRef()}. */
-	public int getCurrentInternalRef() {
-		return this.currentInternalRef;
+	 * Objekt über {@link #from(KBState, KBState)} erzeugt wurde, liefert sie {@code newState.getInternalRef()}. */
+	public int getInternalRef() {
+		return this.internalRef;
 	}
 
 	/** Diese Methode liefert die Referenz, von der aus die nächste für eine neue externe Entität mit Textwert verfügbare Referenz gesucht wird. Wenn dieses
-	 * Objekt über {@link #from(KBState, KBState)} erzeugt wurde, liefert sie {@code newState.getCurrentExternalRef() - oldState.getCurrentExternalRef()}. */
-	public int getCurrentExternalRef() {
-		return this.currentExternalRef;
+	 * Objekt über {@link #from(KBState, KBState)} erzeugt wurde, liefert sie {@code newState.getExternalRef()}. */
+	public int getExternalRef() {
+		return this.externalRef;
 	}
 
+	/** Diese Methode liefert nur dann {@code true}, wenn dieser Wissensstand die gegebene {@link KBEdge Kante} enthält. */
 	public boolean containsEdge(KBEdge edge) {
 		return (edge != null) && this.containsEdge(edge.sourceRef, edge.targetRef, edge.relationRef);
 	}
 
-	/** Diese Methode liefert nur dann {@code true}, wenn die {@link KBEdge Hyperkante} mit der gegebene {@code sourceRef} als {@link KBEdge#sourceRef()}, der
-	 * gegebene {@code targetRef} als {@link KBEdge#targetRef()} und der gegebene {@code relationRef} als {@link KBEdge#relationRef()} vorkommt. */
+	/** Diese Methode liefert nur dann {@code true}, wenn dieser Wissensstand die {@link KBEdge Kante} mit der gegebenen {@link KBEdge#sourceRef() Quellreferenz}
+	 * {@code sourceRef}, der gegebenen {@link KBEdge#targetRef() Zielreferenz} {@code targetRef} und der gegebenen {@link KBEdge#relationRef()
+	 * Beziehungsreferenz} {@code relationRef} enthält. */
 	public boolean containsEdge(int sourceRef, int targetRef, int relationRef) {
 		if ((sourceRef == 0) || (targetRef == 0) || (relationRef == 0)) return false;
 		this.restore();
@@ -446,27 +427,31 @@ public class KBState {
 		return REFSET.getIdx(targetVal, targetRef) != 0;
 	}
 
+	/** Diese Methode liefert nur dann {@code true}, wenn dieser Wissensstand den gegebenen {@link #getValue(int) Textwert} {@code valueStr} enthält. */
 	public boolean containsValue(FEMString valueStr) {
 		if (valueStr == null) return false;
 		this.restore();
 		return this.valueRefMap.containsKey(valueStr);
 	}
 
+	/** Diese Methode liefert nur dann {@code true}, wenn dieser Wissensstand die gegebene {@link #getValueRef(FEMString) Textwertreferenz} {@code valueRef}
+	 * enthält. */
 	public boolean containsValueRef(int valueRef) {
 		if (valueRef == 0) return false;
 		this.restore();
 		return this.valueStrMap.containsKey(valueRef);
 	}
 
-	/** Diese Methode liefert nur dann {@code true}, wenn die gegebene Referenzen {@code sourceRef} als {@link KBEdge#sourceRef()} vorkommt. */
+	/** Diese Methode liefert nur dann {@code true}, wenn dieser Wissensstand eine {@link KBEdge Kante} mit der gegebenen {@link KBEdge#sourceRef() Quellreferenz}
+	 * enthält. */
 	public boolean containsSourceRef(int sourceRef) {
 		if (sourceRef == 0) return false;
 		this.restore();
 		return REFMAP.getIdx(this.sourceMap, sourceRef) != 0;
 	}
 
-	/** Diese Methode liefert nur dann {@code true}, wenn die gegebene Referenzen {@code relationRef} als {@link KBEdge#relationRef()} von {@link KBEdge
-	 * Hyperkanten} mit der gegebene {@code sourceRef} als {@link KBEdge#sourceRef()} vorkommt. */
+	/** Diese Methode liefert nur dann {@code true}, wenn dieser Wissensstand eine {@link KBEdge Kante} mit der gegebenen {@link KBEdge#sourceRef() Quellreferenz}
+	 * {@code sourceRef} und der gegebenen {@link KBEdge#relationRef() Beziehungsreferenz} {@code relationRef} enthält. */
 	public boolean containsSourceRelationRef(int sourceRef, int relationRef) {
 		if ((sourceRef == 0) || (relationRef == 0)) return false;
 		this.restore();
@@ -476,15 +461,16 @@ public class KBState {
 		return REFMAP.getIdx(relationMap, relationRef) != 0;
 	}
 
-	/** Diese Methode liefert nur dann {@code true}, wenn die gegebene Referenzen {@code targetRef} als {@link KBEdge#targetRef()} vorkommt. */
+	/** Diese Methode liefert nur dann {@code true}, wenn dieser Wissensstand eine {@link KBEdge Kante} mit der gegebenen {@link KBEdge#targetRef() Zielreferenz}
+	 * {@code targetRef}. */
 	public boolean containsTargetRef(int targetRef) {
 		if (targetRef == 0) return false;
 		this.restore();
 		return REFMAP.getIdx(this.targetMap, targetRef) != 0;
 	}
 
-	/** Diese Methode liefert nur dann {@code true}, wenn die gegebene Referenzen {@code relationRef} als {@link KBEdge#relationRef()} von {@link KBEdge
-	 * Hyperkanten} mit der gegebene {@code relationRef} als {@link KBEdge#relationRef()} vorkommt. */
+	/** Diese Methode liefert nur dann {@code true}, wenn dieser Wissensstand eine {@link KBEdge Kante} mit der gegebenen {@link KBEdge#targetRef() Zielreferenz}
+	 * {@code targetRef} und der gegebenen {@link KBEdge#relationRef() Beziehungsreferenz} {@code relationRef} enthält. */
 	public boolean containsTargetRelationRef(int targetRef, int relationRef) {
 		if ((targetRef == 0) || (relationRef == 0)) return false;
 		this.restore();
@@ -494,12 +480,9 @@ public class KBState {
 		return REFMAP.getIdx(relationMap, relationRef) != 0;
 	}
 
-	/** Diese Methode liefert ein Wissensabschrift aller {@link KBEdge Kanten} und {@link FEMString Textwerte} als {@code int}-Array mit der Struktur
-	 * {@code (indexRef, currentInternalRef, currentExternalRef, valueOffset,
-	 * sourceCount, (sourceRef, targetRefCount, (targetRef, relationRef)[targetRefCount],
-	 * targetSetCount, (relationRef,
-	 * targetCount, targetRef[targetCount])[targetSetCount])[sourceCount],
-	 * valueCount, (valueRef, valueSize, valueItem[valueSize])[valueCount])}, wobei {@code valueOffset} die Position von {@code valueCount} nennt.
+	/** Diese Methode liefert ein Wissensabschrift dieses Wissensstandes {@code int[]} mit der Struktur
+	 * {@code (indexRef, internalRef, externalRef, valueOffset, sourceCount, (sourceRef, targetRefCount, (targetRef, relationRef)[targetRefCount], targetSetCount, (relationRef, targetCount, targetRef[targetCount])[targetSetCount])[sourceCount], valueCount, (valueRef, valueSize, valueItem[valueSize])[valueCount])},
+	 * wobei {@code valueOffset} die Position von {@code valueCount} nennt.
 	 *
 	 * @return Wissensabschrift. */
 	public int[] toInts() {
@@ -545,8 +528,8 @@ public class KBState {
 		var cursor = 5;
 
 		result[0] = this.indexRef;
-		result[1] = this.currentInternalRef;
-		result[2] = this.currentExternalRef;
+		result[1] = this.internalRef;
+		result[2] = this.externalRef;
 		result[3] = edgesSize + 5;
 
 		result[4] = sourceCount;
@@ -680,9 +663,9 @@ public class KBState {
 
 	int indexRef;
 
-	int currentExternalRef;
+	int externalRef;
 
-	int currentInternalRef;
+	int internalRef;
 
 	/** Dieses Feld speichert die Referenzabbildung gemäß {@link REFMAP} von {@link KBEdge#sourceRef} auf Referenzabbildungen gemäß {@link REFMAP} von
 	 * {@link KBEdge#relationRef} auf {@link KBEdge#targetRef}. Letztere sind dabei als {@code int[1]} oder gemäß {@link REFSET} abgebildet. */
@@ -709,14 +692,14 @@ public class KBState {
 
 	/** Dieser Konstruktor übernimmt die Merkmale der gegebenen {@link #toInts() Wissensabschrift}. */
 	KBState(int[] storage) {
-		this();
 		this.indexRef = storage[0];
-		this.currentInternalRef = storage[1];
-		this.currentExternalRef = storage[2];
+		this.internalRef = storage[1];
+		this.externalRef = storage[2];
+		this.reset();
 		this.storage = storage;
 	}
 
-	/** Dieser Konstruktor übernimmt die Merkmale des gegebenen {@link KBState Wissensstands}. */
+	/** Dieser Konstruktor {@link #reset(KBState) übernimmt} die Merkmale des gegebenen {@link KBState Wissensstands}. */
 	KBState(KBState that) {
 		this.reset(that);
 	}
@@ -729,10 +712,11 @@ public class KBState {
 		this.valueStrMap = new ValueStrMap();
 	}
 
+	/** Diese Methode übernimmt die Merkmale des gegebenen {@link KBState Wissensstands}. */
 	final void reset(KBState that) {
 		this.indexRef = that.indexRef;
-		this.currentInternalRef = that.currentInternalRef;
-		this.currentExternalRef = that.currentExternalRef;
+		this.internalRef = that.internalRef;
+		this.externalRef = that.externalRef;
 		this.sourceMap = that.sourceMap;
 		this.targetMap = that.targetMap;
 		this.valueRefMap = that.valueRefMap;
@@ -760,6 +744,12 @@ public class KBState {
 		this.forEachEdge(null, null, null, null, null, null, task);
 	}
 
+	// TODO forEachSource
+	// TODO forEachSourceRelation
+	// TODO forEachTarget
+	// TODO forEachTargetRelation
+	// TODO forEachRelation auto forEachSourceRelation vs. forEachTargetRelation
+
 	final void forEachEdge(int[] acceptSourceRefset_or_null, int[] refuseSourceRefset_or_null, int[] acceptTargetRefset_or_null, int[] refuseTargetRefset_or_null,
 		int[] acceptRelationRefset_or_null, int[] refuseRelationRefset_or_null, KBEdges.RUN task) {
 		if (this.storage != null) {
@@ -783,6 +773,11 @@ public class KBState {
 		}
 	}
 
+	// TODO sourceIterator
+	// TODO sourceRelationIterator
+	// TODO targetIterator
+	// TODO targetRelationIterator
+	// TODO relationIterator
 	final Iterator2<KBEdge> edgeIterator(int[] acceptSourceRefset_or_null, int[] refuseSourceRefset_or_null, int[] acceptTargetRefset_or_null,
 		int[] refuseTargetRefset_or_null, int[] acceptRelationRefset_or_null, int[] refuseRelationRefset_or_null) {
 		this.restore();
