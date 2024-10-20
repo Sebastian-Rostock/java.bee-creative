@@ -270,35 +270,40 @@ public class KBBuffer extends KBState {
 		this.targetMap = targetMap;
 
 		// PUT sourceMap
-		var nextSourceIdx = REFMAP.putRef(sourceMap, sourceRef);
+		var sourceIdx = REFMAP.putRef(sourceMap, sourceRef);
 
 		// MAX sourceMap
-		if (nextSourceIdx == 0) throw new IllegalStateException();
+		if (sourceIdx == 0) throw new IllegalStateException();
 
 		// GET sourceRelationMap
-		var sourceRelationMap = KBState.asRefMap(REFMAP.getVal(sourceMap, nextSourceIdx));
-		Object[] backupSourceRelationMap = null;
+		var sourceRelationMap = KBState.asRefMap(REFMAP.getVal(sourceMap, sourceIdx));
+		var backupSourceRelationMap = (Object[])null;
 
 		if (sourceRelationMap == null) {
 			// NEW sourceRelationMap
-			REFMAP.setVal(sourceMap, nextSourceIdx, REFMAP.EMPTY);
+			REFMAP.setVal(sourceMap, sourceIdx, REFMAP.EMPTY);
 			sourceRelationMap = REFMAP.create();
 		} else {
 			var backupSourceMap = this.backup.sourceMap;
 			var backupSourceIdx = REFMAP.getIdx(backupSourceMap, sourceRef);
-			backupSourceRelationMap = backupSourceIdx != 0 ? KBState.asRefMap(REFMAP.getVal(backupSourceMap, backupSourceIdx)) : null;
-			if (sourceRelationMap == backupSourceRelationMap) {
-				// COW sourceRelationMap
-				sourceRelationMap = REFMAP.grow(backupSourceRelationMap);
-				if (sourceRelationMap == backupSourceRelationMap) {
-					sourceRelationMap = REFMAP.copy(backupSourceRelationMap);
-				}
-			} else {
+			if (backupSourceIdx == 0) {
 				// OWN sourceRelationMap
 				sourceRelationMap = REFMAP.grow(sourceRelationMap);
+			} else {
+				backupSourceRelationMap = KBState.asRefMap(REFMAP.getVal(backupSourceMap, backupSourceIdx));
+				if (sourceRelationMap == backupSourceRelationMap) {
+					// COW sourceRelationMap
+					sourceRelationMap = REFMAP.grow(backupSourceRelationMap);
+					if (sourceRelationMap == backupSourceRelationMap) {
+						sourceRelationMap = REFMAP.copy(backupSourceRelationMap);
+					}
+				} else {
+					// OWN sourceRelationMap
+					sourceRelationMap = REFMAP.grow(sourceRelationMap);
+				}
 			}
 		}
-		REFMAP.setVal(sourceMap, nextSourceIdx, sourceRelationMap);
+		REFMAP.setVal(sourceMap, sourceIdx, sourceRelationMap);
 
 		// PUT targetMap
 		var targetIdx = REFMAP.putRef(targetMap, targetRef);
@@ -308,7 +313,7 @@ public class KBBuffer extends KBState {
 
 		// GET targetRelationMap
 		var targetRelationMap = KBState.asRefMap(REFMAP.getVal(targetMap, targetIdx));
-		Object[] backupTargetRelationMap = null;
+		var backupTargetRelationMap = (Object[])null;
 
 		if (targetRelationMap == null) {
 			// NEW targetRelationMap
@@ -317,16 +322,21 @@ public class KBBuffer extends KBState {
 		} else {
 			var backupTargetMap = this.backup.targetMap;
 			var backupTargetIdx = REFMAP.getIdx(backupTargetMap, targetRef);
-			backupTargetRelationMap = backupTargetIdx != 0 ? KBState.asRefMap(REFMAP.getVal(backupTargetMap, backupTargetIdx)) : null;
-			if (targetRelationMap == backupTargetRelationMap) {
-				// COW targetRelationMap
-				targetRelationMap = REFMAP.grow(backupTargetRelationMap);
-				if (targetRelationMap == backupTargetRelationMap) {
-					targetRelationMap = REFMAP.copy(backupTargetRelationMap);
-				}
-			} else {
+			if (backupTargetIdx == 0) {
 				// OWN targetRelationMap
 				targetRelationMap = REFMAP.grow(targetRelationMap);
+			} else {
+				backupTargetRelationMap = KBState.asRefMap(REFMAP.getVal(backupTargetMap, backupTargetIdx));
+				if (targetRelationMap == backupTargetRelationMap) {
+					// COW targetRelationMap
+					targetRelationMap = REFMAP.grow(backupTargetRelationMap);
+					if (targetRelationMap == backupTargetRelationMap) {
+						targetRelationMap = REFMAP.copy(backupTargetRelationMap);
+					}
+				} else {
+					// OWN targetRelationMap
+					targetRelationMap = REFMAP.grow(targetRelationMap);
+				}
 			}
 		}
 		REFMAP.setVal(targetMap, targetIdx, targetRelationMap);
@@ -446,22 +456,16 @@ public class KBBuffer extends KBState {
 	}
 
 	private void insertValue(int valueRef, FEMString valueStr) {
-
-		var newValueRef = valueRef;
-		var newValueStr = valueStr.data();
-
-		var oldValueRef = this.valueRefMap.put(newValueStr, newValueRef);
-		if (oldValueRef != null) {
-			if (oldValueRef.intValue() == valueRef) return;
-
-			this.valueRefMap.put(valueStr, oldValueRef);
+		var valueRef2 = this.valueRefMap.put(valueStr, valueRef);
+		if (valueRef2 != null) {
+			if (valueRef == valueRef2.intValue()) return;
+			this.valueRefMap.put(valueStr, valueRef2);
 			throw new IllegalArgumentException();
 		}
-
-		var oldValueStr = this.valueStrMap.put(newValueRef, newValueStr);
-		if (oldValueStr != null) {
-			this.valueStrMap.put(newValueRef, oldValueStr);
-			this.valueRefMap.remove(newValueStr);
+		var valueStr2 = this.valueStrMap.put(valueRef, valueStr);
+		if (valueStr2 != null) {
+			this.valueStrMap.put(valueRef, valueStr2);
+			this.valueRefMap.remove(valueStr);
 			throw new IllegalArgumentException();
 		}
 	}
@@ -478,18 +482,24 @@ public class KBBuffer extends KBState {
 	private boolean deleteEdge(int sourceRef, int targetRef, int relationRef) {
 		if ((sourceRef == 0) || (relationRef == 0) || (targetRef == 0)) return false;
 
-		// TODO prüfen
 		var sourceMap = this.sourceMap;
 		var sourceIdx = REFMAP.getIdx(sourceMap, sourceRef);
-		if (sourceIdx == 0) return false;
+		if (sourceIdx == 0) return false; // NOT sourceRef
 
 		var targetMap = this.targetMap;
 		var targetIdx = REFMAP.getIdx(targetMap, targetRef);
-		if (targetIdx == 0) return false;
+		if (targetIdx == 0) return false; // NOT targetRef
 
 		var sourceRelationMap = KBState.asRefMap(REFMAP.getVal(sourceMap, sourceIdx));
+		var sourceRelationIdx = REFMAP.getIdx(sourceRelationMap, relationRef);
+		if (sourceRelationIdx == 0) return false; // NOT sourceRef relationRef
+
+		var targetRelationMap = KBState.asRefMap(REFMAP.getVal(targetMap, targetIdx));
+		var targetRelationIdx = REFMAP.putRef(targetRelationMap, relationRef);
+		if (targetRelationIdx == 0) return false; // ERR targetRef relationRef (IllegalState)
+
 		var backupSourceRelationMap = (Object[])null;
-		{
+		{ // COW sourceRelationMap
 			var backupSourceMap = this.backup.sourceMap;
 			var backupSourceIdx = REFMAP.getIdx(backupSourceMap, sourceRef);
 			if (backupSourceIdx != 0) {
@@ -501,9 +511,8 @@ public class KBBuffer extends KBState {
 			}
 		}
 
-		var targetRelationMap = KBState.asRefMap(REFMAP.getVal(targetMap, targetIdx));
 		var backupTargetRelationMap = (Object[])null;
-		{
+		{ // COW targetRelationMap
 			var backupTargetMap = this.backup.targetMap;
 			var backupTargetIdx = REFMAP.getIdx(backupTargetMap, targetRef);
 			if (backupTargetIdx != 0) {
@@ -511,82 +520,80 @@ public class KBBuffer extends KBState {
 				if (targetRelationMap == backupTargetRelationMap) {
 					targetRelationMap = REFMAP.copy(targetRelationMap);
 					REFMAP.setVal(targetMap, targetIdx, targetRelationMap);
+
 				}
 			}
 		}
 
-		var sourceRelationIdx = REFMAP.getIdx(sourceRelationMap, relationRef);
-		if (sourceRelationIdx == 0) return false;
-		var sourceRelationTargetVal = KBState.asRefVal(REFMAP.getVal(sourceRelationMap, sourceRelationIdx));
-
-		var targetRelationIdx = REFMAP.putRef(targetRelationMap, relationRef);
-		if (targetRelationIdx == 0) return false; // IllegalState
-		var targetRelationSourceVal = KBState.asRefVal(REFMAP.getVal(targetRelationMap, targetRelationIdx));
-
-		if (KBState.isRef(sourceRelationTargetVal)) {
-			var targetRef2 = KBState.asRef(sourceRelationTargetVal);
-			if (targetRef != targetRef2) return false;
+		var sourceRelationTargetSet = KBState.asRefVal(REFMAP.getVal(sourceRelationMap, sourceRelationIdx));
+		if (KBState.isRef(sourceRelationTargetSet)) {
+			var targetRef2 = KBState.asRef(sourceRelationTargetSet);
+			if (targetRef != targetRef2) return false; // ERR sourceRef relationRef targetRef (IllegalState)
 			REFMAP.setVal(sourceRelationMap, REFMAP.popRef(sourceRelationMap, relationRef), null);
-			if (REFMAP.size(sourceRelationMap) == 0) {
+			if (REFMAP.size(sourceRelationMap) == 0) { // POP sourceRelationMap
 				REFMAP.setVal(sourceMap, REFMAP.popRef(sourceMap, sourceRef), null);
 				this.sourceMap = REFMAP.pack(sourceMap);
-			} else {
+			} else { // POP sourceRelationTargetSet
 				REFMAP.setVal(sourceMap, sourceIdx, REFMAP.pack(sourceRelationMap));
 			}
 		} else {
-			var sourceRelationTargetSet = sourceRelationTargetVal;
-			if (backupSourceRelationMap != null) {
+			if (backupSourceRelationMap != null) { // COW sourceRelationTargetSet
 				var backupSourceRelationIdx = REFMAP.getIdx(backupSourceRelationMap, relationRef);
 				if (backupSourceRelationIdx != 0) {
-					var backupSourceRelationTargetVal = REFMAP.getVal(backupSourceRelationMap, backupSourceRelationIdx);
-					if (sourceRelationTargetSet == backupSourceRelationTargetVal) {
-						sourceRelationTargetSet = REFSET.copy(sourceRelationTargetVal);
+					var backupSourceRelationTargetSet = REFMAP.getVal(backupSourceRelationMap, backupSourceRelationIdx);
+					if (sourceRelationTargetSet == backupSourceRelationTargetSet) {
+						sourceRelationTargetSet = REFSET.copy(sourceRelationTargetSet);
 					}
 				}
 			}
-			var nextSourceRelationTargetIdx = REFSET.popRef(sourceRelationTargetSet, targetRef);
-			if (nextSourceRelationTargetIdx == 0) return false;
+			var sourceRelationTargetIdx = REFSET.popRef(sourceRelationTargetSet, targetRef);
+			if (sourceRelationTargetIdx == 0) return false; // ERR sourceRef relationRef targetRef (IllegalState)
 			if (REFSET.size(sourceRelationTargetSet) == 0) {
 				REFMAP.setVal(sourceRelationMap, sourceRelationIdx, null);
-				if (REFMAP.size(sourceRelationMap) == 0) {
+				if (REFMAP.size(sourceRelationMap) == 0) { // POP sourceRelationMap
 					REFMAP.setVal(sourceMap, REFMAP.popRef(sourceMap, sourceRef), null);
 					this.sourceMap = REFMAP.pack(sourceMap);
-				} else {
+				} else { // POP sourceRelationTargetSet
 					REFMAP.setVal(sourceMap, sourceIdx, REFMAP.pack(sourceRelationMap));
 				}
-			} else {
+			} else { // SET sourceRelationTargetSet
 				REFMAP.setVal(sourceRelationMap, sourceRelationIdx, REFSET.pack(sourceRelationTargetSet));
 			}
 		}
 
-		if (KBState.isRef(targetRelationSourceVal)) {
-			// var sourceRef2 = BEREdges.asRef(nextTargetRelationSourceVal);
-			// if (sourceRef != sourceRef2) return false;
+		var targetRelationSourceSet = KBState.asRefVal(REFMAP.getVal(targetRelationMap, targetRelationIdx));
+		if (KBState.isRef(targetRelationSourceSet)) {
+			var sourceRef2 = KBState.asRef(targetRelationSourceSet);
+			if (sourceRef != sourceRef2) return false; // ERR sourceRef relationRef targetRef (IllegalState)
 			REFMAP.setVal(targetRelationMap, REFMAP.popRef(targetRelationMap, relationRef), null);
-			if (REFMAP.size(targetRelationMap) == 0) {
+			if (REFMAP.size(targetRelationMap) == 0) { // POP targetRelationMap
 				REFMAP.setVal(targetMap, REFMAP.popRef(targetMap, targetRef), null);
 				this.targetMap = REFMAP.pack(targetMap);
-			} else {
+			} else { // POP targetRelationSourceSet
 				REFMAP.setVal(targetMap, targetIdx, REFMAP.pack(targetRelationMap));
 			}
 		} else {
-			var nextTargetRelationSourceSet = targetRelationSourceVal;
-			var prevTargetRelationIdx = backupTargetRelationMap != null ? REFMAP.getIdx(backupTargetRelationMap, relationRef) : 0;
-			var prevTargetRelationSourceVal = prevTargetRelationIdx != 0 ? REFMAP.getVal(backupTargetRelationMap, prevTargetRelationIdx) : null;
-			if (nextTargetRelationSourceSet == prevTargetRelationSourceVal) {
-				nextTargetRelationSourceSet = REFSET.copy(targetRelationSourceVal);
+			if (backupTargetRelationMap != null) { // COW targetRelationSourceSet
+				var backupTargetRelationIdx = REFMAP.getIdx(backupTargetRelationMap, relationRef);
+				if (backupTargetRelationIdx != 0) {
+					var backupTargetRelationSourceSet = REFMAP.getVal(backupTargetRelationMap, backupTargetRelationIdx);
+					if (targetRelationSourceSet == backupTargetRelationSourceSet) {
+						targetRelationSourceSet = REFSET.copy(targetRelationSourceSet);
+					}
+				}
 			}
-			REFSET.popRef(nextTargetRelationSourceSet, sourceRef);
-			if (REFSET.size(nextTargetRelationSourceSet) == 0) {
+			var targetRelationSourceIdx = REFSET.popRef(targetRelationSourceSet, sourceRef);
+			if (targetRelationSourceIdx == 0) return false; // ERR sourceRef relationRef targetRef (IllegalState)
+			if (REFSET.size(targetRelationSourceSet) == 0) {
 				REFMAP.setVal(targetRelationMap, targetRelationIdx, null);
-				if (REFMAP.size(targetRelationMap) == 0) {
+				if (REFMAP.size(targetRelationMap) == 0) { // POP targetRelationMap
 					REFMAP.setVal(targetMap, REFMAP.popRef(targetMap, targetRef), null);
 					this.targetMap = REFMAP.pack(targetMap);
-				} else {
+				} else { // POP targetRelationSourceSet
 					REFMAP.setVal(targetMap, targetIdx, REFMAP.pack(targetRelationMap));
 				}
-			} else {
-				REFMAP.setVal(targetRelationMap, targetRelationIdx, REFSET.pack(nextTargetRelationSourceSet));
+			} else { // SET targetRelationSourceSet
+				REFMAP.setVal(targetRelationMap, targetRelationIdx, REFSET.pack(targetRelationSourceSet));
 			}
 		}
 
@@ -595,7 +602,7 @@ public class KBBuffer extends KBState {
 
 	private void deleteValue(int valueRef, FEMString valueStr) {
 		var valueStr2 = this.valueStrMap.remove(valueRef);
-		var valueRef2 = this.valueRefMap.remove(valueStr.data());
+		var valueRef2 = this.valueRefMap.remove(valueStr);
 		if (valueStr2 == null) {
 			if (valueRef2 == null) return;
 			this.valueRefMap.put(valueStr, valueRef2);
@@ -624,4 +631,5 @@ public class KBBuffer extends KBState {
 		this.valueStrMap.remove(valueRef);
 		return true;
 	}
+
 }
