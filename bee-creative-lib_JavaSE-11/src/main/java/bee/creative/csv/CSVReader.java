@@ -28,31 +28,6 @@ public class CSVReader implements Closeable {
 		return new CSVReader(IO.inputReaderFrom(data));
 	}
 
-	static void check(char symbol) throws IllegalArgumentException {
-		if ((symbol == '\r') || (symbol == '\n')) throw new IllegalArgumentException();
-	}
-
-	/** Dieses Feld speichert die Quelldaten. */
-	protected final Reader reader;
-
-	/** Dieses Feld speichert den Puffer für die Werte. */
-	final StringBuilder value;
-
-	/** Dieses Feld speichert den Puffer für die Einträge. */
-	final ArrayList<String> entry;
-
-	/** Dieses Feld speichert das Maskierungszeichen. */
-	char quote = '"';
-
-	/** Dieses Feld speichert das Trennzeichen. */
-	char comma = ';';
-
-	/** Dieses Feld speichert das erste Zeichen des nächsten Werts, das Trennzeichen, das Maskierungszeichen oder -1. */
-	int symbol;
-
-	/** Dieses Feld speichert nur dann {@code true}, wenn beim {@link #readValueImpl() nächste gelesenen Wert} {@code ""} geliefert werden soll. */
-	boolean ignore;
-
 	/** Dieser Konstruktor initialisiert die Eingabe. Als {@link #getComma() Trennzeichen} wird {@code ';'} und als {@link #getQuote() Maskierungszeichen} wird
 	 * {@code '"'} genutzt. Die Methoden {@link #useQuote(char)}, {@link #useComma(char)}, {@link #readValue()}, {@link #readEntry()} und {@link #readTable()}
 	 * synchronisieren auf den gegebenen {@link Reader}.
@@ -134,15 +109,6 @@ public class CSVReader implements Closeable {
 		}
 	}
 
-	String[][] readTableImpl() throws IOException, IllegalArgumentException {
-		var result = new ArrayList<>();
-		while (true) {
-			var entry = this.readEntryImpl();
-			if (entry == null) return result.toArray(new String[result.size()][]);
-			result.add(entry);
-		}
-	}
-
 	/** Diese Methode ließt den nächsten Eintrag und gibt ihn zurück. Der gelieferte Eintrag besteht dabei aus den {@link #readValue() nächsten Werten} bis zum
 	 * Ende der Zeile. Wenn es keinen weiteren Eintrag gibt, wird {@code null} geliefert.
 	 *
@@ -153,19 +119,6 @@ public class CSVReader implements Closeable {
 	public String[] readEntry() throws IOException, IllegalArgumentException {
 		synchronized (this.reader) {
 			return this.readEntryImpl();
-		}
-	}
-
-	String[] readEntryImpl() throws IOException, IllegalArgumentException {
-		var result = this.entry;
-		try {
-			while (true) {
-				var value = this.readValueImpl();
-				if (value == null) return result.isEmpty() ? null : result.toArray(new String[result.size()]);
-				result.add(value);
-			}
-		} finally {
-			result.clear();
 		}
 	}
 
@@ -185,7 +138,68 @@ public class CSVReader implements Closeable {
 		}
 	}
 
-	String readValueImpl() throws IOException, IllegalArgumentException {
+	@Override
+	public void close() throws IOException {
+		synchronized (this.reader) {
+			this.reader.close();
+		}
+	}
+
+	@Override
+	public String toString() {
+		synchronized (this.reader) {
+			return Objects.toInvokeString(this, this.quote, this.comma, this.reader);
+		}
+	}
+
+	/** Dieses Feld speichert die Quelldaten. */
+	protected final Reader reader;
+
+	static void check(char symbol) throws IllegalArgumentException {
+		if ((symbol == '\r') || (symbol == '\n')) throw new IllegalArgumentException();
+	}
+
+	/** Dieses Feld speichert den Puffer für die Werte. */
+	private final StringBuilder value;
+
+	/** Dieses Feld speichert den Puffer für die Einträge. */
+	private final ArrayList<String> entry;
+
+	/** Dieses Feld speichert das Maskierungszeichen. */
+	private char quote = '"';
+
+	/** Dieses Feld speichert das Trennzeichen. */
+	private char comma = ';';
+
+	/** Dieses Feld speichert das erste Zeichen des nächsten Werts, das Trennzeichen, das Maskierungszeichen oder -1. */
+	private int symbol;
+
+	/** Dieses Feld speichert nur dann {@code true}, wenn beim {@link #readValueImpl() nächste gelesenen Wert} {@code ""} geliefert werden soll. */
+	private boolean ignore;
+
+	private String[][] readTableImpl() throws IOException, IllegalArgumentException {
+		var result = new ArrayList<>();
+		while (true) {
+			var entry = this.readEntryImpl();
+			if (entry == null) return result.toArray(new String[result.size()][]);
+			result.add(entry);
+		}
+	}
+
+	private String[] readEntryImpl() throws IOException, IllegalArgumentException {
+		var result = this.entry;
+		try {
+			while (true) {
+				var value = this.readValueImpl();
+				if (value == null) return result.isEmpty() ? null : result.toArray(new String[result.size()]);
+				result.add(value);
+			}
+		} finally {
+			result.clear();
+		}
+	}
+
+	private String readValueImpl() throws IOException, IllegalArgumentException {
 		if (this.ignore) {
 			this.ignore = false;
 			return "";
@@ -237,20 +251,6 @@ public class CSVReader implements Closeable {
 		} finally {
 			this.symbol = symbol;
 			result.setLength(0);
-		}
-	}
-
-	@Override
-	public void close() throws IOException {
-		synchronized (this.reader) {
-			this.reader.close();
-		}
-	}
-
-	@Override
-	public String toString() {
-		synchronized (this.reader) {
-			return Objects.toInvokeString(this, this.quote, this.comma, this.reader);
 		}
 	}
 

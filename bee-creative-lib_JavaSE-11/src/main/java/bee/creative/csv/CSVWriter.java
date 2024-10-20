@@ -27,22 +27,6 @@ public class CSVWriter implements Closeable, Flushable {
 		return new CSVWriter(IO.outputWriterFrom(data));
 	}
 
-	/** Dieses Feld speichert die Zieldaten. */
-	protected final Writer writer;
-
-	/** Dieses Feld speichert den Maskierungszwang. */
-	boolean force = true;
-
-	/** Dieses Feld speichert das Maskierungszeichen. */
-	char quote = '"';
-
-	/** Dieses Feld speichert das Trennzeichen. */
-	char comma = ';';
-
-	/** Dieses Feld speichert nur dann {@code true}, wenn das {@link #getComma() Trennzeichen} vor dem {@link #writeValue(Object) nächsten geschriebenen Wert}
-	 * ignoriert werden soll (Zeilenanfang). */
-	boolean ignore = true;
-
 	/** Dieser Konstruktor initialisiert die Ausgabe. Als {@link #getComma() Trennzeichen} wird {@code ';'} und als {@link #getQuote() Maskierungszeichen} wird
 	 * {@code '"'} genutzt. Der {@link #getForce() Maskierungszwang} ist aktiviert. Die Methoden {@link #useForce(boolean)}, {@link #useQuote(char)},
 	 * {@link #useComma(char)}, {@link #writeValue(Object)}, {@link #writeEntry(String...)} und {@link #writeTable(Object[][])} synchronisieren auf den gegebenen
@@ -141,12 +125,6 @@ public class CSVWriter implements Closeable, Flushable {
 		return this;
 	}
 
-	void writeTableImpl(Object[][] values) throws IOException {
-		for (var value: values) {
-			this.writeEntryImpl(value);
-		}
-	}
-
 	/** Diese Methode schreibt den abschließenden Zeilenumbruch ({@code "\r\n"}) des aktuellen Eintrags und gibt {@code this} zurück.
 	 *
 	 * @return {@code this}.
@@ -156,11 +134,6 @@ public class CSVWriter implements Closeable, Flushable {
 			this.writeEntryImpl();
 		}
 		return this;
-	}
-
-	void writeEntryImpl() throws IOException {
-		this.writer.write("\r\n");
-		this.ignore = true;
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code this.writeValue(values).writeEntry()}.
@@ -176,11 +149,6 @@ public class CSVWriter implements Closeable, Flushable {
 			this.writeEntryImpl(values);
 		}
 		return this;
-	}
-
-	void writeEntryImpl(Object[] values) throws IOException {
-		this.writeValueImpl(values);
-		this.writeEntryImpl();
 	}
 
 	/** Diese Methode schreibt den gegebenen Wert und gibt {@code this} zurück. Die Maskierung des Werts erfolgt nur dann, wenn das {@link #getQuote()
@@ -201,7 +169,74 @@ public class CSVWriter implements Closeable, Flushable {
 		return this;
 	}
 
-	void writeValueImpl(String value) throws IOException {
+	/** Diese Methode ist eine Abkürzung für {@code this.writeValue(values[0]).writeValue(values[1])...}.
+	 *
+	 * @see #writeValue(Object)
+	 * @param values Werte.
+	 * @return {@code this}.
+	 * @throws IOException Wenn {@link Writer#write(int)} bzw. {@link Writer#write(String)} eine entsprechende Ausnahme auslöst.
+	 * @throws NullPointerException Wenn {@code values} {@code null} ist oder enthält. */
+	public CSVWriter writeValue(Object... values) throws IOException, NullPointerException {
+		synchronized (this.writer) {
+			this.writeValueImpl(values);
+		}
+		return this;
+	}
+
+	@Override
+	public void close() throws IOException {
+		synchronized (this.writer) {
+			this.writer.close();
+		}
+	}
+
+	@Override
+	public void flush() throws IOException {
+		synchronized (this.writer) {
+			this.writer.flush();
+		}
+	}
+
+	@Override
+	public String toString() {
+		synchronized (this.writer) {
+			return Objects.toInvokeString(this, this.force, this.quote, this.comma, this.writer);
+		}
+	}
+
+	/** Dieses Feld speichert die Zieldaten. */
+	protected final Writer writer;
+
+	/** Dieses Feld speichert den Maskierungszwang. */
+	private boolean force = true;
+
+	/** Dieses Feld speichert das Maskierungszeichen. */
+	private char quote = '"';
+
+	/** Dieses Feld speichert das Trennzeichen. */
+	private char comma = ';';
+
+	/** Dieses Feld speichert nur dann {@code true}, wenn das {@link #getComma() Trennzeichen} vor dem {@link #writeValue(Object) nächsten geschriebenen Wert}
+	 * ignoriert werden soll (Zeilenanfang). */
+	private boolean ignore = true;
+
+	private void writeTableImpl(Object[][] values) throws IOException {
+		for (var value: values) {
+			this.writeEntryImpl(value);
+		}
+	}
+
+	private void writeEntryImpl() throws IOException {
+		this.writer.write("\r\n");
+		this.ignore = true;
+	}
+
+	private void writeEntryImpl(Object[] values) throws IOException {
+		this.writeValueImpl(values);
+		this.writeEntryImpl();
+	}
+
+	private void writeValueImpl(String value) throws IOException {
 		var quote = this.quote;
 		var comma = this.comma;
 		var target = this.writer;
@@ -240,44 +275,9 @@ public class CSVWriter implements Closeable, Flushable {
 		}
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code this.writeValue(values[0]).writeValue(values[1])...}.
-	 *
-	 * @see #writeValue(Object)
-	 * @param values Werte.
-	 * @return {@code this}.
-	 * @throws IOException Wenn {@link Writer#write(int)} bzw. {@link Writer#write(String)} eine entsprechende Ausnahme auslöst.
-	 * @throws NullPointerException Wenn {@code values} {@code null} ist oder enthält. */
-	public CSVWriter writeValue(Object... values) throws IOException, NullPointerException {
-		synchronized (this.writer) {
-			this.writeValueImpl(values);
-		}
-		return this;
-	}
-
-	void writeValueImpl(Object... values) throws IOException, NullPointerException {
+	private void writeValueImpl(Object... values) throws IOException, NullPointerException {
 		for (var value: values) {
 			this.writeValueImpl(value.toString());
-		}
-	}
-
-	@Override
-	public void close() throws IOException {
-		synchronized (this.writer) {
-			this.writer.close();
-		}
-	}
-
-	@Override
-	public void flush() throws IOException {
-		synchronized (this.writer) {
-			this.writer.flush();
-		}
-	}
-
-	@Override
-	public String toString() {
-		synchronized (this.writer) {
-			return Objects.toInvokeString(this, this.force, this.quote, this.comma, this.writer);
 		}
 	}
 
