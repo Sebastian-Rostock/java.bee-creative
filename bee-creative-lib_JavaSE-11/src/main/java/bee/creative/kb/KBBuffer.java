@@ -203,10 +203,13 @@ public class KBBuffer extends KBState {
 		return new KBUpdate(this, false);
 	}
 
+	/** Dieses Feld speichert die Sicherungskopie für {@link #commit()} und {@link #rollback()} oder {@code null}. */
 	KBState backup;
 
+	/** Dieses Feld speichert nur dann {@code true}, wenn {@link #backupEdges()} aufgerufen wurde. */
 	boolean backupEdges;
 
+	/** Dieses Feld speichert nur dann {@code true}, wenn {@link #backupValues} aufgerufen wurde. */
 	boolean backupValues;
 
 	private void backup() {
