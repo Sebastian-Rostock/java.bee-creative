@@ -232,7 +232,7 @@ public final class REFMAP {
 
 	}
 
-	static final Object[] EMPTY = new Object[]{REFSET.EMPTY};
+	static final Object[] EMPTY = new Object[]{REFSET.EMPTY, null, null};
 
 	static int[] getKeys(Object[] refmap) {
 		return (int[]) /* refmap.keys */ refmap[0];

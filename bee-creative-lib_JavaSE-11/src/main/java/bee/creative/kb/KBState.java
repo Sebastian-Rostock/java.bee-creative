@@ -599,7 +599,7 @@ public class KBState implements Emuable {
 		return result;
 	}
 
-	public int[] toInts2() {
+	public int[] toInts_() {
 		var sourceIntsCount = KBState.countEdgeInts(this.sourceMap);
 		var targetIntsCount = KBState.countEdgeInts(this.targetMap);
 		var valueIntsCount = KBState.countValueInts(this.valueStrMap);
@@ -616,12 +616,12 @@ public class KBState implements Emuable {
 		return result;
 	}
 
-	private static int writeInts(int[] result, int cursor, int[] ints) {
-		if (ints != null) {
-			var length = ints.length;
-			result[cursor] = length;
-			System.arraycopy(ints, 0, result, cursor + 1, length);
-			return cursor + length + 1;
+	private static int writeRefInts(int[] result, int cursor, int[] refs) {
+		if (refs != null) {
+			var count = refs.length;
+			result[cursor] = count;
+			System.arraycopy(refs, 0, result, cursor + 1, count);
+			return cursor + count + 1;
 		} else {
 			result[cursor] = 0;
 			return cursor + 1;
@@ -630,7 +630,7 @@ public class KBState implements Emuable {
 
 	private static void writeEdgeInts(int[] result, int cursor, Object[] sourceMap) {
 		var sourceCount = sourceMap.length;
-		cursor = KBState.writeInts(result, cursor, REFMAP.getKeys(sourceMap));
+		cursor = KBState.writeRefInts(result, cursor, REFMAP.getKeys(sourceMap));
 		for (var sourceIdx = 1; sourceIdx < sourceCount; sourceIdx++) {
 			var relationMap = KBState.asRefMap(sourceMap[sourceIdx]);
 			if (relationMap == null) {
@@ -639,7 +639,7 @@ public class KBState implements Emuable {
 				var relationCount = relationMap.length;
 				result[cursor++] = relationCount;
 				for (var relationIdx = 0; relationIdx < relationCount; relationIdx++) {
-					cursor = KBState.writeInts(result, cursor, asRefVal(relationMap[relationIdx]));
+					cursor = KBState.writeRefInts(result, cursor, asRefVal(relationMap[relationIdx]));
 				}
 			}
 		}
@@ -658,18 +658,34 @@ public class KBState implements Emuable {
 		}
 	}
 
-	private static int countEdgeInts(Object[] sourceMap) {
-		// TODO
-
-		return 0;
+	private static int countRefInts(int[] refs) {
+		return refs != null ? refs.length + 1 : 1;
 	}
 
-	private static int countValueInts(ValueStrMap valueMap) {
-		var valuesSize = 1;
-		for (var entry: valueMap.fastEntries()) {
-			valuesSize += entry.getValue().length() + 2;
+	private static int countEdgeInts(Object[] sourceMap) {
+		var sourceCount = sourceMap.length;
+		var result = KBState.countRefInts(REFMAP.getKeys(sourceMap));
+		for (var sourceIdx = 1; sourceIdx < sourceCount; sourceIdx++) {
+			var relationMap = KBState.asRefMap(sourceMap[sourceIdx]);
+			if (relationMap == null) {
+				result += 1;
+			} else {
+				var relationCount = relationMap.length;
+				result += 1;
+				for (var relationIdx = 0; relationIdx < relationCount; relationIdx++) {
+					result += KBState.countRefInts(asRefVal(relationMap[relationIdx]));
+				}
+			}
 		}
-		return valuesSize;
+		return result;
+	}
+
+	private static int countValueInts(ValueStrMap valueStrMap) {
+		var result = 1;
+		for (var entry: valueStrMap.fastEntries()) {
+			result += entry.getValue().length() + 2;
+		}
+		return result;
 	}
 
 	/** Diese Methode liefert die {@link #toInts() Wissensabschrift} als {@code byte}-Array mit nativer Bytereihenfolge. */
