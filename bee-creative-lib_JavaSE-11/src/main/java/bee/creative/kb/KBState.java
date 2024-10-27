@@ -7,6 +7,8 @@ import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Arrays;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
+import bee.creative.emu.EMU;
+import bee.creative.emu.Emuable;
 import bee.creative.fem.FEMString;
 import bee.creative.lang.Objects;
 import bee.creative.util.Getter;
@@ -31,7 +33,7 @@ import bee.creative.util.Iterators;
  * ({@link KBEdge#sourceRef()}, {@link KBEdge#relationRef()} und {@link KBEdge#targetRef()})
  *
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public class KBState {
+public class KBState implements Emuable {
 
 	/** Dieses Feld speichert den leeren {@link KBState Wissensstand}. */
 	public static final KBState EMPTY = new KBState();
@@ -480,6 +482,12 @@ public class KBState {
 		return REFMAP.getIdx(relationMap, relationRef) != 0;
 	}
 
+	@Override
+	public long emu() {
+		return EMU.fromObject(this) + KBState.emuEdges(this.sourceMap) + KBState.emuEdges(this.targetMap) + this.valueRefMap.emu() + this.valueStrMap.emu()
+			+ this.edges.emu() + this.values.emu();
+	}
+
 	/** Diese Methode liefert ein Wissensabschrift dieses Wissensstandes {@code int[]} mit der Struktur
 	 * {@code (indexRef, internalRef, externalRef, valueOffset, sourceCount, (sourceRef, targetRefCount, (targetRef, relationRef)[targetRefCount], targetSetCount, (relationRef, targetCount, targetRef[targetCount])[targetSetCount])[sourceCount], valueCount, (valueRef, valueSize, valueItem[valueSize])[valueCount])},
 	 * wobei {@code valueOffset} die Position von {@code valueCount} nennt.
@@ -619,8 +627,10 @@ public class KBState {
 
 	@Override
 	public String toString() {
-		return Objects.toStringCall(false, true, this, "edges", this.edges, "values", this.values);
+		return Objects.toStringCall(true, true, this, "edges", this.edges, "values", this.values);
 	}
+
+	static final int[] EMPTY_REFS = new int[0];
 
 	static boolean isRef(int[] ref_or_refset) {
 		return ref_or_refset.length == 1;
@@ -642,13 +652,13 @@ public class KBState {
 		return (Object[])refmap;
 	}
 
-	static <T> T computeSelect(int[] acceptRefset, int[] refuseRefset, int[] selectRefs, Getter<int[], T> useAcceptRefs) {
+	static <T> T computeSelect(int[] selectRefs, int[] acceptRefset, int[] refuseRefset, Getter<int[], T> useAcceptRefs) {
 		if (refuseRefset != null) return useAcceptRefs.get(REFSET.except(REFSET.from(selectRefs), refuseRefset));
 		if (acceptRefset != null) return useAcceptRefs.get(REFSET.intersect(REFSET.from(selectRefs), acceptRefset));
 		return useAcceptRefs.get(REFSET.from(selectRefs));
 	}
 
-	static <T> T computeExcept(int[] acceptRefset, int[] refuseRefset, int[] exceptRefs, Getter<int[], T> useAcceptRefs, Getter<int[], T> useRefuseRefs) {
+	static <T> T computeExcept(int[] exceptRefs, int[] acceptRefset, int[] refuseRefset, Getter<int[], T> useAcceptRefs, Getter<int[], T> useRefuseRefs) {
 		if (exceptRefs.length == 0) return acceptRefset != null ? useAcceptRefs.get(acceptRefset) : useRefuseRefs.get(refuseRefset);
 		if (acceptRefset != null) {
 			var acceptRefset2 = REFSET.popAllRefs(REFSET.copy(acceptRefset), exceptRefs);
@@ -839,8 +849,17 @@ public class KBState {
 
 	static final class ValueStrMap extends HashMapIO<FEMString> {
 
+		@Override
+		public long emu() {
+			var result = super.emu();
+			for (var index = this.capacityImpl() - 1; 0 <= index; index--) {
+				result += EMU.from(this.customGetValue(index));
+			}
+			return result;
+		}
+
 		public void pack() {
-			var capacity = this.capacity() >> 1;
+			var capacity = this.capacityImpl() >> 1;
 			if (this.size() > capacity) return;
 			this.allocate(capacity);
 		}
@@ -848,7 +867,7 @@ public class KBState {
 		public int[] fastKeys() {
 			var result = new int[this.size()];
 			var cursor = 0;
-			for (var index = this.capacity() - 1; 0 <= index; index--) {
+			for (var index = this.capacityImpl() - 1; 0 <= index; index--) {
 				if (this.customGetValue(index) != null) {
 					result[cursor++] = this.customGetKeyInt(index);
 				}
@@ -915,7 +934,7 @@ public class KBState {
 	static final class ValueRefMap extends HashMapOI<FEMString> {
 
 		public void pack() {
-			var capacity = this.capacity() >> 1;
+			var capacity = this.capacityImpl() >> 1;
 			if (this.size() > capacity) return;
 			this.allocate(capacity);
 		}
@@ -924,7 +943,18 @@ public class KBState {
 
 	}
 
-	private static final int[] EMPTY_REFS = new int[0];
+	private static long emuEdges(Object[] sourceMap) {
+		var result = new long[]{REFMAP.emu(sourceMap)};
+		REFMAP.forEach(sourceMap, (sourceRef, sourceVal) -> {
+			if (sourceVal == null) return;
+			var relationMap = KBState.asRefMap(sourceVal);
+			result[0] += REFMAP.emu(sourceMap);
+			REFMAP.forEach(relationMap, (relationRef, relationVal) -> {
+				result[0] += REFSET.emu(KBState.asRefVal(relationVal));
+			});
+		});
+		return result[0];
+	}
 
 	private static Object[] insertEdge(Object[] sourceMap, int sourceRef, int targetRef, int relationRef) {
 

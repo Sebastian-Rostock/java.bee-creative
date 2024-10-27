@@ -2,6 +2,8 @@ package bee.creative.kb;
 
 import java.util.Map.Entry;
 import java.util.function.Consumer;
+import bee.creative.emu.EMU;
+import bee.creative.emu.Emuable;
 import bee.creative.fem.FEMString;
 import bee.creative.lang.Objects;
 import bee.creative.util.Entries;
@@ -11,7 +13,7 @@ import bee.creative.util.Iterator2;
 /** Diese Klasse implementiert das {@link Iterable2} der Textwerte eines {@link KBState Wissensstands}.
  *
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public class KBValues implements Iterable2<Entry<Integer, FEMString>> {
+public class KBValues implements Iterable2<Entry<Integer, FEMString>>, Emuable {
 
 	/** Diese Methode liefert den {@link KBState Wissensstand}, dessen {@link FEMString Texterte} iteriert werden. */
 	public KBState owner() {
@@ -21,14 +23,14 @@ public class KBValues implements Iterable2<Entry<Integer, FEMString>> {
 	/** Diese Methode liefert einen {@link KBValues Textwertauswahl}, die nur {@link FEMString Textwerte} mit den Referenzen liefert, die in den gegebenen
 	 * Referenzen {@code selectValueRefs} enthalten sind. */
 	public KBValues selectValueRefs(int... selectValueRefs) {
-		return KBState.computeSelect(this.acceptValueRefset, this.refuseValueRefset, selectValueRefs,
+		return KBState.computeSelect(selectValueRefs, this.acceptValueRefset, this.refuseValueRefset,
 			acceptValueRefset -> new KBValues(this.owner, acceptValueRefset, null));
 	}
 
 	/** Diese Methode liefert einen {@link KBValues Textwertauswahl}, die nur {@link FEMString Textwerte} mit den Referenzen liefert, die nicht in den gegebenen
 	 * Referenzen {@code exceptValueRefs} enthalten sind. */
 	public KBValues exceptValueRefs(int... exceptValueRefs) {
-		return KBState.computeExcept(this.acceptValueRefset, this.refuseValueRefset, exceptValueRefs,
+		return KBState.computeExcept(exceptValueRefs, this.acceptValueRefset, this.refuseValueRefset,
 			acceptValueRefset -> new KBValues(this.owner, acceptValueRefset, null), refuseValueRefset -> new KBValues(this.owner, null, refuseValueRefset));
 	}
 
@@ -48,8 +50,13 @@ public class KBValues implements Iterable2<Entry<Integer, FEMString>> {
 	}
 
 	@Override
+	public long emu() {
+		return EMU.fromObject(this) + REFSET.emu(this.acceptValueRefset) + REFSET.emu(this.refuseValueRefset);
+	}
+
+	@Override
 	public String toString() {
-		return Objects.printIterable(false, this);
+		return Objects.printIterable(true, this);
 	}
 
 	/** Diese Schnittstelle definiert den Empfänger für {@link KBValues#forEach(RUN)}. */

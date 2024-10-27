@@ -16,7 +16,7 @@ public class KBBuffer extends KBState {
 		return (edge != null) && this.putEdge(edge.sourceRef, edge.targetRef, edge.relationRef);
 	}
 
-	public boolean putEdge(int sourceRef, int relationRef, int targetRef) {
+	public boolean putEdge(int sourceRef, int targetRef, int relationRef) {
 		this.backupEdges();
 		return this.insertEdge(sourceRef, targetRef, relationRef);
 	}
@@ -66,7 +66,7 @@ public class KBBuffer extends KBState {
 		return (edge != null) && this.popEdge(edge.sourceRef, edge.targetRef, edge.relationRef);
 	}
 
-	public boolean popEdge(int sourceRef, int relationRef, int targetRef) {
+	public boolean popEdge(int sourceRef, int targetRef, int relationRef) {
 		this.backupEdges();
 		return this.deleteEdge(sourceRef, targetRef, relationRef);
 	}
@@ -149,7 +149,7 @@ public class KBBuffer extends KBState {
 		this.backup();
 		return this.nextInternalRef();
 	}
-
+ 
 	public int getNextExternalRef() {
 		this.backup();
 		return this.nextExternalRef();
@@ -240,27 +240,33 @@ public class KBBuffer extends KBState {
 	}
 
 	private int nextExternalRef() {
-		var result = this.nextExternalRef(Math.min(-1, this.externalRef));
-		return this.externalRef = result < 0 ? this.nextExternalRef(-1) : result;
+		var externalRef = this.externalRef;
+		externalRef = this.nextExternalRef(externalRef < 0 ? externalRef : -1);
+		externalRef = externalRef < 0 ? externalRef : this.nextExternalRef(-1);
+		this.externalRef = externalRef - 1;
+		return externalRef;
 	}
 
-	private int nextExternalRef(int result) {
-		while (this.valueStrMap.containsKey(result)) {
-			result--;
+	private int nextExternalRef(int externalRef) {
+		while (this.valueStrMap.containsKey(externalRef)) {
+			externalRef--;
 		}
-		return result;
+		return externalRef;
 	}
 
 	private int nextInternalRef() {
-		var result = this.nextInternalRef(Math.max(1, this.internalRef));
-		return this.internalRef = result < 0 ? this.nextInternalRef(1) : result;
+		var internalRef = this.internalRef;
+		internalRef = this.nextInternalRef(internalRef > 0 ? internalRef : 1);
+		internalRef = internalRef < 0 ? this.nextInternalRef(1) : internalRef;
+		this.internalRef = internalRef + 1;
+		return internalRef;
 	}
 
-	private int nextInternalRef(int result) {
-		while ((REFMAP.getIdx(this.sourceMap, result) != 0) || (REFMAP.getIdx(this.targetMap, result) != 0)) {
-			result++;
+	private int nextInternalRef(int internalRef) {
+		while ((REFMAP.getIdx(this.sourceMap, internalRef) != 0) || (REFMAP.getIdx(this.targetMap, internalRef) != 0)) {
+			internalRef++;
 		}
-		return result;
+		return internalRef;
 	}
 
 	private boolean insertEdge(int sourceRef, int targetRef, int relationRef) {
