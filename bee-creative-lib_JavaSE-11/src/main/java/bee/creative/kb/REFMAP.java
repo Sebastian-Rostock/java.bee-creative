@@ -71,7 +71,7 @@ public final class REFMAP {
 
 	/** @see Emuator#emu(Object) */
 	public static long emu(Object[] refmap) {
-		return REFSET.emu(REFMAP.getKeys(refmap)) + EMU.fromArray(Object.class, refmap.length);
+		return refmap != null ? REFSET.emu(REFMAP.getKeys(refmap)) + EMU.align(12 + (4L * refmap.length)) : 0;
 	}
 
 	/** Diese Methode liefert die Anzahl der Referenzen in der gegebenen Referenzabbildung {@code refmap}. */

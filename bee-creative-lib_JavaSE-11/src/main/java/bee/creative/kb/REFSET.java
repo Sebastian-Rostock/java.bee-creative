@@ -298,7 +298,7 @@ public final class REFSET {
 
 	/** @see Emuator#emu(Object) */
 	public static long emu(int[] refset) {
-		return EMU.fromArray(Integer.TYPE, refset.length);
+		return refset != null ? EMU.align(12 + (4L * refset.length)) : 0;
 	}
 
 	/** Diese Schnittstelle definiert den Empfänger der Referenzen für {@link REFSET#forEach(int[], RUN)}. */
