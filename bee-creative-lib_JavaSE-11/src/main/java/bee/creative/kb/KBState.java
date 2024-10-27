@@ -525,14 +525,10 @@ public class KBState implements Emuable {
 			}
 		}
 
-		var valuesSize = 0;
 		var valueMap = this.valueStrMap;
-		var valuesCount = valueMap.size();
-		for (var entry: valueMap.fastEntries()) {
-			valuesSize += entry.getValue().length() + 2;
-		}
+		var valueIntsCount = KBState.countValueInts(valueMap);
 
-		var result = new int[4 + 1 + edgesSize + 1 + valuesSize];
+		var result = new int[4 + 1 + edgesSize + valueIntsCount];
 		var cursor = 5;
 
 		result[0] = this.indexRef;
@@ -598,8 +594,60 @@ public class KBState implements Emuable {
 			}
 		}
 
-		result[cursor++] = valuesCount;
-		for (var value: valueMap.fastEntries()) {
+		KBState.writeValueInts(result, cursor, valueMap);
+
+		return result;
+	}
+
+	public int[] toInts2() {
+		var sourceIntsCount = KBState.countEdgeInts(this.sourceMap);
+		var targetIntsCount = KBState.countEdgeInts(this.targetMap);
+		var valueIntsCount = KBState.countValueInts(this.valueStrMap);
+		var cursor = 0;
+		var result = new int[3 + sourceIntsCount + targetIntsCount + valueIntsCount];
+		result[cursor++] = this.indexRef;
+		result[cursor++] = this.internalRef;
+		result[cursor++] = this.externalRef;
+		KBState.writeEdgeInts(result, cursor, this.sourceMap);
+		cursor += sourceIntsCount;
+		KBState.writeEdgeInts(result, cursor, this.targetMap);
+		cursor += targetIntsCount;
+		KBState.writeValueInts(result, cursor, this.valueStrMap);
+		return result;
+	}
+
+	private static int writeInts(int[] result, int cursor, int[] ints) {
+		if (ints != null) {
+			var length = ints.length;
+			result[cursor] = length;
+			System.arraycopy(ints, 0, result, cursor + 1, length);
+			return cursor + length + 1;
+		} else {
+			result[cursor] = 0;
+			return cursor + 1;
+		}
+	}
+
+	private static void writeEdgeInts(int[] result, int cursor, Object[] sourceMap) {
+		var sourceCount = sourceMap.length;
+		cursor = KBState.writeInts(result, cursor, REFMAP.getKeys(sourceMap));
+		for (var sourceIdx = 1; sourceIdx < sourceCount; sourceIdx++) {
+			var relationMap = KBState.asRefMap(sourceMap[sourceIdx]);
+			if (relationMap == null) {
+				result[cursor++] = 0;
+			} else {
+				var relationCount = relationMap.length;
+				result[cursor++] = relationCount;
+				for (var relationIdx = 0; relationIdx < relationCount; relationIdx++) {
+					cursor = KBState.writeInts(result, cursor, asRefVal(relationMap[relationIdx]));
+				}
+			}
+		}
+	}
+
+	private static void writeValueInts(int[] result, int cursor, ValueStrMap valueStrMap) {
+		result[cursor++] = valueStrMap.size();
+		for (var value: valueStrMap.fastEntries()) {
 			var valueRef = value.getKey();
 			var valueStr = value.getValue();
 			var valueSize = valueStr.length();
@@ -608,8 +656,20 @@ public class KBState implements Emuable {
 			valueStr.toInts(result, cursor);
 			cursor += valueSize;
 		}
+	}
 
-		return result;
+	private static int countEdgeInts(Object[] sourceMap) {
+		// TODO
+
+		return 0;
+	}
+
+	private static int countValueInts(ValueStrMap valueMap) {
+		var valuesSize = 1;
+		for (var entry: valueMap.fastEntries()) {
+			valuesSize += entry.getValue().length() + 2;
+		}
+		return valuesSize;
 	}
 
 	/** Diese Methode liefert die {@link #toInts() Wissensabschrift} als {@code byte}-Array mit nativer Bytereihenfolge. */
@@ -948,7 +1008,7 @@ public class KBState implements Emuable {
 		REFMAP.forEach(sourceMap, (sourceRef, sourceVal) -> {
 			if (sourceVal == null) return;
 			var relationMap = KBState.asRefMap(sourceVal);
-			result[0] += REFMAP.emu(sourceMap);
+			result[0] += REFMAP.emu(relationMap);
 			REFMAP.forEach(relationMap, (relationRef, relationVal) -> {
 				result[0] += REFSET.emu(KBState.asRefVal(relationVal));
 			});
