@@ -1,7 +1,6 @@
 package bee.creative.kb;
 
 import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
@@ -16,7 +15,7 @@ import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 import bee.creative.fem.FEMString;
 
-/** Diese Klasse implementiert einen {@link DeflaterOutputStream}, der primitive Werte we dein {@link DataOutputStream} schreiben kann.
+/** Diese Klasse implementiert einen {@link DeflaterOutputStream}, der primitive Werte über einen {@link ByteBuffer} mit gegebener {@link ByteOrder} schreibt.
  *
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class ZIPDOS extends DeflaterOutputStream {
@@ -37,12 +36,12 @@ public class ZIPDOS extends DeflaterOutputStream {
 		}
 	}
 
-	/** Dieser Konstruktor initialisiert den {@link ByteArrayOutputStream} mit dem gegebenen und den {@link Deflater} mit {@link Deflater#DEFAULT_COMPRESSION}. */
+	/** Dieser Konstruktor initialisiert den {@link OutputStream} mit dem gegebenen und den {@link Deflater} mit {@link Deflater#DEFAULT_COMPRESSION}. */
 	public ZIPDOS(OutputStream target) throws IOException {
 		this(target, Deflater.DEFAULT_COMPRESSION);
 	}
 
-	/** Dieser Konstruktor initialisiert den {@link ByteArrayOutputStream} mit dem gegebenen und den {@link Deflater} mit der gegebenen Kompressionsstufe
+	/** Dieser Konstruktor initialisiert den {@link OutputStream} mit dem gegebenen und den {@link Deflater} mit der gegebenen Kompressionsstufe
 	 * ({@link Deflater#DEFAULT_COMPRESSION}, {@link Deflater#NO_COMPRESSION}..{@link Deflater#BEST_COMPRESSION}). */
 	public ZIPDOS(OutputStream target, int level) throws IOException {
 		this(target, level, ByteOrder.nativeOrder());
