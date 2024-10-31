@@ -66,8 +66,8 @@ public class ZIPDOS extends DeflaterOutputStream {
 	public void writeInt(int[] values, int offset, int length) throws IOException {
 		while (length > 0) {
 			var count = Math.min(length, ZIPDOS.BUFFER_SIZE / 4);
-			this.bufferAsInt.rewind().put(values, offset, length);
-			this.writeBuffer(length * 4);
+			this.bufferAsInt.rewind().put(values, offset, count);
+			this.writeBuffer(count * 4);
 			offset += count;
 			length -= count;
 		}
@@ -78,7 +78,13 @@ public class ZIPDOS extends DeflaterOutputStream {
 	}
 
 	public void writeByte(byte[] values, int offset, int length) throws IOException {
-		this.write(values, offset, length);
+		while (length > 0) {
+			var count = Math.min(length, ZIPDOS.BUFFER_SIZE);
+			this.bufferAsByte.rewind().put(values, offset, count);
+			this.writeBuffer(count);
+			offset += count;
+			length -= count;
+		}
 	}
 
 	public void writeChar(char... values) throws IOException {
@@ -88,8 +94,8 @@ public class ZIPDOS extends DeflaterOutputStream {
 	public void writeChar(char[] values, int offset, int length) throws IOException {
 		while (length > 0) {
 			var count = Math.min(length, ZIPDOS.BUFFER_SIZE / 2);
-			this.bufferAsChar.rewind().put(values, offset, length);
-			this.writeBuffer(length * 2);
+			this.bufferAsChar.rewind().put(values, offset, count);
+			this.writeBuffer(count * 2);
 			offset += count;
 			length -= count;
 		}
@@ -102,8 +108,8 @@ public class ZIPDOS extends DeflaterOutputStream {
 	public void writeLong(long[] values, int offset, int length) throws IOException {
 		while (length > 0) {
 			var count = Math.min(length, ZIPDOS.BUFFER_SIZE / 8);
-			this.bufferAsLong.rewind().put(values, offset, length);
-			this.writeBuffer(length * 8);
+			this.bufferAsLong.rewind().put(values, offset, count);
+			this.writeBuffer(count * 8);
 			offset += count;
 			length -= count;
 		}
@@ -116,8 +122,8 @@ public class ZIPDOS extends DeflaterOutputStream {
 	public void writeShort(short[] values, int offset, int length) throws IOException {
 		while (length > 0) {
 			var count = Math.min(length, ZIPDOS.BUFFER_SIZE / 2);
-			this.bufferAsShort.rewind().put(values, offset, length);
-			this.writeBuffer(length * 2);
+			this.bufferAsShort.rewind().put(values, offset, count);
+			this.writeBuffer(count * 2);
 			offset += count;
 			length -= count;
 		}
@@ -130,8 +136,8 @@ public class ZIPDOS extends DeflaterOutputStream {
 	public void writeFloat(float[] values, int offset, int length) throws IOException {
 		while (length > 0) {
 			var count = Math.min(length, ZIPDOS.BUFFER_SIZE / 4);
-			this.bufferAsFloat.rewind().put(values, offset, length);
-			this.writeBuffer(length * 4);
+			this.bufferAsFloat.rewind().put(values, offset, count);
+			this.writeBuffer(count * 4);
 			offset += count;
 			length -= count;
 		}
@@ -144,8 +150,8 @@ public class ZIPDOS extends DeflaterOutputStream {
 	public void writeDouble(double[] values, int offset, int length) throws IOException {
 		while (length > 0) {
 			var count = Math.min(length, ZIPDOS.BUFFER_SIZE / 8);
-			this.bufferAsDouble.rewind().put(values, offset, length);
-			this.writeBuffer(length * 8);
+			this.bufferAsDouble.rewind().put(values, offset, count);
+			this.writeBuffer(count * 8);
 			offset += count;
 			length -= count;
 		}
