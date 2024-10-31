@@ -69,6 +69,7 @@ public class ZIPDIS extends InflaterInputStream {
 	}
 
 	public byte[] readByte(byte[] values, int offset, int length) throws IOException {
+		this.bufferAsByte.limit(ZIPDIS.BUFFER_SIZE);
 		while (length > 0) {
 			var count = Math.min(length, ZIPDIS.BUFFER_SIZE);
 			this.readBuffer(count);

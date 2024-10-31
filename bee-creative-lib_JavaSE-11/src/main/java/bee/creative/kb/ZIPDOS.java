@@ -77,6 +77,7 @@ public class ZIPDOS extends DeflaterOutputStream {
 	}
 
 	public void writeByte(byte[] values, int offset, int length) throws IOException {
+		this.bufferAsByte.limit(ZIPDOS.BUFFER_SIZE);
 		while (length > 0) {
 			var count = Math.min(length, ZIPDOS.BUFFER_SIZE);
 			this.bufferAsByte.rewind().put(values, offset, count);
