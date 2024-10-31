@@ -878,9 +878,25 @@ public class KBState implements Emuable {
 		}
 	}
 
-	private Object[] readEdgesI(ZIPDIS source) {
-		// I TODO
-		return null;
+	private int[] readRefs(ZIPDIS source) throws IOException {
+		var count = source.readInt(1)[0];
+		return count == 0 ? null : source.readInt(count);
+	}
+
+	private Object[] readEdgesI(ZIPDIS source) throws IOException {
+		var sourceCount = source.readInt(1)[0];
+		var sourceMap = new Object[sourceCount];
+		for (var sourceIdx = 1; sourceIdx < sourceCount; sourceIdx++) {
+			var relationCount = source.readInt(1)[0];
+			if (relationCount != 0) {
+				var relationMap = new Object[relationCount];
+				for (var relationIdx = 0; relationIdx < relationCount; relationIdx++) {
+					relationMap[relationIdx] = readRefs(source);
+				}
+				sourceMap[sourceIdx] = relationMap;
+			}
+		}
+		return sourceMap;
 	}
 
 	private void readEdgesC(ZIPDIS source) throws IOException {
