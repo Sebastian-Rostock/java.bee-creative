@@ -659,12 +659,14 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static abstract class HashString extends FEMString {
 
-		/** Diese Methode bestückt den Streuwertpuffer der gegebenen Zeichenkette.
-		 * 
+		/** Diese Methode bestückt den Streuwertpuffer der gegebenen Zeichenkette, sofern diese ein {@link HashString} ist.
+		 *
 		 * @param target Zeichenkette.
 		 * @param hash Streuwert. */
-		public static void setHash(HashString target, int hash) {
-			target.hash = hash;
+		public static void setHash(FEMString target, int hash) {
+			if (target instanceof HashString) {
+				((HashString)target).hash = hash;
+			}
 		}
 
 		@Override
