@@ -659,16 +659,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static abstract class HashString extends FEMString {
 
-		/** Diese Methode bestückt den Streuwertpuffer der gegebenen Zeichenkette, sofern diese ein {@link HashString} ist.
-		 *
-		 * @param target Zeichenkette.
-		 * @param hash Streuwert. */
-		public static void setHash(FEMString target, int hash) {
-			if (target instanceof HashString) {
-				((HashString)target).hash = hash;
-			}
-		}
-
 		@Override
 		public int hashCode() {
 			var result = this.hash;
@@ -923,6 +913,11 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 	public static final class CompactStringINT8 extends HashString implements Emuable {
 
+		public CompactStringINT8(int hash, byte[] items, int offset, int length) throws IllegalArgumentException {
+			this(items, offset, length);
+			this.hash = hash;
+		}
+
 		@Override
 		public long emu() {
 			return EMU.fromObject(this) + ((this.offset == 0) && (this.length == this.items.length) ? EMU.fromArray(this.items) : 0);
@@ -968,6 +963,11 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 	public static final class CompactStringINT16 extends HashString implements Emuable {
 
+		public CompactStringINT16(int hash, short[] items, int offset, int length) throws IllegalArgumentException {
+			this(items, offset, length);
+			this.hash = hash;
+		}
+
 		@Override
 		public long emu() {
 			return EMU.fromObject(this) + ((this.offset == 0) && (this.length == this.items.length) ? EMU.fromArray(this.items) : 0);
@@ -1011,6 +1011,11 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	public static final class CompactStringINT32 extends HashString implements Emuable {
+
+		public CompactStringINT32(int hash, int[] items, int offset, int length) throws IllegalArgumentException {
+			this(items, offset, length);
+			this.hash = hash;
+		}
 
 		@Override
 		public long emu() {
@@ -1060,6 +1065,11 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	public static final class CompactStringUTF8 extends HashString implements Emuable {
+
+		public CompactStringUTF8(int hash, byte[] items, int offset, int length) throws IllegalArgumentException {
+			this(items, offset, length);
+			this.hash = hash;
+		}
 
 		@Override
 		public long emu() {
@@ -1122,6 +1132,11 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	public static final class CompactStringUTF16 extends HashString implements Emuable {
+
+		public CompactStringUTF16(int hash, char[] items, int offset, int length) throws IllegalArgumentException {
+			this(items, offset, length);
+			this.hash = hash;
+		}
 
 		@Override
 		public long emu() {
