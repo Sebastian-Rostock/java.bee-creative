@@ -12,6 +12,111 @@ import bee.creative.util.HashMapOI;
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class KBBuffer extends KBState {
 
+	/** Diese Methode setzt die Referenz auf die Entität des Inhaltsverzeichnisses. */
+	public void setIndexRef(int indexRef) {
+		this.backup();
+		this.indexRef = indexRef;
+	}
+
+	/** Diese Methode setzt die Referenz, von der aus die nächste für eine neue interne Entität ohne Textwert verfügbare Referenz gesucht wird. */
+	public void setInternalRef(int internalRef) {
+		this.backup();
+		this.internalRef = internalRef;
+	}
+
+	/** Diese Methode setzt die Referenz, von der aus die nächste für eine neue externe Entität mit Textwert verfügbare Referenz gesucht wird. */
+	public void setExternalRef(int externalRef) {
+		this.backup();
+		this.externalRef = externalRef;
+	}
+
+	public int getNextInternalRef() {
+		this.backup();
+		return this.nextInternalRef();
+	}
+
+	public int getNextExternalRef() {
+		this.backup();
+		return this.nextExternalRef();
+	}
+
+	public boolean fixSourceRelationRefs(int sourceRef, int... relationRefs) {
+		var relationMap = this.getRefmap(this.sourceMap, sourceRef);
+		var relationSet = REFSET.except(REFSET.copy(REFMAP.getKeys(relationMap)), REFSET.from(relationRefs));
+		if (REFSET.size(relationSet) == 0) return false;
+		this.backupEdges();
+		REFSET.forEach(relationSet, relationRef -> this.fixSourceRelationTargetRefs(sourceRef, relationRef, REFSET.EMPTY_REFS));
+		return true;
+	}
+
+	public boolean popSourceRelationRefs(int sourceRef, int... relationRefs) {
+		var relationMap = this.getRefmap(this.sourceMap, sourceRef);
+		var relationSet = REFSET.intersect(REFSET.from(relationRefs), REFMAP.getKeys(relationMap));
+		if (REFSET.size(relationSet) == 0) return false;
+		this.backupEdges();
+		REFSET.forEach(relationSet, relationRef -> this.fixSourceRelationTargetRefs(sourceRef, relationRef, REFSET.EMPTY_REFS));
+		return true;
+	}
+
+	public boolean fixSourceRelationTargetRefs(int sourceRef, int relationRef, int... targetRefs) {
+		var targetVal = this.getRefset(this.sourceMap, sourceRef, relationRef);
+		if (targetVal == null) return false;
+		if (KBState.isRef(targetVal)) {
+			var targetRef = KBState.asRef(targetVal);
+			if (this.contains(targetRefs, targetRef)) return false;
+			this.backupEdges();
+			this.deleteEdge(sourceRef, targetRef, relationRef);
+		} else {
+			var targetSet = REFSET.except(REFSET.copy(targetVal), REFSET.from(targetRefs));
+			if (REFSET.size(targetSet) == 0) return false;
+			this.backupEdges();
+			REFSET.forEach(targetSet, targetRef -> this.deleteEdge(sourceRef, targetRef, relationRef));
+		}
+		return true;
+	}
+
+	public boolean setSourceRelationTargetRefs(int sourceRef, int relationRef, int... targetRefs) {
+		return this.fixSourceRelationTargetRefs(sourceRef, relationRef, targetRefs) | this.putSourceRelationTargetRefs(sourceRef, relationRef, targetRefs);
+	}
+
+	public boolean putSourceRelationTargetRefs(int sourceRef, int relationRef, int... targetRefs) {
+		if ((sourceRef == 0) || (relationRef == 0)) return false;
+		var targetSet = REFSET.from(targetRefs);
+		var targetVal = this.getRefset(this.sourceMap, sourceRef, relationRef);
+		if (targetVal != null) {
+			if (KBState.isRef(targetVal)) {
+				var targetRef = KBState.asRef(targetVal);
+				REFSET.popRef(targetSet, targetRef);
+			} else {
+				targetSet = REFSET.except(targetSet, targetVal);
+			}
+		}
+		if (REFSET.size(targetSet) == 0) return false;
+		this.backupEdges();
+		REFSET.forEach(targetSet, targetRef -> this.deleteEdge(sourceRef, targetRef, relationRef));
+
+		return true;
+
+	}
+
+	public boolean popSourceRelationTargetRefs(int sourceRef, int relationRef, int... targetRefs) {
+		if ((sourceRef == 0) || (relationRef == 0)) return false;
+		var targetVal = this.getRefset(this.sourceMap, sourceRef, relationRef);
+		if (targetVal == null) return false;
+		if (KBState.isRef(targetVal)) {
+			var targetRef = KBState.asRef(targetVal);
+			if (!this.contains(targetRefs, targetRef)) return false;
+			this.backupEdges();
+			this.deleteEdge(sourceRef, targetRef, relationRef);
+		} else {
+			var targetSet = REFSET.intersect(REFSET.from(targetRefs), targetVal);
+			if (REFSET.size(targetSet) == 0) return false;
+			this.backupEdges();
+			REFSET.forEach(targetSet, targetRef -> this.deleteEdge(sourceRef, targetRef, relationRef));
+		}
+		return true;
+	}
+
 	public boolean putEdge(KBEdge edge) {
 		return (edge != null) && this.putEdge(edge.sourceRef, edge.targetRef, edge.relationRef);
 	}
@@ -125,34 +230,6 @@ public class KBBuffer extends KBState {
 		this.valueStrMap.pack();
 		this.valueRefMap.pack();
 		return result != this.getValueCount();
-	}
-
-	/** Diese Methode setzt die Referenz auf die Entität des Inhaltsverzeichnisses. */
-	public void setIndexRef(int indexRef) {
-		this.backup();
-		this.indexRef = indexRef;
-	}
-
-	/** Diese Methode setzt die Referenz, von der aus die nächste für eine neue interne Entität ohne Textwert verfügbare Referenz gesucht wird. */
-	public void setInternalRef(int internalRef) {
-		this.backup();
-		this.internalRef = internalRef;
-	}
-
-	/** Diese Methode setzt die Referenz, von der aus die nächste für eine neue externe Entität mit Textwert verfügbare Referenz gesucht wird. */
-	public void setExternalRef(int externalRef) {
-		this.backup();
-		this.externalRef = externalRef;
-	}
-
-	public int getNextInternalRef() {
-		this.backup();
-		return this.nextInternalRef();
-	}
- 
-	public int getNextExternalRef() {
-		this.backup();
-		return this.nextExternalRef();
 	}
 
 	/** Diese Methode entfernt alle {@link #edges() Kanten} und {@link #values() Textwerte}. */
@@ -270,7 +347,7 @@ public class KBBuffer extends KBState {
 	}
 
 	private boolean insertEdge(int sourceRef, int targetRef, int relationRef) {
-		if ((sourceRef == 0) || (relationRef == 0) || (targetRef == 0)) return false;
+		if ((sourceRef == 0) || (targetRef == 0) || (relationRef == 0)) return false;
 
 		var sourceMap = this.sourceMap;
 		var targetMap = this.targetMap;
@@ -492,7 +569,7 @@ public class KBBuffer extends KBState {
 	}
 
 	private boolean deleteEdge(int sourceRef, int targetRef, int relationRef) {
-		if ((sourceRef == 0) || (relationRef == 0) || (targetRef == 0)) return false;
+		if ((sourceRef == 0) || (targetRef == 0) || (relationRef == 0)) return false;
 
 		var sourceMap = this.sourceMap;
 		var sourceIdx = REFMAP.getIdx(sourceMap, sourceRef);
@@ -642,6 +719,13 @@ public class KBBuffer extends KBState {
 		if (valueRef == null) return false;
 		this.valueStrMap.remove(valueRef);
 		return true;
+	}
+
+	private boolean contains(int[] refs, int ref) {
+		for (int ref2: refs) {
+			if (ref == ref2) return true;
+		}
+		return false;
 	}
 
 }
