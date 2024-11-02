@@ -229,12 +229,12 @@ public class KBState implements Emuable {
 
 	public int[] getSourceRelationRefs(int sourceRef) {
 		var relationMap = this.getRefmap(this.sourceMap, sourceRef);
-		return relationMap != null ? REFMAP.toArray(relationMap) : KBState.EMPTY_REFS;
+		return REFMAP.toArray(relationMap);
 	}
 
 	public int getSourceRelationCount(int sourceRef) {
 		var relationMap = this.getRefmap(this.sourceMap, sourceRef);
-		return relationMap != null ? REFMAP.size(relationMap) : 0;
+		return REFMAP.size(relationMap);
 	}
 
 	public int getSourceRelationTargetRef(int sourceRef, int relationRef) {
@@ -244,7 +244,7 @@ public class KBState implements Emuable {
 
 	public int[] getSourceRelationTargetRefs(int sourceRef, int relationRef) {
 		var targetVal = this.getRefset(this.sourceMap, sourceRef, relationRef);
-		return targetVal == null ? KBState.EMPTY_REFS : KBState.isRef(targetVal) ? new int[]{KBState.asRef(targetVal)} : REFSET.toArray(targetVal);
+		return targetVal == null ? REFSET.EMPTY_REFS : KBState.isRef(targetVal) ? new int[]{KBState.asRef(targetVal)} : REFSET.toArray(targetVal);
 	}
 
 	public int getSourceRelationTargetCount(int sourceRef, int relationRef) {
@@ -261,9 +261,9 @@ public class KBState implements Emuable {
 	}
 
 	public int[] getTargetRelationRefs(int targetRef) {
-		if (targetRef == 0) return KBState.EMPTY_REFS;
+		if (targetRef == 0) return REFSET.EMPTY_REFS;
 		var targetIdx = REFMAP.getIdx(this.targetMap, targetRef);
-		if (targetIdx == 0) return KBState.EMPTY_REFS;
+		if (targetIdx == 0) return REFSET.EMPTY_REFS;
 		var relationMap = KBState.asRefMap(REFMAP.getVal(this.targetMap, targetIdx));
 		return REFMAP.toArray(relationMap);
 	}
@@ -291,12 +291,12 @@ public class KBState implements Emuable {
 	/** Diese Methode liefert die {@link KBEdge#sourceRef() Quellreferenzen} aller {@link KBEdge Kanten} mit der gegebenen {@link KBEdge#targetRef() Zielreferenz}
 	 * {@code targetRef} und der gegebenen {@link KBEdge#relationRef() Beziehungsreferenz} {@code relationRef}. */
 	public int[] getTargetRelationSourceRefs(int targetRef, int relationRef) {
-		if ((targetRef == 0) || (relationRef == 0)) return KBState.EMPTY_REFS;
+		if ((targetRef == 0) || (relationRef == 0)) return REFSET.EMPTY_REFS;
 		var targetIdx = REFMAP.getIdx(this.targetMap, targetRef);
-		if (targetIdx == 0) return KBState.EMPTY_REFS;
+		if (targetIdx == 0) return REFSET.EMPTY_REFS;
 		var relationMap = KBState.asRefMap(REFMAP.getVal(this.targetMap, targetIdx));
 		var relationIdx = REFMAP.getIdx(relationMap, relationRef);
-		if (relationIdx == 0) return KBState.EMPTY_REFS;
+		if (relationIdx == 0) return REFSET.EMPTY_REFS;
 		var sourceVal = KBState.asRefVal(REFMAP.getVal(relationMap, relationIdx));
 		if (KBState.isRef(sourceVal)) return new int[]{KBState.asRef(sourceVal)};
 		return REFSET.toArray(sourceVal);
@@ -419,8 +419,6 @@ public class KBState implements Emuable {
 		return Objects.toStringCall(true, true, this, "edges", this.edges, "values", this.values);
 	}
 
-	static final int[] EMPTY_REFS = new int[0];
-
 	static boolean isRef(int[] ref_or_refset) {
 		return ref_or_refset.length == 1;
 	}
@@ -503,10 +501,11 @@ public class KBState implements Emuable {
 	}
 
 	final Object[] getRefmap(Object[] sourceMap, int sourceRef) {
-		if (sourceRef == 0) return null;
+		if (sourceRef == 0) return REFMAP.EMPTY;
 		var sourceIdx = REFMAP.getIdx(sourceMap, sourceRef);
-		if (sourceIdx == 0) return null;
+		if (sourceIdx == 0) return REFMAP.EMPTY;
 		var relationMap = KBState.asRefMap(REFMAP.getVal(sourceMap, sourceIdx));
+		if (relationMap == null) return REFMAP.EMPTY;
 		return relationMap;
 	}
 
