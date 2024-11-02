@@ -41,6 +41,7 @@ public class KBBuffer extends KBState {
 	}
 
 	public boolean fixSourceRelationRefs(int sourceRef, int... relationRefs) {
+		if (sourceRef == 0) return false;
 		var relationMap = this.getRefmap(this.sourceMap, sourceRef);
 		var relationSet = REFSET.except(REFSET.copy(REFMAP.getKeys(relationMap)), REFSET.from(relationRefs));
 		if (REFSET.size(relationSet) == 0) return false;
@@ -50,6 +51,7 @@ public class KBBuffer extends KBState {
 	}
 
 	public boolean popSourceRelationRefs(int sourceRef, int... relationRefs) {
+		if (sourceRef == 0) return false;
 		var relationMap = this.getRefmap(this.sourceMap, sourceRef);
 		var relationSet = REFSET.intersect(REFSET.from(relationRefs), REFMAP.getKeys(relationMap));
 		if (REFSET.size(relationSet) == 0) return false;
@@ -59,8 +61,8 @@ public class KBBuffer extends KBState {
 	}
 
 	public boolean fixSourceRelationTargetRefs(int sourceRef, int relationRef, int... targetRefs) {
+		if ((sourceRef == 0) || (relationRef == 0)) return false;
 		var targetVal = this.getRefset(this.sourceMap, sourceRef, relationRef);
-		if (targetVal == null) return false;
 		if (KBState.isRef(targetVal)) {
 			var targetRef = KBState.asRef(targetVal);
 			if (this.contains(targetRefs, targetRef)) return false;
@@ -102,7 +104,6 @@ public class KBBuffer extends KBState {
 	public boolean popSourceRelationTargetRefs(int sourceRef, int relationRef, int... targetRefs) {
 		if ((sourceRef == 0) || (relationRef == 0)) return false;
 		var targetVal = this.getRefset(this.sourceMap, sourceRef, relationRef);
-		if (targetVal == null) return false;
 		if (KBState.isRef(targetVal)) {
 			var targetRef = KBState.asRef(targetVal);
 			if (!this.contains(targetRefs, targetRef)) return false;
