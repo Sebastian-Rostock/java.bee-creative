@@ -228,55 +228,28 @@ public class KBState implements Emuable {
 	}
 
 	public int[] getSourceRelationRefs(int sourceRef) {
-		if (sourceRef == 0) return KBState.EMPTY_REFS;
-		var sourceIdx = REFMAP.getIdx(this.sourceMap, sourceRef);
-		if (sourceIdx == 0) return KBState.EMPTY_REFS;
-		var relationMap = KBState.asRefMap(REFMAP.getVal(this.sourceMap, sourceIdx));
-		return REFMAP.toArray(relationMap);
+		var relationMap = this.getRefmap(this.sourceMap, sourceRef);
+		return relationMap != null ? REFMAP.toArray(relationMap) : KBState.EMPTY_REFS;
 	}
 
 	public int getSourceRelationCount(int sourceRef) {
-		if (sourceRef == 0) return 0;
-		var sourceIdx = REFMAP.getIdx(this.sourceMap, sourceRef);
-		if (sourceIdx == 0) return 0;
-		var relationMap = KBState.asRefMap(REFMAP.getVal(this.sourceMap, sourceIdx));
-		return REFMAP.size(relationMap);
+		var relationMap = this.getRefmap(this.sourceMap, sourceRef);
+		return relationMap != null ? REFMAP.size(relationMap) : 0;
 	}
 
 	public int getSourceRelationTargetRef(int sourceRef, int relationRef) {
-		if ((sourceRef == 0) || (relationRef == 0)) return 0;
-		var sourceIdx = REFMAP.getIdx(this.sourceMap, sourceRef);
-		if (sourceIdx == 0) return 0;
-		var relationMap = KBState.asRefMap(REFMAP.getVal(this.sourceMap, sourceIdx));
-		var relationIdx = REFMAP.getIdx(relationMap, relationRef);
-		if (relationIdx == 0) return 0;
-		var targetVal = KBState.asRefVal(REFMAP.getVal(relationMap, relationIdx));
-		if (KBState.isRef(targetVal)) return KBState.asRef(targetVal);
-		return REFSET.getRef(targetVal);
+		var targetVal = this.getRefset(this.sourceMap, sourceRef, relationRef);
+		return targetVal == null ? 0 : KBState.isRef(targetVal) ? KBState.asRef(targetVal) : REFSET.getRef(targetVal);
 	}
 
 	public int[] getSourceRelationTargetRefs(int sourceRef, int relationRef) {
-		if ((sourceRef == 0) || (relationRef == 0)) return KBState.EMPTY_REFS;
-		var sourceIdx = REFMAP.getIdx(this.sourceMap, sourceRef);
-		if (sourceIdx == 0) return KBState.EMPTY_REFS;
-		var relationMap = KBState.asRefMap(REFMAP.getVal(this.sourceMap, sourceIdx));
-		var relationIdx = REFMAP.getIdx(relationMap, relationRef);
-		if (relationIdx == 0) return KBState.EMPTY_REFS;
-		var targetVal = KBState.asRefVal(REFMAP.getVal(relationMap, relationIdx));
-		if (KBState.isRef(targetVal)) return new int[]{KBState.asRef(targetVal)};
-		return REFSET.toArray(targetVal);
+		var targetVal = this.getRefset(this.sourceMap, sourceRef, relationRef);
+		return targetVal == null ? KBState.EMPTY_REFS : KBState.isRef(targetVal) ? new int[]{KBState.asRef(targetVal)} : REFSET.toArray(targetVal);
 	}
 
 	public int getSourceRelationTargetCount(int sourceRef, int relationRef) {
-		if ((sourceRef == 0) || (relationRef == 0)) return 0;
-		var sourceIdx = REFMAP.getIdx(this.sourceMap, sourceRef);
-		if (sourceIdx == 0) return 0;
-		var relationMap = KBState.asRefMap(REFMAP.getVal(this.sourceMap, sourceIdx));
-		var relationIdx = REFMAP.getIdx(relationMap, relationRef);
-		if (relationIdx == 0) return 0;
-		var targetVal = KBState.asRefVal(REFMAP.getVal(relationMap, relationIdx));
-		if (KBState.isRef(targetVal)) return 1;
-		return REFSET.size(targetVal);
+		var targetVal = this.getRefset(this.sourceMap, sourceRef, relationRef);
+		return targetVal == null ? 0 : KBState.isRef(targetVal) ? 1 : REFSET.size(targetVal);
 	}
 
 	public int[] getTargetRefs() {
@@ -469,8 +442,8 @@ public class KBState implements Emuable {
 	}
 
 	static <T> T computeSelect(int[] selectRefs, int[] acceptRefset, int[] refuseRefset, Getter<int[], T> useAcceptRefs) {
-		if (refuseRefset != null) return useAcceptRefs.get(REFSET.except(REFSET.from(selectRefs), refuseRefset));
-		if (acceptRefset != null) return useAcceptRefs.get(REFSET.intersect(REFSET.from(selectRefs), acceptRefset));
+		if (refuseRefset != null) return useAcceptRefs.get(REFSET.trim(REFSET.except(REFSET.from(selectRefs), refuseRefset)));
+		if (acceptRefset != null) return useAcceptRefs.get(REFSET.trim(REFSET.intersect(REFSET.from(selectRefs), acceptRefset)));
 		return useAcceptRefs.get(REFSET.from(selectRefs));
 	}
 
@@ -517,6 +490,24 @@ public class KBState implements Emuable {
 	/** Dieser Konstruktor {@link #reset(KBState) übernimmt} die Merkmale des gegebenen {@link KBState Wissensstands}. */
 	KBState(KBState that) {
 		this.reset(that);
+	}
+
+	final int[] getRefset(Object[] sourceMap, int sourceRef, int relationRef) {
+		if (relationRef == 0) return null;
+		var relationMap = this.getRefmap(sourceMap, sourceRef);
+		if (relationMap == null) return null;
+		var relationIdx = REFMAP.getIdx(relationMap, relationRef);
+		if (relationIdx == 0) return null;
+		var targetVal = KBState.asRefVal(REFMAP.getVal(relationMap, relationIdx));
+		return targetVal;
+	}
+
+	final Object[] getRefmap(Object[] sourceMap, int sourceRef) {
+		if (sourceRef == 0) return null;
+		var sourceIdx = REFMAP.getIdx(sourceMap, sourceRef);
+		if (sourceIdx == 0) return null;
+		var relationMap = KBState.asRefMap(REFMAP.getVal(sourceMap, sourceIdx));
+		return relationMap;
 	}
 
 	/** Diese Methode leert {@link #sourceMap}, {@link #targetMap}, {@link #valueRefMap} und {@link #valueStrMap}. */
