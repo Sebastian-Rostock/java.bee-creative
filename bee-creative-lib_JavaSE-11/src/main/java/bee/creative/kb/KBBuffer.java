@@ -26,18 +26,18 @@ public class KBBuffer extends KBState {
 		return this.insertValueStr(valueStr);
 	}
 
-	public HashMapOI<FEMString> putAllValue(FEMString... values) {
-		return this.putAllValue(Arrays.asList(values));
+	public HashMapOI<FEMString> putAllValues(FEMString... values) {
+		return this.putAllValues(Arrays.asList(values));
 	}
 
-	public HashMapOI<FEMString> putAllValue(Iterable<FEMString> values) {
+	public HashMapOI<FEMString> putAllValues(Iterable<FEMString> values) {
 		this.backupValues();
 		var result = new HashMapOI<FEMString>();
 		values.forEach(valueStr -> result.put(valueStr, this.insertValueStr(valueStr)));
 		return result;
 	}
 
-	public boolean putAllValue(KBValues values) {
+	public boolean putAllValues(KBValues values) {
 		this.backupValues();
 		var result = this.getValueCount();
 		values.forEach(this::insertValue);
