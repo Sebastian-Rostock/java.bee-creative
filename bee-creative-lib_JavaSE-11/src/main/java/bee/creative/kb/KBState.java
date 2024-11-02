@@ -317,14 +317,8 @@ public class KBState implements Emuable {
 	 * Beziehungsreferenz} {@code relationRef} enthält. */
 	public boolean containsEdge(int sourceRef, int targetRef, int relationRef) {
 		if ((sourceRef == 0) || (targetRef == 0) || (relationRef == 0)) return false;
-		var sourceIdx = REFMAP.getIdx(this.sourceMap, sourceRef);
-		if (sourceIdx == 0) return false;
-		var relationMap = KBState.asRefMap(REFMAP.getVal(this.sourceMap, sourceIdx));
-		var relationIdx = REFMAP.getIdx(relationMap, relationRef);
-		if (relationIdx == 0) return false;
-		var targetVal = KBState.asRefVal(REFMAP.getVal(relationMap, relationIdx));
-		if (KBState.isRef(targetVal)) return KBState.asRef(targetVal) == targetRef;
-		return REFSET.getIdx(targetVal, targetRef) != 0;
+		var targetVal = this.getRefset(this.sourceMap, sourceRef, relationRef);
+		return KBState.isRef(targetVal) ? KBState.asRef(targetVal) == targetRef : REFSET.getIdx(targetVal, targetRef) != 0;
 	}
 
 	/** Diese Methode liefert nur dann {@code true}, wenn dieser Wissensstand den gegebenen {@link #getValue(int) Textwert} {@code valueStr} enthält. */
@@ -351,9 +345,7 @@ public class KBState implements Emuable {
 	 * {@code sourceRef} und der gegebenen {@link KBEdge#relationRef() Beziehungsreferenz} {@code relationRef} enthält. */
 	public boolean containsSourceRelationRef(int sourceRef, int relationRef) {
 		if ((sourceRef == 0) || (relationRef == 0)) return false;
-		var sourceIdx = REFMAP.getIdx(this.sourceMap, sourceRef);
-		if (sourceIdx == 0) return false;
-		var relationMap = KBState.asRefMap(REFMAP.getVal(this.sourceMap, sourceIdx));
+		var relationMap = this.getRefmap(this.sourceMap, sourceRef);
 		return REFMAP.getIdx(relationMap, relationRef) != 0;
 	}
 
@@ -368,9 +360,7 @@ public class KBState implements Emuable {
 	 * {@code targetRef} und der gegebenen {@link KBEdge#relationRef() Beziehungsreferenz} {@code relationRef} enthält. */
 	public boolean containsTargetRelationRef(int targetRef, int relationRef) {
 		if ((targetRef == 0) || (relationRef == 0)) return false;
-		var targetIdx = REFMAP.getIdx(this.targetMap, targetRef);
-		if (targetIdx == 0) return false;
-		var relationMap = KBState.asRefMap(REFMAP.getVal(this.targetMap, targetIdx));
+		var relationMap = this.getRefmap(this.targetMap, targetRef);
 		return REFMAP.getIdx(relationMap, relationRef) != 0;
 	}
 
@@ -378,6 +368,10 @@ public class KBState implements Emuable {
 	public long emu() {
 		return EMU.fromObject(this) + this.emuEdges(this.sourceMap) + this.emuEdges(this.targetMap) + this.valueRefMap.emu() + this.valueStrMap.emu()
 			+ this.edges.emu() + this.values.emu();
+	}
+
+	public byte[] persist() throws IOException {
+		return ZIPDOS.deflate(this::persist);
 	}
 
 	/** Diese Methode fügt die Wissensabschrift dieses Wissensstandes an den gegebenen {@link ZIPDOS} an. */
@@ -759,7 +753,7 @@ public class KBState implements Emuable {
 
 	}
 
-	private static final int MAGIC = 0xCBFFCBFF;
+	private static final int MAGIC = 0xCBFF2024;
 
 	private long emuEdges(Object[] sourceMap) {
 		var result = new long[]{REFMAP.emu(sourceMap)};
