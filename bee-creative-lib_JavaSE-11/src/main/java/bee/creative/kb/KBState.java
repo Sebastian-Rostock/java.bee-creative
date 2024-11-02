@@ -8,6 +8,7 @@ import java.util.NoSuchElementException;
 import bee.creative.emu.EMU;
 import bee.creative.emu.Emuable;
 import bee.creative.fem.FEMString;
+import bee.creative.fem.FEMString.CompactStringUTF8;
 import bee.creative.lang.Objects;
 import bee.creative.util.Getter;
 import bee.creative.util.HashMapIO;
@@ -21,7 +22,7 @@ import bee.creative.util.Iterators;
  * {@link #getTargetRefs() Zielreferenzen} aus effizient zugegriffen werden kann. Jedem Textwert ist eineindeutig eine {@link #getValueRef(FEMString)
  * Textreferenz} zugeordnet.
  * <p>
- * Eine Wissensstand kann in eine {@link #persist(ZIPDOS, boolean) Wissensabschrift} überführt werden.
+ * Eine Wissensstand kann in eine {@link #persist(ZIPDOS) Wissensabschrift} überführt werden.
  * <p>
  * Die über {@link #getIndexRef()}, {@link #getExternalRef()} und {@link #getInternalRef()} und bereitgestellten Referenzen haben Bedeutung für {@link KBBuffer}
  * und {@link KBUpdate}.
@@ -34,22 +35,12 @@ public class KBState implements Emuable {
 	/** Dieses Feld speichert den leeren {@link KBState Wissensstand}. */
 	public static final KBState EMPTY = new KBState();
 
-	/** Diese Methode liefert einen neuen {@link KBState Wissensstand} zur gegebenen {@link #persist(ZIPDOS, boolean) Wissensabschrift}. */
+	/** Diese Methode liefert einen neuen {@link KBState Wissensstand} zur gegebenen {@link #persist(ZIPDOS) Wissensabschrift}. */
 	public static KBState from(ZIPDIS source) throws IOException {
-		var magic_indexRef_internalRef_externalRef_indexed = source.readInt(5);
-		if (magic_indexRef_internalRef_externalRef_indexed[0] != KBState.MAGIC) throw new IOException();
 		var result = new KBState();
-		result.indexRef = magic_indexRef_internalRef_externalRef_indexed[1];
-		result.internalRef = magic_indexRef_internalRef_externalRef_indexed[2];
-		result.externalRef = magic_indexRef_internalRef_externalRef_indexed[3];
-		if (magic_indexRef_internalRef_externalRef_indexed[4] != 0) {
-			result.sourceMap = result.readEdgesI(source);
-			result.targetMap = result.readEdgesI(source);
-			result.readValues(source);
-		} else {
-			result.readEdgesC(source);
-			result.readValues(source);
-		}
+		result.restoreRefs(source);
+		result.restoreEdgeMaps(source);
+		result.restoreValueMaps(source);
 		return result;
 	}
 
@@ -73,7 +64,7 @@ public class KBState implements Emuable {
 		result.externalRef = state.externalRef;
 		result.valueRefMap = (ValueRefMap)state.valueRefMap.clone();
 		result.valueStrMap = (ValueStrMap)state.valueStrMap.clone();
-		state.forEachEdge(result::insertEdge);
+		state.forEachEdge(result::insertEdge); // TODO effizientere deep copy
 		return result;
 	}
 
@@ -444,15 +435,10 @@ public class KBState implements Emuable {
 	}
 
 	/** Diese Methode fügt die Wissensabschrift dieses Wissensstandes an den gegebenen {@link ZIPDOS} an. */
-	public void persist(ZIPDOS target, boolean indexed) throws IOException {
-		target.writeInt(KBState.MAGIC, this.indexRef, this.internalRef, this.externalRef, indexed ? -1 : 0);
-		if (indexed) {
-			this.writeEdgesI(target, this.sourceMap);
-			this.writeEdgesI(target, this.targetMap);
-		} else {
-			this.writeEdgesC(target, this.sourceMap);
-		}
-		this.writeValues(target, this.valueStrMap);
+	public void persist(ZIPDOS target) throws IOException {
+		this.persistRefs(target);
+		this.persistEdgeMaps(target);
+		this.persistValueMaps(target);
 	}
 
 	@Override
@@ -878,168 +864,122 @@ public class KBState implements Emuable {
 		}
 	}
 
-	private int[] readRefs(ZIPDIS source) throws IOException {
-		var count = source.readInt(1)[0];
-		return count == 0 ? null : source.readInt(count);
+	private void persistRefs(ZIPDOS target) throws IOException {
+		target.writeInt(KBState.MAGIC, this.indexRef, this.internalRef, this.externalRef);
 	}
 
-	private Object[] readEdgesI(ZIPDIS source) throws IOException {
-		var sourceCount = source.readInt(1)[0];
-		var sourceMap = new Object[sourceCount];
-		for (var sourceIdx = 1; sourceIdx < sourceCount; sourceIdx++) {
-			var relationCount = source.readInt(1)[0];
-			if (relationCount != 0) {
-				var relationMap = new Object[relationCount];
-				for (var relationIdx = 0; relationIdx < relationCount; relationIdx++) {
-					relationMap[relationIdx] = readRefs(source);
+	private void persistEdgeMap(ZIPDOS result, Object[] sourceMap) throws IOException {
+		var sourceSize = sourceMap.length;
+		result.writeInt(sourceSize);
+		var relationSizeArray = new int[sourceSize];
+		relationSizeArray[0] = REFMAP.getKeys(sourceMap).length;
+		for (var s = 1; s < sourceSize; s++) {
+			var relationMap = KBState.asRefMap(sourceMap[s]);
+			relationSizeArray[s] = relationMap == null ? -1 : relationMap.length;
+		}
+		result.writeInt(relationSizeArray);
+		result.writeInt(REFMAP.getKeys(sourceMap));
+		for (var s = 1; s < sourceSize; s++) {
+			var relationMap = KBState.asRefMap(sourceMap[s]);
+			if (relationMap != null) {
+				var relationSize = relationMap.length;
+				var targetSizeArray = new int[relationSize];
+				for (var r = 0; r < relationSize; r++) {
+					var targetVal = KBState.asRefVal(relationMap[r]);
+					targetSizeArray[r] = targetVal == null ? -1 : targetVal.length;
 				}
-				sourceMap[sourceIdx] = relationMap;
+				result.writeInt(targetSizeArray);
+				for (var r = 0; r < relationSize; r++) {
+					var targetVal = KBState.asRefVal(relationMap[r]);
+					if (targetVal != null) {
+						result.writeInt(targetVal);
+					}
+				}
+			}
+		}
+	}
+
+	private void persistEdgeMaps(ZIPDOS target) throws IOException {
+		this.persistEdgeMap(target, this.sourceMap);
+		this.persistEdgeMap(target, this.targetMap);
+	}
+
+	private void persistValueMaps(ZIPDOS result) throws IOException {
+		var valueMap = this.valueStrMap;
+		var valueCount = valueMap.size();
+		var refArray = new int[valueCount];
+		var hashArray = new int[valueCount];
+		var countArray = new int[valueCount];
+		var lengthArray = new int[valueCount];
+		var stringArray = new byte[valueCount][];
+		var iter = valueMap.fastIterator();
+		for (var i = 0; iter.hasNext(); i++) {
+			var entry = iter.next();
+			var valueRef = entry.getKey();
+			var valueStr = entry.getValue();
+			refArray[i] = valueRef;
+			hashArray[i] = valueStr.hashCode();
+			countArray[i] = (stringArray[i] = valueStr.toBytes(true)).length;
+			lengthArray[i] = valueStr.length();
+		}
+		result.writeInt(valueCount);
+		result.writeInt(refArray);
+		result.writeInt(hashArray);
+		result.writeInt(countArray);
+		result.writeInt(lengthArray);
+		for (var i = 0; i < valueCount; i++) {
+			result.writeByte(stringArray[i]);
+		}
+	}
+
+	private void restoreRefs(ZIPDIS source) throws IOException {
+		var header = source.readInt(4);
+		if (header[0] != KBState.MAGIC) throw new IOException();
+		this.indexRef = header[1];
+		this.internalRef = header[2];
+		this.externalRef = header[3];
+	}
+
+	private Object[] restoreEdgeMap(ZIPDIS source) throws IOException {
+		var sourceSize = source.readInt(1)[0];
+		var sourceMap = new Object[sourceSize];
+		var relationSizeArray = source.readInt(sourceSize);
+		sourceMap[0] = source.readInt(relationSizeArray[0]);
+		for (var s = 1; s < sourceSize; s++) {
+			var relationSize = relationSizeArray[s];
+			if (relationSize > 0) {
+				var relationMap = new Object[relationSize];
+				var targetSizeArray = source.readInt(relationSize);
+				sourceMap[s] = relationMap;
+				for (var r = 0; r < relationSize; r++) {
+					var targetSize = targetSizeArray[r];
+					if (targetSize > 0) {
+						relationMap[r] = source.readInt(targetSize);
+					}
+				}
 			}
 		}
 		return sourceMap;
 	}
 
-	private void readEdgesC(ZIPDIS source) throws IOException {
-		var sourceCount = source.readInt(1)[0];
-		while (0 < sourceCount--) {
-			var sourceRef_targetRefCount_targetSetCount = source.readInt(3);
-			var sourceRef = sourceRef_targetRefCount_targetSetCount[0];
-			var targetRefCount = sourceRef_targetRefCount_targetSetCount[1];
-			var targetSetCount = sourceRef_targetRefCount_targetSetCount[2];
-			while (0 < targetRefCount--) {
-				var targetRef_relationRef = source.readInt(2);
-				var targetRef = targetRef_relationRef[0];
-				var relationRef = targetRef_relationRef[1];
-				this.insertEdge(sourceRef, targetRef, relationRef);
-			}
-			while (0 < targetSetCount--) {
-				var relationRef_targetCount = source.readInt(2);
-				var relationRef = relationRef_targetCount[0];
-				var targetCount = relationRef_targetCount[1];
-				var targetRefs = source.readInt(targetCount);
-				for (var i = 0; i < targetCount; i++) {
-					var targetRef = targetRefs[i];
-					this.insertEdge(sourceRef, targetRef, relationRef);
-				}
-			}
-		}
+	private void restoreEdgeMaps(ZIPDIS source) throws IOException {
+		this.sourceMap = this.restoreEdgeMap(source);
+		this.targetMap = this.restoreEdgeMap(source);
 	}
 
-	private void readValues(ZIPDIS source) throws IOException {
+	private void restoreValueMaps(ZIPDIS source) throws IOException {
 		var valueCount = source.readInt(1)[0];
+		var refArray = source.readInt(valueCount);
+		var hashArray = source.readInt(valueCount);
+		var countArray = source.readInt(valueCount);
+		var lengthArray = source.readInt(valueCount);
 		this.valueRefMap.allocate(valueCount);
 		this.valueStrMap.allocate(valueCount);
-		while (0 < valueCount--) {
-			var valueRef = source.readInt(1)[0];
-			var valueStr = source.readString();
-			this.insertValue(valueRef, valueStr);
-		}
-	}
-
-	private void writeRefs(ZIPDOS result, int[] refs) throws IOException {
-		if (refs != null) {
-			result.writeInt(refs.length);
-			result.writeInt(refs);
-		} else {
-			result.writeInt(0);
-		}
-	}
-
-	private void writeEdgesI(ZIPDOS result, Object[] sourceMap) throws IOException {
-		var sourceCount = sourceMap.length;
-		result.writeInt(sourceCount);
-		this.writeRefs(result, REFMAP.getKeys(sourceMap));
-		for (var sourceIdx = 1; sourceIdx < sourceCount; sourceIdx++) {
-			var relationMap = KBState.asRefMap(sourceMap[sourceIdx]);
-			if (relationMap == null) {
-				result.writeInt(0);
-			} else {
-				var relationCount = relationMap.length;
-				result.writeInt(relationCount);
-				for (var relationIdx = 0; relationIdx < relationCount; relationIdx++) {
-					this.writeRefs(result, KBState.asRefVal(relationMap[relationIdx]));
-				}
-			}
-		}
-	}
-
-	private void writeEdgesC(ZIPDOS result, Object[] sourceMap) throws IOException {
-		var sourceCount = 0;
-		for (var sourceIdx = sourceMap.length - 1; 0 < sourceIdx; sourceIdx--) {
-			var relationMap = KBState.asRefMap(sourceMap[sourceIdx]);
-			if (relationMap != null) {
-				TEST: for (var relationIdx = relationMap.length - 1; 0 < relationIdx; relationIdx--) {
-					var targetVal = KBState.asRefVal(relationMap[relationIdx]);
-					if (targetVal != null) {
-						if (KBState.isRef(targetVal) || (REFSET.size(targetVal) > 0)) {
-							sourceCount++;
-							break TEST;
-						}
-					}
-				}
-			}
-		}
-		result.writeInt(sourceCount);
-		for (var sourceIdx = sourceMap.length - 1; 0 < sourceIdx; sourceIdx--) {
-			var relationMap = KBState.asRefMap(sourceMap[sourceIdx]);
-			if (relationMap != null) {
-				var targetRefCount = 0;
-				var targetSetCount = 0;
-				for (var relationIdx = relationMap.length - 1; 0 < relationIdx; relationIdx--) {
-					var targetVal = KBState.asRefVal(relationMap[relationIdx]);
-					if (targetVal != null) {
-						if (KBState.isRef(targetVal)) {
-							targetRefCount++;
-						} else {
-							var targetCount = REFSET.size(targetVal);
-							if (targetCount == 1) {
-								targetRefCount++;
-							} else if (targetCount > 0) {
-								targetSetCount++;
-							}
-						}
-					}
-				}
-				if ((targetRefCount != 0) || (targetSetCount != 0)) {
-					var sourceRef = REFSET.getRef(REFMAP.getKeys(sourceMap), sourceIdx);
-					result.writeInt(sourceRef, targetRefCount, targetSetCount);
-					if (targetRefCount != 0) {
-						for (var relationIdx = relationMap.length - 1; 0 < relationIdx; relationIdx--) {
-							var targetVal = KBState.asRefVal(relationMap[relationIdx]);
-							if (targetVal != null) {
-								var relationRef = REFSET.getRef(REFMAP.getKeys(relationMap), relationIdx);
-								if (KBState.isRef(targetVal)) {
-									result.writeInt(KBState.asRef(targetVal), relationRef);
-								} else if (REFSET.size(targetVal) == 1) {
-									result.writeInt(REFSET.getRef(targetVal), relationRef);
-								}
-							}
-						}
-					}
-					if (targetSetCount != 0) {
-						for (var relationIdx = relationMap.length - 1; 0 < relationIdx; relationIdx--) {
-							var targetVal = KBState.asRefVal(relationMap[relationIdx]);
-							if ((targetVal != null) && !KBState.isRef(targetVal)) {
-								var targetCount = REFSET.size(targetVal);
-								if (targetCount > 1) {
-									var targetRefs = REFSET.toArray(targetVal);
-									var relationRef = REFSET.getRef(REFMAP.getKeys(relationMap), relationIdx);
-									result.writeInt(relationRef, targetCount);
-									result.writeInt(targetRefs);
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-	private void writeValues(ZIPDOS result, ValueStrMap valueStrMap) throws IOException {
-		result.writeInt(valueStrMap.size());
-		for (var entry: valueStrMap.fastEntries()) {
-			result.writeInt(entry.getKey());
-			result.writeString(entry.getValue());
+		for (var i = 0; i < valueCount; i++) {
+			var valueRef = (Integer)refArray[i];
+			var valueStr = new CompactStringUTF8(hashArray[i], source.readByte(countArray[i]), 0, lengthArray[i]);
+			this.valueRefMap.put(valueStr, valueRef);
+			this.valueStrMap.put(valueRef, valueStr);
 		}
 	}
 
