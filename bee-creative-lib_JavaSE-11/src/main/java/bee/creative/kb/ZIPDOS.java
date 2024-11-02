@@ -13,7 +13,6 @@ import java.nio.LongBuffer;
 import java.nio.ShortBuffer;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
-import bee.creative.fem.FEMString;
 
 /** Diese Klasse implementiert einen {@link DeflaterOutputStream}, der primitive Werte über einen {@link ByteBuffer} mit gegebener {@link ByteOrder} schreibt.
  *
@@ -148,16 +147,6 @@ public class ZIPDOS extends DeflaterOutputStream {
 			offset += count;
 			length -= count;
 		}
-	}
-
-	public void writeString(String value) throws IOException {
-		this.writeString(FEMString.from(value));
-	}
-
-	public void writeString(FEMString value) throws IOException {
-		var bytes = value.toBytes(true);
-		this.writeInt(value.hashCode(), bytes.length);
-		this.writeByte(bytes);
 	}
 
 	public interface RUN {

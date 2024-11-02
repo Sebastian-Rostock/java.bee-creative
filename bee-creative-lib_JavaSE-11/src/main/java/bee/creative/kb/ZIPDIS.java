@@ -15,8 +15,6 @@ import java.nio.ShortBuffer;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
-import bee.creative.fem.FEMString;
-import bee.creative.fem.FEMString.HashString;
 
 /** Diese Klasse implementiert einen {@link InflaterInputStream}, der primitive Werte über einen {@link ByteBuffer} mit gegebener {@link ByteOrder} liest.
  *
@@ -153,13 +151,6 @@ public class ZIPDIS extends InflaterInputStream {
 			length -= count;
 		}
 		return values;
-	}
-
-	public FEMString readString() throws IOException {
-		var hash_count = this.readInt(2);
-		var result = FEMString.from(false, true, this.readByte(hash_count[1]));
-		HashString.setHash(result, hash_count[0]);
-		return result;
 	}
 
 	public interface RUN<T> {
