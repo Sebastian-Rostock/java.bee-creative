@@ -168,6 +168,7 @@ public final class REFSET {
 	/** Diese Methode entfernt aus der gegebenen Referenzmenge {@code refset1} alle Referenzen, die in der gegebenen Referenzmenge {@code refset2} enthalten sind,
 	 * und gibt die geänderte Referenzmenge zurück. **/
 	public static int[] except(int[] refset1, int[] refset2) {
+		// TODO size abhängiger loop
 		for (var off = refset1.length - 1; 3 < off; off -= 3) {
 			var ref = refset1[off];
 			if ((ref != 0) && (REFSET.getIdx(refset2, ref) != 0)) {
@@ -180,6 +181,8 @@ public final class REFSET {
 	/** Diese Methode entfernt aus der gegebenen Referenzmenge {@code refset1} alle Referenzen, die nicht in der gegebenen Referenzmenge {@code refset2} enthalten
 	 * sind, und gibt die geänderte Referenzmenge zurück. **/
 	public static int[] intersect(int[] refset1, int[] refset2) {
+		if (size(refset2) == 0) return EMPTY;
+		// TODO size abhängiger loop
 		for (var off = refset1.length - 1; 3 < off; off -= 3) {
 			var ref = refset1[off];
 			if ((ref != 0) && (REFSET.getIdx(refset2, ref) == 0)) {
@@ -225,7 +228,7 @@ public final class REFSET {
 
 	/** Diese Methode liefert eine Kopie der gegebenen Referenzmenge {@code refset}. */
 	public static int[] copy(int[] refset) {
-		if (refset == REFSET.EMPTY) return refset;
+		if (REFSET.size(refset) == 0) return REFSET.EMPTY;
 		var refset2 = refset.clone();
 		return refset2;
 	}
@@ -279,6 +282,7 @@ public final class REFSET {
 	/** Diese Methode liefert alle Referenzen der gegebenen Referenzmenge {@code refset}. */
 	public static int[] toArray(int[] refset) {
 		var size = REFSET.size(refset);
+		if (size == 0) return REFSET.EMPTY_REFS;
 		var refs = new int[size];
 		for (var off = refset.length - 1; 3 < off; off -= 3) {
 			var ref = refset[off];
@@ -361,6 +365,8 @@ public final class REFSET {
 	}
 
 	static final int[] EMPTY = new int[]{0, 1, 0, 0, 0, 0, 0, 0, 0};
+
+	static final int[] EMPTY_REFS = new int[0];
 
 	static int getSize(int[] refset) {
 		return /* refset.size */ refset[0];
