@@ -42,7 +42,7 @@ public final class REFSET {
 
 	/** Diese Methode liefert eine {@link #create() neue Referenzmenge}, {@link #putRef(int[], int) ergänzt} um die gegebenen Referenzen. */
 	public static int[] from(int... refs) {
-		return refs.length != 0 ? REFSET.putAllRefs(REFSET.create(), refs) : REFSET.EMPTY;
+		return refs.length == 0 ? REFSET.EMPTY : REFSET.putAllRefs(REFSET.create(), refs);
 	}
 
 	/** Diese Methode liefert eine {@link #create() neue Referenzmenge}, {@link #putRef(int[], int) ergänzt} um die gegebenen Referenzen. */
@@ -145,7 +145,6 @@ public final class REFSET {
 	/** Diese Methode entfernt die gegebenen Referenzen {@code refs} aud der gegebenen Referenzmenge {@code refset}, reduziert bei Bedarf deren Kapazität und gibt
 	 * die geänderte Referenzmenge zurück. **/
 	public static int[] popAllRefs(int[] refset, int[] refs) {
-		Objects.notNull(refset);
 		for (var ref: refs) {
 			REFSET.popRef(refset, ref);
 		}
@@ -155,6 +154,7 @@ public final class REFSET {
 	/** Diese Methode fügt die Referenzen der gegebenen Referenzmenge {@code refset2} in die gegebene Referenzmenge {@code refset1} ein, erweitert bei Bedarf
 	 * deren Kapazität und gibt die geänderte Referenzmenge zurück. **/
 	public static int[] unite(int[] refset1, int[] refset2) {
+		Objects.notNull(refset1);
 		for (var off2 = refset2.length - 1; 3 < off2; off2 -= 3) {
 			var ref2 = refset2[off2];
 			if (ref2 != 0) {
@@ -168,11 +168,24 @@ public final class REFSET {
 	/** Diese Methode entfernt aus der gegebenen Referenzmenge {@code refset1} alle Referenzen, die in der gegebenen Referenzmenge {@code refset2} enthalten sind,
 	 * und gibt die geänderte Referenzmenge zurück. **/
 	public static int[] except(int[] refset1, int[] refset2) {
-		// TODO size abhängiger loop
-		for (var off = refset1.length - 1; 3 < off; off -= 3) {
-			var ref = refset1[off];
-			if ((ref != 0) && (REFSET.getIdx(refset2, ref) != 0)) {
-				REFSET.popRef(refset1, ref);
+		var size1 = REFSET.size(refset1);
+		if (size1 == 0) return REFSET.EMPTY;
+		var size2 = REFSET.size(refset2);
+		if (size2 == 0) return refset1;
+		if (size1 <= size2) {
+			for (var off = refset1.length - 1; 3 < off; off -= 3) {
+				var ref = refset1[off];
+				if ((ref != 0) && (REFSET.getIdx(refset2, ref) != 0)) {
+					REFSET.popRef(refset1, ref);
+					if (REFSET.size(refset1) == 0) return REFSET.EMPTY;
+				}
+			}
+		} else {
+			for (var off = refset2.length - 1; 3 < off; off -= 3) {
+				var ref = refset2[off];
+				if ((ref != 0) && (REFSET.popRef(refset1, ref) != 0)) {
+					if (REFSET.size(refset1) == 0) return REFSET.EMPTY;
+				}
 			}
 		}
 		return refset1;
@@ -181,12 +194,12 @@ public final class REFSET {
 	/** Diese Methode entfernt aus der gegebenen Referenzmenge {@code refset1} alle Referenzen, die nicht in der gegebenen Referenzmenge {@code refset2} enthalten
 	 * sind, und gibt die geänderte Referenzmenge zurück. **/
 	public static int[] intersect(int[] refset1, int[] refset2) {
-		if (size(refset2) == 0) return EMPTY;
-		// TODO size abhängiger loop
+		if ((REFSET.size(refset1) == 0) || (REFSET.size(refset2) == 0)) return REFSET.EMPTY;
 		for (var off = refset1.length - 1; 3 < off; off -= 3) {
 			var ref = refset1[off];
 			if ((ref != 0) && (REFSET.getIdx(refset2, ref) == 0)) {
 				REFSET.popRef(refset1, ref);
+				if (REFSET.size(refset1) == 0) return REFSET.EMPTY;
 			}
 		}
 		return refset1;
