@@ -21,21 +21,22 @@ import java.util.zip.InflaterInputStream;
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class ZIPDIS extends InflaterInputStream {
 
-	public static <T> T inflate(byte[] source, RUN<T> task) throws IOException {
+	public static <T> T inflate(byte[] source, TASK<T> task) throws IOException {
 		return ZIPDIS.inflate(source, ByteOrder.nativeOrder(), task);
 	}
 
-	public static <T> T inflate(byte[] source, ByteOrder order, RUN<T> task) throws IOException {
+	public static <T> T inflate(byte[] source, ByteOrder order, TASK<T> task) throws IOException {
 		try (var zipdis = new ZIPDIS(new ByteArrayInputStream(source), order)) {
 			return task.run(zipdis);
 		}
 	}
 
+	/** Dieser Konstruktor initialisiert den gegebenen {@link InputStream} mit {@code source} und die Bytereihenfolge mit der nativen. */
 	public ZIPDIS(InputStream source) throws IOException {
 		this(source, ByteOrder.nativeOrder());
 	}
 
-	/** Dieser Konstruktor initialisiert den gegebenen {@link InputStream}. */
+	/** Dieser Konstruktor initialisiert den gegebenen {@link InputStream} mit {@code source} und die Bytereihenfolge mit {@code order}. */
 	public ZIPDIS(InputStream source, ByteOrder order) throws IOException {
 		super(source, new Inflater(true), ZIPDIS.BUFFER_SIZE);
 		this.bufferAsByte = ByteBuffer.allocateDirect(ZIPDIS.BUFFER_SIZE).order(order);
@@ -153,13 +154,13 @@ public class ZIPDIS extends InflaterInputStream {
 		return values;
 	}
 
-	public interface RUN<T> {
+	public interface TASK<T> {
 
 		T run(ZIPDIS source) throws IOException;
 
 	}
 
-	private static final int BUFFER_SIZE = 524288;
+	private static final int BUFFER_SIZE = 1 << 19;
 
 	private final ByteBuffer bufferAsByte;
 

@@ -19,15 +19,24 @@ import java.util.zip.DeflaterOutputStream;
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class ZIPDOS extends DeflaterOutputStream {
 
-	public static byte[] deflate(RUN task) throws IOException {
-		return ZIPDOS.deflate(Deflater.DEFAULT_COMPRESSION, task);
+	/** Diese Methode ist eine Abkürzung für {@link #deflate(int, ByteOrder, TASK) deflate(Deflater.DEFAULT_COMPRESSION, ByteOrder.nativeOrder(), task)}. */
+	public static byte[] deflate(TASK task) throws IOException {
+		return ZIPDOS.deflate(Deflater.DEFAULT_COMPRESSION, ByteOrder.nativeOrder(), task);
 	}
 
-	public static byte[] deflate(int level, RUN task) throws IOException {
+	/** Diese Methode ist eine Abkürzung für {@link #deflate(int, ByteOrder, TASK) deflate(level, ByteOrder.nativeOrder(), task)}. */
+	public static byte[] deflate(int level, TASK task) throws IOException {
 		return ZIPDOS.deflate(level, ByteOrder.nativeOrder(), task);
 	}
 
-	public static byte[] deflate(int level, ByteOrder order, RUN task) throws IOException {
+	/** Diese Methode erzeugt einen neuen {@link ZIPDOS} mit der gegebenen Kompressionsstufe {@code level} ({@link Deflater#DEFAULT_COMPRESSION},
+	 * {@link Deflater#NO_COMPRESSION}..{@link Deflater#BEST_COMPRESSION}) und der gegebenen Bytereihenfolge mit {@code order} auf Basis eines
+	 * {@link ByteArrayOutputStream}, ruft damit die gegebene Funktion {@code task} auf und liefert schließlich die dadurch erzeugte Bytefolge.
+	 * 
+	 * @see TASK#run(ZIPDOS)
+	 * @see ZIPDOS#ZIPDOS(OutputStream, int, ByteOrder)
+	 * @see ByteArrayOutputStream#toByteArray() */
+	public static byte[] deflate(int level, ByteOrder order, TASK task) throws IOException {
 		try (var result = new ByteArrayOutputStream(ZIPDOS.BUFFER_SIZE); var target = new ZIPDOS(result, level, order)) {
 			task.run(target);
 			target.flush();
@@ -35,17 +44,20 @@ public class ZIPDOS extends DeflaterOutputStream {
 		}
 	}
 
-	/** Dieser Konstruktor initialisiert den {@link OutputStream} mit dem gegebenen und den {@link Deflater} mit {@link Deflater#DEFAULT_COMPRESSION}. */
+	/** Dieser Konstruktor initialisiert den {@link OutputStream} mit {@code target}, die Kompressionsstufe des {@link Deflater} mit
+	 * {@link Deflater#DEFAULT_COMPRESSION} und die Bytereihenfolge mit der nativen. */
 	public ZIPDOS(OutputStream target) throws IOException {
 		this(target, Deflater.DEFAULT_COMPRESSION);
 	}
 
-	/** Dieser Konstruktor initialisiert den {@link OutputStream} mit dem gegebenen und den {@link Deflater} mit der gegebenen Kompressionsstufe
-	 * ({@link Deflater#DEFAULT_COMPRESSION}, {@link Deflater#NO_COMPRESSION}..{@link Deflater#BEST_COMPRESSION}). */
+	/** Dieser Konstruktor initialisiert den {@link OutputStream} mit {@code target}, die Kompressionsstufe des {@link Deflater} mit {@code level}
+	 * ({@link Deflater#DEFAULT_COMPRESSION}, {@link Deflater#NO_COMPRESSION}..{@link Deflater#BEST_COMPRESSION}) und die Bytereihenfolge mit der nativen. */
 	public ZIPDOS(OutputStream target, int level) throws IOException {
 		this(target, level, ByteOrder.nativeOrder());
 	}
 
+	/** Dieser Konstruktor initialisiert den {@link OutputStream} mit {@code target}, die Kompressionsstufe des {@link Deflater} mit {@code level}
+	 * ({@link Deflater#DEFAULT_COMPRESSION}, {@link Deflater#NO_COMPRESSION}..{@link Deflater#BEST_COMPRESSION}) und die Bytereihenfolge mit {@code order}. */
 	public ZIPDOS(OutputStream target, int level, ByteOrder order) throws IOException {
 		super(target, new Deflater(level, true), ZIPDOS.BUFFER_SIZE, true);
 		this.bufferAsByte = ByteBuffer.allocateDirect(ZIPDOS.BUFFER_SIZE).order(order);
@@ -149,13 +161,13 @@ public class ZIPDOS extends DeflaterOutputStream {
 		}
 	}
 
-	public interface RUN {
+	public interface TASK {
 
 		void run(ZIPDOS target) throws IOException;
 
 	}
 
-	private static final int BUFFER_SIZE = 524288;
+	private static final int BUFFER_SIZE = 1 << 19;
 
 	private final ByteBuffer bufferAsByte;
 
