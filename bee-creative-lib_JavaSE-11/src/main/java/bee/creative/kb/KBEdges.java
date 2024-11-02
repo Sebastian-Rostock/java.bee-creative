@@ -4,13 +4,14 @@ import java.util.function.Consumer;
 import bee.creative.emu.EMU;
 import bee.creative.emu.Emuable;
 import bee.creative.lang.Objects;
+import bee.creative.lang.Objects.UseToString;
 import bee.creative.util.Iterable2;
 import bee.creative.util.Iterator2;
 
 /** Diese Klasse implementiert das {@link Iterable2} der {@link KBEdge Kanten} eines {@link KBState Wissensstands}.
  *
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public class KBEdges implements Iterable2<KBEdge>, Emuable {
+public class KBEdges implements Iterable2<KBEdge>, Emuable, UseToString {
 
 	/** Diese Methode liefert den {@link KBState Wissensstand}, dessen {@link KBEdge Kanten} iteriert werden. */
 	public KBState owner() {
@@ -93,7 +94,7 @@ public class KBEdges implements Iterable2<KBEdge>, Emuable {
 
 	@Override
 	public String toString() {
-		return Objects.printIterable(true, this);
+		return Objects.printIterable(true, 20, this);
 	}
 
 	/** Diese Schnittstelle definiert den Empfänger der Referenzen für {@link KBEdges#forEach(RUN)}. */

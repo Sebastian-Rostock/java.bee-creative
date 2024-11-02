@@ -2,7 +2,6 @@ package bee.creative.lang;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -74,9 +73,9 @@ public class Objects {
 	public static String printMap(final boolean format, final Map<?, ?> object) {
 		if (object == null) return "null";
 		if (object.isEmpty()) return "{}";
-		String space = (format ? "{\n  " : "{");
-		final String comma = (format ? ",\n  " : ", ");
-		final StringBuilder result = new StringBuilder();
+		var space = (format ? "{\n  " : "{");
+		final var comma = (format ? ",\n  " : ", ");
+		final var result = new StringBuilder();
 		for (final Entry<?, ?> entry: object.entrySet()) {
 			result.append(space).append(Objects.toString(format, format, entry.getKey())).append(" = ").append(Objects.toString(format, format, entry.getValue()));
 			space = comma;
@@ -90,8 +89,8 @@ public class Objects {
 	 * @return {@link Object#toString() Textdarstelung}. */
 	public static String printChar(final Character object) {
 		if (object == null) return "null";
-		final StringBuilder result = new StringBuilder(4).append('\'');
-		switch (object.charValue()) {
+		final var result = new StringBuilder(4).append('\'');
+		switch (object) {
 			case '\'':
 				result.append("\\\'");
 			break;
@@ -119,12 +118,12 @@ public class Objects {
 	 * @throws IllegalArgumentException Wenn das gegebene Objekt kein Array ist. */
 	public static String printArray(final boolean format, final Object object) throws IllegalArgumentException {
 		if (object == null) return "null";
-		final int size = Array.getLength(object);
+		final var size = Array.getLength(object);
 		if (size == 0) return "[]";
-		String space = (format ? "[\n  " : "[");
-		final String comma = (format ? ",\n  " : ", ");
-		final StringBuilder result = new StringBuilder();
-		for (int i = 0; i < size; i++) {
+		var space = (format ? "[\n  " : "[");
+		final var comma = (format ? ",\n  " : ", ");
+		final var result = new StringBuilder();
+		for (var i = 0; i < size; i++) {
 			result.append(space).append(Objects.toString(format, format, Array.get(object, i)));
 			space = comma;
 		}
@@ -139,10 +138,10 @@ public class Objects {
 	 * @return {@link Object#toString() Textdarstelung}. */
 	public static String printString(final boolean format, final CharSequence object) {
 		if (object == null) return "null";
-		final String space = (format ? "\\n\"+\n\"" : "\\n");
-		final StringBuilder result = new StringBuilder("\"");
+		final var space = (format ? "\\n\"+\n\"" : "\\n");
+		final var result = new StringBuilder("\"");
 		int last = -1, next = 0;
-		final int size = object.length();
+		final var size = object.length();
 		while (next < size) {
 			switch (object.charAt(next)) {
 				case '\"':
@@ -169,17 +168,24 @@ public class Objects {
 	 * @param format Aktivierung der hierarchische Formatierung.
 	 * @param object {@link Iterable} oder {@code null}.
 	 * @return {@link Object#toString() Textdarstelung}. */
-	public static String printIterable(final boolean format, final Iterable<?> object) {
+	public static String printIterable(boolean format, Iterable<?> object) {
+		return Objects.printIterable(format, Integer.MAX_VALUE, object);
+	}
+
+	public static String printIterable(boolean format, int limit, Iterable<?> object) {
 		if (object == null) return "null";
-		final Iterator<?> iter = object.iterator();
+		var iter = object.iterator();
 		if (!iter.hasNext()) return "[]";
-		final StringBuilder result = new StringBuilder();
-		Object next = iter.next();
+		var result = new StringBuilder();
+		var next = iter.next();
 		if (!iter.hasNext()) return result.append("[").append(Objects.toString(format, format, next)).append("]").toString();
 		result.append(format ? "[\n  " : "[").append(Objects.toString(format, format, next));
-		while (iter.hasNext()) {
+		while (iter.hasNext() && (0 < limit--)) {
 			next = iter.next();
 			result.append(format ? ",\n  " : ", ").append(Objects.toString(format, format, next));
+		}
+		if (iter.hasNext()) {
+			result.append(format ? ",\n  " : ", ").append("…");
 		}
 		return result.append(format ? "\n]" : "]").toString();
 	}
@@ -201,9 +207,9 @@ public class Objects {
 	 * @return Zeichenkette mit erhöhtem Einzug. */
 	public static String indent(final String value) {
 		if (value == null) return "null";
-		final StringBuilder result = new StringBuilder();
+		final var result = new StringBuilder();
 		int last = -1, next = 0;
-		final int size = value.length();
+		final var size = value.length();
 		while ((next = value.indexOf('\n', next)) >= 0) {
 			result.append(value.substring(last + 1, last = next)).append("\n  ");
 			next++;
@@ -235,7 +241,7 @@ public class Objects {
 	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}. */
 	public static int hash(final Object... objects) {
 		if (objects == null) return 0;
-		int result = Objects.hashInit();
+		var result = Objects.hashInit();
 		for (final Object object: objects) {
 			result = Objects.hashPush(result, Objects.hash(object));
 		}
@@ -309,9 +315,9 @@ public class Objects {
 	public static boolean equals(final Object[] objects1, final Object[] objects2) {
 		if (objects1 == objects2) return true;
 		if ((objects1 == null) || (objects2 == null)) return false;
-		final int length = objects1.length;
+		final var length = objects1.length;
 		if (length != objects2.length) return false;
-		for (int i = 0; i < length; i++) {
+		for (var i = 0; i < length; i++) {
 			if (!Objects.equals(objects1[i], objects2[i])) return false;
 		}
 		return true;
@@ -352,7 +358,7 @@ public class Objects {
 	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}. */
 	public static int deepHash(final Object... objects) {
 		if (objects == null) return 0;
-		int result = Objects.hashInit();
+		var result = Objects.hashInit();
 		for (final Object object: objects) {
 			result = Objects.hashPush(result, Objects.deepHash(object));
 		}
@@ -428,9 +434,9 @@ public class Objects {
 	public static boolean deepEquals(final Object[] objects1, final Object[] objects2) {
 		if (objects1 == objects2) return true;
 		if ((objects1 == null) || (objects2 == null)) return false;
-		final int length = objects1.length;
+		final var length = objects1.length;
 		if (length != objects2.length) return false;
-		for (int i = 0; i < length; i++) {
+		for (var i = 0; i < length; i++) {
 			if (!Objects.deepEquals(objects1[i], objects2[i])) return false;
 		}
 		return true;
@@ -465,9 +471,9 @@ public class Objects {
 	public static boolean identityEquals(final Object[] objects1, final Object[] objects2) {
 		if (objects1 == objects2) return true;
 		if ((objects1 == null) || (objects2 == null)) return false;
-		final int length = objects1.length;
+		final var length = objects1.length;
 		if (length != objects2.length) return false;
-		for (int i = 0; i < length; i++) {
+		for (var i = 0; i < length; i++) {
 			if (objects1[i] != objects2[i]) return false;
 		}
 		return true;
@@ -552,19 +558,19 @@ public class Objects {
 	 * @return {@link Object#toString() Textdarstelung}.
 	 * @throws NullPointerException Wenn {@code name} bzw. {@code args} {@code null} ist. */
 	public static String toStringCall(final boolean format, final boolean label, final String name, final Object... args) throws NullPointerException {
-		final StringBuilder result = new StringBuilder(name.length() + 128);
+		final var result = new StringBuilder(name.length() + 128);
 		result.append(name);
 		if (args.length != 0) {
-			String join = (format ? "(\n  " : "(");
-			final String comma = (format ? ",\n  " : ", ");
+			var join = (format ? "(\n  " : "(");
+			final var comma = (format ? ",\n  " : ", ");
 			if (label) {
 				for (int i = 0, size = args.length - 1; i < size; i += 2) {
 					result.append(join).append(Objects.toString(format, format, args[i])).append(": ").append(Objects.toString(format, format, args[i + 1]));
 					join = comma;
 				}
 			} else {
-				for (int i = 0, size = args.length; i < size; i++) {
-					result.append(join).append(Objects.toString(format, format, args[i]));
+				for (Object arg: args) {
+					result.append(join).append(Objects.toString(format, format, arg));
 					join = comma;
 				}
 			}

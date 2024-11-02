@@ -7,7 +7,6 @@ import bee.creative.emu.EMU;
 import bee.creative.emu.Emuable;
 import bee.creative.lang.Objects;
 import bee.creative.util.AbstractIterator;
-import bee.creative.util.Iterables;
 
 /** Diese Klasse implementiert eine abstrakte Zahlenfolge, welche in einer Auflistung ({@link IAMListing}) für die Elemente sowie einer Abbildung
  * ({@link IAMMapping}) für die Schlüssel und Werte der Einträge ({@code IAMEntry}) verwendet wird.
@@ -277,7 +276,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 
 		@Override
 		protected int customGet(final int index) {
-			final int index2 = index - this.array1.length;
+			final var index2 = index - this.array1.length;
 			return index2 < 0 ? this.array1.customGet(index) : this.array2.customGet(index2);
 		}
 
@@ -341,7 +340,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 			final int count1 = this.array1.length - offset, count2 = length - count1;
 			if (count1 <= 0) return this.array2.customCompare(-count1, that, offset, length);
 			if (count2 <= 0) return this.array1.customCompare(index, that, offset, length);
-			final int result = this.array1.customCompare(index, that, offset, count1);
+			final var result = this.array1.customCompare(index, that, offset, count1);
 			if (result != 0) return result;
 			return this.array2.customCompare(0, that, offset + count1, count2);
 		}
@@ -448,9 +447,9 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 * @return {@link IAMArray} aus den {@link Number#intValue()}.
 	 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
 	public static INT32Array from(final List<? extends Number> array) throws NullPointerException {
-		final int length = array.size();
-		final int[] result = new int[length];
-		int offset = 0;
+		final var length = array.size();
+		final var result = new int[length];
+		var offset = 0;
 		for (final Number item: array) {
 			result[offset++] = item.intValue();
 		}
@@ -670,7 +669,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 * @throws NullPointerException Wenn {@code result} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn diese Zahlenfolge nicht in den gegebenen Bereich passt. */
 	public final void get(final int[] result, final int offset) throws NullPointerException, IllegalArgumentException {
-		final int length = Math.min(result.length - offset, this.length);
+		final var length = Math.min(result.length - offset, this.length);
 		if ((offset < 0) || (length < 0)) throw new IllegalArgumentException();
 		this.customGet(0, result, offset, length);
 	}
@@ -682,7 +681,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 * @throws NullPointerException Wenn {@code result} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn diese Zahlenfolge nicht in den gegebenen Bereich passt. */
 	public final void get(final byte[] result, final int offset) throws NullPointerException, IllegalArgumentException {
-		final int length = Math.min(result.length - offset, this.length);
+		final var length = Math.min(result.length - offset, this.length);
 		if ((offset < 0) || (length < 0)) throw new IllegalArgumentException();
 		this.customGet(0, result, offset, length);
 	}
@@ -694,7 +693,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 * @throws NullPointerException Wenn {@code result} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn diese Zahlenfolge nicht in den gegebenen Bereich passt. */
 	public final void get(final short[] result, final int offset) throws NullPointerException, IllegalArgumentException {
-		final int length = Math.min(result.length - offset, this.length);
+		final var length = Math.min(result.length - offset, this.length);
 		if ((offset < 0) || (length < 0)) throw new IllegalArgumentException();
 		this.customGet(0, result, offset, length);
 	}
@@ -759,11 +758,11 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	public final int compare(final IAMArray that) throws NullPointerException {
 		final int l1 = this.length, l2 = that.length;
 		if (l1 < l2) {
-			final int result = this.customCompare(0, that, 0, l1);
+			final var result = this.customCompare(0, that, 0, l1);
 			return result != 0 ? result : -1;
 		}
 		if (l1 > l2) {
-			final int result = this.customCompare(0, that, 0, l2);
+			final var result = this.customCompare(0, that, 0, l2);
 			return result != 0 ? result : +1;
 		}
 		return this.customCompare(0, that, 0, l2);
@@ -850,7 +849,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 * @see #length()
 	 * @return Kopie der Zahlenfolge. */
 	public int[] toInts() {
-		final int[] result = new int[this.length];
+		final var result = new int[this.length];
 		this.get(result, 0);
 		return result;
 	}
@@ -861,7 +860,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 * @see #length()
 	 * @return Kopie der Zahlenfolge. */
 	public byte[] toBytes() {
-		final byte[] result = new byte[this.length];
+		final var result = new byte[this.length];
 		this.get(result, 0);
 		return result;
 	}
@@ -872,7 +871,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 * @see #length()
 	 * @return Kopie der Zahlenfolge. */
 	public short[] toShorts() {
-		final short[] result = new short[this.length];
+		final var result = new short[this.length];
 		this.get(result, 0);
 		return result;
 	}
@@ -890,7 +889,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 
 			@Override
 			public Integer next() {
-				return Integer.valueOf(IAMArray.this.customGet(this.index++));
+				return IAMArray.this.customGet(this.index++);
 			}
 
 		};
@@ -898,7 +897,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 
 	@Override
 	public final int hashCode() {
-		int hash = Objects.hashInit();
+		var hash = Objects.hashInit();
 		for (int i = 0, l = this.length; l != 0; ++i, --l) {
 			hash = Objects.hashPush(hash, this.customGet(i));
 		}
@@ -917,9 +916,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 
 	@Override
 	public String toString() {
-		return this.length > 30 ? //
-			Objects.printIterable(false, Iterables.concat(this.section(0, 15), Iterables.fromItem(Objects.toStringFuture("...")))) : //
-			Objects.printIterable(false, this);
+		return Objects.printIterable(false, 30, this);
 	}
 
 }

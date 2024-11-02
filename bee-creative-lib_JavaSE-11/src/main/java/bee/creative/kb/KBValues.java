@@ -6,6 +6,7 @@ import bee.creative.emu.EMU;
 import bee.creative.emu.Emuable;
 import bee.creative.fem.FEMString;
 import bee.creative.lang.Objects;
+import bee.creative.lang.Objects.UseToString;
 import bee.creative.util.Entries;
 import bee.creative.util.Iterable2;
 import bee.creative.util.Iterator2;
@@ -13,7 +14,7 @@ import bee.creative.util.Iterator2;
 /** Diese Klasse implementiert das {@link Iterable2} der Textwerte eines {@link KBState Wissensstands}.
  *
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public class KBValues implements Iterable2<Entry<Integer, FEMString>>, Emuable {
+public class KBValues implements Iterable2<Entry<Integer, FEMString>>, Emuable, UseToString {
 
 	/** Diese Methode liefert den {@link KBState Wissensstand}, dessen {@link FEMString Texterte} iteriert werden. */
 	public KBState owner() {
@@ -56,7 +57,7 @@ public class KBValues implements Iterable2<Entry<Integer, FEMString>>, Emuable {
 
 	@Override
 	public String toString() {
-		return Objects.printIterable(true, this);
+		return Objects.printIterable(true, 20, this);
 	}
 
 	/** Diese Schnittstelle definiert den Empfänger für {@link KBValues#forEach(RUN)}. */
