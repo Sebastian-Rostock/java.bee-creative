@@ -1,11 +1,13 @@
 package bee.creative.lang;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.IllegalFormatException;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import bee.creative.util.AbstractList2;
+import bee.creative.util.Collections.ConcatList;
+import bee.creative.util.Iterator2;
+import bee.creative.util.Iterators;
 import bee.creative.util.List2;
 
 /** Diese Klasse implementiert eine {@link RuntimeException}, an welche mehrere {@link #getMessages() Nachrichten} {@link #push(Object) angefügt} werden können
@@ -15,79 +17,18 @@ import bee.creative.util.List2;
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Exception2 extends RuntimeException implements Iterable<String> {
 
-	private final class Messages extends AbstractList2<String> {
-
-		final List<Object> that;
-
-		Messages(final List<Object> that) {
-			this.that = that;
-		}
-
-		@Override
-		public int size() {
-			synchronized (this.that) {
-				return this.that.size();
-			}
-		}
-
-		@Override
-		public String get(final int index) {
-			synchronized (this.that) {
-				return this.that.get(index).toString();
-			}
-		}
-
-		@Override
-		public String set(final int index, final String element) {
-			synchronized (this.that) {
-				return this.that.set(index, element).toString();
-			}
-		}
-
-		@Override
-		public void add(final int index, final String element) {
-			synchronized (this.that) {
-				this.that.add(index, element);
-			}
-		}
-
-		@Override
-		public String remove(final int index) {
-			synchronized (this.that) {
-				return this.that.remove(index).toString();
-			}
-		}
-
-		@Override
-		protected void removeRange(final int fromIndex, final int toIndex) {
-			synchronized (this.that) {
-				this.that.subList(fromIndex, toIndex).clear();
-			}
-		}
-
-	}
-
-	private static final long serialVersionUID = -5638352849317018143L;
-
 	/** Diese Methode gibt die gegebene Ausnahme als {@link Exception2} zurück. Wenn {@code cause} eine {@link Exception2} ist, wird diese unverändert geliefert.
 	 * Andernfalls wird eine neue {@link Exception2} mit der gegebenen Ausnahme als {@link #useCause(Throwable) Ursache} erzeugt und geliefert.
 	 *
 	 * @param cause Ausnahme.
 	 * @return {@link Exception2}. */
-	public static Exception2 from(final Throwable cause) {
+	public static Exception2 from(Throwable cause) {
 		if (cause instanceof Exception2) return (Exception2)cause;
 		return new Exception2().useCause(cause);
 	}
 
-	private Throwable cause;
-
-	private boolean handled;
-
-	private final List<Object> messages;
-
 	/** Dieser Konstruktor initialisiert eine neue Ausnahme ohne {@link #getCause() Ursache} und {@link #getMessages() Nachrichten}. */
 	public Exception2() {
-		this.messages = new LinkedList<>();
 	}
 
 	@Override
@@ -100,7 +41,7 @@ public class Exception2 extends RuntimeException implements Iterable<String> {
 	 * @see #getCause()
 	 * @param cause Ursache der Ausnahme oder {@code null}.
 	 * @return {@code this}. */
-	public Exception2 useCause(final Throwable cause) {
+	public Exception2 useCause(Throwable cause) {
 		this.cause = cause;
 		return this;
 	}
@@ -117,7 +58,7 @@ public class Exception2 extends RuntimeException implements Iterable<String> {
 	 * @param handled {@code true}, wenn diese Ausnahme behandelt wurde;<br>
 	 *        {@code false}, wenn diese Ausnahme nicht behandelt wurde.
 	 * @return {@code this}. */
-	public Exception2 useHandled(final boolean handled) {
+	public Exception2 useHandled(boolean handled) {
 		this.handled = handled;
 		return this;
 	}
@@ -132,7 +73,7 @@ public class Exception2 extends RuntimeException implements Iterable<String> {
 	 * @see #push(Object)
 	 * @return Nachrichten. */
 	public List2<String> getMessages() {
-		return new Messages(this.messages);
+		return new ConcatList<>(this.messages, Collections.emptyList(), true);
 	}
 
 	/** Diese Methode fügt die gegebene Nachricht an das Ende der {@link #getMessages() Nachrichten} dieser Ausnahme an und gibt {@code this} zurück. Wenn die
@@ -142,11 +83,9 @@ public class Exception2 extends RuntimeException implements Iterable<String> {
 	 * @see List#add(Object)
 	 * @param message Nachricht oder {@code null}.
 	 * @return {@code this}. */
-	public Exception2 push(final Object message) {
+	public Exception2 push(Object message) {
 		if (message == null) return this;
-		synchronized (this.messages) {
-			this.messages.add(message);
-		}
+		this.messages.add(message.toString());
 		return this;
 	}
 
@@ -160,7 +99,7 @@ public class Exception2 extends RuntimeException implements Iterable<String> {
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@link String#format(String, Object...)} eine entsprechende Ausnahme auslöst.
 	 * @throws IllegalFormatException Wenn {@link String#format(String, Object...)} eine entsprechende Ausnahme auslöst. */
-	public Exception2 push(final String format, final Object... args) throws NullPointerException, IllegalFormatException {
+	public Exception2 push(String format, Object... args) throws NullPointerException, IllegalFormatException {
 		return format != null ? this.push(Strings.formatFuture(format, args)) : this;
 	}
 
@@ -172,7 +111,7 @@ public class Exception2 extends RuntimeException implements Iterable<String> {
 	 * @param messages Nachrichten oder {@code null}.
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code messages} {@code null} ist. */
-	public Exception2 pushAll(final Object... messages) {
+	public Exception2 pushAll(Object... messages) {
 		return messages != null ? this.pushAll(Arrays.asList(messages)) : this;
 	}
 
@@ -182,17 +121,23 @@ public class Exception2 extends RuntimeException implements Iterable<String> {
 	 * @see #getMessages()
 	 * @param messages Nachrichten oder {@code null}.
 	 * @return {@code this}. */
-	public Exception2 pushAll(final Iterable<?> messages) {
+	public Exception2 pushAll(Iterable<?> messages) {
 		if (messages == null) return this;
-		for (final Object message: messages) {
-			this.push(message);
-		}
+		messages.forEach(this::push);
 		return this;
 	}
 
 	@Override
-	public Iterator<String> iterator() {
-		return this.getMessages().iterator();
+	public Iterator2<String> iterator() {
+		return Iterators.from(this.messages.iterator());
 	}
+
+	private static final long serialVersionUID = 856089094921728079L;
+
+	private Throwable cause;
+
+	private boolean handled;
+
+	private final List<String> messages = Collections.synchronizedList(new LinkedList<>());
 
 }

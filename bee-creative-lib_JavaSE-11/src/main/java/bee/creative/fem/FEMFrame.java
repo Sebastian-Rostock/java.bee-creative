@@ -17,161 +17,9 @@ import bee.creative.util.Iterators;
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class FEMFrame implements Array2<FEMValue>, UseToString {
 
-	public static class ArrayFrame extends FEMFrame {
-
-		public final FEMArray params;
-
-		ArrayFrame(FEMFrame parent, FEMArray params, FEMContext context) {
-			super(parent, context);
-			this.params = params;
-		}
-
-		@Override
-		public FEMValue get(int index) throws IndexOutOfBoundsException {
-			final var index2 = index - this.params.length;
-			return index2 >= 0 ? this.parent.get(index2) : this.params.customGet(index);
-		}
-
-		@Override
-		public FEMFunction param(int index) throws IndexOutOfBoundsException {
-			return this.params.get(index);
-		}
-
-		@Override
-		public int size() {
-			return this.params.length;
-		}
-
-		@Override
-		public FEMArray params() {
-			return this.params;
-		}
-
-		@Override
-		public FEMFrame withContext(FEMContext context) throws NullPointerException {
-			if (this.context == context) return this;
-			return new ArrayFrame(this.parent, this.params, Objects.notNull(context));
-		}
-
-	}
-
-	public static class EmptyFrame extends FEMFrame {
-
-		@Override
-		public FEMValue get(int index) throws IndexOutOfBoundsException {
-			throw new IndexOutOfBoundsException();
-		}
-
-		@Override
-		public FEMFunction param(int index) throws IndexOutOfBoundsException {
-			throw new IndexOutOfBoundsException();
-		}
-
-		@Override
-		public int size() {
-			return 0;
-		}
-
-		@Override
-		public FEMArray params() {
-			return FEMArray.EMPTY;
-		}
-
-		@Override
-		public FEMFrame withContext(FEMContext context) throws NullPointerException {
-			if (this.context == context) return this;
-			return new ArrayFrame(this, FEMArray.EMPTY, Objects.notNull(context));
-		}
-
-	}
-
-	public static class InvokeFrame extends FEMFrame {
-
-		public final InvokeParams params;
-
-		InvokeFrame(FEMFrame parent, InvokeParams params, FEMContext context) {
-			super(parent, context);
-			this.params = params;
-		}
-
-		InvokeFrame(FEMFrame parent, FEMFunction[] params, FEMContext context) {
-			super(parent, context);
-			this.params = new InvokeParams(parent, params);
-		}
-
-		@Override
-		public FEMValue get(int index) throws IndexOutOfBoundsException {
-			final var index2 = index - this.params.length;
-			return index2 >= 0 ? this.parent.get(index2) : this.params.frameGet(index);
-		}
-
-		@Override
-		public FEMFunction param(int index) throws IndexOutOfBoundsException {
-			if ((index < 0) || (index >= this.params.length)) throw new IndexOutOfBoundsException();
-			return this.params.functions[index];
-		}
-
-		@Override
-		public int size() {
-			return this.params.length;
-		}
-
-		@Override
-		public FEMArray params() {
-			return this.params;
-		}
-
-		@Override
-		public FEMFrame withContext(FEMContext context) throws NullPointerException {
-			if (this.context == context) return this;
-			return new InvokeFrame(this.parent, this.params, Objects.notNull(context));
-		}
-
-	}
-
-	public static class InvokeParams extends HashArray {
-
-		public final FEMFrame frame;
-
-		/** Dieses Feld speichert das Array der Parameterwerte, das nicht verändert werden darf. */
-		final FEMValue[] values;
-
-		/** Dieses Feld speichert das Array der Parameterfunktionen, das nicht verändert werden darf. */
-		final FEMFunction[] functions;
-
-		InvokeParams(FEMFrame frame, FEMFunction[] params) {
-			super(params.length);
-			this.frame = frame;
-			this.functions = params;
-			this.values = new FEMValue[params.length];
-		}
-
-		FEMValue frameGet(int index) {
-			synchronized (this.values) {
-				var result = this.values[index];
-				if (result != null) return result;
-				result = this.functions[index].invoke(this.frame);
-				this.values[index] = Objects.notNull(result);
-				return result;
-			}
-		}
-
-		@Override
-		protected FEMValue customGet(int index) {
-			synchronized (this.values) {
-				var result = this.values[index];
-				if (result != null) return result;
-				result = this.functions[index].toFuture(this.frame);
-				this.values[index] = Objects.notNull(result);
-				return result;
-			}
-		}
-
-	}
-
 	/** Dieses Feld speichert den leeren Stapelrahmen, der keine Parameterwerte bereitstellt, das Kontextobjekt {@link FEMContext#EMPTY} verwendet und sich selbst
 	 * als {@link #parent()} nutzt. */
-	public static final FEMFrame EMPTY = new EmptyFrame();
+	public static final FEMFrame EMPTY = new ArrayFrame();
 
 	/** Dieses Feld speichert eine Funktion, deren Ergebniswert einer Sicht auf die Parameterwerte des Stapelrahmens {@code frame} entspricht, d.h.
 	 * {@code frame.params()}.
@@ -199,22 +47,6 @@ public abstract class FEMFrame implements Array2<FEMValue>, UseToString {
 	 * @throws NullPointerException Wenn {@code context} {@code null} ist. */
 	public static FEMFrame from(FEMContext context) throws NullPointerException {
 		return FEMFrame.EMPTY.withContext(context);
-	}
-
-	/** Dieses Feld speichert die übergeordneten Parameterdaten. */
-	protected final FEMFrame parent;
-
-	/** Dieses Feld speichert das Kontextobjekt. */
-	protected final FEMContext context;
-
-	FEMFrame() {
-		this.parent = this;
-		this.context = FEMContext.EMPTY;
-	}
-
-	protected FEMFrame(FEMFrame parent, FEMContext context) {
-		this.parent = parent;
-		this.context = context;
 	}
 
 	/** Diese Methode gibt die Anzahl der Parameterwerte zurück, die zur Verwendung durch eine aufgerufene Funktion bestimmt sind. Über die Methode
@@ -362,7 +194,7 @@ public abstract class FEMFrame implements Array2<FEMValue>, UseToString {
 	public abstract FEMValue get(int index) throws IndexOutOfBoundsException;
 
 	/** Diese Methode liefert die {@link FEMFunction Funktion} zur Berechnung des {@code index}-ten {@link #size() zugesicherten} Parameterwerts.
-	 * 
+	 *
 	 * @param index Index.
 	 * @return Funktion zur Berechnung des {@code index}-ter Parameterwerts.
 	 * @throws IndexOutOfBoundsException Wenn für den gegebenen Index kein Parameterwert existiert. */
@@ -378,6 +210,148 @@ public abstract class FEMFrame implements Array2<FEMValue>, UseToString {
 		final var res = new FEMPrinter();
 		FEMDomain.DEFAULT.printFrame(res, this.params());
 		return res.print();
+	}
+
+	public static class ArrayFrame extends FEMFrame {
+
+		@Override
+		public FEMValue get(int index) throws IndexOutOfBoundsException {
+			final var index2 = index - this.params.length;
+			return index2 >= 0 ? this.parent.get(index2) : this.params.customGet(index);
+		}
+
+		@Override
+		public FEMFunction param(int index) throws IndexOutOfBoundsException {
+			return this.params.get(index);
+		}
+
+		@Override
+		public int size() {
+			return this.params.length;
+		}
+
+		@Override
+		public FEMArray params() {
+			return this.params;
+		}
+
+		@Override
+		public FEMFrame withContext(FEMContext context) throws NullPointerException {
+			if (this.context == context) return this;
+			return new ArrayFrame(this.parent, this.params, Objects.notNull(context));
+		}
+
+		final FEMArray params;
+
+		ArrayFrame() {
+			this.params = FEMArray.EMPTY;
+		}
+
+		ArrayFrame(FEMFrame parent, FEMArray params, FEMContext context) {
+			super(parent, context);
+			this.params = params;
+		}
+
+	}
+
+	public static class InvokeFrame extends FEMFrame {
+
+		@Override
+		public FEMValue get(int index) throws IndexOutOfBoundsException {
+			final var index2 = index - this.params.length;
+			return index2 >= 0 ? this.parent.get(index2) : this.params.frameGet(index);
+		}
+
+		@Override
+		public FEMFunction param(int index) throws IndexOutOfBoundsException {
+			if ((index < 0) || (index >= this.params.length)) throw new IndexOutOfBoundsException();
+			return this.params.functions[index];
+		}
+
+		@Override
+		public int size() {
+			return this.params.length;
+		}
+
+		@Override
+		public InvokeParams params() {
+			return this.params;
+		}
+
+		@Override
+		public FEMFrame withContext(FEMContext context) throws NullPointerException {
+			if (this.context == context) return this;
+			return new InvokeFrame(this.parent, this.params, Objects.notNull(context));
+		}
+
+		final InvokeParams params;
+
+		InvokeFrame(FEMFrame parent, InvokeParams params, FEMContext context) {
+			super(parent, context);
+			this.params = params;
+		}
+
+		InvokeFrame(FEMFrame parent, FEMFunction[] params, FEMContext context) {
+			super(parent, context);
+			this.params = new InvokeParams(parent, params);
+		}
+
+	}
+
+	public static class InvokeParams extends HashArray {
+
+		@Override
+		protected FEMValue customGet(int index) {
+			synchronized (this.values) {
+				var result = this.values[index];
+				if (result != null) return result;
+				result = this.functions[index].toFuture(this.frame);
+				this.values[index] = Objects.notNull(result);
+				return result;
+			}
+		}
+
+		public final FEMFrame frame;
+
+		/** Dieses Feld speichert das Array der Parameterwerte, das nicht verändert werden darf. */
+		final FEMValue[] values;
+
+		/** Dieses Feld speichert das Array der Parameterfunktionen, das nicht verändert werden darf. */
+		final FEMFunction[] functions;
+
+		InvokeParams(FEMFrame frame, FEMFunction[] params) {
+			super(params.length);
+			this.frame = frame;
+			this.functions = params;
+			this.values = new FEMValue[params.length];
+		}
+
+		FEMValue frameGet(int index) {
+			synchronized (this.values) {
+				var result = this.values[index];
+				if (result != null) return result;
+				result = this.functions[index].invoke(this.frame);
+				this.values[index] = Objects.notNull(result);
+				return result;
+			}
+		}
+
+	}
+
+	/** Dieses Feld speichert die übergeordneten Parameterdaten. */
+	final FEMFrame parent;
+
+	/** Dieses Feld speichert das Kontextobjekt. */
+	final FEMContext context;
+
+	FEMFrame() {
+		this.parent = this;
+		this.context = FEMContext.EMPTY;
+	}
+
+	FEMFrame(FEMFrame parent, FEMContext context) {
+		this.parent = parent;
+		this.context = context;
 	}
 
 }

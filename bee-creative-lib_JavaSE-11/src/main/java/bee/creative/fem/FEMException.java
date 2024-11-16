@@ -10,23 +10,15 @@ import bee.creative.lang.Exception2;
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMException extends Exception2 {
 
-	private static final long serialVersionUID = -2654985371977072939L;
-
 	/** Diese Methode gibt die gegebene Ausnahme als {@link FEMException} zurück. Wenn {@code cause} eine {@link FEMException} ist, wird diese unverändert
 	 * geliefert. Andernfalls wird eine neue {@link FEMException} mit der gegebenen Ausnahme als {@link #useCause(Throwable) Ursache} erzeugt und geliefert.
 	 *
 	 * @param cause Ausnahme.
 	 * @return {@link FEMException}. */
-	public static FEMException from(final Throwable cause) {
+	public static FEMException from(Throwable cause) {
 		if (cause instanceof FEMException) return (FEMException)cause;
 		return new FEMException().useCause(cause);
 	}
-
-	/** Dieses Feld speichert den Wert. */
-	FEMValue value;
-
-	/** Dieses Feld speichert den Kontextobjekt. */
-	FEMContext context;
 
 	/** Dieser Konstruktor initialisiert eine neue Ausnahme ohne {@link #getValue() Wert}, {@link #getContext() Kontextobjekt}, {@link #getCause() Ursache} und
 	 * {@link #getMessages() Nachrichten}. */
@@ -45,7 +37,7 @@ public final class FEMException extends Exception2 {
 	 * @see #getValue()
 	 * @param value Wert oder {@code null}.
 	 * @return {@code this}. */
-	public FEMException useValue(final FEMValue value) {
+	public FEMException useValue(FEMValue value) {
 		this.value = value;
 		return this;
 	}
@@ -63,45 +55,53 @@ public final class FEMException extends Exception2 {
 	 * @see #getContext()
 	 * @param context Kontextobjekt oder {@code null}.
 	 * @return {@code this}. */
-	public FEMException useContext(final FEMContext context) {
+	public FEMException useContext(FEMContext context) {
 		this.context = context;
 		return this;
 	}
 
 	@Override
-	public FEMException useCause(final Throwable cause) {
+	public FEMException useCause(Throwable cause) {
 		super.useCause(cause);
 		return this;
 	}
 
 	@Override
-	public FEMException useHandled(final boolean handled) {
+	public FEMException useHandled(boolean handled) {
 		super.useHandled(handled);
 		return this;
 	}
 
 	@Override
-	public FEMException push(final Object message) {
+	public FEMException push(Object message) {
 		super.push(message);
 		return this;
 	}
 
 	@Override
-	public FEMException push(final String format, final Object... args) throws NullPointerException, IllegalFormatException {
+	public FEMException push(String format, Object... args) throws NullPointerException, IllegalFormatException {
 		super.push(format, args);
 		return this;
 	}
 
 	@Override
-	public FEMException pushAll(final Iterable<?> messages) {
+	public FEMException pushAll(Iterable<?> messages) {
 		super.pushAll(messages);
 		return this;
 	}
 
 	@Override
-	public FEMException pushAll(final Object... messages) {
+	public FEMException pushAll(Object... messages) {
 		super.pushAll(messages);
 		return this;
 	}
+
+	/** Dieses Feld speichert den Wert. */
+	FEMValue value;
+
+	/** Dieses Feld speichert den Kontextobjekt. */
+	FEMContext context;
+
+	private static final long serialVersionUID = -2654985371977072939L;
 
 }
