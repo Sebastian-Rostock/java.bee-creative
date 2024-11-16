@@ -8,7 +8,7 @@ import java.util.Map;
 import bee.creative.array.CompactIntegerArray;
 import bee.creative.lang.Objects;
 
-/** Diese Klasse implementiert ein Objekt zum Parsen einer Zeichenkette in hierarchische {@link Token Abschnitte}.
+/** Diese Klasse implementiert einen Parsen zur Umwandlung einer Zeichenkette in hierarchische {@link Token Abschnitte}.
  *
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 class __Parser {
@@ -75,37 +75,25 @@ class __Parser {
 		return false;
 	}
 
-	/** Dieser Konstruktor initialisiert die Eingabe.
-	 *
-	 * @param source Eingabe.
-	 * @throws NullPointerException Wenn die Eingabe {@code null} ist. */
+	/** Dieser Konstruktor initialisiert {@link #source()}. */
 	public __Parser(String source) throws NullPointerException {
-		this.setSource(Source.from(source));
+		this.useSource(Source.from(source));
 	}
 
 	/** Diese Methode liefert die Eingabe. */
-	public final Source getSource() {
+	public final Source source() {
 		return this.source;
 	}
 
-	/** Diese Methode setzt die Eingabe und {@link #reset() setzt} die aktuelle Position auf {@code 0}. */
-	public final void setSource(Source source) throws NullPointerException {
-		this.array = source.chars;
-		this.startIndex = source.offset;
-		this.finalIndex = source.offset + source.length;
-		this.source = source;
-		this.reset();
-	}
-
-	/** Diese Methode setzt die {@link #index() aktuelle Position} und gibt das {@link #symbol() aktuelle Zeichen} zurück.
+	/** Diese Methode setzt die {@link #index() aktuelle Position} und gibt das {@link #symbol() aktuelle Zeichen} zurück. Wenn die Position ungültig ist, wird
+	 * sie auf das Ende der Eingabe gesetzt.
 	 *
 	 * @see #index()
 	 * @see #symbol()
 	 * @param index Position.
-	 * @return {@link #symbol() aktuelles Zeichen} oder {@code -1}.
-	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist. */
-	public final int seek(int index) throws IndexOutOfBoundsException {
-		return this.seekImpl(this.startIndex + index);
+	 * @return {@link #symbol() aktuelles Zeichen} oder {@code -1}. */
+	public final int seek(int index) {
+		return this.select(this.startIndex + index);
 	}
 
 	/** Diese Methode überspring das {@link #symbol() aktuelle Zeichen}, navigiert zum nächsten Zeichen und gibt dieses zurück.
@@ -116,7 +104,7 @@ class __Parser {
 	 * @see #target()
 	 * @return {@link #symbol() aktuelles Zeichen} oder {@code -1}. */
 	public final int skip() {
-		return this.seekImpl(this.index + 1);
+		return this.select(this.index + 1);
 	}
 
 	/** Diese Methode setzt die {@link #index() aktuelle Position} auf {@code 0} zurück.
@@ -137,7 +125,7 @@ class __Parser {
 	}
 
 	/** Diese Methode gibt die Nummer des aktuellen Zeichens ({@code char}) oder {@code -1} zurück. Der Rückgabewert ist nur dann {@code -1}, wenn das Ende der
-	 * {@link #getSource() Eingabe} erreicht wurde.
+	 * {@link #source() Eingabe} erreicht wurde.
 	 *
 	 * @see #skip()
 	 * @see #take()
@@ -154,7 +142,7 @@ class __Parser {
 		return this.tokens;
 	}
 
-	/** Diese Methode gibt nur dann {@code true} zurück, wenn die {@link #index() aktuelle Position} gleich {@code 0} und damit am Anfang der {@link #getSource()
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn die {@link #index() aktuelle Position} gleich {@code 0} und damit am Anfang der {@link #source()
 	 * Eingabe} ist.
 	 *
 	 * @see #seek(int)
@@ -162,11 +150,11 @@ class __Parser {
 	 * @see #index()
 	 * @return {@code true}, wenn die aktuelle Position minimal ist. */
 	public final boolean isReset() {
-		return this.index == this.startIndex;
+		return this.index() == 0;
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn das {@link #symbol() aktuelle Zeichen} kleiner {@code 0} und damit die {@link #index() aktuelle
-	 * Position} am Ende der {@link #getSource() Eingabe} ist.
+	 * Position} am Ende der {@link #source() Eingabe} ist.
 	 *
 	 * @see #seek(int)
 	 * @see #index()
@@ -178,7 +166,7 @@ class __Parser {
 	}
 
 	/** Diese Methode übernimmt das {@link #symbol() aktuelle Zeichen} in die {@link #target() Ausgabe}, navigiert zum nächsten Zeichen und gibt dieses zurück.
-	 * Wenn sich die {@link #index() aktuelle Position} bereits am Ende der {@link #getSource() Eingabe} befindet, wird kein Zeichen in die Ausgabe übernommen.
+	 * Wenn sich die {@link #index() aktuelle Position} bereits am Ende der {@link #source() Eingabe} befindet, wird kein Zeichen in die Ausgabe übernommen.
 	 *
 	 * @see #take(int)
 	 * @see #skip()
@@ -211,13 +199,19 @@ class __Parser {
 		this.target.append(symbols.toString());
 	}
 
+	/** Diese Methode erzeugt und liefert einen an der {@link #index() aktuellen Position} beginnenden und ein Zeichen langen Abschnitt. */
+	public final Token make() {
+		return Token.from(this.source).useStart(this.index()).useLength(1);
+	}
+
 	/** Diese Methode erzeugt einen an der {@link #index() aktuellen Position} beginnenden und ein Zeichen langen Abschnitt und gibt diesen Abschnitt zurück. Sie
 	 * ist eine Abkürzung für {@link #make(int, int, int) this.make(type, this.index(), 1)}.
 	 *
 	 * @param type Abschnittstyp.
 	 * @return neuer Abschnitt. */
+	@Deprecated
 	public final Token make(int type) throws IllegalArgumentException {
-		return this.make(type, this.index(), 1);
+		return Token.from(this.source).useType(type).useStart(this.index()).useLength(1);
 	}
 
 	/** Diese Methode erzeugt einen an der gegebenen Position beginnenden und an der {@link #index() aktuellen Position} endenden Abschnitt und gibt diesen
@@ -226,8 +220,9 @@ class __Parser {
 	 * @param type Abschnittstyp.
 	 * @param offset Abschnittsbeginn.
 	 * @return neuer Abschnitt. */
+	@Deprecated
 	public final Token make(int type, int offset) throws IllegalArgumentException {
-		return this.make(type, offset, this.index() - offset);
+		return Token.from(this.source).useType(type).useStart(offset).useLength(this.index() - offset);
 	}
 
 	/** Diese Methode liefert einen neuen Abschnitt mit den gegebenen Eigenschaften.
@@ -236,6 +231,7 @@ class __Parser {
 	 * @param offset Abschnittsbeginn.
 	 * @param length Abschnittslänge.
 	 * @return neuer Abschnitt. */
+	@Deprecated
 	public final Token make(int type, int offset, int length) throws IllegalArgumentException {
 		return Token.from(this.source).useType(type).useStart(offset).useLength(length);
 	}
@@ -245,8 +241,9 @@ class __Parser {
 	 * @see #make(int)
 	 * @param type Abschnittstyp.
 	 * @return Abschnitt. */
+	@Deprecated
 	public final Token push(int type) throws IllegalArgumentException {
-		return this.push(this.make(type));
+		return this.push(Token.from(this.source).useType(type).useStart(this.index()).useLength(1));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #push(Token) this.push(this.make(type, offset))}.
@@ -255,8 +252,9 @@ class __Parser {
 	 * @param type Abschnittstyp.
 	 * @param offset Abschnittsbeginn.
 	 * @return Abschnitt oder {@code null}. */
+	@Deprecated
 	public final Token push(int type, int offset) throws IllegalArgumentException {
-		return this.push(this.make(type, offset));
+		return this.push(Token.from(this.source).useType(type).useStart(offset).useLength(this.index() - offset));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #push(Token) this.push(this.make(type, offset, length))}.
@@ -266,12 +264,17 @@ class __Parser {
 	 * @param offset Abschnittsbeginn.
 	 * @param length Abschnittslänge.
 	 * @return Abschnitt oder {@code null}. */
+	@Deprecated
 	public final Token push(int type, int offset, int length) {
-		return this.push(this.make(type, offset, length));
+		return this.push(Token.from(this.source).useType(type).useStart(offset).useLength(length));
 	}
 
-	/** Diese Methode ergänzt die {@link #tokens() Liste der Abschnitte} um den gegebenen Abschnitt, sofern dieser nilcht {@code null} ist, und gibt ihn
-	 * zurück. */
+	/** Diese Methode ist eine Abkürzung für {@link #push(Token) this.push(this.make())}. */
+	public final Token push() {
+		return this.push(this.make());
+	}
+
+	/** Diese Methode ergänzt die {@link #tokens() Liste der erfassten Abschnitte} um den gegebenen, sofern dieser nilcht {@code null} ist, und liefert diesen. */
 	public final Token push(Token token) {
 		if (token == null) return token;
 		this.tokens.add(token);
@@ -301,26 +304,36 @@ class __Parser {
 		return this.target.toString();
 	}
 
-	/** Diese Methode gibt die Länge der {@link #getSource() Eingabe} zurück.
+	/** Diese Methode gibt die Länge der {@link #source() Eingabe} zurück.
 	 *
 	 * @see #seek(int)
 	 * @see #index()
-	 * @see #getSource()
+	 * @see #source()
 	 * @return Länge der Eingabe. */
 	public final int length() {
 		return this.finalIndex - this.startIndex;
 	}
 
-	@Override
-	public String toString() {
-		return this.getSource().toString();
+	/** Diese Methode setzt die Eingabe, {@link #reset() setzt} die aktuelle Position auf {@code 0} und liefert {@code this}. */
+	public final __Parser useSource(Source source) throws NullPointerException {
+		this.array = source.chars;
+		this.startIndex = source.offset;
+		this.finalIndex = source.offset + source.length;
+		this.source = source;
+		this.reset();
+		return this;
 	}
 
-	/** Diese Klasse implementiert einen {@link #type() typisierten} Abschnitt einer {@link #source() Zeichenkette}. Abschnitte können zudem über
+	@Override
+	public String toString() {
+		return this.source().toString();
+	}
+
+	/** Diese Klasse implementiert einen {@link #getType() typisierten} Abschnitt einer {@link #source() Zeichenkette}. Abschnitte können zudem über
 	 * {@link #children() untergeordnete Kindabschnitte} einen syntaktischen Baum bilden und beliebige {@link #values() benannte Werte} besitzen.
 	 *
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public static final class Token {
+	public static class Token implements Comparable<Token> {
 
 		/** Dieses Feld speichert den leeren Abschnitt. */
 		public static final Token EMPTY = Token.from(Source.EMPTY);
@@ -362,7 +375,7 @@ class __Parser {
 		}
 
 		/** Diese Methode liefet den Typ des Abschnitts. */
-		public int type() {
+		public int getType() {
 			return this.type;
 		}
 
@@ -401,23 +414,6 @@ class __Parser {
 			return this.source;
 		}
 
-		/** Diese Methode ergänzt die {@link #children() Liste der Kindabschnitte} um den gegebenen Kindabschnitt und liefert {@code this}. */
-		public Token add(Token child) {
-			this.children().add(child);
-			return this;
-		}
-
-		/** Diese Methode ergänzt die {@link #children() Liste der Kindabschnitte} um die gegebenen Kindabschnitte und liefert {@code this}. */
-		public Token addAll(Token... children) {
-			return this.addAll(Arrays.asList(children));
-		}
-
-		/** Diese Methode ergänzt die {@link #children() Liste der Kindabschnitte} um die gegebenen Kindabschnitte und liefert {@code this}. */
-		public Token addAll(Iterable<Token> children) {
-			this.children().addAll(children);
-			return this;
-		}
-
 		/** Diese Methode liefert die Position des {@link #children() Kindabschnitts}, der die gegebene Position {@link #containing(int) enthält} und ist eine
 		 * Abkürzung für {@link #find(Comparable) this.find(Token.containing(index))}. */
 		public int find(int index) {
@@ -434,7 +430,19 @@ class __Parser {
 			return this.children != null ? Comparables.binarySearch(this.children, comp) : -1;
 		}
 
-		/** Diese Methode setzt den {@link #type() Abschnittstyp} und liefert {@code this}. */
+		/** Diese Methode ergänzt die {@link #children() Liste der Kindabschnitte} um den gegebenen Kindabschnitt und liefert {@code this}. */
+		public Token add(Token child) {
+			this.children().add(child);
+			return this;
+		}
+
+		/** Diese Methode ergänzt die {@link #children() Liste der Kindabschnitte} um die gegebenen Kindabschnitte und liefert {@code this}. */
+		public Token addAll(Iterable<Token> children) {
+			this.children().addAll(children);
+			return this;
+		}
+
+		/** Diese Methode setzt den {@link #getType() Abschnittstyp} und liefert {@code this}. */
 		public Token useType(int type) {
 			this.type = type;
 			return this;
@@ -448,7 +456,7 @@ class __Parser {
 
 		/** Diese Methode setzt die {@link #end() Endposition} und liefert {@code this}. Wenn die {@link #start() Startposition} nicht beibehalten werden kann, wird
 		 * sie auf die Endposition verschoben. */
-		public Token useEnd(int end) {
+		public Token useEnd(int end) throws IllegalArgumentException {
 			if ((end < 0) || (this.source.length() < end)) throw new IllegalArgumentException();
 			this.length = end - (this.offset = Math.min(this.offset, end));
 			return this;
@@ -480,6 +488,11 @@ class __Parser {
 			if (!(object instanceof Token)) return false;
 			var that = (Token)object;
 			return (this.type == that.type) && (this.offset == that.offset) && (this.length == that.length);
+		}
+
+		@Override
+		public int compareTo(Token that) {
+			return this.offset - that.offset;
 		}
 
 		/** Diese Methode liefert die Zeichenkette im Abschnitt. */
@@ -565,7 +578,7 @@ class __Parser {
 		 *  res[2] = this.root().get(res[0]).get(res[1]).find(index);
 		 *  ...
 		 *  </pre> */
-		public int[] path(final int index) {
+		public int[] path(int index) {
 			var comp = Token.containing(index);
 			var buffer = new CompactIntegerArray(10);
 			for (var token = this.root; true;) {
@@ -578,7 +591,7 @@ class __Parser {
 
 		@Override
 		public int hashCode() {
-			return Objects.hash(this.source(), this.root, this.tokens);
+			return Objects.hash(this.root, this.tokens);
 		}
 
 		@Override
@@ -586,7 +599,7 @@ class __Parser {
 			if (object == this) return true;
 			if (!(object instanceof Result)) return false;
 			var that = (Result)object;
-			return Objects.equals(this.source(), that.source()) && Objects.equals(this.root, that.root) && Objects.equals(this.tokens, that.tokens);
+			return Objects.equals(this.root, that.root) && Objects.equals(this.tokens, that.tokens);
 		}
 
 		@Override
@@ -611,7 +624,7 @@ class __Parser {
 	public static class Source {
 
 		/** Dieses Feld speichert die leere Zeichenkette. */
-		public static Source EMPTY = Source.from("");
+		public static Source EMPTY = Source.from(new char[0]);
 
 		/** Diese Methode liefert eine Zeichenkette mit der gegebenen Zeichen. */
 		public static Source from(char[] chars) throws NullPointerException {
@@ -620,7 +633,8 @@ class __Parser {
 
 		/** Diese Methode liefert eine Zeichenkette mit dem Abschnitt der gegebenen Zeichenkette. */
 		public static Source from(char[] chars, int offset, int length) throws NullPointerException, IllegalArgumentException {
-			if (((offset | length) < 0) || ((offset + length) > chars.length)) throw new IllegalArgumentException();
+			if (((offset | length) < 0) || (length > (chars.length - offset))) throw new IllegalArgumentException();
+			if (length == 0) return Source.EMPTY;
 			return new Source(chars, offset, length);
 		}
 
@@ -630,7 +644,9 @@ class __Parser {
 		}
 
 		/** Diese Methode liefert eine Zeichenkette mit dem Abschnitt der gegebenen Zeichenkette. */
-		public static Source from(String string, int offset, int length) throws NullPointerException {
+		public static Source from(String string, int offset, int length) throws NullPointerException, IllegalArgumentException {
+			if (((offset | length) < 0) || (length > (string.length() - offset))) throw new IllegalArgumentException();
+			if (length == 0) return Source.EMPTY;
 			var chars = new char[length];
 			string.getChars(offset, offset + length, chars, 0);
 			return new Source(chars, 0, length);
@@ -643,15 +659,16 @@ class __Parser {
 
 		/** Diese Methode liefert einen Abschnitt dieser Zeichenkette. */
 		public Source section(int offset, int length) {
-			if (((offset | length) < 0) || ((offset + length) > this.length)) throw new IllegalArgumentException();
+			if (((offset | length) < 0) || (length > (this.length - offset))) throw new IllegalArgumentException();
 			return new Source(this.chars, this.offset + offset, length);
 		}
 
 		@Override
 		public int hashCode() {
 			var prev = Objects.hashInit();
-			for (var next: this.chars) {
-				prev = Objects.hashPush(prev, next);
+			var chars = this.chars;
+			for (int i = this.offset, limit = this.offset + this.length; i < limit; i++) {
+				prev = Objects.hashPush(prev, chars[i]);
 			}
 			return prev;
 		}
@@ -712,9 +729,8 @@ class __Parser {
 	/** Dieses Feld speichert die erfassten Abschnitte. */
 	private final LinkedList<Token> tokens = new LinkedList<>();
 
-	private int seekImpl(final int index) {
-		if (index < 0) throw new IndexOutOfBoundsException();
-		if (index < this.finalIndex) return this.symbol = this.array[this.index = index];
+	private int select(int index) {
+		if ((this.startIndex <= index) && (index < this.finalIndex)) return this.symbol = this.array[this.index = index];
 		this.index = this.finalIndex;
 		return this.symbol = -1;
 	}
