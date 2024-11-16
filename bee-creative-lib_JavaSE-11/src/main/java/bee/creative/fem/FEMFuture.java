@@ -10,15 +10,6 @@ package bee.creative.fem;
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMFuture implements FEMValue {
 
-	FEMFrame frame;
-
-	FEMFunction target;
-
-	FEMFuture(final FEMFrame frame, final FEMFunction function) {
-		this.frame = frame;
-		this.target = function;
-	}
-
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn der {@link #result() Ergebniswert} ausgewertet wurde, d.h. wenn {@link #target()} einen
 	 * {@link FEMValue} liefert.
 	 *
@@ -64,8 +55,8 @@ public final class FEMFuture implements FEMValue {
 	 * @return Ergebniswert.
 	 * @throws NullPointerException Wenn der berechnete Ergebniswert {@code null} ist. */
 	@Override
-	public synchronized FEMValue result(final boolean deep) throws NullPointerException {
-		final FEMValue result = this.target.invoke(this.frame).result(deep);
+	public synchronized FEMValue result(boolean deep) throws NullPointerException {
+		var result = this.target.invoke(this.frame).result(deep);
 		this.target = result;
 		this.frame = FEMFrame.EMPTY;
 		return result;
@@ -77,7 +68,7 @@ public final class FEMFuture implements FEMValue {
 	}
 
 	@Override
-	public boolean equals(final Object object) {
+	public boolean equals(Object object) {
 		if (object == this) return true;
 		if (!(object instanceof FEMValue)) return false;
 		return this.result().equals(object);
@@ -92,6 +83,15 @@ public final class FEMFuture implements FEMValue {
 	@Override
 	public FEMFunction toFunction() {
 		return this.result().toFunction();
+	}
+
+	FEMFrame frame;
+
+	FEMFunction target;
+
+	FEMFuture(FEMFrame frame, FEMFunction function) {
+		this.frame = frame;
+		this.target = function;
 	}
 
 }

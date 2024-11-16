@@ -6,7 +6,7 @@ import bee.creative.lang.Objects;
  * Das {@link #compose(FEMFunction...) Komponieren} eines Funktionszeigers entspricht dem Komponieren der referenzierten {@link #value() Funktion}.
  *
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class FEMHandler implements FEMValue  {
+public final class FEMHandler implements FEMValue {
 
 	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
 	public static final int ID = 2;
@@ -23,14 +23,8 @@ public final class FEMHandler implements FEMValue  {
 	 * @param function Funktion.
 	 * @return Funktionszeiger.
 	 * @throws NullPointerException Wenn {@code function} {@code null} ist. */
-	public static FEMHandler from(final FEMFunction function) throws NullPointerException {
+	public static FEMHandler from(FEMFunction function) throws NullPointerException {
 		return new FEMHandler(Objects.notNull(function));
-	}
-
-	final FEMFunction value;
-
-	FEMHandler(final FEMFunction value) {
-		this.value = value;
 	}
 
 	/** Diese Methode gibt {@code this} zurück. */
@@ -52,7 +46,7 @@ public final class FEMHandler implements FEMValue  {
 	}
 
 	@Override
-	public FEMFunction compose(final FEMFunction... params) throws NullPointerException {
+	public FEMFunction compose(FEMFunction... params) throws NullPointerException {
 		return FEMComposite.from(true, this, params.clone());
 	}
 
@@ -70,12 +64,12 @@ public final class FEMHandler implements FEMValue  {
 			if (!(object instanceof FEMHandler)) return false;
 		}
 		if (object == null) return false;
-		final FEMHandler that = (FEMHandler)object;
+		var that = (FEMHandler)object;
 		return Objects.equals(this.value, that.value);
 	}
 
 	@Override
-	public FEMFunction trace(final FEMTracer tracer) throws NullPointerException {
+	public FEMFunction trace(FEMTracer tracer) throws NullPointerException {
 		return FEMHandler.from(this.value.trace(tracer));
 	}
 
@@ -87,6 +81,12 @@ public final class FEMHandler implements FEMValue  {
 	@Override
 	public FEMFunction toFunction() {
 		return this.value;
+	}
+
+	final FEMFunction value;
+
+	FEMHandler(FEMFunction value) {
+		this.value = value;
 	}
 
 }

@@ -6,7 +6,7 @@ import bee.creative.util.Comparators;
 /** Diese Klasse implementiert eine unveränderliche Dezimalzahl. Intern wird die Dezimalzahl als {@code long} dargestellt.
  *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class FEMInteger implements FEMValue , Comparable<FEMInteger> {
+public final class FEMInteger implements FEMValue, Comparable<FEMInteger> {
 
 	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
 	public static final int ID = 6;
@@ -27,7 +27,7 @@ public final class FEMInteger implements FEMValue , Comparable<FEMInteger> {
 	 *
 	 * @param value Wert.
 	 * @return Dezimalzahl. */
-	public static FEMInteger from(final long value) {
+	public static FEMInteger from(long value) {
 		return new FEMInteger(value);
 	}
 
@@ -36,7 +36,7 @@ public final class FEMInteger implements FEMValue , Comparable<FEMInteger> {
 	 * @param value Wert.
 	 * @return Dezimalzahl.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-	public static FEMInteger from(final Number value) throws NullPointerException {
+	public static FEMInteger from(Number value) throws NullPointerException {
 		return new FEMInteger(value.longValue());
 	}
 
@@ -49,22 +49,12 @@ public final class FEMInteger implements FEMValue , Comparable<FEMInteger> {
 	 * @return Dezimalzahl.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist. */
-	public static FEMInteger from(final String value) throws NullPointerException, IllegalArgumentException {
+	public static FEMInteger from(String value) throws NullPointerException, IllegalArgumentException {
 		try {
 			return FEMInteger.from(Long.parseLong(value));
-		} catch (final NumberFormatException cause) {
+		} catch (NumberFormatException cause) {
 			throw new IllegalArgumentException(cause);
 		}
-	}
-
-	/** Dieses Feld speichert die interne Darstellung der Dezimalzahl. */
-	final long value;
-
-	/** Dieser Konstruktor initialisiert die interne Darstellung der Dezimalzahl.
-	 *
-	 * @param value interne Darstellung der Dezimalzahl. */
-	public FEMInteger(final long value) {
-		this.value = value;
 	}
 
 	/** Diese Methode gibt {@code this} zurück. */
@@ -98,7 +88,7 @@ public final class FEMInteger implements FEMValue , Comparable<FEMInteger> {
 			object = ((FEMValue)object).data();
 			if (!(object instanceof FEMInteger)) return false;
 		}
-		final FEMInteger that = (FEMInteger)object;
+		var that = (FEMInteger)object;
 		return this.value == that.value;
 	}
 
@@ -108,7 +98,7 @@ public final class FEMInteger implements FEMValue , Comparable<FEMInteger> {
 	 * @return Vergleichswert.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
 	@Override
-	public int compareTo(final FEMInteger that) throws NullPointerException {
+	public int compareTo(FEMInteger that) throws NullPointerException {
 		return Comparators.compare(this.value, that.value);
 	}
 
@@ -125,7 +115,14 @@ public final class FEMInteger implements FEMValue , Comparable<FEMInteger> {
 	 *
 	 * @return {@link Long}. */
 	public Long toNumber() {
-		return Long.valueOf(this.value);
+		return this.value;
+	}
+
+	/** Dieses Feld speichert die interne Darstellung der Dezimalzahl. */
+	final long value;
+
+	FEMInteger(long value) {
+		this.value = value;
 	}
 
 }
