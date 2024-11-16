@@ -13,134 +13,6 @@ import bee.creative.util.Parser.Result;
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class FEMPrinter {
 
-	static final class Level extends Indent {
-
-		/** Dieses Feld speichert die Tiefe der Ebene, beginnend mit 1. */
-		final int depth;
-
-		/** Dieses Feld speichert die übergeordnete Ebene oder {@code null}. */
-		final Level parent;
-
-		/** Dieses Feld speichert die Aktivierung der Einrückung dieser Ebene. */
-		boolean enabled;
-
-		Level(final FEMPrinter owner, final Level parent) {
-			this.depth = parent != null ? parent.depth + 1 : 1;
-			this.parent = parent;
-			this.inc = new TokenInc(owner, this);
-			this.dec = new TokenDec(owner, this);
-			this.spc = new TokenSpc(owner, this);
-		}
-
-	}
-
-	static abstract class Token {
-
-		private final FEMPrinter owner;
-
-		private final Level level;
-
-		Token(final FEMPrinter owner, final Level level) {
-			this.owner = owner;
-			this.level = level;
-		}
-
-		final Indent toIdent() {
-			return this.owner.caches[this.level.enabled ? this.level.depth : 0];
-		}
-
-	}
-
-	static final class TokenInc extends Token {
-
-		TokenInc(final FEMPrinter owner, final Level level) {
-			super(owner, level);
-		}
-
-		@Override
-		public String toString() {
-			return this.toIdent().inc.toString();
-		}
-
-	}
-
-	static final class TokenDec extends Token {
-
-		TokenDec(final FEMPrinter owner, final Level level) {
-			super(owner, level);
-		}
-
-		@Override
-		public String toString() {
-			return this.toIdent().dec.toString();
-		}
-
-	}
-
-	static final class TokenSpc extends Token {
-
-		TokenSpc(final FEMPrinter owner, final Level level) {
-			super(owner, level);
-		}
-
-		@Override
-		public String toString() {
-			return this.toIdent().spc.toString();
-		}
-
-	}
-
-	static class Indent {
-
-		static final Indent ENABLED = Indent.from("", "", "\n");
-
-		static final Indent DISABLED = Indent.from("", "", " ");
-
-		static Indent from(final String indent_or_null) {
-			return indent_or_null != null ? Indent.ENABLED : Indent.DISABLED;
-		}
-
-		static Indent from(final String indent_or_null, final Indent parent_or_null) {
-			if (indent_or_null == null) return Indent.DISABLED;
-			final Indent res = new Indent();
-			res.dec = parent_or_null == null ? "\n" : parent_or_null.inc;
-			res.inc = res.dec + indent_or_null;
-			res.spc = res.inc;
-			return res;
-		}
-
-		static Indent from(final String inc, final String dec, final String spc) {
-			final Indent res = new Indent();
-			res.inc = inc;
-			res.dec = dec;
-			res.spc = spc;
-			return res;
-		}
-
-		/** Dieses Feld speichert die Einrückung für {@link FEMPrinter#pushBreakInc()}. */
-		Object inc;
-
-		/** Dieses Feld speichert die Einrückung für {@link FEMPrinter#pushBreakDec()}. */
-		Object dec;
-
-		/** Dieses Feld speichert die Einrückung für {@link FEMPrinter#pushBreakSpc()}. */
-		Object spc;
-
-	}
-
-	/** Dieses Feld speichert die erfassten Objekte. */
-	private ArrayList<Object> list;
-
-	/** Dieses Feld speichert die aktuelle Einrückebene. */
-	private Level level;
-
-	/** Dieses Feld speichert die maximale Einrücktiefe. */
-	private int depth;
-
-	private String indent;
-
-	Indent[] caches;
-
 	/** Dieser Konstruktor initialisiert einen neuen Formetter, welcher keine {@link FEMPrinter#useIndent(String) Einrückung} nutzt. */
 	public FEMPrinter() {
 		this.reset();
@@ -158,7 +30,7 @@ public class FEMPrinter {
 	 *
 	 * @param indent Zeichenkette zur Einrückung (z.B. {@code null}, {@code "\t"} oder {@code "  "}).
 	 * @return {@code this}. */
-	public FEMPrinter useIndent(final String indent) {
+	public FEMPrinter useIndent(String indent) {
 		this.indent = indent;
 		return this;
 	}
@@ -178,7 +50,7 @@ public class FEMPrinter {
 	 *
 	 * @param src Objekt oder {@code null}.
 	 * @return {@code this}. */
-	public final FEMPrinter push(final Object src) {
+	public final FEMPrinter push(Object src) {
 		if (src == null) return this;
 		this.list.add(src);
 		return this;
@@ -192,7 +64,7 @@ public class FEMPrinter {
 	 * @see #pushBreakSpc()
 	 * @return {@code this}. */
 	public final FEMPrinter pushBreakInc() {
-		final Level level = new Level(this, this.level);
+		var level = new Level(this, this.level);
 		this.depth = Math.max(this.depth, level.depth);
 		this.list.add(level.inc);
 		this.level = level;
@@ -207,7 +79,7 @@ public class FEMPrinter {
 	 * @see #pushBreakSpc()
 	 * @return {@code this}. */
 	public final FEMPrinter pushBreakDec() {
-		Level level = this.level;
+		var level = this.level;
 		this.list.add(level.dec);
 		level = level.parent;
 		if (level == null) return this;
@@ -235,8 +107,8 @@ public class FEMPrinter {
 	 * @see #pushBreakDec()
 	 * @return {@code this}. */
 	public final FEMPrinter pushIndent() {
-		final Level level = this.level;
-		for (Level parent = level.parent; (parent != null) && !parent.enabled; parent = parent.parent) {
+		var level = this.level;
+		for (var parent = level.parent; (parent != null) && !parent.enabled; parent = parent.parent) {
 			parent.enabled = true;
 		}
 		return this;
@@ -247,12 +119,12 @@ public class FEMPrinter {
 	 * @see #push(Object)
 	 * @return Quelltext. */
 	public final String print() throws IllegalArgumentException {
-		final StringBuilder res = new StringBuilder();
+		var res = new StringBuilder();
 		try {
 			this.print(res);
-		} catch (final IllegalArgumentException cause) {
+		} catch (IllegalArgumentException cause) {
 			throw cause;
-		} catch (final Exception cause) {
+		} catch (Exception cause) {
 			throw new IllegalArgumentException(cause);
 		}
 		return res.toString();
@@ -260,20 +132,20 @@ public class FEMPrinter {
 
 	/** Diese Methode {@link Appendable#append(CharSequence) fügt} die {@link Object#toString() Textdarstellungen} der {@link #push(Object) erfastten} Objekte und
 	 * Einrückungen an den gegebenen Puffer an. */
-	public final void print(final Appendable res) throws IOException {
-		final int length = this.depth + 1;
-		final String indent = this.indent;
-		final Indent[] caches = new Indent[length];
+	public final void print(Appendable res) throws IOException {
+		var length = this.depth + 1;
+		var indent = this.indent;
+		var caches = new Indent[length];
 		caches[0] = Indent.DISABLED;
 		caches[1] = Indent.from(indent);
 		Indent parent = null;
-		for (int i = 2; i < length; i++) {
+		for (var i = 2; i < length; i++) {
 			parent = Indent.from(indent, parent);
 			caches[i] = parent;
 		}
 		this.caches = caches;
 		try {
-			for (final Object item: this.list) {
+			for (var item: this.list) {
 				res.append(item.toString());
 			}
 		} finally {
@@ -284,6 +156,134 @@ public class FEMPrinter {
 	@Override
 	public String toString() {
 		return Objects.toInvokeString(this, this.indent);
+	}
+
+	/** Dieses Feld speichert die erfassten Objekte. */
+	private ArrayList<Object> list;
+
+	/** Dieses Feld speichert die aktuelle Einrückebene. */
+	private Level level;
+
+	/** Dieses Feld speichert die maximale Einrücktiefe. */
+	private int depth;
+
+	private String indent;
+
+	private Indent[] caches;
+
+	private static final class Level extends Indent {
+
+		/** Dieses Feld speichert die Tiefe der Ebene, beginnend mit 1. */
+		final int depth;
+
+		/** Dieses Feld speichert die übergeordnete Ebene oder {@code null}. */
+		final Level parent;
+
+		/** Dieses Feld speichert die Aktivierung der Einrückung dieser Ebene. */
+		boolean enabled;
+
+		Level(FEMPrinter owner, Level parent) {
+			this.depth = parent != null ? parent.depth + 1 : 1;
+			this.parent = parent;
+			this.inc = new TokenInc(owner, this);
+			this.dec = new TokenDec(owner, this);
+			this.spc = new TokenSpc(owner, this);
+		}
+
+	}
+
+	private static abstract class Token {
+
+		final FEMPrinter owner;
+
+		final Level level;
+
+		Token(FEMPrinter owner, Level level) {
+			this.owner = owner;
+			this.level = level;
+		}
+
+		final Indent toIdent() {
+			return this.owner.caches[this.level.enabled ? this.level.depth : 0];
+		}
+
+	}
+
+	private static class TokenInc extends Token {
+
+		@Override
+		public String toString() {
+			return this.toIdent().inc.toString();
+		}
+
+		TokenInc(FEMPrinter owner, Level level) {
+			super(owner, level);
+		}
+
+	}
+
+	private static class TokenDec extends Token {
+
+		@Override
+		public String toString() {
+			return this.toIdent().dec.toString();
+		}
+
+		TokenDec(FEMPrinter owner, Level level) {
+			super(owner, level);
+		}
+
+	}
+
+	private static class TokenSpc extends Token {
+
+		@Override
+		public String toString() {
+			return this.toIdent().spc.toString();
+		}
+
+		TokenSpc(FEMPrinter owner, Level level) {
+			super(owner, level);
+		}
+
+	}
+
+	private static class Indent {
+
+		static final Indent ENABLED = Indent.from("", "", "\n");
+
+		static final Indent DISABLED = Indent.from("", "", " ");
+
+		static Indent from(String indent_or_null) {
+			return indent_or_null != null ? Indent.ENABLED : Indent.DISABLED;
+		}
+
+		static Indent from(String indent_or_null, Indent parent_or_null) {
+			if (indent_or_null == null) return Indent.DISABLED;
+			var res = new Indent();
+			res.dec = parent_or_null == null ? "\n" : parent_or_null.inc;
+			res.inc = res.dec + indent_or_null;
+			res.spc = res.inc;
+			return res;
+		}
+
+		static Indent from(String inc, String dec, String spc) {
+			var res = new Indent();
+			res.inc = inc;
+			res.dec = dec;
+			res.spc = spc;
+			return res;
+		}
+
+		/** Dieses Feld speichert die Einrückung für {@link FEMPrinter#pushBreakInc()}. */
+		Object inc;
+
+		/** Dieses Feld speichert die Einrückung für {@link FEMPrinter#pushBreakDec()}. */
+		Object dec;
+
+		/** Dieses Feld speichert die Einrückung für {@link FEMPrinter#pushBreakSpc()}. */
+		Object spc;
+
 	}
 
 }

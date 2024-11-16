@@ -26,7 +26,7 @@ public final class FEMNative implements FEMValue {
 	 *
 	 * @param data Objekt oder {@code null}.
 	 * @return Wert. */
-	public static FEMNative from(final Object data) {
+	public static FEMNative from(Object data) {
 		if (data == null) return FEMNative.NULL;
 		if (data == Boolean.TRUE) return FEMNative.TRUE;
 		if (data == Boolean.FALSE) return FEMNative.FALSE;
@@ -40,7 +40,7 @@ public final class FEMNative implements FEMValue {
 	/** Dieser Konstruktor initialisiert das native Objekt.
 	 *
 	 * @param data Objekt. */
-	public FEMNative(final Object data) {
+	public FEMNative(Object data) {
 		this.data = data;
 	}
 
@@ -61,10 +61,10 @@ public final class FEMNative implements FEMValue {
 	}
 
 	@Override
-	public boolean equals(final Object object) {
+	public boolean equals(Object object) {
 		if (object == this) return true;
 		if (!(object instanceof FEMValue)) return false;
-		final FEMValue that = (FEMValue)object;
+		var that = (FEMValue)object;
 		return Objects.equals(this.data(), that.data());
 	}
 
