@@ -62,13 +62,9 @@ public class FEMType<GData> {
 		return Objects.toInvokeString(this, this.id);
 	}
 
-	/** Dieses Feld speichert den Identifikator. */
-	final int id;
+	private final int id;
 
-	/** Dieser Konstruktor initialisiert den Identifikator.
-	 *
-	 * @param id Identifikator. */
-	protected FEMType(int id) {
+	private FEMType(int id) {
 		this.id = id;
 	}
 

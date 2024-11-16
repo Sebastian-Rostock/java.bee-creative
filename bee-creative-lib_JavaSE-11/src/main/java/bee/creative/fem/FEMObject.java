@@ -208,7 +208,7 @@ public final class FEMObject implements FEMValue, Comparable<FEMObject> {
 	 * <li>ownerValue - 16 Bit</li>
 	 * </ul>
 	 */
-	final int valueL;
+	private final int valueL;
 
 	/** Dieses Feld speichert die 32 MSB der internen 64 Bit Darstellung dieser Zeitangabe.
 	 * <p>
@@ -217,9 +217,9 @@ public final class FEMObject implements FEMValue, Comparable<FEMObject> {
 	 * <li>refValue - 32 Bit</li>
 	 * </ul>
 	 */
-	final int valueH;
+	private final int valueH;
 
-	FEMObject(int valueH, int valueL) {
+	private FEMObject(int valueH, int valueL) {
 		this.valueH = valueH;
 		this.valueL = valueL;
 	}

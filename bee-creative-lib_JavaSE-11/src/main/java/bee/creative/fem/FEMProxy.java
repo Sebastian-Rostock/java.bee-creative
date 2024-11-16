@@ -95,14 +95,11 @@ public final class FEMProxy implements FEMFunction, Property<FEMFunction>, Emuab
 		return FEMDomain.DEFAULT.printConst(this.name.toString());
 	}
 
-	/** Dieses Feld speichert die Kennung des Platzhalters. */
-	final FEMValue id;
+	private	final FEMValue id;
 
-	/** Dieses Feld speichert den Namen. */
-	final FEMString name;
+	private	final FEMString name;
 
-	/** Dieses Feld speichert die Funktion. */
-	FEMFunction target;
+	private	FEMFunction target;
 
 	FEMProxy(FEMValue id, FEMString name) {
 		this.id = id;

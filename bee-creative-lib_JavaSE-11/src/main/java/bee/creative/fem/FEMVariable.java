@@ -57,10 +57,9 @@ public final class FEMVariable implements FEMValue, Property<FEMValue> {
 		return Objects.toInvokeString(this, this.value);
 	}
 
-	/** Dieses Feld speichert den Wert. */
-	FEMValue value;
+	private FEMValue value;
 
-	FEMVariable(FEMValue value) throws NullPointerException {
+	private FEMVariable(FEMValue value) throws NullPointerException {
 		this.set(value);
 	}
 

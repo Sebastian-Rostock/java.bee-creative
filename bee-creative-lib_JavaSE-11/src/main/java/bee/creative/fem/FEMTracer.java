@@ -165,21 +165,21 @@ public final class FEMTracer {
 	}
 
 	/** Dieses Feld speichert den {@link Listener}. */
-	Listener listener = Listener.EMPTY;
+	private Listener listener = Listener.EMPTY;
 
 	/** Dieses Feld speichert den Stapelrahmen der Funktion. Dieser kann in der Methode {@link Listener#onInvoke(FEMTracer)} für den Aufruf angepasst werden. */
-	FEMFrame frame;
+	private FEMFrame frame;
 
 	/** Dieses Feld speichert die Function, die nach {@link Listener#onInvoke(FEMTracer)} aufgerufen wird bzw. vor {@link Listener#onThrow(FEMTracer)} oder
 	 * {@link Listener#onReturn(FEMTracer)} aufgerufen wurde. Diese kann in der Methode {@link Listener#onInvoke(FEMTracer)} für den Aufruf angepasst werden. */
-	FEMFunction function;
+	private FEMFunction function;
 
 	/** Dieses Feld speichert den Ergebniswert, der von der Funktion zurück gegeben wurde. Dieser kann in der Methode {@link Listener#onReturn(FEMTracer)}
 	 * angepasst werden. */
-	FEMValue result;
+	private FEMValue result;
 
 	/** Dieses Feld speichert die {@link RuntimeException}, die von der Funktion ausgelöst wurde. Diese kann in der Methode {@link Listener#onThrow(FEMTracer)}
 	 * angepasst werden. */
-	RuntimeException exception;
+	private RuntimeException exception;
 
 }
