@@ -6,7 +6,7 @@ import bee.creative.lang.Objects;
  * Das {@link #compose(FEMFunction...) Komponieren} eines Funktionszeigers entspricht dem Komponieren der referenzierten {@link #value() Funktion}.
  *
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class FEMHandler extends FEMValue {
+public final class FEMHandler implements FEMValue  {
 
 	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
 	public static final int ID = 2;

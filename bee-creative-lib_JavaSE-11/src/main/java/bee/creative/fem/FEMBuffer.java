@@ -1193,7 +1193,7 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 			if (proxy != null) return proxy;
 			final FEMValue id = this.getAt(addr + 0, FEMValue.class);
 			final FEMString name = this.getAt(addr + 8, FEMString.class);
-			final FEMProxy proxy2 = new FEMProxy(id, name, null);
+			final FEMProxy proxy2 = new FEMProxy(id, name);
 			this.proxyGetMap.put(addr2, proxy2);
 			this.proxyGetList.addLast(addr2);
 			this.runProxyGetList();

@@ -28,7 +28,7 @@ import bee.creative.util.Map3;
 /** Diese Klasse implementiert eine unveränderliche Auflistung von Werten sowie Methoden zur Erzeugung solcher Wertlisten.
  *
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public abstract class FEMArray extends FEMValue implements Array<FEMValue>, Iterable<FEMValue>, UseToString {
+public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable<FEMValue>, UseToString {
 
 	/** Diese Schnittstelle definiert ein Objekt zum geordneten Sammeln von Werten einer Wertliste in der Methode {@link FEMArray#extract(Collector)}. */
 	public static interface Collector {
@@ -380,7 +380,6 @@ public abstract class FEMArray extends FEMValue implements Array<FEMValue>, Iter
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	public static class ConcatArray extends HashArray implements Emuable {
 
 		static int size(FEMArray array) {
@@ -484,7 +483,6 @@ public abstract class FEMArray extends FEMValue implements Array<FEMValue>, Iter
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	public static class ConcatArray1 extends ConcatArray {
 
 		ConcatArray1(final FEMArray array1, final FEMArray array2) throws IllegalArgumentException {
@@ -493,7 +491,6 @@ public abstract class FEMArray extends FEMValue implements Array<FEMValue>, Iter
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	public static class ConcatArray2 extends ConcatArray {
 
 		ConcatArray2(final FEMArray array1, final FEMArray array2) throws IllegalArgumentException {
@@ -502,7 +499,6 @@ public abstract class FEMArray extends FEMValue implements Array<FEMValue>, Iter
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	public static class SectionArray extends HashArray implements Emuable {
 
 		public final FEMArray array;
@@ -548,7 +544,6 @@ public abstract class FEMArray extends FEMValue implements Array<FEMValue>, Iter
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	public static class ReverseArray extends HashArray implements Emuable {
 
 		public final FEMArray array;
@@ -601,7 +596,6 @@ public abstract class FEMArray extends FEMValue implements Array<FEMValue>, Iter
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	public static class UniformArray extends HashArray {
 
 		public final FEMValue value;

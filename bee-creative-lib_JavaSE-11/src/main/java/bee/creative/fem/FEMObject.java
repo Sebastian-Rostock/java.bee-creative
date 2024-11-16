@@ -11,7 +11,7 @@ import bee.creative.util.Comparators;
  * {@code 0..2147483647}, {@code 0..65535} bzw. {@code 0..65535}.
  *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
+public final class FEMObject implements FEMValue , Comparable<FEMObject> {
 
 	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
 	public static final int ID = 10;

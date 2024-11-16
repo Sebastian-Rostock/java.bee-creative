@@ -87,7 +87,7 @@ import bee.creative.lang.Objects;
  * </p>
  *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetime> {
+public final class FEMDatetime implements FEMValue , Comparable<FEMDatetime> {
 
 	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
 	public static final int ID = 9;

@@ -13,25 +13,15 @@ import bee.creative.util.Parser.Token;
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class FEMToken {
 
-	private final Token token;
-
-	private final Map<String, FEMFunction> proxies;
-
 	/** Dieser Konstruktor initialisiert das Objekt mit dem {@link Token#EMPTY leeren Abschnitt} sowie einer leeren Plazhalterabbildung. */
 	public FEMToken() {
 		this.token = Token.EMPTY;
 		this.proxies = new HashMap<>();
 	}
 
-	/** Dieser Konstruktor initialisiert das Objekt mit dem gegebenen Abschnitt sowie der Plazhalterabbildung des gegebenen Objekts. */
-	protected FEMToken(final FEMToken parent, final Token token) throws NullPointerException {
-		this.token = token;
-		this.proxies = parent.proxies;
-	}
-
 	/** Diese Methode gibt einen neuen Kompiller mit dem gegebenen typisierten Abschnitt zurück. Der gelieferte Kompiler verwendet die {@link #proxies() Abbildung
 	 * von Namen auf Platzhalter} dieses Kompilers. */
-	public FEMToken with(final Token token) throws NullPointerException {
+	public FEMToken with(Token token) throws NullPointerException {
 		return new FEMToken(this, Objects.notNull(token));
 	}
 
@@ -54,16 +44,17 @@ public class FEMToken {
 
 	/** Diese Methode gibt die Spaltennummer zur {@link #srcIndex() aktuellen Quelltextposition} zurück. */
 	public int colIndex() {
-		final String src = this.source();
-		final int pos = this.srcIndex(), add = src.lastIndexOf('\n', pos);
+		var src = this.source();
+		var pos = this.srcIndex();
+		var add = src.lastIndexOf('\n', pos);
 		return (pos + 1) - (add < 0 ? 0 : add);
 	}
 
 	/** Diese Methode gibt die Zeilennummer zur {@link #srcIndex() aktuellen Quelltextposition} zurück. */
 	public int rowIndex() {
-		final String src = this.source();
-		int res = 0;
-		for (int pos = this.srcIndex() + 1; pos >= 0; pos = src.lastIndexOf('\n', pos - 1), res++) {}
+		var res = 0;
+		var src = this.source();
+		for (var pos = this.srcIndex() + 1; pos >= 0; pos = src.lastIndexOf('\n', pos - 1), res++) {}
 		return res;
 	}
 
@@ -77,6 +68,16 @@ public class FEMToken {
 	@Override
 	public String toString() {
 		return Objects.toInvokeString(this, this.token(), this.proxies());
+	}
+
+	private final Token token;
+
+	private final Map<String, FEMFunction> proxies;
+
+	/** Dieser Konstruktor initialisiert das Objekt mit dem gegebenen Abschnitt sowie der Plazhalterabbildung des gegebenen Objekts. */
+	private FEMToken(FEMToken parent, Token token) throws NullPointerException {
+		this.token = token;
+		this.proxies = parent.proxies;
 	}
 
 }

@@ -12,19 +12,15 @@ import bee.creative.util.Property;
  * @see FEMParser#proxies()
  * @see FEMToken#proxies()
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class FEMProxy extends FEMFunction implements Property<FEMFunction>, Emuable {
-
-	/** Dieses Feld speichert den leeren Platzhalter mit {@link FEMVoid#INSTANCE undefinierter Kennung}, {@link FEMString#EMPTY leerem Namen} und
-	 * {@link FEMVoid#INSTANCE undefinierter Funktion.}. */
-	public static final FEMProxy EMPTY = new FEMProxy(FEMVoid.INSTANCE, FEMString.EMPTY, FEMVoid.INSTANCE);
+public final class FEMProxy implements FEMFunction, Property<FEMFunction>, Emuable {
 
 	/** Diese Methode ist eine Abkürzung für {@link #from(FEMString) FEMProxy.from(FEMString.from(id))}. */
-	public static FEMProxy from(final String id) throws NullPointerException {
+	public static FEMProxy from(String id) throws NullPointerException {
 		return FEMProxy.from(FEMString.from(id));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #from(FEMValue, FEMString) FEMProxy.from(id, id)}. */
-	public static FEMProxy from(final FEMString id) throws NullPointerException {
+	public static FEMProxy from(FEMString id) throws NullPointerException {
 		return FEMProxy.from(id, id);
 	}
 
@@ -34,29 +30,8 @@ public final class FEMProxy extends FEMFunction implements Property<FEMFunction>
 	 * @param name Name.
 	 * @return Platzhalter.
 	 * @throws NullPointerException Wenn {@code id} bzw. {@code name} {@code null} ist. */
-	public static FEMProxy from(final FEMValue id, final FEMString name) throws NullPointerException {
-		return new FEMProxy(id, name, null);
-	}
-
-	/** Dieses Feld speichert die Kennung des Platzhalters. */
-	final FEMValue id;
-
-	/** Dieses Feld speichert den Namen. */
-	final FEMString name;
-
-	/** Dieses Feld speichert die Funktion. */
-	FEMFunction target;
-
-	/** Dieser Konstruktor initialisiert den Plathhalter.
-	 *
-	 * @param id {@link #id() Kennung}.
-	 * @param name {@link #name() Name}.
-	 * @param target {@link #get() Funktion} oder {@code null}.
-	 * @throws NullPointerException Wenn {@code id} bzw. {@code name} {@code null} ist. */
-	public FEMProxy(final FEMValue id, final FEMString name, final FEMFunction target) throws NullPointerException {
-		this.id = Objects.notNull(id);
-		this.name = Objects.notNull(name);
-		this.set(target);
+	public static FEMProxy from(FEMValue id, FEMString name) throws NullPointerException {
+		return new FEMProxy(Objects.notNull(id), Objects.notNull(name));
 	}
 
 	/** Diese Methode gibt die Kennung des Platzhalters zurück. Diese Kennung wird im Konstruktor initialisiert und zur Berechnung von {@link #hashCode()
@@ -87,7 +62,7 @@ public final class FEMProxy extends FEMFunction implements Property<FEMFunction>
 	 *
 	 * @param function Funktion oder {@code null}. */
 	@Override
-	public void set(final FEMFunction function) {
+	public void set(FEMFunction function) {
 		this.target = function;
 	}
 
@@ -97,7 +72,7 @@ public final class FEMProxy extends FEMFunction implements Property<FEMFunction>
 	}
 
 	@Override
-	public FEMValue invoke(final FEMFrame frame) {
+	public FEMValue invoke(FEMFrame frame) {
 		return this.target.invoke(frame);
 	}
 
@@ -108,17 +83,30 @@ public final class FEMProxy extends FEMFunction implements Property<FEMFunction>
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn die {@link #id() Kennung} dieses Platzhalters gleich der des gegebenen ist. */
 	@Override
-	public boolean equals(final Object object) {
+	public boolean equals(Object object) {
 		if (object == this) return true;
 		if (!(object instanceof FEMProxy)) return false;
-		final FEMProxy object2 = (FEMProxy)object;
-		final FEMProxy that = object2;
+		var that = (FEMProxy)object;
 		return this.id.equals(that.id);
 	}
 
 	@Override
 	public String toString() {
 		return FEMDomain.DEFAULT.printConst(this.name.toString());
+	}
+
+	/** Dieses Feld speichert die Kennung des Platzhalters. */
+	final FEMValue id;
+
+	/** Dieses Feld speichert den Namen. */
+	final FEMString name;
+
+	/** Dieses Feld speichert die Funktion. */
+	FEMFunction target;
+
+	FEMProxy(FEMValue id, FEMString name) {
+		this.id = id;
+		this.name = name;
 	}
 
 }

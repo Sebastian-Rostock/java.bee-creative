@@ -3,7 +3,7 @@ package bee.creative.fem;
 /** Diese Klasse implementiert den unveränderlichen Leerwert.
  *
  * @author Sebastian Rostock 2015. */
-public final class FEMVoid extends FEMValue {
+public final class FEMVoid implements FEMValue {
 
 	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
 	public static final int ID = 0;
@@ -20,12 +20,9 @@ public final class FEMVoid extends FEMValue {
 	 * @return Leerwert.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist. */
-	public static FEMVoid from(final String value) throws NullPointerException, IllegalArgumentException {
+	public static FEMVoid from(String value) throws NullPointerException, IllegalArgumentException {
 		if (value.equals("void")) return FEMVoid.INSTANCE;
 		throw new IllegalArgumentException();
-	}
-
-	FEMVoid() {
 	}
 
 	/** Diese Methode gibt {@code this} zurück. */
@@ -56,6 +53,9 @@ public final class FEMVoid extends FEMValue {
 	@Override
 	public String toString() {
 		return "null";
+	}
+
+	FEMVoid() {
 	}
 
 }

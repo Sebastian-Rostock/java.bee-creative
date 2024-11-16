@@ -21,7 +21,7 @@ import bee.creative.util.Comparators;
  * </p>
  *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class FEMDuration extends FEMValue implements Comparable<FEMDuration> {
+public final class FEMDuration implements FEMValue , Comparable<FEMDuration> {
 
 	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
 	public static final int ID = 8;

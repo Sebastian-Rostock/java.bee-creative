@@ -16,80 +16,12 @@ public class FEMType<GData> {
 	 * @param <GData> Typ des Werts.
 	 * @param id Identifikator für {@link #id()}.
 	 * @return {@code simple}-{@link FEMType}. */
-	public static <GData> FEMType<GData> from(final int id) {
+	public static <GData> FEMType<GData> from(int id) {
 		return new FEMType<>(id);
 	}
 
-	/** Dieses Feld speichert den Identifikator. */
-	final int id;
-
-	/** Dieser Konstruktor initialisiert den Identifikator.
-	 *
-	 * @param id Identifikator. */
-	protected FEMType(final int id) {
-		this.id = id;
-	}
-
 	/** Diese Methode gibt den Identifikator dieses Datentyps zurück. Dieser sollte über eine statische Konstante definiert werden, um Fallunterscheidungen mit
-	 * einem {@code switch}-Statement umsetzen zu können. Derzeit bekannt sind:
-	 * <table>
-	 * <tr>
-	 * <th>{@link #id()}</th>
-	 * <th>Datentyp</th>
-	 * </tr>
-	 * <tr>
-	 * <td>{@code 0}</td>
-	 * <td>{@link FEMVoid}</td>
-	 * </tr>
-	 * <tr>
-	 * <td>{@code 1}</td>
-	 * <td>{@link FEMArray}</td>
-	 * </tr>
-	 * <tr>
-	 * <td>{@code 2}</td>
-	 * <td>{@link FEMHandler}</td>
-	 * </tr>
-	 * <tr>
-	 * <td>{@code 3}</td>
-	 * <td>{@link FEMBoolean}</td>
-	 * </tr>
-	 * <tr>
-	 * <td>{@code 4}</td>
-	 * <td>{@link FEMString}</td>
-	 * </tr>
-	 * <tr>
-	 * <td>{@code 5}</td>
-	 * <td>{@link FEMBinary}</td>
-	 * </tr>
-	 * <tr>
-	 * <td>{@code 6}</td>
-	 * <td>{@link FEMInteger}</td>
-	 * </tr>
-	 * <tr>
-	 * <td>{@code 7}</td>
-	 * <td>{@link FEMDecimal}</td>
-	 * </tr>
-	 * <tr>
-	 * <td>{@code 8}</td>
-	 * <td>{@link FEMDuration}</td>
-	 * </tr>
-	 * <tr>
-	 * <td>{@code 9}</td>
-	 * <td>{@link FEMDatetime}</td>
-	 * </tr>
-	 * <tr>
-	 * <td>{@code 10}</td>
-	 * <td>{@link FEMObject}</td>
-	 * </tr>
-	 * <tr>
-	 * <td>{@code -1}</td>
-	 * <td>{@link FEMNative}</td>
-	 * </tr>
-	 * <tr>
-	 * <td>{@code -2}</td>
-	 * <td>{@link FEMVariable}</td>
-	 * </tr>
-	 * </table>
+	 * einem {@code switch}-Statement umsetzen zu können.
 	 *
 	 * @return Identifikator dieses Datentyps. */
 	public final int id() {
@@ -102,7 +34,7 @@ public class FEMType<GData> {
 	 * @see Class#isAssignableFrom(Class)
 	 * @param that Datentyp.
 	 * @return {@code true}, wenn ein {@code cast} in den gegebenen Datentyp zulässig ist. */
-	public boolean is(final FEMType<?> that) {
+	public boolean is(FEMType<?> that) {
 		return (this == that) || ((that != null) && (that.id == this.id));
 	}
 
@@ -110,7 +42,7 @@ public class FEMType<GData> {
 	 *
 	 * @see #id() */
 	@Override
-	public final int hashCode() {
+	public int hashCode() {
 		return this.id;
 	}
 
@@ -118,16 +50,26 @@ public class FEMType<GData> {
 	 *
 	 * @see #id() */
 	@Override
-	public final boolean equals(final Object object) {
+	public boolean equals(Object object) {
 		if (object == this) return true;
 		if (!(object instanceof FEMType<?>)) return false;
-		final FEMType<?> that = (FEMType<?>)object;
+		var that = (FEMType<?>)object;
 		return this.id == that.id;
 	}
 
 	@Override
 	public String toString() {
 		return Objects.toInvokeString(this, this.id);
+	}
+
+	/** Dieses Feld speichert den Identifikator. */
+	final int id;
+
+	/** Dieser Konstruktor initialisiert den Identifikator.
+	 *
+	 * @param id Identifikator. */
+	protected FEMType(int id) {
+		this.id = id;
 	}
 
 }

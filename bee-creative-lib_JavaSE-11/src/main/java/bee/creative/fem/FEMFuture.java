@@ -8,7 +8,7 @@ package bee.creative.fem;
  * Funktion werden die Verweise auf Stapelrahmen und Funktion aufgelöst.
  *
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class FEMFuture extends FEMValue {
+public final class FEMFuture implements FEMValue {
 
 	FEMFrame frame;
 

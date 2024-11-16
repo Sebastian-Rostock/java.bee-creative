@@ -6,7 +6,7 @@ import bee.creative.util.Property;
 /** Diese Klasse implementiert eine Variable als veränderlichen Verweis auf einen Wert.
  *
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class FEMVariable extends FEMValue implements Property<FEMValue> {
+public final class FEMVariable implements FEMValue, Property<FEMValue> {
 
 	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
 	public static final int ID = -2;
@@ -19,19 +19,8 @@ public final class FEMVariable extends FEMValue implements Property<FEMValue> {
 	 * @param value Initialwert.
 	 * @return {@link FEMVariable}.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-	public static FEMVariable from(final FEMValue value) throws NullPointerException {
+	public static FEMVariable from(FEMValue value) throws NullPointerException {
 		return new FEMVariable(value);
-	}
-
-	/** Dieses Feld speichert den Wert. */
-	FEMValue value;
-
-	/** Dieser Konstruktor initialisiert den Wert dieser Variablen.
-	 *
-	 * @param value initialier Wert, der z.B. als {@link FEMFuture} gegeben sein kann.
-	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-	public FEMVariable(final FEMValue value) throws NullPointerException {
-		this.set(value);
 	}
 
 	/** Diese Methode gibt den aktuellen Wert der Variable zurück, der über {@link #set(FEMValue)} geändert werden kann.
@@ -48,7 +37,7 @@ public final class FEMVariable extends FEMValue implements Property<FEMValue> {
 	 * @param value aktuellen Wert.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
 	@Override
-	public synchronized void set(final FEMValue value) throws NullPointerException {
+	public synchronized void set(FEMValue value) throws NullPointerException {
 		this.value = Objects.notNull(value);
 	}
 
@@ -66,6 +55,13 @@ public final class FEMVariable extends FEMValue implements Property<FEMValue> {
 	@Override
 	public String toString() {
 		return Objects.toInvokeString(this, this.value);
+	}
+
+	/** Dieses Feld speichert den Wert. */
+	FEMValue value;
+
+	FEMVariable(FEMValue value) throws NullPointerException {
+		this.set(value);
 	}
 
 }

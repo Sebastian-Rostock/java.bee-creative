@@ -20,7 +20,7 @@ import bee.creative.util.Iterators;
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class FEMComposite extends BaseFunction implements Emuable, Array2<FEMFunction>, UseToString {
 
-	@SuppressWarnings ("javadoc")
+	
 	public static final class FEMCompositeF extends FEMComposite {
 
 		FEMCompositeF(final FEMFunction target, final FEMFunction[] params) {
@@ -39,7 +39,7 @@ public abstract class FEMComposite extends BaseFunction implements Emuable, Arra
 
 	}
 
-	@SuppressWarnings ("javadoc")
+	
 	public static final class FEMCompositeT extends FEMComposite {
 
 		FEMCompositeT(final FEMFunction target, final FEMFunction[] params) {

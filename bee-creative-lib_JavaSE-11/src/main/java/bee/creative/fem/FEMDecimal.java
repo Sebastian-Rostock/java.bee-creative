@@ -5,7 +5,7 @@ import bee.creative.lang.Integers;
 /** Diese Klasse implementiert einen unveränderlichen Dezimalbruch. Intern wird der Dezimalbruch als {@code double} dargestellt.
  *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class FEMDecimal extends FEMValue implements Comparable<FEMDecimal> {
+public final class FEMDecimal implements FEMValue , Comparable<FEMDecimal> {
 
 	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
 	public static final int ID = 7;

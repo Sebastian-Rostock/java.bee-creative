@@ -13,23 +13,13 @@ import bee.creative.lang.Objects;
 public final class FEMBinding extends BaseFunction {
 
 	/** Diese Methode gibt diese Funktion mit Bindung an den gegebenen {@link FEMFrame Stapelrahmen} zurück.
-	 * <p>
 	 *
 	 * @see FEMBinding
 	 * @param params {@link FEMFrame Stapelrahmen} mit den zusätzlichen Parameterwerten.
 	 * @return {@link FEMFunction} mit gebundenem {@link FEMFrame Stapelrahmen}.
 	 * @throws NullPointerException Wenn {@code params} {@code null} ist. */
-	public static FEMBinding from(final FEMFunction target, final FEMFrame params) throws NullPointerException {
+	public static FEMBinding from(FEMFunction target, FEMFrame params) throws NullPointerException {
 		return new FEMBinding(Objects.notNull(target), Objects.notNull(params));
-	}
-
-	final FEMFunction target;
-
-	final FEMFrame params;
-
-	FEMBinding(final FEMFunction target, final FEMFrame params) {
-		this.target = target;
-		this.params = params;
 	}
 
 	/** Diese Methode gibt die gebundene Funktion zurück, welche mit den gebundenen zusätzlichen Parameterwerten aufgerufen wird.
@@ -47,7 +37,7 @@ public final class FEMBinding extends BaseFunction {
 	}
 
 	@Override
-	public FEMValue invoke(final FEMFrame frame) throws NullPointerException {
+	public FEMValue invoke(FEMFrame frame) throws NullPointerException {
 		return this.target.invoke(this.params.newFrame(frame.params()).withContext(frame.context()));
 	}
 
@@ -57,11 +47,20 @@ public final class FEMBinding extends BaseFunction {
 	}
 
 	@Override
-	public boolean equals(final Object object) {
+	public boolean equals(Object object) {
 		if (object == this) return true;
 		if (!(object instanceof FEMBinding)) return false;
-		final FEMBinding that = (FEMBinding)object;
+		var that = (FEMBinding)object;
 		return Objects.equals(this.params, that.params) && Objects.equals(this.target, that.target);
+	}
+
+	final FEMFunction target;
+
+	final FEMFrame params;
+
+	FEMBinding(FEMFunction target, FEMFrame params) {
+		this.target = target;
+		this.params = params;
 	}
 
 }

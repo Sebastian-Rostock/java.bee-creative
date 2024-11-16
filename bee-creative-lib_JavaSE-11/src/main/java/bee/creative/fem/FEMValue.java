@@ -2,8 +2,8 @@ package bee.creative.fem;
 
 import bee.creative.lang.Objects;
 
-/** Diese Klasse implementiert einen abstrakten Wert, der als Ergebnis der {@link FEMFunction#invoke(FEMFrame) Auswertung} einer {@link FEMFunction Funktion}
- * oder als {@link FEMFrame#get(int) Parameterwert} in einem {@link FEMFrame Stapelrahmen} zur Auswertung einer Funktion verwendet werden kann.
+/** Diese Schnittstelle definiert einen Wert, der als Ergebnis der {@link FEMFunction#invoke(FEMFrame) Auswertung} einer {@link FEMFunction Funktion} oder als
+ * {@link FEMFrame#get(int) Parameterwert} in einem {@link FEMFrame Stapelrahmen} zur Auswertung einer Funktion verwendet werden kann.
  * <p>
  * Ein solcher Wert besitzt dazu {@link FEMValue#data() Nutzdaten} mit einem bestimmten {@link FEMValue#type() Datentyp}. Die Konvertierung der Nutzdaten in
  * einen gegebenen Datentyp {@code type} kann im Rahmen eines gegebenen {@link FEMContext Kontextobjekts} {@code context} über den Befehl
@@ -12,22 +12,24 @@ import bee.creative.lang.Objects;
  * Die Methode {@link #invoke(FEMFrame)} des Werts liefert {@code this}, sodass ein Wert direkt als Parameterfunktion eingesetzt werden kann.
  *
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public abstract class FEMValue extends FEMFunction {
+public interface FEMValue extends FEMFunction {
 
 	/** Diese Methode gibt den Datentyp der {@link #data() Nutzdaten} zurück.
 	 *
 	 * @return Datentyp. */
-	public abstract FEMType<?> type();
+	FEMType<?> type();
 
 	/** Diese Methode gibt die Nutzdaten zurück.
 	 *
 	 * @return Nutzdaten. */
-	public abstract Object data();
+	default Object data() {
+		return this;
+	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #result(boolean) result(false)}.
 	 *
 	 * @return ausgewerteter Ergebniswert. */
-	public final FEMValue result() {
+	default FEMValue result() {
 		return this.result(false);
 	}
 
@@ -40,34 +42,34 @@ public abstract class FEMValue extends FEMFunction {
 	 * @see FEMFrame#get(int)
 	 * @see FEMFunction#invoke(FEMFrame)
 	 * @return ausgewerteter Ergebniswert. */
-	public FEMValue result(final boolean deep) {
+	default FEMValue result(boolean deep) {
 		return this;
 	}
 
 	@Override
-	public final FEMValue invoke(final FEMFrame frame) throws NullPointerException {
+	default FEMValue invoke(FEMFrame frame) throws NullPointerException {
 		Objects.notNull(frame);
 		return this;
 	}
 
 	@Override
-	public FEMFunction compose(final FEMFunction... params) throws NullPointerException {
+	default FEMFunction compose(FEMFunction... params) throws NullPointerException {
 		Objects.notNull(params);
 		return this;
 	}
 
 	@Override
-	public final FEMValue toValue() {
+	default FEMValue toValue() {
 		return this;
 	}
 
 	@Override
-	public final FEMFunction toFuture() {
+	default FEMFunction toFuture() {
 		return this;
 	}
 
 	@Override
-	public final FEMValue toFuture(final FEMFrame frame) throws NullPointerException {
+	default FEMValue toFuture(FEMFrame frame) throws NullPointerException {
 		Objects.notNull(frame);
 		return this;
 	}
@@ -77,7 +79,7 @@ public abstract class FEMValue extends FEMFunction {
 	 *
 	 * @see FEMHandler
 	 * @return Funktion des Werts. */
-	public FEMFunction toFunction() { // DONE
+	default FEMFunction toFunction() {
 		return this;
 	}
 

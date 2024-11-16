@@ -31,7 +31,7 @@ import bee.creative.util.Iterables;
  * </p>
  *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public abstract class FEMString extends FEMValue implements Iterable<Integer>, Comparable<FEMString>, UseToString {
+public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparable<FEMString>, UseToString {
 
 	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
 	public static final int ID = 4;

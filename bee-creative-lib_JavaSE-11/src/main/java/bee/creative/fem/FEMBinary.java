@@ -18,7 +18,7 @@ import bee.creative.util.Iterables;
 /** Diese Klasse implementiert eine unveränderliche Bytefolge sowie Methoden zur Erzeugung solcher Bytefolgen aus nativen Arrays.
  *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comparable<FEMBinary>, UseToString {
+public abstract class FEMBinary implements FEMValue , Iterable<Byte>, Comparable<FEMBinary>, UseToString {
 
 	/** Diese Schnittstelle definiert ein Objekt zum geordneten Sammeln von Bytes einer Bytefolge in der Methode {@link FEMBinary#extract(Collector)}. */
 	public static interface Collector {
@@ -171,7 +171,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 
 	}
 
-	@SuppressWarnings ("javadoc")
+	
 	public static class IntegerBinaryBE extends FEMBinary {
 
 		public final long value;
@@ -198,7 +198,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 
 	}
 
-	@SuppressWarnings ("javadoc")
+	
 	public static class IntegerBinaryLE extends FEMBinary {
 
 		public final long value;
@@ -250,7 +250,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 
 	}
 
-	@SuppressWarnings ("javadoc")
+	
 	public static class ConcatBinary extends HashBinary implements Emuable {
 
 		static int size(FEMBinary array) {
@@ -327,7 +327,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 
 	}
 
-	@SuppressWarnings ("javadoc")
+	
 	public static class ConcatBinary1 extends ConcatBinary {
 
 		ConcatBinary1(final FEMBinary binary1, final FEMBinary binary2) throws IllegalArgumentException {
@@ -336,7 +336,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 
 	}
 
-	@SuppressWarnings ("javadoc")
+	
 	public static class ConcatBinary2 extends ConcatBinary {
 
 		ConcatBinary2(final FEMBinary binary1, final FEMBinary binary2) throws IllegalArgumentException {
@@ -345,7 +345,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 
 	}
 
-	@SuppressWarnings ("javadoc")
+	
 	public static class SectionBinary extends HashBinary implements Emuable {
 
 		public final FEMBinary binary;
@@ -386,7 +386,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 
 	}
 
-	@SuppressWarnings ("javadoc")
+	
 	public static class ReverseBinary extends HashBinary implements Emuable {
 
 		public final FEMBinary binary;
@@ -434,7 +434,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 
 	}
 
-	@SuppressWarnings ("javadoc")
+	
 	public static class UniformBinary extends HashBinary {
 
 		public final byte value;
@@ -490,7 +490,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 
 	}
 
-	@SuppressWarnings ("javadoc")
+	
 	public static class CompactBinary extends HashBinary implements Emuable {
 
 		/** Dieses Feld speichert das Array der Bytes, das nicht verändert werden sollte. */

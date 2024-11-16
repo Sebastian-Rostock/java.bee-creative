@@ -1,11 +1,10 @@
 package bee.creative.fem;
 
-import bee.creative.lang.Natives;
 import bee.creative.lang.Objects;
 import bee.creative.util.Iterables;
 
-/** Diese Klasse implementiert eine abstrakte Funktion, deren {@link #invoke(FEMFrame) Berechnungsmethode} mit einem {@link FEMFrame Stapelrahmen} aufgerufen
- * werden kann, um einen Ergebniswert zu ermitteln. Aus den {@link FEMFrame#params() Parameterwerten} sowie dem {@link FEMFrame#context() Kontextobjekt} der
+/** Diese Schnittstelle definiert eine Funktion, deren {@link #invoke(FEMFrame) Berechnungsmethode} mit einem {@link FEMFrame Stapelrahmen} aufgerufen werden
+ * kann, um einen Ergebniswert zu ermitteln. Aus den {@link FEMFrame#params() Parameterwerten} sowie dem {@link FEMFrame#context() Kontextobjekt} der
  * Stapelrahmens können hierbei Informationen für die Berechnungen extrahiert werden. Der Zustand des Kontextobjekts kann auch modifiziert werden.
  * <p>
  * Als {@link #toString() Textdarstellung} wird der {@link Class#getSimpleName() Klassenname} verwendet.
@@ -13,127 +12,17 @@ import bee.creative.util.Iterables;
  * @see FEMValue
  * @see FEMFrame
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public abstract class FEMFunction {
-
-	@SuppressWarnings ("javadoc")
-	public static abstract class BaseFunction extends FEMFunction {
-
-		@Override
-		public String toString() {
-			return FEMDomain.DEFAULT.printScript(this);
-		}
-
-	}
-
-	@SuppressWarnings ("javadoc")
-	public static final class TraceFunction extends BaseFunction {
-
-		final FEMTracer tracer;
-
-		final FEMFunction target;
-
-		TraceFunction(final FEMTracer tracer, final FEMFunction target) throws NullPointerException {
-			this.tracer = Objects.notNull(tracer);
-			this.target = target;
-		}
-
-		public FEMTracer tracer() {
-			return this.tracer;
-		}
-
-		public FEMFunction target() {
-			return this.target;
-		}
-
-		@Override
-		public FEMValue invoke(final FEMFrame frame) {
-			try {
-				final FEMTracer.Listener helper = this.tracer.getListener();
-				helper.onInvoke(this.tracer.useFrame(frame).useFunction(this.target));
-				try {
-					helper.onReturn(this.tracer.useResult(this.tracer.getFunction().invoke(this.tracer.getFrame())));
-					return this.tracer.getResult();
-				} catch (final RuntimeException exception) {
-					helper.onThrow(this.tracer.useException(exception));
-					throw this.tracer.getException();
-				}
-			} finally {
-				this.tracer.clear();
-			}
-		}
-
-		@Override
-		public FEMFunction trace(final FEMTracer tracer) throws NullPointerException {
-			return this.target.trace(tracer);
-		}
-
-		@Override
-		public int hashCode() {
-			return Objects.hashPush(Objects.hash(this.target), 1237);
-		}
-
-		@Override
-		public boolean equals(final Object object) {
-			if (object == this) return true;
-			if (!(object instanceof TraceFunction)) return false;
-			final TraceFunction that = (TraceFunction)object;
-			return this.target.equals(that.target);
-		}
-
-	}
-
-	@SuppressWarnings ("javadoc")
-	public static final class FutureFunction extends BaseFunction {
-
-		final FEMFunction target;
-
-		FutureFunction(final FEMFunction function) {
-			this.target = function;
-		}
-
-		public FEMFunction target() {
-			return this.target;
-		}
-
-		@Override
-		public FEMValue invoke(final FEMFrame frame) {
-			return this.toFuture(frame);
-		}
-
-		@Override
-		public FEMFunction trace(final FEMTracer tracer) throws NullPointerException {
-			return this.target.trace(tracer).toFuture();
-		}
-
-		@Override
-		public int hashCode() {
-			return Objects.hashPush(Objects.hash(this.target), 1271);
-		}
-
-		@Override
-		public boolean equals(final Object object) {
-			if (object == this) return true;
-			if (!(object instanceof FutureFunction)) return false;
-			final FutureFunction data = (FutureFunction)object;
-			return this.target.equals(data.target);
-		}
-
-		@Override
-		public FEMFunction toFuture() {
-			return this;
-		}
-
-	}
+public interface FEMFunction {
 
 	/** Dieses Feld speichert die leere Parameterliste. */
-	public static final FEMFunction[] PARAMS = new FEMFunction[0];
+	FEMFunction[] PARAMS = new FEMFunction[0];
 
 	/** Diese Methode führt Berechnungen mit dem gegebenen Stapelrahmen durch und gibt den ermittelten Ergebniswert zurück.
 	 *
 	 * @param frame Stapelrahmen.u
 	 * @return Ergebniswert.
 	 * @throws NullPointerException Wenn {@code frame} {@code null} ist. */
-	public abstract FEMValue invoke(FEMFrame frame) throws NullPointerException;
+	FEMValue invoke(FEMFrame frame) throws NullPointerException;
 
 	/** Diese Methode gibt eine komponierte Funktion zurück, welche diese Funktion mit den gegebenen Parameterfunktionen aufruft.
 	 * <p>
@@ -149,14 +38,14 @@ public abstract class FEMFunction {
 	 * @param params Parameterfunktionen.
 	 * @return komponierte Funktion.
 	 * @throws NullPointerException Wenn {@code params} {@code null} ist. */
-	public FEMFunction compose(final FEMFunction... params) throws NullPointerException {
+	default FEMFunction compose(FEMFunction... params) throws NullPointerException {
 		return FEMComposite.from(false, this, params.clone());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #compose(FEMFunction...) this.compose(Iterables.toArray(FEMFunction.PARAMS, params))}.
 	 *
 	 * @see Iterables#toArray(Iterable, Object[]) */
-	public final FEMFunction compose(final Iterable<? extends FEMFunction> params) throws NullPointerException {
+	default FEMFunction compose(Iterable<? extends FEMFunction> params) throws NullPointerException {
 		return this.compose(Iterables.toArray(params, FEMFunction.PARAMS));
 	}
 
@@ -181,7 +70,7 @@ public abstract class FEMFunction {
 	 * @param tracer {@link FEMTracer}.
 	 * @return Funktion.
 	 * @throws NullPointerException Wenn {@code tracer} {@code null} ist. */
-	public FEMFunction trace(final FEMTracer tracer) throws NullPointerException {
+	default FEMFunction trace(FEMTracer tracer) throws NullPointerException {
 		return new TraceFunction(tracer, this);
 	}
 
@@ -189,7 +78,7 @@ public abstract class FEMFunction {
 	 * {@link FEMHandler Funktionszeiger} auf sich selbst.
 	 *
 	 * @return Wert. */
-	public FEMValue toValue() {
+	default FEMValue toValue() {
 		return new FEMHandler(this);
 	}
 
@@ -198,7 +87,7 @@ public abstract class FEMFunction {
 	 *
 	 * @see FutureFunction
 	 * @return {@link FEMFuture}-Funktion. */
-	public FEMFunction toFuture() {
+	default FEMFunction toFuture() {
 		return new FutureFunction(this);
 	}
 
@@ -208,13 +97,115 @@ public abstract class FEMFunction {
 	 * @param frame Stapelrahmen.
 	 * @return Ergebniswert ggf. als {@link FEMFuture}.
 	 * @throws NullPointerException Wenn {@code frame} {@code null} ist. */
-	public FEMValue toFuture(final FEMFrame frame) throws NullPointerException {
+	default FEMValue toFuture(FEMFrame frame) throws NullPointerException {
 		return new FEMFuture(Objects.notNull(frame), this);
 	}
 
-	@Override
-	public String toString() {
-		return Natives.printClass(this.getClass());
+	public static abstract class BaseFunction implements FEMFunction {
+
+		@Override
+		public String toString() {
+			return FEMDomain.DEFAULT.printScript(this);
+		}
+
+	}
+
+	public static final class TraceFunction extends BaseFunction {
+
+		public FEMTracer tracer() {
+			return this.tracer;
+		}
+
+		public FEMFunction target() {
+			return this.target;
+		}
+
+		@Override
+		public FEMValue invoke(FEMFrame frame) {
+			try {
+				var listener = this.tracer.getListener();
+				listener.onInvoke(this.tracer.useFrame(frame).useFunction(this.target));
+				try {
+					listener.onReturn(this.tracer.useResult(this.tracer.getFunction().invoke(this.tracer.getFrame())));
+					return this.tracer.getResult();
+				} catch (RuntimeException exception) {
+					listener.onThrow(this.tracer.useException(exception));
+					throw this.tracer.getException();
+				}
+			} finally {
+				this.tracer.clear();
+			}
+		}
+
+		@Override
+		public FEMFunction trace(FEMTracer tracer) throws NullPointerException {
+			return this.target.trace(tracer);
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hashPush(Objects.hash(this.target), 1237);
+		}
+
+		@Override
+		public boolean equals(Object object) {
+			if (object == this) return true;
+			if (!(object instanceof TraceFunction)) return false;
+			var that = (TraceFunction)object;
+			return this.target.equals(that.target);
+		}
+
+		final FEMTracer tracer;
+
+		final FEMFunction target;
+
+		TraceFunction(FEMTracer tracer, FEMFunction target) throws NullPointerException {
+			this.tracer = Objects.notNull(tracer);
+			this.target = target;
+		}
+
+	}
+
+	public static final class FutureFunction extends BaseFunction {
+
+		public FEMFunction target() {
+			return this.target;
+		}
+
+		@Override
+		public FEMValue invoke(FEMFrame frame) {
+			return this.toFuture(frame);
+		}
+
+		@Override
+		public FEMFunction trace(FEMTracer tracer) throws NullPointerException {
+			return this.target.trace(tracer).toFuture();
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hashPush(Objects.hash(this.target), 1271);
+		}
+
+		@Override
+		public boolean equals(Object object) {
+			if (object == this) return true;
+			if (!(object instanceof FutureFunction)) return false;
+			var that = (FutureFunction)object;
+			return this.target.equals(that.target);
+		}
+
+		@Override
+		public FEMFunction toFuture() {
+			return this;
+		}
+
+		final FEMFunction target;
+
+		FutureFunction(FEMFunction function) {
+			this.target = function;
+		}
+
 	}
 
 }

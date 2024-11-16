@@ -5,7 +5,7 @@ package bee.creative.fem;
  * @see #index()
  * @see #invoke(FEMFrame)
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class FEMParam extends FEMFunction {
+public final class FEMParam implements FEMFunction {
 
 	/** Dieses Feld speichert die projezierenden Funktionen für die Indizes {@code 0..15}. */
 	static final FEMParam[] CACHE = { //

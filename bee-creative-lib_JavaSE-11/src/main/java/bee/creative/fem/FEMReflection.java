@@ -34,191 +34,14 @@ import bee.creative.lang.Objects;
  * <p>
  *
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public abstract class FEMReflection extends FEMFunction {
-
-	@SuppressWarnings ("javadoc")
-	public static final class StaticField extends FEMReflection {
-
-		public final Field field;
-
-		StaticField(final Field field) {
-			this.field = field;
-		}
-
-		@Override
-		public final FEMValue invoke(final FEMFrame frame) {
-			try {
-				switch (frame.size()) {
-					case 0:
-						final Object getValue = this.field.get(null);
-						return new FEMNative(getValue);
-					case 1:
-						final Object setValue = frame.get(0).data();
-						this.field.set(null, setValue);
-						return FEMNative.NULL;
-				}
-				throw new IllegalArgumentException();
-			} catch (final Exception cause) {
-				throw FEMException.from(cause).useContext(frame.context()).push(this.toString());
-			}
-		}
-
-		@Override
-		public final Field member() {
-			return this.field;
-		}
-
-		@Override
-		public final String toString() {
-			return Natives.printField(this.field);
-		}
-
-	}
-
-	@SuppressWarnings ("javadoc")
-	public static final class StaticMethod extends FEMReflection {
-
-		public final Method method;
-
-		StaticMethod(final Method method) {
-			this.method = method;
-		}
-
-		@Override
-		public final FEMValue invoke(final FEMFrame frame) {
-			try {
-				final Object[] params = FEMReflection.params(frame, false);
-				final Object result = this.method.invoke(null, params);
-				return new FEMNative(result);
-			} catch (final Exception cause) {
-				throw FEMException.from(cause).useContext(frame.context()).push(this.toString());
-			}
-		}
-
-		@Override
-		public final Method member() {
-			return this.method;
-		}
-
-		@Override
-		public final String toString() {
-			return Natives.printMethod(this.method);
-		}
-
-	}
-
-	@SuppressWarnings ("javadoc")
-	public static final class StaticConstructor extends FEMReflection {
-
-		public final Constructor<?> constructor;
-
-		StaticConstructor(final Constructor<?> constructor) {
-			this.constructor = constructor;
-		}
-
-		@Override
-		public final FEMValue invoke(final FEMFrame frame) {
-			try {
-				final Object[] params = FEMReflection.params(frame, false);
-				final Object result = this.constructor.newInstance(params);
-				return new FEMNative(result);
-			} catch (final Exception cause) {
-				throw FEMException.from(cause).useContext(frame.context()).push(this.toString());
-			}
-		}
-
-		@Override
-		public final Constructor<?> member() {
-			return this.constructor;
-		}
-
-		@Override
-		public final String toString() {
-			return Natives.printConstructor(this.constructor);
-		}
-
-	}
-
-	@SuppressWarnings ("javadoc")
-	public static final class InstanceField extends FEMReflection {
-
-		public final Field field;
-
-		InstanceField(final Field field) {
-			this.field = field;
-		}
-
-		@Override
-		public final FEMValue invoke(final FEMFrame frame) {
-			try {
-				switch (frame.size()) {
-					case 1:
-						final Object getInput = frame.get(0).data();
-						final Object getValue = this.field.get(getInput);
-						return new FEMNative(getValue);
-					case 2:
-						final Object setInput = frame.get(0).data();
-						final Object setValue = frame.get(1).data();
-						this.field.set(setInput, setValue);
-						return FEMNative.NULL;
-				}
-				throw new IllegalArgumentException();
-			} catch (final Exception cause) {
-				throw FEMException.from(cause).useContext(frame.context()).push(this.toString());
-			}
-		}
-
-		@Override
-		public final Field member() {
-			return this.field;
-		}
-
-		@Override
-		public final String toString() {
-			return Natives.printField(this.field);
-		}
-
-	}
-
-	@SuppressWarnings ("javadoc")
-	public static final class InstanceMethod extends FEMReflection {
-
-		public final Method method;
-
-		InstanceMethod(final Method method) {
-			this.method = method;
-		}
-
-		@Override
-		public final FEMValue invoke(final FEMFrame frame) {
-			try {
-				final Object[] params = FEMReflection.params(frame, true);
-				final Object input = frame.get(0).data();
-				final Object result = this.method.invoke(input, params);
-				return new FEMNative(result);
-			} catch (final Exception cause) {
-				throw FEMException.from(cause).useContext(frame.context()).push(this.toString());
-			}
-		}
-
-		@Override
-		public final Method member() {
-			return this.method;
-		}
-
-		@Override
-		public final String toString() {
-			return Natives.printMethod(this.method);
-		}
-
-	}
+public abstract class FEMReflection implements FEMFunction {
 
 	/** Diese Methode gibt eine Funktion zurück, mit welcher der Wert des gegebenen Datenfelds gelesen sowie geschrieben werden kann.
 	 *
 	 * @param field Datenfeld.
 	 * @return Funktion zum gegebenen Datenfeld.
 	 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
-	public static FEMReflection from(final Field field) throws NullPointerException {
+	public static FEMReflection from(Field field) throws NullPointerException {
 		return Modifier.isStatic(field.getModifiers()) ? new StaticField(field) : new InstanceField(field);
 	}
 
@@ -234,8 +57,8 @@ public abstract class FEMReflection extends FEMFunction {
 	 * @return {@link FEMReflection}.
 	 * @throws NullPointerException Wenn {@link Natives#parse(String)} eine entsprechende Ausnahme auslöst.
 	 * @throws IllegalArgumentException Wenn {@link Natives#parse(String)} eine entsprechende Ausnahme auslöst. */
-	public static FEMFunction from(final String memberPath) throws NullPointerException, IllegalArgumentException {
-		final Object object = Natives.parse(memberPath);
+	public static FEMFunction from(String memberPath) throws NullPointerException, IllegalArgumentException {
+		var object = Natives.parse(memberPath);
 		if (object instanceof Class<?>) return new FEMNative(object);
 		if (object instanceof Constructor<?>) return FEMReflection.from((Constructor<?>)object);
 		if (object instanceof Method) return FEMReflection.from((Method)object);
@@ -247,7 +70,7 @@ public abstract class FEMReflection extends FEMFunction {
 	 * @param method Methode.
 	 * @return Funktion zur gegebenen Methode.
 	 * @throws NullPointerException Wenn {@code method} {@code null} ist. */
-	public static FEMReflection from(final Method method) throws NullPointerException {
+	public static FEMReflection from(Method method) throws NullPointerException {
 		return Modifier.isStatic(method.getModifiers()) ? new StaticMethod(method) : new InstanceMethod(method);
 	}
 
@@ -256,17 +79,8 @@ public abstract class FEMReflection extends FEMFunction {
 	 * @param constructor Konstruktor.
 	 * @return Funktion zum gegebenen Konstruktor.
 	 * @throws NullPointerException Wenn {@code constructor} {@code null} ist. */
-	public static FEMReflection from(final Constructor<?> constructor) throws NullPointerException {
+	public static FEMReflection from(Constructor<?> constructor) throws NullPointerException {
 		return new StaticConstructor(Objects.notNull(constructor));
-	}
-
-	static Object[] params(final FEMFrame frame, final boolean skipFirst) {
-		final int offset = skipFirst ? 1 : 0, length = frame.size() - offset;
-		final Object[] result = new Object[length];
-		for (int i = 0; i < length; i++) {
-			result[i] = frame.get(i + offset).data();
-		}
-		return result;
 	}
 
 	/** Diese Methode gibt den {@link Member} zurück, auf den sich die Methode {@link #invoke(FEMFrame)} bezieht.
@@ -308,11 +122,199 @@ public abstract class FEMReflection extends FEMFunction {
 	}
 
 	@Override
-	public final boolean equals(final Object object) {
+	public final boolean equals(Object object) {
 		if (object == this) return true;
 		if (!(object instanceof FEMReflection)) return false;
-		final FEMReflection that = (FEMReflection)object;
+		var that = (FEMReflection)object;
 		return this.member().equals(that.member());
+	}
+
+	public static final class StaticField extends FEMReflection {
+
+		public final Field field;
+
+		@Override
+		public FEMValue invoke(FEMFrame frame) {
+			try {
+				switch (frame.size()) {
+					case 0: {
+						var getValue = this.field.get(null);
+						return new FEMNative(getValue);
+					}
+					case 1: {
+						var setValue = frame.get(0).data();
+						this.field.set(null, setValue);
+						return FEMNative.NULL;
+					}
+					default:
+						throw new IllegalArgumentException();
+				}
+			} catch (Exception cause) {
+				throw FEMException.from(cause).useContext(frame.context()).push(this.toString());
+			}
+		}
+
+		@Override
+		public Field member() {
+			return this.field;
+		}
+
+		@Override
+		public String toString() {
+			return Natives.printField(this.field);
+		}
+
+		StaticField(final Field field) {
+			this.field = field;
+		}
+
+	}
+
+	public static final class StaticMethod extends FEMReflection {
+
+		public final Method method;
+
+		@Override
+		public FEMValue invoke(FEMFrame frame) {
+			try {
+				var params = FEMReflection.params(frame, false);
+				var result = this.method.invoke(null, params);
+				return new FEMNative(result);
+			} catch (Exception cause) {
+				throw FEMException.from(cause).useContext(frame.context()).push(this.toString());
+			}
+		}
+
+		@Override
+		public Method member() {
+			return this.method;
+		}
+
+		@Override
+		public String toString() {
+			return Natives.printMethod(this.method);
+		}
+
+		StaticMethod(Method method) {
+			this.method = method;
+		}
+
+	}
+
+	public static final class StaticConstructor extends FEMReflection {
+
+		public final Constructor<?> constructor;
+
+		@Override
+		public FEMValue invoke(FEMFrame frame) {
+			try {
+				var params = FEMReflection.params(frame, false);
+				var result = this.constructor.newInstance(params);
+				return new FEMNative(result);
+			} catch (final Exception cause) {
+				throw FEMException.from(cause).useContext(frame.context()).push(this.toString());
+			}
+		}
+
+		@Override
+		public Constructor<?> member() {
+			return this.constructor;
+		}
+
+		@Override
+		public String toString() {
+			return Natives.printConstructor(this.constructor);
+		}
+
+		StaticConstructor(Constructor<?> constructor) {
+			this.constructor = constructor;
+		}
+
+	}
+
+	public static final class InstanceField extends FEMReflection {
+
+		public final Field field;
+
+		@Override
+		public FEMValue invoke(FEMFrame frame) {
+			try {
+				switch (frame.size()) {
+					case 1: {
+						var getInput = frame.get(0).data();
+						var getValue = this.field.get(getInput);
+						return new FEMNative(getValue);
+					}
+					case 2: {
+						var setInput = frame.get(0).data();
+						var setValue = frame.get(1).data();
+						this.field.set(setInput, setValue);
+						return FEMNative.NULL;
+					}
+					default:
+						throw new IllegalArgumentException();
+				}
+			} catch (Exception cause) {
+				throw FEMException.from(cause).useContext(frame.context()).push(this.toString());
+			}
+		}
+
+		@Override
+		public Field member() {
+			return this.field;
+		}
+
+		@Override
+		public String toString() {
+			return Natives.printField(this.field);
+		}
+
+		InstanceField(Field field) {
+			this.field = field;
+		}
+
+	}
+
+	public static final class InstanceMethod extends FEMReflection {
+
+		public final Method method;
+
+		@Override
+		public FEMValue invoke(FEMFrame frame) {
+			try {
+				var params = FEMReflection.params(frame, true);
+				var input = frame.get(0).data();
+				var result = this.method.invoke(input, params);
+				return new FEMNative(result);
+			} catch (Exception cause) {
+				throw FEMException.from(cause).useContext(frame.context()).push(this.toString());
+			}
+		}
+
+		@Override
+		public Method member() {
+			return this.method;
+		}
+
+		@Override
+		public String toString() {
+			return Natives.printMethod(this.method);
+		}
+
+		InstanceMethod(Method method) {
+			this.method = method;
+		}
+
+	}
+
+	static Object[] params(FEMFrame frame, boolean skipFirst) {
+		var offset = skipFirst ? 1 : 0;
+		var length = frame.size() - offset;
+		var result = new Object[length];
+		for (var i = 0; i < length; i++) {
+			result[i] = frame.get(i + offset).data();
+		}
+		return result;
 	}
 
 }
