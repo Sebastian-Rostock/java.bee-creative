@@ -1065,7 +1065,7 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 
 	/** Diese Methode gibt den im gegebenen Speicherbereich ({@code value: double}) enthaltenen Dezimalbruch zurück. */
 	protected FEMDecimal getDecimalByAddr(final long addr) throws IllegalArgumentException {
-		return new FEMDecimal(Double.longBitsToDouble(this.buffer.getLong(addr)));
+		return FEMDecimal.from(Double.longBitsToDouble(this.buffer.getLong(addr)));
 	}
 
 	/** Diese Methode fügt den gegebenen Dezimalbruch in den Puffer ein und gibt die Referenz darauf zurück. */
@@ -1271,7 +1271,7 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 
 	/** Diese Methode gibt die im gegebenen Speicherbereich ({@code targetRef: long}) enthaltene Funktionsbindung zurück. */
 	protected FEMClosure getClosureByAddr(final long addr) throws IllegalArgumentException {
-		return new FEMClosure(this.getAt(addr));
+		return FEMClosure.from(this.getAt(addr));
 	}
 
 	/** Diese Methode fügt die gegebene Funktionsbindung in den Puffer ein und gibt die Referenz darauf zurück. */
@@ -1279,7 +1279,7 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 		final var ref = this.getRef(src);
 		if (ref != 0) return ref;
 		final var addr = this.putData(8);
-		this.buffer.putLong(addr, this.put(src.target));
+		this.buffer.putLong(addr, this.put(src.target()));
 		return this.putRef(FEMBuffer.TYPE_CLOSURE_ADDR, addr);
 	}
 

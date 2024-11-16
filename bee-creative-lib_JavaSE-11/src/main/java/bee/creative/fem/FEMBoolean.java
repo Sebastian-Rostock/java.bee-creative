@@ -21,7 +21,7 @@ public final class FEMBoolean implements FEMValue, Comparable<FEMBoolean> {
 	 *
 	 * @param data Wert.
 	 * @return Wahrheitswert. */
-	public static FEMBoolean from(final boolean data) {
+	public static FEMBoolean from(boolean data) {
 		return data ? FEMBoolean.TRUE : FEMBoolean.FALSE;
 	}
 
@@ -32,7 +32,7 @@ public final class FEMBoolean implements FEMValue, Comparable<FEMBoolean> {
 	 * @param data Wert.
 	 * @return Wahrheitswert.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-	public static FEMBoolean from(final Boolean data) throws NullPointerException {
+	public static FEMBoolean from(Boolean data) throws NullPointerException {
 		return FEMBoolean.from(data.booleanValue());
 	}
 
@@ -42,20 +42,10 @@ public final class FEMBoolean implements FEMValue, Comparable<FEMBoolean> {
 	 * @return Wahrheitswert.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist. */
-	public static FEMBoolean from(final String value) throws NullPointerException, IllegalArgumentException {
+	public static FEMBoolean from(String value) throws NullPointerException, IllegalArgumentException {
 		if (value.equals("true")) return FEMBoolean.TRUE;
 		if (value.equals("false")) return FEMBoolean.FALSE;
 		throw new IllegalArgumentException();
-	}
-
-	/** Dieses Feld speichert die interne Darstellung des Wahrheitswerts. */
-	final boolean value;
-
-	/** Dieser Konstruktor initialisiert die interne Darstellung des Wahrheitswerts.
-	 *
-	 * @param value interne Darstellung des Wahrheitswerts. */
-	FEMBoolean(final boolean value) {
-		this.value = value;
 	}
 
 	/** Diese Methode gibt {@code this} zurück. */
@@ -89,7 +79,7 @@ public final class FEMBoolean implements FEMValue, Comparable<FEMBoolean> {
 			object = ((FEMValue)object).data();
 			if (!(object instanceof FEMBoolean)) return false;
 		}
-		final var that = (FEMBoolean)object;
+		var that = (FEMBoolean)object;
 		return this.value == that.value;
 	}
 
@@ -99,7 +89,7 @@ public final class FEMBoolean implements FEMValue, Comparable<FEMBoolean> {
 	 * @return Vergleichswert.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
 	@Override
-	public int compareTo(final FEMBoolean that) throws NullPointerException {
+	public int compareTo(FEMBoolean that) throws NullPointerException {
 		return Boolean.compare(this.value, that.value);
 	}
 
@@ -117,6 +107,12 @@ public final class FEMBoolean implements FEMValue, Comparable<FEMBoolean> {
 	 * @return {@link Boolean}. */
 	public Boolean toBoolean() {
 		return this.value;
+	}
+
+	private final boolean value;
+
+	private FEMBoolean(boolean value) {
+		this.value = value;
 	}
 
 }

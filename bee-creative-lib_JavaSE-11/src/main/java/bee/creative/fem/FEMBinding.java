@@ -54,11 +54,11 @@ public final class FEMBinding extends BaseFunction {
 		return Objects.equals(this.params, that.params) && Objects.equals(this.target, that.target);
 	}
 
-	final FEMFunction target;
+	private final FEMFunction target;
 
-	final FEMFrame params;
+	private final FEMFrame params;
 
-	FEMBinding(FEMFunction target, FEMFrame params) {
+	private FEMBinding(FEMFunction target, FEMFrame params) {
 		this.target = target;
 		this.params = params;
 	}

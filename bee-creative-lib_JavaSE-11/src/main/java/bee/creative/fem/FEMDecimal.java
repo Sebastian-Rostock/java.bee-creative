@@ -26,7 +26,7 @@ public final class FEMDecimal implements FEMValue, Comparable<FEMDecimal> {
 	 *
 	 * @param value Wert.
 	 * @return Dezimalbruch. */
-	public static FEMDecimal from(final double value) {
+	public static FEMDecimal from(double value) {
 		return new FEMDecimal(value);
 	}
 
@@ -35,7 +35,7 @@ public final class FEMDecimal implements FEMValue, Comparable<FEMDecimal> {
 	 * @param value Wert.
 	 * @return Dezimalbruch.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-	public static FEMDecimal from(final Number value) throws NullPointerException {
+	public static FEMDecimal from(Number value) throws NullPointerException {
 		return FEMDecimal.from(value.doubleValue());
 	}
 
@@ -48,22 +48,12 @@ public final class FEMDecimal implements FEMValue, Comparable<FEMDecimal> {
 	 * @return Dezimalbruch.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist. */
-	public static FEMDecimal from(final String value) throws NullPointerException, IllegalArgumentException {
+	public static FEMDecimal from(String value) throws NullPointerException, IllegalArgumentException {
 		try {
 			return FEMDecimal.from(Double.parseDouble(value));
-		} catch (final NumberFormatException cause) {
+		} catch (NumberFormatException cause) {
 			throw new IllegalArgumentException(cause);
 		}
-	}
-
-	/** Dieses Feld speichert die interne Darstellung des Dezimalbruchs. */
-	final double value;
-
-	/** Dieser Konstruktor initialisiert die interne Darstellung des Dezimalbruchs.
-	 *
-	 * @param value interne Darstellung des Dezimalbruchs. */
-	public FEMDecimal(final double value) {
-		this.value = value;
 	}
 
 	/** Diese Methode gibt {@code this} zurück. */
@@ -86,7 +76,7 @@ public final class FEMDecimal implements FEMValue, Comparable<FEMDecimal> {
 
 	@Override
 	public int hashCode() {
-		final var value = Double.doubleToLongBits(this.value);
+		var value = Double.doubleToLongBits(this.value);
 		return Integers.toIntL(value) ^ Integers.toIntH(value);
 	}
 
@@ -98,12 +88,12 @@ public final class FEMDecimal implements FEMValue, Comparable<FEMDecimal> {
 			object = ((FEMValue)object).data();
 			if (!(object instanceof FEMDecimal)) return false;
 		}
-		final var that = (FEMDecimal)object;
+		var that = (FEMDecimal)object;
 		return (this.value == that.value) || (Double.isNaN(this.value) && Double.isNaN(that.value));
 	}
 
 	@Override
-	public int compareTo(final FEMDecimal value) {
+	public int compareTo(FEMDecimal value) {
 		return this.compareTo(value, 0);
 	}
 
@@ -114,7 +104,7 @@ public final class FEMDecimal implements FEMValue, Comparable<FEMDecimal> {
 	 * @param undefined Rückgabewert für nicht vergleichbare Dezimalbrüche.
 	 * @return Vergleichswert oder {@code undefined}.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-	public int compareTo(final FEMDecimal that, final int undefined) throws NullPointerException {
+	public int compareTo(FEMDecimal that, int undefined) throws NullPointerException {
 		if (this.value < that.value) return -1;
 		if (this.value > that.value) return +1;
 		if (this.value == that.value) return 0;
@@ -135,6 +125,12 @@ public final class FEMDecimal implements FEMValue, Comparable<FEMDecimal> {
 	 * @return {@link Double}. */
 	public Double toNumber() {
 		return this.value;
+	}
+
+	private final double value;
+
+	private FEMDecimal(double value) {
+		this.value = value;
 	}
 
 }

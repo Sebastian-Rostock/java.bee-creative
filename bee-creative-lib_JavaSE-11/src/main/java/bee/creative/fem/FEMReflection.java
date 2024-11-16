@@ -307,7 +307,7 @@ public abstract class FEMReflection implements FEMFunction {
 
 	}
 
-	static Object[] params(FEMFrame frame, boolean skipFirst) {
+	private static Object[] params(FEMFrame frame, boolean skipFirst) {
 		var offset = skipFirst ? 1 : 0;
 		var length = frame.size() - offset;
 		var result = new Object[length];

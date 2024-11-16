@@ -46,13 +46,13 @@ public final class FEMClosure extends BaseFunction {
 	public boolean equals(Object object) {
 		if (object == this) return true;
 		if (!(object instanceof FEMClosure)) return false;
-		final var that = (FEMClosure)object;
+		  var that = (FEMClosure)object;
 		return Objects.equals(this.target, that.target);
 	}
 
-	final FEMFunction target;
+	private final FEMFunction target;
 
-	FEMClosure(FEMFunction target) {
+	private FEMClosure(FEMFunction target) {
 		this.target = target;
 	}
 

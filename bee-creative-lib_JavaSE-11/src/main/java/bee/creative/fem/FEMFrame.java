@@ -84,7 +84,7 @@ public abstract class FEMFrame implements Array2<FEMValue>, UseToString {
 	 *
 	 * @return neuer Stapelrahmen. */
 	public final FEMFrame newFrame() {
-		return new ArrayFrame(this, FEMArray.EMPTY, this.context);
+		return new ArrayFrame(this, FEMArray.EMPTY, this.context());
 	}
 
 	/** Diese Methode gibt einen neuen Stapelrahmen zurück, welcher die gegebenen {@link #params() zugesicherten Parameterwerte} besitzt, das {@link #context()
@@ -94,7 +94,7 @@ public abstract class FEMFrame implements Array2<FEMValue>, UseToString {
 	 * @return neuer Stapelrahmen.
 	 * @throws NullPointerException Wenn {@code params} {@code null} ist. */
 	public final FEMFrame newFrame(FEMArray params) throws NullPointerException {
-		return new ArrayFrame(this, params.length == 0 ? FEMArray.EMPTY : params, this.context);
+		return new ArrayFrame(this, params.length == 0 ? FEMArray.EMPTY : params, this.context());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #newFrame(FEMArray) this.newFrame(FEMArray.from(params))}.
@@ -125,7 +125,7 @@ public abstract class FEMFrame implements Array2<FEMValue>, UseToString {
 	 * @return neuer Stapelrahmen.
 	 * @throws NullPointerException Wenn {@code params} {@code null} ist. */
 	public final FEMFrame newFrame(FEMFunction[] params) throws NullPointerException {
-		return new InvokeFrame(this, params, this.context);
+		return new InvokeFrame(this, params, this.context());
 	}
 
 	/** Diese Methode gibt diesen Stapelrahmen mit den gegebenen {@link #params() zugesicherten Parameterwerten} zurück. Sie ist eine Abkürzung für
@@ -137,7 +137,7 @@ public abstract class FEMFrame implements Array2<FEMValue>, UseToString {
 	 * @return neuer Stapelrahmen.
 	 * @throws NullPointerException Wenn {@code params} {@code null} ist. */
 	public final FEMFrame withParams(FEMArray params) throws NullPointerException {
-		return new ArrayFrame(this.parent, params.length == 0 ? FEMArray.EMPTY : params, this.context);
+		return new ArrayFrame(this.parent(), params.length == 0 ? FEMArray.EMPTY : params, this.context());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #withParams(FEMArray) this.withParams(FEMArray.from(params))}.
@@ -163,7 +163,7 @@ public abstract class FEMFrame implements Array2<FEMValue>, UseToString {
 	 * @return neuer Stapelrahmen.
 	 * @throws NullPointerException Wenn {@code params} {@code null} ist. */
 	public final FEMFrame withParams(FEMFunction[] params) throws NullPointerException {
-		return new InvokeFrame(this.parent, params, this.context);
+		return new InvokeFrame(this.parent(), params, this.context());
 	}
 
 	/** Diese Methode gibt diesen Stapelrahmen ohne {@link #params() zugesicherte Parameterwerte} zurück. Sie ist eine Abkürzung für
@@ -173,7 +173,7 @@ public abstract class FEMFrame implements Array2<FEMValue>, UseToString {
 	 * @see #withContext(FEMContext)
 	 * @return neuer Stapelrahmen. */
 	public final FEMFrame withoutParams() {
-		return new ArrayFrame(this.parent, FEMArray.EMPTY, this.context);
+		return new ArrayFrame(this.parent(), FEMArray.EMPTY, this.context());
 	}
 
 	/** Diese Methode gibt diesen Stapelrahmen mit dem gegebenen {@link #context() Kontextobjekt} zurück.
@@ -212,12 +212,28 @@ public abstract class FEMFrame implements Array2<FEMValue>, UseToString {
 		return res.print();
 	}
 
-	public static class ArrayFrame extends FEMFrame {
+	/** Dieses Feld speichert die übergeordneten Parameterdaten. */
+	private final FEMFrame parent;
+
+	/** Dieses Feld speichert das Kontextobjekt. */
+	private final FEMContext context;
+
+	private FEMFrame() {
+		this.parent = this;
+		this.context = FEMContext.EMPTY;
+	}
+
+	private FEMFrame(FEMFrame parent, FEMContext context) {
+		this.parent = parent;
+		this.context = context;
+	}
+
+	private static class ArrayFrame extends FEMFrame {
 
 		@Override
 		public FEMValue get(int index) throws IndexOutOfBoundsException {
 			final var index2 = index - this.params.length;
-			return index2 >= 0 ? this.parent.get(index2) : this.params.customGet(index);
+			return index2 >= 0 ? this.parent().get(index2) : this.params.customGet(index);
 		}
 
 		@Override
@@ -237,29 +253,29 @@ public abstract class FEMFrame implements Array2<FEMValue>, UseToString {
 
 		@Override
 		public FEMFrame withContext(FEMContext context) throws NullPointerException {
-			if (this.context == context) return this;
-			return new ArrayFrame(this.parent, this.params, Objects.notNull(context));
+			if (this.context() == context) return this;
+			return new ArrayFrame(this.parent(), this.params, Objects.notNull(context));
 		}
 
-		final FEMArray params;
+		private final FEMArray params;
 
-		ArrayFrame() {
+		private ArrayFrame() {
 			this.params = FEMArray.EMPTY;
 		}
 
-		ArrayFrame(FEMFrame parent, FEMArray params, FEMContext context) {
+		private ArrayFrame(FEMFrame parent, FEMArray params, FEMContext context) {
 			super(parent, context);
 			this.params = params;
 		}
 
 	}
 
-	public static class InvokeFrame extends FEMFrame {
+	private static class InvokeFrame extends FEMFrame {
 
 		@Override
 		public FEMValue get(int index) throws IndexOutOfBoundsException {
 			final var index2 = index - this.params.length;
-			return index2 >= 0 ? this.parent.get(index2) : this.params.frameGet(index);
+			return index2 >= 0 ? this.parent().get(index2) : this.params.frameGet(index);
 		}
 
 		@Override
@@ -280,25 +296,25 @@ public abstract class FEMFrame implements Array2<FEMValue>, UseToString {
 
 		@Override
 		public FEMFrame withContext(FEMContext context) throws NullPointerException {
-			if (this.context == context) return this;
-			return new InvokeFrame(this.parent, this.params, Objects.notNull(context));
+			if (this.context() == context) return this;
+			return new InvokeFrame(this.parent(), this.params, Objects.notNull(context));
 		}
 
-		final InvokeParams params;
+		private final InvokeParams params;
 
-		InvokeFrame(FEMFrame parent, InvokeParams params, FEMContext context) {
+		private InvokeFrame(FEMFrame parent, InvokeParams params, FEMContext context) {
 			super(parent, context);
 			this.params = params;
 		}
 
-		InvokeFrame(FEMFrame parent, FEMFunction[] params, FEMContext context) {
+		private InvokeFrame(FEMFrame parent, FEMFunction[] params, FEMContext context) {
 			super(parent, context);
 			this.params = new InvokeParams(parent, params);
 		}
 
 	}
 
-	public static class InvokeParams extends HashArray {
+	private static class InvokeParams extends HashArray {
 
 		@Override
 		protected FEMValue customGet(int index) {
@@ -311,22 +327,20 @@ public abstract class FEMFrame implements Array2<FEMValue>, UseToString {
 			}
 		}
 
-		public final FEMFrame frame;
+		private final FEMFrame frame;
 
-		/** Dieses Feld speichert das Array der Parameterwerte, das nicht verändert werden darf. */
-		final FEMValue[] values;
+		private final FEMValue[] values;
 
-		/** Dieses Feld speichert das Array der Parameterfunktionen, das nicht verändert werden darf. */
-		final FEMFunction[] functions;
+		private final FEMFunction[] functions;
 
-		InvokeParams(FEMFrame frame, FEMFunction[] params) {
+		private InvokeParams(FEMFrame frame, FEMFunction[] params) {
 			super(params.length);
 			this.frame = frame;
 			this.functions = params;
 			this.values = new FEMValue[params.length];
 		}
 
-		FEMValue frameGet(int index) {
+		private FEMValue frameGet(int index) {
 			synchronized (this.values) {
 				var result = this.values[index];
 				if (result != null) return result;
@@ -336,22 +350,6 @@ public abstract class FEMFrame implements Array2<FEMValue>, UseToString {
 			}
 		}
 
-	}
-
-	/** Dieses Feld speichert die übergeordneten Parameterdaten. */
-	final FEMFrame parent;
-
-	/** Dieses Feld speichert das Kontextobjekt. */
-	final FEMContext context;
-
-	FEMFrame() {
-		this.parent = this;
-		this.context = FEMContext.EMPTY;
-	}
-
-	FEMFrame(FEMFrame parent, FEMContext context) {
-		this.parent = parent;
-		this.context = context;
 	}
 
 }

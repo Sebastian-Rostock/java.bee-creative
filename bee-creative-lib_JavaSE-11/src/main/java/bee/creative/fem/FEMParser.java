@@ -12,10 +12,6 @@ import bee.creative.util.Parser;
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class FEMParser extends Parser {
 
-	private final LinkedList<String> params = new LinkedList<>();
-
-	private final HashSet<String> proxies = new HashSet<>();
-
 	/** Dieser Konstruktor initialisiert die Eingabe.
 	 *
 	 * @param source Eingabe.
@@ -50,5 +46,9 @@ public class FEMParser extends Parser {
 	public final HashSet<String> proxies() {
 		return this.proxies;
 	}
+
+	private final LinkedList<String> params = new LinkedList<>();
+
+	private final HashSet<String> proxies = new HashSet<>();
 
 }

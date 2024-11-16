@@ -20,66 +20,19 @@ import bee.creative.util.Iterators;
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class FEMComposite extends BaseFunction implements Emuable, Array2<FEMFunction>, UseToString {
 
-	public static final class FEMCompositeF extends FEMComposite {
-
-		FEMCompositeF(final FEMFunction target, final FEMFunction[] params) {
-			super(target, params);
-		}
-
-		@Override
-		public FEMValue invoke(final FEMFrame frame) throws NullPointerException {
-			return this.target.invoke(frame.newFrame(this.params));
-		}
-
-		@Override
-		public boolean isConcat() {
-			return false;
-		}
-
-	}
-
-	public static final class FEMCompositeT extends FEMComposite {
-
-		FEMCompositeT(final FEMFunction target, final FEMFunction[] params) {
-			super(target, params);
-		}
-
-		@Override
-		public FEMValue invoke(final FEMFrame frame) throws NullPointerException {
-			return this.target.invoke(frame).toFunction().invoke(frame.newFrame(this.params));
-		}
-
-		@Override
-		public boolean isConcat() {
-			return true;
-		}
-
-	}
-
 	/** Diese Methode gibt eine neue komponierte Funktion mit den gegebenen Eigenschaften zurück.
 	 *
 	 * @param concat Verkettung.
 	 * @param target aufzurufende Funktion.
 	 * @param params Parameterfunktionen.
 	 * @return komponierte Funktion. */
-	public static FEMComposite from(final boolean concat, final FEMFunction target, final FEMFunction[] params) throws NullPointerException {
+	public static FEMComposite from(boolean concat, FEMFunction target, FEMFunction[] params) throws NullPointerException {
 		return concat ? new FEMCompositeT(target, params) : new FEMCompositeF(target, params);
-	}
-
-	int hash;
-
-	final FEMFunction target;
-
-	final FEMFunction[] params;
-
-	FEMComposite(final FEMFunction target, final FEMFunction[] params) {
-		this.target = Objects.notNull(target);
-		this.params = params.clone();
 	}
 
 	/** Diese Methode gibt den {@code index}-ten Kindabschnitt zurück. */
 	@Override
-	public final FEMFunction get(final int index) throws IndexOutOfBoundsException {
+	public final FEMFunction get(int index) throws IndexOutOfBoundsException {
 		return this.params[index];
 	}
 
@@ -116,16 +69,16 @@ public abstract class FEMComposite extends BaseFunction implements Emuable, Arra
 	}
 
 	@Override
-	public final FEMComposite trace(final FEMTracer tracer) throws NullPointerException {
-		final var params = this.params.clone();
-		for (int i = 0, size = params.length; i < size; i++) {
+	public final FEMComposite trace(FEMTracer tracer) throws NullPointerException {
+		var params = this.params.clone();
+		for (var i = 0; i < params.length; i++) {
 			params[i] = params[i].trace(tracer);
 		}
 		return FEMComposite.from(this.isConcat(), this.target.trace(tracer), params);
 	}
 
 	@Override
-	public final FEMFunction compose(final FEMFunction... params) throws NullPointerException {
+	public final FEMFunction compose(FEMFunction... params) throws NullPointerException {
 		return FEMComposite.from(true, this, params.clone());
 	}
 
@@ -138,10 +91,10 @@ public abstract class FEMComposite extends BaseFunction implements Emuable, Arra
 	}
 
 	@Override
-	public final boolean equals(final Object object) {
+	public final boolean equals(Object object) {
 		if (object == this) return true;
 		if (!(object instanceof FEMComposite)) return false;
-		final var that = (FEMComposite)object;
+		var that = (FEMComposite)object;
 		return (this.isConcat() == that.isConcat()) && (this.hashCode() == that.hashCode()) && Objects.equals(this.target, that.target)
 			&& Objects.equals(this.params, that.params);
 	}
@@ -149,6 +102,53 @@ public abstract class FEMComposite extends BaseFunction implements Emuable, Arra
 	@Override
 	public final Iterator<FEMFunction> iterator() {
 		return Iterators.fromArray(this, 0, this.size());
+	}
+
+	final FEMFunction target;
+
+	final FEMFunction[] params;
+
+	int hash;
+
+	FEMComposite(FEMFunction target, FEMFunction[] params) {
+		this.target = Objects.notNull(target);
+		this.params = params.clone();
+	}
+
+	static final class FEMCompositeF extends FEMComposite {
+
+		@Override
+		public FEMValue invoke(FEMFrame frame) throws NullPointerException {
+			return this.target.invoke(frame.newFrame(this.params));
+		}
+
+		@Override
+		public boolean isConcat() {
+			return false;
+		}
+
+		FEMCompositeF(FEMFunction target, FEMFunction[] params) {
+			super(target, params);
+		}
+
+	}
+
+	static final class FEMCompositeT extends FEMComposite {
+
+		@Override
+		public FEMValue invoke(FEMFrame frame) throws NullPointerException {
+			return this.target.invoke(frame).toFunction().invoke(frame.newFrame(this.params));
+		}
+
+		@Override
+		public boolean isConcat() {
+			return true;
+		}
+
+		FEMCompositeT(FEMFunction target, FEMFunction[] params) {
+			super(target, params);
+		}
+
 	}
 
 }

@@ -42,7 +42,7 @@ public class FEMContext extends BaseObject {
 	 * @param type Datentyp.
 	 * @return {@code dataFrom}-{@link Getter3}.
 	 * @throws NullPointerException Wenn {@code type} {@code null} ist. */
-	public <GData> Getter3<FEMValue, GData> dataFrom(final FEMType<? extends GData> type) throws NullPointerException {
+	public <GData> Getter3<FEMValue, GData> dataFrom(FEMType<? extends GData> type) throws NullPointerException {
 		Objects.notNull(type);
 		return value -> this.dataFrom(value, type);
 	}
@@ -57,10 +57,10 @@ public class FEMContext extends BaseObject {
 	 * @throws NullPointerException Wenn {@code value} bzw. {@code type} {@code null} ist.
 	 * @throws ClassCastException Wenn bei der Konvertierung ein unzulässiger {@code cast} vorkommt.
 	 * @throws IllegalArgumentException Wenn die Nutzdaten des Werts nicht konvertiert werden können. */
-	public <GData> GData dataFrom(final FEMValue value, final FEMType<GData> type) throws NullPointerException, ClassCastException, IllegalArgumentException {
+	public <GData> GData dataFrom(FEMValue value, FEMType<GData> type) throws NullPointerException, ClassCastException, IllegalArgumentException {
 		if (!value.type().is(type)) throw new IllegalArgumentException();
 		@SuppressWarnings ("unchecked")
-		final var result = (GData)value.data();
+		var result = (GData)value.data();
 		return result;
 	}
 
@@ -89,20 +89,10 @@ public class FEMContext extends BaseObject {
 	 * @return Wertliste.
 	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn das gegebene Objekt bzw. eines der Elemente nicht umgewandelt werden kann. */
-	public FEMArray arrayFrom(final Object data) throws NullPointerException, IllegalArgumentException {
+	public FEMArray arrayFrom(Object data) throws NullPointerException, IllegalArgumentException {
 		if (data instanceof FEMArray) return (FEMArray)data;
 		if (data instanceof Iterable<?>) return this.arrayFromImpl(Iterables.toArray((Iterable<?>)data));
 		return this.arrayFromImpl(data);
-	}
-
-	FEMArray arrayFromImpl(final Object data) throws NullPointerException, IllegalArgumentException {
-		final var length = Array.getLength(data);
-		if (length == 0) return FEMArray.EMPTY;
-		final var values = new FEMValue[length];
-		for (var i = 0; i < length; i++) {
-			values[i] = this.valueFrom(Array.get(data, i));
-		}
-		return FEMArray.from(values);
 	}
 
 	/** Diese Methode gibt einen {@link Getter3} zurück, der seine Eingabe {@code input} über {@link #valueFrom(Object) valueFrom(input)} in seine Ausgabe
@@ -119,7 +109,7 @@ public class FEMContext extends BaseObject {
 	 * @param object Nutzdaten.
 	 * @return Wert mit den gegebenen Nutzdaten.
 	 * @throws IllegalArgumentException Wenn kein Wert mit den gegebenen Nutzdaten erzeugt werden kann. */
-	public FEMValue valueFrom(final Object object) throws IllegalArgumentException {
+	public FEMValue valueFrom(Object object) throws IllegalArgumentException {
 		if (object == null) return FEMVoid.INSTANCE;
 		if (object instanceof FEMValue) return (FEMValue)object;
 		if (object instanceof FEMFunction) return ((FEMFunction)object).toValue();
@@ -149,7 +139,7 @@ public class FEMContext extends BaseObject {
 	 * @return Objekt
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code value} ungültig ist. */
-	public Object objectFrom(final FEMValue value) throws NullPointerException, IllegalArgumentException {
+	public Object objectFrom(FEMValue value) throws NullPointerException, IllegalArgumentException {
 		switch (value.type().id()) {
 			case FEMVoid.ID:
 				return null;
@@ -171,9 +161,19 @@ public class FEMContext extends BaseObject {
 		return value.data();
 	}
 
-	Object[] objectFromImpl(final FEMArray array) {
-		final var length = array.length();
-		final var result = new Object[length];
+	private FEMArray arrayFromImpl(Object data) throws NullPointerException, IllegalArgumentException {
+		var length = Array.getLength(data);
+		if (length == 0) return FEMArray.EMPTY;
+		var values = new FEMValue[length];
+		for (var i = 0; i < length; i++) {
+			values[i] = this.valueFrom(Array.get(data, i));
+		}
+		return FEMArray.from(values);
+	}
+
+	private Object[] objectFromImpl(FEMArray array) {
+		var length = array.length();
+		var result = new Object[length];
 		for (var i = 0; i < length; i++) {
 			result[i] = this.objectFrom(array.get(i));
 		}
