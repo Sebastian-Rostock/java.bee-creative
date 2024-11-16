@@ -137,7 +137,7 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 		protected boolean customEquals(final FEMBinary that) throws NullPointerException {
 			if (this == that) return true;
 			if (that instanceof MappedBinary) {
-				final MappedBinary that2 = (MappedBinary)that;
+				final var that2 = (MappedBinary)that;
 				if ((this.addr == that2.addr) && (this.buffer == that2.buffer)) return true;
 			}
 			return super.customEquals(that);
@@ -177,7 +177,7 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 		protected boolean customEquals(final FEMString that) throws NullPointerException {
 			if (this == that) return true;
 			if (that instanceof MappedString) {
-				final MappedString that2 = (MappedString)that;
+				final var that2 = (MappedString)that;
 				if ((this.addr == that2.addr) && (this.buffer == that2.buffer)) return true;
 			}
 			return super.customEquals(that);
@@ -494,19 +494,19 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	/** Diese Methode sucht die gegebene Funktion mit dem gegebenen Streuwert in der {@link #reusableTable} und gibt deren Referenz oder {@code 0} zurück. */
 	private long getReusableRef(final FEMFunction reusable, final int reusableHash) {
 		final int reusableLimit = this.reusableLimit, hashMask = reusableLimit - 1, reusableIndex = reusableHash & hashMask;
-		final long reusableTable = this.reusableTable;
-		final long reusableTable_headValueAddr = reusableTable + (reusableIndex * 4L);
-		int reusedIndex = this.buffer.getInt(reusableTable_headValueAddr);
+		final var reusableTable = this.reusableTable;
+		final var reusableTable_headValueAddr = reusableTable + (reusableIndex * 4L);
+		var reusedIndex = this.buffer.getInt(reusableTable_headValueAddr);
 		while (reusedIndex >= 0) {
-			final long reusableTable_hashValueAddr = reusableTable + (reusableLimit * 8L) + (reusedIndex * 4L);
-			final int valHash = this.buffer.getInt(reusableTable_hashValueAddr);
+			final var reusableTable_hashValueAddr = reusableTable + (reusableLimit * 8L) + (reusedIndex * 4L);
+			final var valHash = this.buffer.getInt(reusableTable_hashValueAddr);
 			if (reusableHash == valHash) {
-				final long reusableTable_itemValueAddr = reusableTable + (reusableLimit * 12L) + (reusedIndex * 8L);
-				final long reusedRef = this.buffer.getLong(reusableTable_itemValueAddr);
-				final FEMFunction reused = this.get(reusedRef);
+				final var reusableTable_itemValueAddr = reusableTable + (reusableLimit * 12L) + (reusedIndex * 8L);
+				final var reusedRef = this.buffer.getLong(reusableTable_itemValueAddr);
+				final var reused = this.get(reusedRef);
 				if (Objects.equals(reused, reusable)) return reusedRef;
 			}
-			final long reusableTable_nextValueAddr = reusableTable + (reusableLimit * 4L) + (reusedIndex * 4L);
+			final var reusableTable_nextValueAddr = reusableTable + (reusableLimit * 4L) + (reusedIndex * 4L);
 			reusedIndex = this.buffer.getInt(reusableTable_nextValueAddr);
 		}
 		return 0;
@@ -516,17 +516,17 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	 * äquivalente} Funktion bereits enthalten ist, wird die Referenz nicht in die Tabelle aufgenommen. Dies führt dann zu einem Speicherleck, da es mindestens
 	 * zwei äquivalente Funktionen mit unterschiedlichen Adressen gibt. */
 	private void putReusableRef(final long reusableRef) {
-		final FEMFunction reusable = this.get(reusableRef);
-		final int reusableHash = reusable.hashCode();
-		final long reusedRef = this.getReusableRef(reusable, reusableHash);
+		final var reusable = this.get(reusableRef);
+		final var reusableHash = reusable.hashCode();
+		final var reusedRef = this.getReusableRef(reusable, reusableHash);
 		if (reusedRef != 0) return;
 		this.growReusableTable();
 		final int reusableLimit = this.reusableLimit, reusableIndex = this.reusableCount, hashMask = reusableLimit - 1, headIndex = reusableHash & hashMask;
-		final long reusableTable = this.reusableTable;
-		final long reusableTable_headValueAddr = reusableTable + (headIndex * 4L);
-		final long reusableTable_nextValueAddr = reusableTable + (reusableLimit * 4L) + (reusableIndex * 4L);
-		final long reusableTable_hashValueAddr = reusableTable + (reusableLimit * 8L) + (reusableIndex * 4L);
-		final long reusableTable_itemValueAddr = reusableTable + (reusableLimit * 12L) + (reusableIndex * 8L);
+		final var reusableTable = this.reusableTable;
+		final var reusableTable_headValueAddr = reusableTable + (headIndex * 4L);
+		final var reusableTable_nextValueAddr = reusableTable + (reusableLimit * 4L) + (reusableIndex * 4L);
+		final var reusableTable_hashValueAddr = reusableTable + (reusableLimit * 8L) + (reusableIndex * 4L);
+		final var reusableTable_itemValueAddr = reusableTable + (reusableLimit * 12L) + (reusableIndex * 8L);
 		this.buffer.putInt(reusableTable_nextValueAddr, this.buffer.getInt(reusableTable_headValueAddr));
 		this.buffer.putInt(reusableTable_headValueAddr, reusableIndex);
 		this.buffer.putInt(reusableTable_hashValueAddr, reusableHash);
@@ -568,31 +568,31 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 			final int reusableLimit2 = reusableLimit * 2, hashMask = reusableLimit2 - 1;
 			if (reusableLimit2 >= 0) {
 				final long reusableTable = this.reusableTable, reusableTable2, reusableTableSize = reusableLimit * 20L;
-				final long reusableTable3 = reusableTable - reusableTableSize;
+				final var reusableTable3 = reusableTable - reusableTableSize;
 				if (this.nextAddr > reusableTable3) {
-					final long reusableTableSize2 = reusableTableSize * 2;
+					final var reusableTableSize2 = reusableTableSize * 2;
 					this.buffer.grow(reusableTable + reusableTableSize + reusableTableSize2);
 					reusableTable2 = (this.buffer.size() & -8L) - reusableTableSize2;
 				} else {
 					reusableTable2 = reusableTable3;
 				}
-				final long reusableTable_hashArrayAddr = reusableTable + (reusableLimit * 8L);
-				final long reusableTable_hashArrayAddr2 = reusableTable2 + (reusableLimit2 * 8L);
+				final var reusableTable_hashArrayAddr = reusableTable + (reusableLimit * 8L);
+				final var reusableTable_hashArrayAddr2 = reusableTable2 + (reusableLimit2 * 8L);
 				this.buffer.copy(reusableTable_hashArrayAddr2, reusableTable_hashArrayAddr, reusableCount * 4L);
-				final long reusableTable_itemArrayAddr = reusableTable + (reusableLimit * 12L);
-				final long reusableTable_itemArrayAddr2 = reusableTable2 + (reusableLimit2 * 12L);
+				final var reusableTable_itemArrayAddr = reusableTable + (reusableLimit * 12L);
+				final var reusableTable_itemArrayAddr2 = reusableTable2 + (reusableLimit2 * 12L);
 				this.buffer.copy(reusableTable_itemArrayAddr2, reusableTable_itemArrayAddr, reusableCount * 8L);
-				final int[] headValue = new int[Math.min(262144, reusableLimit2)];
+				final var headValue = new int[Math.min(262144, reusableLimit2)];
 				Arrays.fill(headValue, -1);
-				for (int reusedIndex2 = 0; reusedIndex2 < reusableLimit2; reusedIndex2 += headValue.length) {
-					final long reusableTable_headValueAddr2 = reusableTable2 + (reusedIndex2 * 4L);
+				for (var reusedIndex2 = 0; reusedIndex2 < reusableLimit2; reusedIndex2 += headValue.length) {
+					final var reusableTable_headValueAddr2 = reusableTable2 + (reusedIndex2 * 4L);
 					this.buffer.putInt(reusableTable_headValueAddr2, headValue);
 				}
-				for (int reusedIndex = 0; reusedIndex < reusableCount; reusedIndex++) {
-					final long reusableTable_hashItemAddr2 = reusableTable_hashArrayAddr2 + (reusedIndex * 4L);
+				for (var reusedIndex = 0; reusedIndex < reusableCount; reusedIndex++) {
+					final var reusableTable_hashItemAddr2 = reusableTable_hashArrayAddr2 + (reusedIndex * 4L);
 					final int reusableHash = this.buffer.getInt(reusableTable_hashItemAddr2), reusableIndex = reusableHash & hashMask;
-					final long reusableTable_headValueAddr2 = reusableTable2 + (reusableIndex * 4L);
-					final long reusableTable_nextValueAddr2 = reusableTable2 + (reusableLimit2 * 4L) + (reusedIndex * 4L);
+					final var reusableTable_headValueAddr2 = reusableTable2 + (reusableIndex * 4L);
+					final var reusableTable_nextValueAddr2 = reusableTable2 + (reusableLimit2 * 4L) + (reusedIndex * 4L);
 					this.buffer.putInt(reusableTable_nextValueAddr2, this.buffer.getInt(reusableTable_headValueAddr2));
 					this.buffer.putInt(reusableTable_headValueAddr2, reusedIndex);
 				}
@@ -618,7 +618,7 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	}
 
 	private void clearReusables() {
-		final long reusableTable = this.nextAddr;
+		final var reusableTable = this.nextAddr;
 		this.putReusableCount(0);
 		this.putReusableLimit(2);
 		this.putReusableTable(reusableTable);
@@ -630,7 +630,7 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	FEMFunction reusablesGet(final int index) {
 		synchronized (this.buffer) {
 			if ((index < 0) || (index >= this.reusableCount)) throw new IndexOutOfBoundsException();
-			final long reusableTable_itemValueAddr = this.reusableTable + (this.reusableLimit * 12L) + (index * 8L);
+			final var reusableTable_itemValueAddr = this.reusableTable + (this.reusableLimit * 12L) + (index * 8L);
 			return this.get(this.buffer.getLong(reusableTable_itemValueAddr));
 		}
 	}
@@ -697,8 +697,8 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	 * @param count Anzahl der Referenzen.
 	 * @return Funktionen. */
 	public FEMFunction[] getAllAt(final long addr, final int count) throws IllegalArgumentException {
-		final FEMFunction[] result = new FEMFunction[count];
-		for (int i = 0; i < count; i++) {
+		final var result = new FEMFunction[count];
+		for (var i = 0; i < count; i++) {
 			result[i] = this.getAt(addr + (i * 8));
 		}
 		return result;
@@ -759,10 +759,10 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	 * @throws IllegalArgumentException Wenn die Funktionen nicht angefügt werden können. */
 	public void put(final FEMProxy proxy, final FEMFunction target) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 		synchronized (this.buffer) {
-			final long ref = this.put(proxy);
+			final var ref = this.put(proxy);
 			if (this.getHead(ref) != FEMBuffer.TYPE_PROXY_ADDR) throw new IllegalStateException();
-			final long addr = this.getBody(ref);
-			this.proxyPutList.addLast(Entries.from(Long.valueOf(addr), target));
+			final var addr = this.getBody(ref);
+			this.proxyPutList.addLast(Entries.from(addr, target));
 			this.runProxyPutList();
 		}
 	}
@@ -775,9 +775,9 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	 * @throws IllegalStateException Wenn der Puffer nur zum Lesen angebunden ist.
 	 * @throws IllegalArgumentException Wenn mindestens eine der Funktionen nicht angefügt werden kann. */
 	public long[] putAll(final FEMFunction... src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
-		final int length = src.length;
-		final long[] result = new long[length];
-		for (int i = 0; i < length; i++) {
+		final var length = src.length;
+		final var result = new long[length];
+		for (var i = 0; i < length; i++) {
 			result[i] = this.put(src[i]);
 		}
 		return result;
@@ -790,7 +790,7 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	 * @param body Rumpfdaten, bspw. Adresse (58 Bit).
 	 * @return Referenz. */
 	protected long putRef(final int head, final long body) {
-		final long ref = this.getRef(head, body);
+		final var ref = this.getRef(head, body);
 		this.putReusableRef(ref);
 		return ref;
 	}
@@ -807,9 +807,9 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 			final long nextAddr = this.nextAddr, nextAddr2 = (nextAddr + size + 7) & -8L, reusableTable = this.reusableTable;
 			if (nextAddr2 < nextAddr) throw new IllegalArgumentException();
 			if (nextAddr2 > reusableTable) {
-				final long reusableTableSize = this.reusableLimit * 20L;
+				final var reusableTableSize = this.reusableLimit * 20L;
 				this.buffer.grow(nextAddr2 + reusableTableSize + reusableTableSize);
-				final long reusableTable2 = (this.buffer.size() - reusableTableSize) & -8L;
+				final var reusableTable2 = (this.buffer.size() - reusableTableSize) & -8L;
 				this.buffer.copy(reusableTable2, reusableTable, reusableTableSize);
 				this.putReusableTable(reusableTable2);
 			}
@@ -934,9 +934,9 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	/** Diese Methode fügt die gegebene Wertliste in den Puffer ein und gibt die Adresse darauf zurück. Eine über {@link FEMArray#compact(boolean)} indizierte
 	 * Wertliste wird mit der Indizierung kodiert. */
 	protected long putArrayAsRef(final FEMArray src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
-		final int length = src.length();
+		final var length = src.length();
 		if (length == 0) return this.getRef(FEMBuffer.TYPE_ARRAY_DATA, 0);
-		final FEMArray src2 = src.compact();
+		final var src2 = src.compact();
 		final long ref = this.getRef(src2), addr;
 		if (ref != 0) {
 			if (!src.isIndexed()) return ref;
@@ -950,8 +950,8 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 			this.buffer.putLong(addr + 8, this.putAll(src2.value()));
 			if (!src.isIndexed()) return this.putRef(FEMBuffer.TYPE_ARRAY_ADDR, addr);
 		}
-		final CompactArray3 src3 = (src2 instanceof CompactArray3) ? (CompactArray3)src2 : new CompactArray3(src2.value());
-		final long addr2 = this.putData(src3.table.length * 4L);
+		final var src3 = (src2 instanceof CompactArray3) ? (CompactArray3)src2 : new CompactArray3(src2.value());
+		final var addr2 = this.putData(src3.table.length * 4L);
 		this.buffer.putInt(addr2, src3.table);
 		this.buffer.putLong(addr + 8 + (length * 8L), addr2);
 		return this.putRef(FEMBuffer.TYPE_ARRAY_ADDR, addr);
@@ -983,26 +983,26 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	/** Diese Methode fügt die gegebene Zeichenkette in den Puffer ein und gibt die Adresse darauf zurück. Dazu werden die {@link FEMString#compact()
 	 * kompaktierten} Formen der Zeichenkette analysiert und entsprechend als {@code byte}, {@code short} oder {@code int}-Codepoints gespeichert. */
 	protected long putStringAsRef(final FEMString src) throws NullPointerException, IllegalStateException {
-		final int length = src.length();
+		final var length = src.length();
 		if (length == 0) return this.getRef(FEMBuffer.TYPE_STRING_DATA, 0);
-		final FEMString src2 = src.compact();
+		final var src2 = src.compact();
 		if (src2.isUniform()) return this.getRef(FEMBuffer.TYPE_STRING_DATA, Integers.toLong(src2.get(0), length));
-		final long ref = this.getRef(src2);
+		final var ref = this.getRef(src2);
 		if (ref != 0) return ref;
 		if ((src2 instanceof CompactStringINT8) || (src2 instanceof MappedStringINT8)) {
-			final long addr = this.putData(length + 8L);
+			final var addr = this.putData(length + 8L);
 			this.buffer.putInt(addr + 0, length);
 			this.buffer.putInt(addr + 4, src2.hashCode());
 			this.buffer.put(addr + 8, src2.toBytes());
 			return this.putRef(FEMBuffer.TYPE_STRING_ADDR1, addr);
 		} else if ((src2 instanceof CompactStringINT16) || (src2 instanceof MappedStringINT16)) {
-			final long addr = this.putData((length * 2L) + 8L);
+			final var addr = this.putData((length * 2L) + 8L);
 			this.buffer.putInt(addr + 0, length);
 			this.buffer.putInt(addr + 4, src2.hashCode());
 			this.buffer.putShort(addr + 8, src2.toShorts());
 			return this.putRef(FEMBuffer.TYPE_STRING_ADDR2, addr);
 		} else {
-			final long addr = this.putData((length * 4L) + 8L);
+			final var addr = this.putData((length * 4L) + 8L);
 			this.buffer.putInt(addr + 0, length);
 			this.buffer.putInt(addr + 4, src2.hashCode());
 			this.buffer.putInt(addr + 8, src2.toInts());
@@ -1022,13 +1022,13 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 
 	/** Diese Methode fügt die gegebene Bytefolge in den Puffer ein und gibt die Referenz darauf zurück. */
 	protected long putBinaryAsRef(final FEMBinary src) throws NullPointerException, IllegalStateException {
-		final int length = src.length();
+		final var length = src.length();
 		if (length == 0) return this.getRef(FEMBuffer.TYPE_BINARY_DATA, 0);
-		final FEMBinary src2 = src.compact();
+		final var src2 = src.compact();
 		if (src2.isUniform()) return this.getRef(FEMBuffer.TYPE_BINARY_DATA, Integers.toLong(src2.get(0) & 0xFF, length));
-		final long ref = this.getRef(src2);
+		final var ref = this.getRef(src2);
 		if (ref != 0) return ref;
-		final long addr = this.putData(length + 8L);
+		final var addr = this.putData(length + 8L);
 		this.buffer.putInt(addr + 0, length);
 		this.buffer.putInt(addr + 4, src2.hashCode());
 		this.buffer.put(addr + 8, src2.value());
@@ -1037,28 +1037,28 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 
 	/** Diese Methode gibt die Dezimalzahl mit den gegebenen Daten ({@code +value: 58}) zurück. */
 	protected FEMInteger getIntegerByData1(final long data) throws IllegalArgumentException {
-		return new FEMInteger(+data);
+		return FEMInteger.from(+data);
 	}
 
 	/** Diese Methode gibt die Dezimalzahl mit den gegebenen Daten ({@code -value: 58}) zurück. */
 	protected FEMInteger getIntegerByData2(final long data) throws IllegalArgumentException {
-		return new FEMInteger(-data);
+		return  FEMInteger.from(-data);
 	}
 
 	/** Diese Methode gibt die im gegebenen Speicherbereich ({@code value: long}) enthaltene Dezimalzahl zurück. */
 	protected FEMInteger getIntegerByAddr(final long addr) throws IllegalArgumentException {
-		return new FEMInteger(this.buffer.getLong(addr));
+		return FEMInteger.from(this.buffer.getLong(addr));
 	}
 
 	/** Diese Methode fügt die gegebene Dezimalzahl in den Puffer ein und gibt die Referenz darauf zurück. */
 	protected long putIntegerAsRef(final FEMInteger src) throws NullPointerException, IllegalStateException {
-		final long data1 = src.value();
+		final var data1 = src.value();
 		if (this.getBody(this.getRef(0, data1)) == data1) return this.getRef(FEMBuffer.TYPE_INTEGER_DATA1, data1);
-		final long data2 = -data1;
+		final var data2 = -data1;
 		if (this.getBody(this.getRef(0, data2)) == data2) return this.getRef(FEMBuffer.TYPE_INTEGER_DATA2, data2);
-		final long ref = this.getRef(src);
+		final var ref = this.getRef(src);
 		if (ref != 0) return ref;
-		final long addr = this.putData(8);
+		final var addr = this.putData(8);
 		this.buffer.putLong(addr, data1);
 		return this.putRef(FEMBuffer.TYPE_INTEGER_ADDR, addr);
 	}
@@ -1070,9 +1070,9 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 
 	/** Diese Methode fügt den gegebenen Dezimalbruch in den Puffer ein und gibt die Referenz darauf zurück. */
 	protected long putDecimalAsRef(final FEMDecimal src) throws NullPointerException, IllegalStateException {
-		final long ref = this.getRef(src);
+		final var ref = this.getRef(src);
 		if (ref != 0) return ref;
-		final long addr = this.putData(8);
+		final var addr = this.putData(8);
 		this.buffer.putLong(addr, Double.doubleToRawLongBits(src.value()));
 		return this.putRef(FEMBuffer.TYPE_DECIMAL_ADDR, addr);
 	}
@@ -1104,13 +1104,13 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 
 	/** Diese Methode fügt den gegebenen Zeitspanne in den Puffer ein und gibt die Referenz darauf zurück. */
 	protected long putDurationAsRef(final FEMDuration src) throws NullPointerException, IllegalStateException {
-		final long data1 = src.value();
+		final var data1 = src.value();
 		if (this.getBody(this.getRef(0, data1)) == data1) return this.getRef(FEMBuffer.TYPE_DURATION_DATA1, data1);
-		final long data2 = this.getBody(data1);
+		final var data2 = this.getBody(data1);
 		if (this.getRef(0, data2) == data1) return this.getRef(FEMBuffer.TYPE_DURATION_DATA2, data2);
-		final long ref = this.getRef(src);
+		final var ref = this.getRef(src);
 		if (ref != 0) return ref;
-		final long addr = this.putData(8);
+		final var addr = this.putData(8);
 		this.buffer.putLong(addr, data1);
 		return this.putRef(FEMBuffer.TYPE_DURATION_ADDR, addr);
 	}
@@ -1132,28 +1132,28 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 
 	/** Diese Methode fügt die gegebene Zeitangabe in den Puffer ein und gibt die Referenz darauf zurück. */
 	protected long putDatetimeAsRef(final FEMDatetime src) throws NullPointerException, IllegalStateException {
-		final long data1 = src.value();
+		final var data1 = src.value();
 		if (this.getBody(this.getRef(0, data1)) == data1) return this.getRef(FEMBuffer.TYPE_DATETIME_DATA1, data1);
-		final long data2 = this.getBody(data1);
+		final var data2 = this.getBody(data1);
 		if (this.getRef(0, data2) == data1) return this.getRef(FEMBuffer.TYPE_DATETIME_DATA2, data2);
-		final long ref = this.getRef(src);
+		final var ref = this.getRef(src);
 		if (ref != 0) return ref;
-		final long addr = this.putData(8);
+		final var addr = this.putData(8);
 		this.buffer.putLong(addr, data1);
 		return this.putRef(FEMBuffer.TYPE_DATETIME_ADDR, addr);
 	}
 
 	/** Diese Methode gibt den im gegebenen Speicherbereich ({@code functionRef: long}) enthaltenen Funktionszeiger zurück. */
 	protected FEMHandler getHandlerByAddr(final long addr) throws IllegalArgumentException {
-		return new FEMHandler(this.getAt(addr));
+		return FEMHandler.from(this.getAt(addr));
 	}
 
 	/** Diese Methode fügt den gegebenen Funktionszeiger in den Puffer ein und gibt die Referenz darauf zurück. */
 	protected long putHandlerAsRef(final FEMHandler src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
-		final long ref = this.getRef(src);
+		final var ref = this.getRef(src);
 		if (ref != 0) return ref;
-		final long addr = this.putData(8);
-		this.buffer.putLong(addr, this.put(src.value));
+		final var addr = this.putData(8);
+		this.buffer.putLong(addr, this.put(src.value()));
 		return this.putRef(FEMBuffer.TYPE_HANDLER_ADDR, addr);
 	}
 
@@ -1174,13 +1174,13 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 
 	/** Diese Methode fügt den gegebenen Objektreferenz in den Puffer ein und gibt die Referenz darauf zurück. */
 	protected long putObjectAsRef(final FEMObject src) throws NullPointerException, IllegalStateException {
-		final long data1 = src.value();
+		final var data1 = src.value();
 		if (this.getBody(this.getRef(0, data1)) == data1) return this.getRef(FEMBuffer.TYPE_OBJECT_DATA1, data1);
-		final long data2 = this.getBody(data1);
+		final var data2 = this.getBody(data1);
 		if (this.getRef(0, data2) == data1) return this.getRef(FEMBuffer.TYPE_OBJECT_DATA2, data2);
-		final long ref = this.getRef(src);
+		final var ref = this.getRef(src);
 		if (ref != 0) return ref;
-		final long addr = this.putData(8);
+		final var addr = this.putData(8);
 		this.buffer.putLong(addr, data1);
 		return this.putRef(FEMBuffer.TYPE_OBJECT_ADDR, addr);
 	}
@@ -1188,12 +1188,12 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	/** Diese Methode gibt den im gegebenen Speicherbereich ({@code idRef: long, nameRef: long, targetRef: long}) enthaltenen Platzhalter zurück. */
 	protected FEMProxy getProxyByAddr(final long addr) throws IllegalArgumentException {
 		synchronized (this.buffer) {
-			final Long addr2 = Long.valueOf(addr);
-			final FEMProxy proxy = this.proxyGetMap.get(addr2);
+			final var addr2 = addr;
+			final var proxy = this.proxyGetMap.get(addr2);
 			if (proxy != null) return proxy;
-			final FEMValue id = this.getAt(addr + 0, FEMValue.class);
-			final FEMString name = this.getAt(addr + 8, FEMString.class);
-			final FEMProxy proxy2 = new FEMProxy(id, name);
+			final var id = this.getAt(addr + 0, FEMValue.class);
+			final var name = this.getAt(addr + 8, FEMString.class);
+			final var proxy2 = FEMProxy.from(id, name);
 			this.proxyGetMap.put(addr2, proxy2);
 			this.proxyGetList.addLast(addr2);
 			this.runProxyGetList();
@@ -1203,15 +1203,15 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 
 	/** Diese Methode fügt den gegebenen Platzhalter in den Puffer ein und gibt die Referenz darauf zurück. */
 	protected long putProxyAsRef(final FEMProxy src) throws NullPointerException, IllegalArgumentException {
-		final long ref = this.getRef(src);
+		final var ref = this.getRef(src);
 		if (ref != 0) return ref;
-		final long idRef = this.put(src.id());
-		final FEMValue id2 = this.get(idRef, FEMValue.class);
-		final long nameRef = this.put(src.name());
-		final FEMString name2 = this.get(nameRef, FEMString.class);
-		final FEMProxy proxy2 = FEMProxy.from(id2, name2);
-		final long addr = this.putData(24);
-		final Long addr2 = Long.valueOf(addr);
+		final var idRef = this.put(src.id());
+		final var id2 = this.get(idRef, FEMValue.class);
+		final var nameRef = this.put(src.name());
+		final var name2 = this.get(nameRef, FEMString.class);
+		final var proxy2 = FEMProxy.from(id2, name2);
+		final var addr = this.putData(24);
+		final var addr2 = addr;
 		this.buffer.putLong(addr + 0, idRef);
 		this.buffer.putLong(addr + 8, nameRef);
 		this.buffer.putLong(addr + 16, 0);
@@ -1232,8 +1232,8 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 
 	/** Diese Methode setzt die Zielfunktion des Platzhalters mit der gegebenen Adresse. */
 	protected void runProxyGetItem(final Long addr) {
-		final FEMProxy proxy = this.proxyGetMap.get(addr);
-		final FEMFunction target = this.getAt(addr.longValue() + 16);
+		final var proxy = this.proxyGetMap.get(addr);
+		final var target = this.getAt(addr.longValue() + 16);
 		this.setProxyTarget(proxy, target);
 	}
 
@@ -1242,7 +1242,7 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	protected void runProxyPutList() {
 		if (this.proxyPutList.size() > 1) return;
 		while (!this.proxyPutList.isEmpty()) {
-			final Entry<Long, FEMFunction> next = this.proxyPutList.getFirst();
+			final var next = this.proxyPutList.getFirst();
 			this.runProxyPutItem(next.getKey(), next.getValue());
 			this.proxyPutList.removeFirst();
 		}
@@ -1276,9 +1276,9 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 
 	/** Diese Methode fügt die gegebene Funktionsbindung in den Puffer ein und gibt die Referenz darauf zurück. */
 	protected long putClosureAsRef(final FEMClosure src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
-		final long ref = this.getRef(src);
+		final var ref = this.getRef(src);
 		if (ref != 0) return ref;
-		final long addr = this.putData(8);
+		final var addr = this.putData(8);
 		this.buffer.putLong(addr, this.put(src.target));
 		return this.putRef(FEMBuffer.TYPE_CLOSURE_ADDR, addr);
 	}
@@ -1291,10 +1291,10 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 
 	/** Diese Methode fügt den gegebenen Funktionsaufruf in den Puffer ein und gibt die Referenz darauf zurück. */
 	protected long putCompositeAsRef(final FEMComposite src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
-		final long ref = this.getRef(src);
+		final var ref = this.getRef(src);
 		if (ref != 0) return ref;
-		final int count = src.params.length;
-		final long addr = this.putData((count * 8L) + 16L);
+		final var count = src.params.length;
+		final var addr = this.putData((count * 8L) + 16L);
 		this.buffer.putInt(addr + 0, count);
 		this.buffer.putInt(addr + 4, src.isConcat() ? 1 : 0);
 		this.buffer.putLong(addr + 8, this.put(src.target));

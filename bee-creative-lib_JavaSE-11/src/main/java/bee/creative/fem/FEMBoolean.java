@@ -3,7 +3,7 @@ package bee.creative.fem;
 /** Diese Klasse implementiert einen unveränderlichen Wahrheitswert. Intern wird der Wahrheitswert als {@code boolean} dargestellt.
  *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class FEMBoolean implements FEMValue , Comparable<FEMBoolean> {
+public final class FEMBoolean implements FEMValue, Comparable<FEMBoolean> {
 
 	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
 	public static final int ID = 3;
@@ -89,7 +89,7 @@ public final class FEMBoolean implements FEMValue , Comparable<FEMBoolean> {
 			object = ((FEMValue)object).data();
 			if (!(object instanceof FEMBoolean)) return false;
 		}
-		final FEMBoolean that = (FEMBoolean)object;
+		final var that = (FEMBoolean)object;
 		return this.value == that.value;
 	}
 
@@ -116,7 +116,7 @@ public final class FEMBoolean implements FEMValue , Comparable<FEMBoolean> {
 	 *
 	 * @return {@link Boolean}. */
 	public Boolean toBoolean() {
-		return Boolean.valueOf(this.value);
+		return this.value;
 	}
 
 }

@@ -87,7 +87,7 @@ import bee.creative.lang.Objects;
  * </p>
  *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class FEMDatetime implements FEMValue , Comparable<FEMDatetime> {
+public final class FEMDatetime implements FEMValue, Comparable<FEMDatetime> {
 
 	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
 	public static final int ID = 9;
@@ -136,7 +136,7 @@ public final class FEMDatetime implements FEMValue , Comparable<FEMDatetime> {
 	 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist. */
 	public static FEMDatetime from(final String string) throws NullPointerException, IllegalArgumentException {
 		if (string.length() > 29) throw new IllegalArgumentException();
-		final char[] buffer = string.toCharArray();
+		final var buffer = string.toCharArray();
 		switch (buffer.length) {
 			case 0: //
 				return FEMDatetime.EMPTY;
@@ -204,7 +204,8 @@ public final class FEMDatetime implements FEMValue , Comparable<FEMDatetime> {
 	}
 
 	static FEMDatetime fromT12(final FEMDatetime result, final char[] buffer, final int offset) {
-		if ((buffer[offset + 2] != ':') || (buffer[offset + 5] != ':') || (buffer[offset + 8] != '.') || (Integers.getSize(buffer, offset + 9, 3) != 3)) throw new IllegalArgumentException();
+		if ((buffer[offset + 2] != ':') || (buffer[offset + 5] != ':') || (buffer[offset + 8] != '.') || (Integers.getSize(buffer, offset + 9, 3) != 3))
+			throw new IllegalArgumentException();
 		final int hour = FEMDatetime.fromI2(buffer, offset + 0), minute = FEMDatetime.fromI2(buffer, offset + 3), second = FEMDatetime.fromI2(buffer, offset + 6),
 			millisecond = Integers.parseInt(buffer, offset + 9, 3);
 		return result.withTime(hour, minute, second, millisecond);
@@ -315,8 +316,7 @@ public final class FEMDatetime implements FEMValue , Comparable<FEMDatetime> {
 			if ((minute != 0) || (second != 0) || (millisecond != 0)) throw new IllegalArgumentException();
 		} else {
 			if ((hour < 0) || (hour > 23) || (minute < 0) || (minute > 59)) throw new IllegalArgumentException();
-			if ((second < 0) || (second > 59)) throw new IllegalArgumentException();
-			if ((millisecond < 0) || (millisecond > 999)) throw new IllegalArgumentException();
+			if ((second < 0) || (second > 59) || (millisecond < 0) || (millisecond > 999)) throw new IllegalArgumentException();
 		}
 	}
 
@@ -430,7 +430,7 @@ public final class FEMDatetime implements FEMValue , Comparable<FEMDatetime> {
 	 * @param calendarday Kalendertag.
 	 * @return Jahr, Monat und Tag. */
 	static int dateOf(final int calendarday) {
-		final int months = (int)(((calendarday + 139824) * 400 * 12L) / 146097);
+		final var months = (int)(((calendarday + 139824) * 400 * 12L) / 146097);
 		final int div = months / 12, mod = months % 12;
 		int year = div + 1200, month = mod + 1, date = (calendarday - FEMDatetime.calendardayOfImpl(year, month, 1)) + 1;
 		if (date <= 0) {
@@ -491,8 +491,8 @@ public final class FEMDatetime implements FEMValue , Comparable<FEMDatetime> {
 	}
 
 	static int yeardayOfImpl(final int calendarday) {
-		final int year = (((calendarday + 139810) * 400) / 146097) + 1200;
-		final int result = (calendarday - FEMDatetime.calendardayOfImpl(year, 1, 1)) + 1;
+		final var year = (((calendarday + 139810) * 400) / 146097) + 1200;
+		final var result = (calendarday - FEMDatetime.calendardayOfImpl(year, 1, 1)) + 1;
 		if (result == 0) return FEMDatetime.leapOfImpl(year - 1) ? 366 : 365;
 		if (result == 366) return FEMDatetime.leapOfImpl(year) ? 366 : 1;
 		return result;
@@ -544,7 +544,7 @@ public final class FEMDatetime implements FEMValue , Comparable<FEMDatetime> {
 
 	static int calendardayOfImpl(final int year, final int month, final int date) {
 		final int year2 = (year - ((7 >> month) & 1)) >> 2, year3 = year2 / 25, month2 = month << 1;
-		final int month3 = (month * 29) + ((59630432 >> month2) & 3) + ((266948608 >> month2) & 12);
+		final var month3 = (month * 29) + ((59630432 >> month2) & 3) + ((266948608 >> month2) & 12);
 		return ((((year * 365) + year2) - year3) + (year3 >> 2) + month3 + date) - 578130;
 	}
 
@@ -819,7 +819,7 @@ public final class FEMDatetime implements FEMValue , Comparable<FEMDatetime> {
 	 * @throws IllegalArgumentException Wenn {@code calendarday} ungültig ist. */
 	public FEMDatetime withDate(final int calendarday) throws IllegalArgumentException {
 		FEMDatetime.checkDate(calendarday);
-		final int date = FEMDatetime.dateOf(calendarday);
+		final var date = FEMDatetime.dateOf(calendarday);
 		return this.withDateImpl((date >> 10) & 0x3FFF, (date >> 5) & 0x1F, (date >> 0) & 0x1F);
 	}
 
@@ -970,7 +970,7 @@ public final class FEMDatetime implements FEMValue , Comparable<FEMDatetime> {
 		} else {
 			if ((zoneHour < -14) || (zoneHour > 14) || (zoneMinute < 0) || (zoneMinute > 59)) throw new IllegalArgumentException();
 		}
-		final int zone = (zoneHour * 60) + (zoneHour < 0 ? -zoneMinute : zoneMinute);
+		final var zone = (zoneHour * 60) + (zoneHour < 0 ? -zoneMinute : zoneMinute);
 		if (!this.hasZone()) return this.withZoneImpl(zone);
 		return this.moveZoneImpl(zone - this.zoneValueImpl());
 	}
@@ -997,7 +997,7 @@ public final class FEMDatetime implements FEMValue , Comparable<FEMDatetime> {
 	 * @throws IllegalArgumentException Wenn die Zeitzone ungültig ist. */
 	public FEMDatetime withZone(final Calendar calendar) throws NullPointerException, IllegalArgumentException {
 		if (!calendar.isSet(Calendar.ZONE_OFFSET)) return this.withoutZone();
-		final int zone = (calendar.get(Calendar.ZONE_OFFSET) + calendar.get(Calendar.DST_OFFSET)) / 60000;
+		final var zone = (calendar.get(Calendar.ZONE_OFFSET) + calendar.get(Calendar.DST_OFFSET)) / 60000;
 		return this.withZone(zone);
 	}
 
@@ -1022,7 +1022,7 @@ public final class FEMDatetime implements FEMValue , Comparable<FEMDatetime> {
 	 * @throws NullPointerException Wenn {@code datetime} {@code null} ist. */
 	public FEMDatetime withZone(final FEMDatetime datetime) throws NullPointerException {
 		if (!datetime.hasZone()) return this.withoutZone();
-		final int zone = datetime.zoneValueImpl();
+		final var zone = datetime.zoneValueImpl();
 		if (!this.hasZone()) return this.withZoneImpl(zone);
 		return this.moveZoneImpl(zone - this.zoneValueImpl());
 	}
@@ -1175,11 +1175,11 @@ public final class FEMDatetime implements FEMValue , Comparable<FEMDatetime> {
 	}
 
 	FEMDatetime moveImpl(final int months, final long millis) {
-		int days = 0;
-		FEMDatetime result = this;
+		var days = 0;
+		var result = this;
 		if (millis != 0) {
-			final long datetimemillis = millis + this.daymillisValueImpl();
-			int daymillis = (int)(datetimemillis % 86400000);
+			final var datetimemillis = millis + this.daymillisValueImpl();
+			var daymillis = (int)(datetimemillis % 86400000);
 			days = (int)(datetimemillis / 86400000);
 			if (daymillis < 0) {
 				days--;
@@ -1190,7 +1190,7 @@ public final class FEMDatetime implements FEMValue , Comparable<FEMDatetime> {
 			}
 		}
 		if (!this.hasDate() || ((days | months) == 0)) return result;
-		final int datetimemonths = (this.yearValueImpl() * 12) + this.monthValueImpl() + months + -1;
+		final var datetimemonths = (this.yearValueImpl() * 12) + this.monthValueImpl() + months + -1;
 		final int year = datetimemonths / 12, month = (datetimemonths % 12) + 1;
 		final int value = this.dateValueImpl(), length = FEMDatetime.lengthOf(month, year), date = value > length ? length : value;
 		if (days == 0) return result.withDateImpl(year, month, date);
@@ -1215,11 +1215,11 @@ public final class FEMDatetime implements FEMValue , Comparable<FEMDatetime> {
 
 	FEMDatetime moveZoneImpl(final int minutes) {
 		if (minutes == 0) return this;
-		final int zone = minutes + this.zoneValueImpl();
+		final var zone = minutes + this.zoneValueImpl();
 		FEMDatetime.checkZone(zone);
 		if (this.hasTime()) return this.moveImpl(0, minutes * 60000).withZoneImpl(zone);
 		if (!this.hasDate()) return this.withZoneImpl(zone);
-		final int days = (minutes - 1439) / 1440;
+		final var days = (minutes - 1439) / 1440;
 		if (days != 0) return this.moveImpl(0, days * 86400000L).withZoneImpl(zone);
 		return this.withZoneImpl(zone);
 	}
@@ -1236,7 +1236,7 @@ public final class FEMDatetime implements FEMValue , Comparable<FEMDatetime> {
 
 	@Override
 	public int hashCode() {
-		final int result = Objects.hash((this.daymillisValueImpl() + (this.zoneValueImpl() * -60000)) + (this.calendardayValueImpl() * 86400000L));
+		final var result = Objects.hash((this.daymillisValueImpl() + (this.zoneValueImpl() * -60000)) + (this.calendardayValueImpl() * 86400000L));
 		return this.hasZone() ? ~result : result;
 	}
 
@@ -1248,7 +1248,7 @@ public final class FEMDatetime implements FEMValue , Comparable<FEMDatetime> {
 			object = ((FEMValue)object).data();
 			if (!(object instanceof FEMDatetime)) return false;
 		}
-		final FEMDatetime that = (FEMDatetime)object;
+		final var that = (FEMDatetime)object;
 		return ((this.valueL == that.valueL) && (this.valueH == that.valueH)) || (this.compareTo(that, 1) == 0);
 	}
 
@@ -1306,7 +1306,7 @@ public final class FEMDatetime implements FEMValue , Comparable<FEMDatetime> {
 		if (thisHasDate != thatHasDate) return undefined;
 		int deltamillis;
 		if (thisHasDate) {
-			final int deltadays = this.calendardayValueImpl() - that.calendardayValueImpl();
+			final var deltadays = this.calendardayValueImpl() - that.calendardayValueImpl();
 			if (deltadays < -2) return -1;
 			if (deltadays > +2) return +1;
 			deltamillis = (deltadays * 86400000) + offsetmillis;
@@ -1348,9 +1348,9 @@ public final class FEMDatetime implements FEMValue , Comparable<FEMDatetime> {
 	 * @return Textdarstellung. */
 	@Override
 	public String toString() {
-		final char[] buffer = new char[29];
-		final boolean hasDate = this.hasDate();
-		int offset = 0;
+		final var buffer = new char[29];
+		final var hasDate = this.hasDate();
+		var offset = 0;
 		if (hasDate) {
 			Integers.printInt(this.yearValueImpl(), buffer, offset, 4);
 			offset += 4;
@@ -1379,7 +1379,7 @@ public final class FEMDatetime implements FEMValue , Comparable<FEMDatetime> {
 			offset += 1;
 			Integers.printInt(this.secondValueImpl(), buffer, offset, 2);
 			offset += 2;
-			final int millisecond = this.millisecondValueImpl();
+			final var millisecond = this.millisecondValueImpl();
 			if (millisecond != 0) {
 				buffer[offset] = '.';
 				offset += 1;
@@ -1388,12 +1388,12 @@ public final class FEMDatetime implements FEMValue , Comparable<FEMDatetime> {
 			}
 		}
 		if (this.hasZone()) {
-			final int zone = this.zoneValueImpl();
+			final var zone = this.zoneValueImpl();
 			if (zone == 0) {
 				buffer[offset] = 'Z';
 				offset += 1;
 			} else {
-				final int zoneAbs = Math.abs(zone);
+				final var zoneAbs = Math.abs(zone);
 				buffer[offset] = zone < 0 ? '-' : '+';
 				offset += 1;
 				Integers.printInt(zoneAbs / 60, buffer, offset, 2);
@@ -1411,7 +1411,7 @@ public final class FEMDatetime implements FEMValue , Comparable<FEMDatetime> {
 	 *
 	 * @return {@link Calendar}. */
 	public GregorianCalendar toCalendar() {
-		final GregorianCalendar result = new GregorianCalendar();
+		final var result = new GregorianCalendar();
 		result.clear();
 		if (this.hasDate()) {
 			result.set(Calendar.YEAR, this.yearValueImpl());

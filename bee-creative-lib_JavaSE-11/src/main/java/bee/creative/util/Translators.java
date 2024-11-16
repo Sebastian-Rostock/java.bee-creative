@@ -9,12 +9,117 @@ import bee.creative.lang.Objects;
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Translators {
 
+	/** Diese Methode liefert den {@link EmptyTranslator}. */
+	@SuppressWarnings ("unchecked")
+	public static <GSource, GTarget> Translator2<GSource, GTarget> empty() {
+		return (Translator2<GSource, GTarget>)EmptyTranslator.INSTANCE;
+	}
+
+	/** Diese Methode liefert einen neutralen {@link Translator2} und ist eine Abkürzung für {@link Translators#neutral(Class)
+	 * Translators.neutral(Object.class)}. */
+	@SuppressWarnings ("unchecked")
+	public static <GValue> Translator2<GValue, GValue> neutral() {
+		return (Translator2<GValue, GValue>)Translators.neutral(Object.class);
+	}
+
+	/** Diese Methode liefert einen neutralen {@link Translator2} und ist eine Abkürzung für {@link Translators#from(Class, Class, Getter, Getter)
+	 * Translators.from(valueClass, valueClass, Getters.neutral(), Getters.neutral())}. */
+	public static <GValue> Translator2<GValue, GValue> neutral(Class<GValue> valueClass) throws NullPointerException {
+		return Translators.from(valueClass, valueClass, Getters.<GValue>neutral(), Getters.<GValue>neutral());
+	}
+
+	/** Diese Methode liefert den gegebenen {@link Translator} als {@link Translator2}. Wenn er {@code null} ist, wird der {@link EmptyTranslator} geliefert. */
+	public static <GSource, GTarget> Translator2<GSource, GTarget> from(Translator<GSource, GTarget> that) {
+		if (that == null) return Translators.empty();
+		if (that instanceof Translator2) return (Translator2<GSource, GTarget>)that;
+		return Translators.reverse(Translators.reverse(that));
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link CompositeTranslator new CompositeTranslator<>(sourceClass, targetClass, sourceTrans, targetTrans)}. */
+	public static <GSource, GTarget> Translator2<GSource, GTarget> from(Class<GSource> sourceClass, Class<GTarget> targetClass,
+		Getter<? super GSource, ? extends GTarget> sourceTrans, Getter<? super GTarget, ? extends GSource> targetTrans) throws NullPointerException {
+		return new CompositeTranslator<>(sourceClass, targetClass, sourceTrans, targetTrans);
+	}
+
+	public static <GEnum extends Enum<?>> Translator2<String, GEnum> fromEnum(Class<GEnum> enumClass) throws NullPointerException {
+		return Translators.fromEnum(Enum::name, enumClass.getEnumConstants());
+	}
+
+	public static <GSource, GTarget> Translator2<GSource, GTarget> fromEnum(Map<GTarget, GSource> sourceByTarget) throws NullPointerException {
+		return Translators.fromEnum(sourceByTarget::get, sourceByTarget.keySet());
+	}
+
+	@SafeVarargs
+	public static <GSource, GTarget> Translator2<GSource, GTarget> fromEnum(Getter<GTarget, GSource> ident, GTarget... targets) throws NullPointerException {
+		return Translators.fromEnum(ident, Arrays.asList(targets));
+	}
+
+	public static <GSource, GTarget> Translator2<GSource, GTarget> fromEnum(Getter<GTarget, GSource> ident, Iterable<GTarget> targets)
+		throws NullPointerException {
+		return new EnumTranslator<>(ident, targets);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link ConcatTranslator new ConcatTranslator<>(that, trans)}. */
+	public static <GSource, GCenter, GTarget> Translator2<GSource, GTarget> concat(Translator<GSource, GCenter> that, Translator<GCenter, GTarget> trans)
+		throws NullPointerException {
+		return new ConcatTranslator<>(that, trans);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link ReverseTranslator new ReverseTranslator<>(that)}. */
+	public static <GSource, GTarget> Translator2<GSource, GTarget> reverse(Translator<GTarget, GSource> that) throws NullPointerException {
+		return new ReverseTranslator<>(that);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link OptionalizedTranslator new OptionalizedTranslator<>(that, mutex)}. */
+	public static <GSource, GTarget> Translator2<GSource, GTarget> optionalize(Translator<GSource, GTarget> that) throws NullPointerException {
+		return new OptionalizedTranslator<>(that);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #synchronize(Translator, Object) Translators.synchronize(that, that)}. */
+	public static <GSource, GTarget> Translator2<GSource, GTarget> synchronize(Translator<GSource, GTarget> that) throws NullPointerException {
+		return Translators.synchronize(that, that);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link SynchronizedTranslator new SynchronizedTranslator<>(that, mutex)}. */
+	public static <GSource, GTarget> Translator2<GSource, GTarget> synchronize(Translator<GSource, GTarget> that, Object mutex) throws NullPointerException {
+		return new SynchronizedTranslator<>(that, mutex);
+	}
+
 	/** Diese Klasse implementiert einen {@link Translator2}, der alle Quell- und Zielobjekte ablehnt.
 	 *
 	 * @author [cc-by] 2021 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static class EmptyTranslator extends AbstractTranslator<Object, Object> {
 
 		public static final Translator2<?, ?> INSTANCE = new EmptyTranslator();
+
+	}
+
+	/** Diese Klasse implementiert einen {@link Translator2}, der alle Quellobjekte in deren Textdarstellung übersetzt.
+	 *
+	 * @author [cc-by] 2021 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
+	public static class StringTranslator extends AbstractTranslator<Object, String> {
+
+		public static final StringTranslator INSTANCE = new StringTranslator();
+
+		@Override
+		public boolean isSource(Object object) {
+			return object != null;
+		}
+
+		@Override
+		public boolean isTarget(Object object) {
+			return object instanceof String;
+		}
+
+		@Override
+		public Object toSource(Object object) throws ClassCastException, IllegalArgumentException {
+			return object;
+		}
+
+		@Override
+		public String toTarget(Object object) throws ClassCastException, IllegalArgumentException {
+			return object.toString();
+		}
 
 	}
 
@@ -289,82 +394,6 @@ public class Translators {
 			return Objects.toInvokeString(this, this.that, this.mutex == this ? null : this.mutex);
 		}
 
-	}
-
-	/** Diese Methode liefert den {@link EmptyTranslator}. */
-	@SuppressWarnings ("unchecked")
-	public static <GSource, GTarget> Translator2<GSource, GTarget> empty() {
-		return (Translator2<GSource, GTarget>)EmptyTranslator.INSTANCE;
-	}
-
-	/** Diese Methode liefert einen neutralen {@link Translator2} und ist eine Abkürzung für {@link Translators#neutral(Class)
-	 * Translators.neutral(Object.class)}. */
-	@SuppressWarnings ("unchecked")
-	public static <GValue> Translator2<GValue, GValue> neutral() {
-		return (Translator2<GValue, GValue>)Translators.neutral(Object.class);
-	}
-
-	/** Diese Methode liefert einen neutralen {@link Translator2} und ist eine Abkürzung für {@link Translators#from(Class, Class, Getter, Getter)
-	 * Translators.from(valueClass, valueClass, Getters.neutral(), Getters.neutral())}. */
-	public static <GValue> Translator2<GValue, GValue> neutral(Class<GValue> valueClass) throws NullPointerException {
-		return Translators.from(valueClass, valueClass, Getters.<GValue>neutral(), Getters.<GValue>neutral());
-	}
-
-	/** Diese Methode liefert den gegebenen {@link Translator} als {@link Translator2}. Wenn er {@code null} ist, wird der {@link EmptyTranslator} geliefert. */
-	public static <GSource, GTarget> Translator2<GSource, GTarget> from(Translator<GSource, GTarget> that) {
-		if (that == null) return Translators.empty();
-		if (that instanceof Translator2) return (Translator2<GSource, GTarget>)that;
-		return Translators.reverse(Translators.reverse(that));
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link CompositeTranslator new CompositeTranslator<>(sourceClass, targetClass, sourceTrans, targetTrans)}. */
-	public static <GSource, GTarget> Translator2<GSource, GTarget> from(Class<GSource> sourceClass, Class<GTarget> targetClass,
-		Getter<? super GSource, ? extends GTarget> sourceTrans, Getter<? super GTarget, ? extends GSource> targetTrans) throws NullPointerException {
-		return new CompositeTranslator<>(sourceClass, targetClass, sourceTrans, targetTrans);
-	}
-
-	public static <GEnum extends Enum<?>> Translator2<String, GEnum> fromEnum(Class<GEnum> enumClass) throws NullPointerException {
-		return Translators.fromEnum(Enum::name, enumClass.getEnumConstants());
-	}
-
-	public static <GSource, GTarget> Translator2<GSource, GTarget> fromEnum(Map<GTarget, GSource> sourceByTarget) throws NullPointerException {
-		return Translators.fromEnum(sourceByTarget::get, sourceByTarget.keySet());
-	}
-
-	@SafeVarargs
-	public static <GSource, GTarget> Translator2<GSource, GTarget> fromEnum(Getter<GTarget, GSource> ident, GTarget... targets) throws NullPointerException {
-		return Translators.fromEnum(ident, Arrays.asList(targets));
-	}
-
-	public static <GSource, GTarget> Translator2<GSource, GTarget> fromEnum(Getter<GTarget, GSource> ident, Iterable<GTarget> targets)
-		throws NullPointerException {
-		return new EnumTranslator<>(ident, targets);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link ConcatTranslator new ConcatTranslator<>(that, trans)}. */
-	public static <GSource, GCenter, GTarget> Translator2<GSource, GTarget> concat(Translator<GSource, GCenter> that, Translator<GCenter, GTarget> trans)
-		throws NullPointerException {
-		return new ConcatTranslator<>(that, trans);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link ReverseTranslator new ReverseTranslator<>(that)}. */
-	public static <GSource, GTarget> Translator2<GSource, GTarget> reverse(Translator<GTarget, GSource> that) throws NullPointerException {
-		return new ReverseTranslator<>(that);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link OptionalizedTranslator new OptionalizedTranslator<>(that, mutex)}. */
-	public static <GSource, GTarget> Translator2<GSource, GTarget> optionalize(Translator<GSource, GTarget> that) throws NullPointerException {
-		return new OptionalizedTranslator<>(that);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link #synchronize(Translator, Object) Translators.synchronize(that, that)}. */
-	public static <GSource, GTarget> Translator2<GSource, GTarget> synchronize(Translator<GSource, GTarget> that) throws NullPointerException {
-		return Translators.synchronize(that, that);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link SynchronizedTranslator new SynchronizedTranslator<>(that, mutex)}. */
-	public static <GSource, GTarget> Translator2<GSource, GTarget> synchronize(Translator<GSource, GTarget> that, Object mutex) throws NullPointerException {
-		return new SynchronizedTranslator<>(that, mutex);
 	}
 
 }

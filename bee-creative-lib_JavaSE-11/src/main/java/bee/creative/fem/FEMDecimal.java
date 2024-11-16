@@ -5,7 +5,7 @@ import bee.creative.lang.Integers;
 /** Diese Klasse implementiert einen unveränderlichen Dezimalbruch. Intern wird der Dezimalbruch als {@code double} dargestellt.
  *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class FEMDecimal implements FEMValue , Comparable<FEMDecimal> {
+public final class FEMDecimal implements FEMValue, Comparable<FEMDecimal> {
 
 	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
 	public static final int ID = 7;
@@ -86,7 +86,7 @@ public final class FEMDecimal implements FEMValue , Comparable<FEMDecimal> {
 
 	@Override
 	public int hashCode() {
-		final long value = Double.doubleToLongBits(this.value);
+		final var value = Double.doubleToLongBits(this.value);
 		return Integers.toIntL(value) ^ Integers.toIntH(value);
 	}
 
@@ -98,7 +98,7 @@ public final class FEMDecimal implements FEMValue , Comparable<FEMDecimal> {
 			object = ((FEMValue)object).data();
 			if (!(object instanceof FEMDecimal)) return false;
 		}
-		final FEMDecimal that = (FEMDecimal)object;
+		final var that = (FEMDecimal)object;
 		return (this.value == that.value) || (Double.isNaN(this.value) && Double.isNaN(that.value));
 	}
 
@@ -134,7 +134,7 @@ public final class FEMDecimal implements FEMValue , Comparable<FEMDecimal> {
 	 *
 	 * @return {@link Double}. */
 	public Double toNumber() {
-		return Double.valueOf(this.value);
+		return this.value;
 	}
 
 }

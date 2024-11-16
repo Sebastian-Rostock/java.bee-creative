@@ -60,7 +60,7 @@ public class FEMContext extends BaseObject {
 	public <GData> GData dataFrom(final FEMValue value, final FEMType<GData> type) throws NullPointerException, ClassCastException, IllegalArgumentException {
 		if (!value.type().is(type)) throw new IllegalArgumentException();
 		@SuppressWarnings ("unchecked")
-		final GData result = (GData)value.data();
+		final var result = (GData)value.data();
 		return result;
 	}
 
@@ -96,10 +96,10 @@ public class FEMContext extends BaseObject {
 	}
 
 	FEMArray arrayFromImpl(final Object data) throws NullPointerException, IllegalArgumentException {
-		final int length = Array.getLength(data);
+		final var length = Array.getLength(data);
 		if (length == 0) return FEMArray.EMPTY;
-		final FEMValue[] values = new FEMValue[length];
-		for (int i = 0; i < length; i++) {
+		final var values = new FEMValue[length];
+		for (var i = 0; i < length; i++) {
 			values[i] = this.valueFrom(Array.get(data, i));
 		}
 		return FEMArray.from(values);
@@ -172,9 +172,9 @@ public class FEMContext extends BaseObject {
 	}
 
 	Object[] objectFromImpl(final FEMArray array) {
-		final int length = array.length();
-		final Object[] result = new Object[length];
-		for (int i = 0; i < length; i++) {
+		final var length = array.length();
+		final var result = new Object[length];
+		for (var i = 0; i < length; i++) {
 			result[i] = this.objectFrom(array.get(i));
 		}
 		return result;

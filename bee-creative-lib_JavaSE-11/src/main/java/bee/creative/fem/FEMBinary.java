@@ -18,7 +18,7 @@ import bee.creative.util.Iterables;
 /** Diese Klasse implementiert eine unveränderliche Bytefolge sowie Methoden zur Erzeugung solcher Bytefolgen aus nativen Arrays.
  *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public abstract class FEMBinary implements FEMValue , Iterable<Byte>, Comparable<FEMBinary>, UseToString {
+public abstract class FEMBinary implements FEMValue, Iterable<Byte>, Comparable<FEMBinary>, UseToString {
 
 	/** Diese Schnittstelle definiert ein Objekt zum geordneten Sammeln von Bytes einer Bytefolge in der Methode {@link FEMBinary#extract(Collector)}. */
 	public static interface Collector {
@@ -145,7 +145,7 @@ public abstract class FEMBinary implements FEMValue , Iterable<Byte>, Comparable
 
 		@Override
 		public boolean push(final byte value) {
-			int index = this.index;
+			var index = this.index;
 			this.array[index] = FEMBinary.toChar((value >> 4) & 0xF);
 			++index;
 			this.array[index] = FEMBinary.toChar((value >> 0) & 0xF);
@@ -171,7 +171,6 @@ public abstract class FEMBinary implements FEMValue , Iterable<Byte>, Comparable
 
 	}
 
-	
 	public static class IntegerBinaryBE extends FEMBinary {
 
 		public final long value;
@@ -198,7 +197,6 @@ public abstract class FEMBinary implements FEMValue , Iterable<Byte>, Comparable
 
 	}
 
-	
 	public static class IntegerBinaryLE extends FEMBinary {
 
 		public final long value;
@@ -243,18 +241,17 @@ public abstract class FEMBinary implements FEMValue , Iterable<Byte>, Comparable
 
 		@Override
 		public int hashCode() {
-			final int result = this.hash;
+			final var result = this.hash;
 			if (result != 0) return result;
 			return this.hash = super.hashCode();
 		}
 
 	}
 
-	
 	public static class ConcatBinary extends HashBinary implements Emuable {
 
 		static int size(FEMBinary array) {
-			for (int size = 0; true; size++) {
+			for (var size = 0; true; size++) {
 				if (array instanceof ConcatBinary2) {
 					array = ((ConcatBinary)array).binary2;
 				} else if (array instanceof ConcatBinary) {
@@ -266,15 +263,15 @@ public abstract class FEMBinary implements FEMValue , Iterable<Byte>, Comparable
 		static ConcatBinary from(final FEMBinary binary1, final FEMBinary binary2) throws IllegalArgumentException {
 			final int size1 = ConcatBinary.size(binary1), size2 = ConcatBinary.size(binary2);
 			if ((size1 + 1) < size2) {
-				final ConcatBinary cb2 = (ConcatBinary)binary2;
+				final var cb2 = (ConcatBinary)binary2;
 				if (!(cb2 instanceof ConcatBinary1)) return ConcatBinary.from(ConcatBinary.from(binary1, cb2.binary1), cb2.binary2);
-				final ConcatBinary cb21 = (ConcatBinary)cb2.binary1;
+				final var cb21 = (ConcatBinary)cb2.binary1;
 				return ConcatBinary.from(ConcatBinary.from(binary1, cb21.binary1), ConcatBinary.from(cb21.binary2, cb2.binary2));
 			}
 			if ((size2 + 1) < size1) {
-				final ConcatBinary cb1 = (ConcatBinary)binary1;
+				final var cb1 = (ConcatBinary)binary1;
 				if (!(cb1 instanceof ConcatBinary2)) return ConcatBinary.from(cb1.binary1, ConcatBinary.from(cb1.binary2, binary2));
-				final ConcatBinary cb12 = (ConcatBinary)cb1.binary2;
+				final var cb12 = (ConcatBinary)cb1.binary2;
 				return ConcatBinary.from(ConcatBinary.from(cb1.binary1, cb12.binary1), ConcatBinary.from(cb12.binary2, binary2));
 			}
 			if (size1 > size2) return new ConcatBinary1(binary1, binary2);
@@ -294,7 +291,7 @@ public abstract class FEMBinary implements FEMValue , Iterable<Byte>, Comparable
 
 		@Override
 		protected byte customGet(final int index) throws IndexOutOfBoundsException {
-			final int index2 = index - this.binary1.length;
+			final var index2 = index - this.binary1.length;
 			return index2 < 0 ? this.binary1.customGet(index) : this.binary2.customGet(index2);
 		}
 
@@ -327,7 +324,6 @@ public abstract class FEMBinary implements FEMValue , Iterable<Byte>, Comparable
 
 	}
 
-	
 	public static class ConcatBinary1 extends ConcatBinary {
 
 		ConcatBinary1(final FEMBinary binary1, final FEMBinary binary2) throws IllegalArgumentException {
@@ -336,7 +332,6 @@ public abstract class FEMBinary implements FEMValue , Iterable<Byte>, Comparable
 
 	}
 
-	
 	public static class ConcatBinary2 extends ConcatBinary {
 
 		ConcatBinary2(final FEMBinary binary1, final FEMBinary binary2) throws IllegalArgumentException {
@@ -345,7 +340,6 @@ public abstract class FEMBinary implements FEMValue , Iterable<Byte>, Comparable
 
 	}
 
-	
 	public static class SectionBinary extends HashBinary implements Emuable {
 
 		public final FEMBinary binary;
@@ -365,7 +359,7 @@ public abstract class FEMBinary implements FEMValue , Iterable<Byte>, Comparable
 
 		@Override
 		protected int customFind(final byte that, final int offset, final int length, final boolean foreward) {
-			final int result = this.binary.customFind(that, offset + this.offset, length, foreward);
+			final var result = this.binary.customFind(that, offset + this.offset, length, foreward);
 			return result >= 0 ? result - this.offset : -1;
 		}
 
@@ -386,7 +380,6 @@ public abstract class FEMBinary implements FEMValue , Iterable<Byte>, Comparable
 
 	}
 
-	
 	public static class ReverseBinary extends HashBinary implements Emuable {
 
 		public final FEMBinary binary;
@@ -403,7 +396,7 @@ public abstract class FEMBinary implements FEMValue , Iterable<Byte>, Comparable
 
 		@Override
 		protected int customFind(final byte that, final int offset, final int length, final boolean foreward) {
-			final int result = this.binary.customFind(that, this.length - offset - length, length, !foreward);
+			final var result = this.binary.customFind(that, this.length - offset - length, length, !foreward);
 			return result >= 0 ? this.length - result - 1 : -1;
 		}
 
@@ -434,7 +427,6 @@ public abstract class FEMBinary implements FEMValue , Iterable<Byte>, Comparable
 
 	}
 
-	
 	public static class UniformBinary extends HashBinary {
 
 		public final byte value;
@@ -490,7 +482,6 @@ public abstract class FEMBinary implements FEMValue , Iterable<Byte>, Comparable
 
 	}
 
-	
 	public static class CompactBinary extends HashBinary implements Emuable {
 
 		/** Dieses Feld speichert das Array der Bytes, das nicht verändert werden sollte. */
@@ -591,7 +582,7 @@ public abstract class FEMBinary implements FEMValue , Iterable<Byte>, Comparable
 		if ((offset < 0) || (length < 0) || ((offset + length) > items.length)) throw new IllegalArgumentException();
 		if (length == 0) return FEMBinary.EMPTY;
 		if (length == 1) return new UniformBinary(1, items[offset]);
-		final byte[] result = new byte[length];
+		final var result = new byte[length];
 		System.arraycopy(items, offset, result, 0, length);
 		return new CompactBinary(result);
 	}
@@ -603,7 +594,7 @@ public abstract class FEMBinary implements FEMValue , Iterable<Byte>, Comparable
 	 * @return Bytefolge.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
 	public static FEMBinary from(final boolean copy, final byte[] items) throws NullPointerException {
-		final int length = items.length;
+		final var length = items.length;
 		if (length == 0) return FEMBinary.EMPTY;
 		if (length == 1) return new UniformBinary(1, items[0]);
 		return new CompactBinary(copy ? items.clone() : items);
@@ -640,8 +631,8 @@ public abstract class FEMBinary implements FEMValue , Iterable<Byte>, Comparable
 		}
 		count >>= 1;
 		if (count == 0) return FEMBinary.EMPTY;
-		final byte[] bytes = new byte[count];
-		for (int i = 0; i < count; i++, index += 2) {
+		final var bytes = new byte[count];
+		for (var i = 0; i < count; i++, index += 2) {
 			bytes[i] = (byte)((FEMBinary.toDigit(string.charAt(index + 0)) << 4) | (FEMBinary.toDigit(string.charAt(index + 1)) << 0));
 		}
 		if (count == 1) return new UniformBinary(1, bytes[0]);
@@ -673,11 +664,11 @@ public abstract class FEMBinary implements FEMValue , Iterable<Byte>, Comparable
 	 * @return Bytefolge.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist oder enthält. */
 	public static FEMBinary from(final List<? extends Number> items) throws NullPointerException {
-		final int length = items.size();
+		final var length = items.size();
 		if (length == 0) return FEMBinary.EMPTY;
 		if (length == 1) return FEMBinary.from(1, items.get(0).byteValue());
-		final byte[] result = new byte[length];
-		for (int i = 0; i < length; i++) {
+		final var result = new byte[length];
+		for (var i = 0; i < length; i++) {
 			result[i] = items.get(i).byteValue();
 		}
 		return FEMBinary.from(false, result);
@@ -702,7 +693,7 @@ public abstract class FEMBinary implements FEMValue , Iterable<Byte>, Comparable
 	 * @return Verkettung der Bytefolgen.
 	 * @throws NullPointerException Wenn {@code values} {@code null} ist oder enthält. */
 	public static FEMBinary concatAll(final FEMBinary... values) throws NullPointerException {
-		final int length = values.length;
+		final var length = values.length;
 		if (length == 0) return FEMBinary.EMPTY;
 		if (length == 1) return values[0].data();
 		return FEMBinary.concatAll(values, 0, length - 1);
@@ -710,7 +701,7 @@ public abstract class FEMBinary implements FEMValue , Iterable<Byte>, Comparable
 
 	static FEMBinary concatAll(final FEMBinary[] values, final int min, final int max) throws NullPointerException {
 		if (min == max) return values[min];
-		final int mid = (min + max) >> 1;
+		final var mid = (min + max) >> 1;
 		return FEMBinary.concatAll(values, min, mid).concat(FEMBinary.concatAll(values, mid + 1, max));
 	}
 
@@ -720,7 +711,7 @@ public abstract class FEMBinary implements FEMValue , Iterable<Byte>, Comparable
 	 * @return Zeichen ({@code '0'..'9', 'A'..'F'}).
 	 * @throws IllegalArgumentException Wenn {@code hexDigit} ungültig ist. */
 	public static char toChar(final int hexDigit) throws IllegalArgumentException {
-		final int letter = hexDigit - 10;
+		final var letter = hexDigit - 10;
 		if (letter >= 6) throw new IllegalArgumentException("hexDigit > 15");
 		if (letter >= 0) return (char)('A' + letter);
 		if (hexDigit >= 0) return (char)('0' + hexDigit);
@@ -733,13 +724,13 @@ public abstract class FEMBinary implements FEMValue , Iterable<Byte>, Comparable
 	 * @return hexadezimale Ziffer ({@code 0..15}).
 	 * @throws IllegalArgumentException Wenn {@code hexChar} ungültig ist. */
 	public static int toDigit(final int hexChar) throws IllegalArgumentException {
-		final int digit = hexChar - '0';
+		final var digit = hexChar - '0';
 		if (digit < 0) throw new IllegalArgumentException("hexChar < '0'");
 		if (digit <= 9) return digit;
-		final int lower = hexChar - 'a';
+		final var lower = hexChar - 'a';
 		if (lower > 5) throw new IllegalArgumentException("hexChar > 'f'");
 		if (lower >= 0) return lower + 10;
-		final int upper = hexChar - 'A';
+		final var upper = hexChar - 'A';
 		if (upper < 0) throw new IllegalArgumentException("'9' < hexChar < 'A'");
 		if (upper <= 5) return upper + 10;
 		throw new IllegalArgumentException("'F' < hexChar < 'a'");
@@ -771,9 +762,9 @@ public abstract class FEMBinary implements FEMValue , Iterable<Byte>, Comparable
 	 * @return Position des ersten Vorkommens der gegebene Bytefolge ({@code offset..this.length()-that.length()}) oder {@code -1}.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
 	protected int customFind(final FEMBinary that, final int offset) {
-		final byte value = that.customGet(0);
-		final int count = (this.length - that.length) + 1;
-		for (int result = offset; true; result++) {
+		final var value = that.customGet(0);
+		final var count = (this.length - that.length) + 1;
+		for (var result = offset; true; result++) {
 			result = this.customFind(value, result, count - result, true);
 			if (result < 0) return -1;
 			if (this.customEquals(that, result)) return result;
@@ -789,22 +780,22 @@ public abstract class FEMBinary implements FEMValue , Iterable<Byte>, Comparable
 	 * @return Position des ersten Vorkommens des gegebenen Bytes oder {@code -1}.
 	 * @param foreward {@code true}, wenn die Reihenfolge vorwärts ist, bzw. {@code false}, wenn sie rückwärts ist. */
 	protected int customFind(final byte that, final int offset, final int length, final boolean foreward) {
-		final ItemFinder finder = new ItemFinder(that);
+		final var finder = new ItemFinder(that);
 		if (this.customExtract(finder, offset, length, foreward)) return -1;
 		return foreward ? (finder.index + offset) : (length - finder.index - 1);
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Bytefolge gleich der gegebenen ist. Sie Implementiert {@link #equals(Object)}. */
 	protected boolean customEquals(final FEMBinary that) throws NullPointerException {
-		final int length = this.length;
+		final var length = this.length;
 		if ((length != that.length) || (this.hashCode() != that.hashCode())) return false;
 		return this.customEquals(that, 0);
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn die gegebenen Bytefolge an der gegebenen Position in dieser Bytefolge liegt. */
 	protected boolean customEquals(final FEMBinary that, final int offset) {
-		final int length = that.length;
-		for (int i = 0; i < length; i++) {
+		final var length = that.length;
+		for (var i = 0; i < length; i++) {
 			if (this.customGet(offset + i) != that.customGet(i)) return false;
 		}
 		return true;
@@ -855,7 +846,7 @@ public abstract class FEMBinary implements FEMValue , Iterable<Byte>, Comparable
 	 *
 	 * @return Array mit den Bytes dieser Bytefolge. */
 	public byte[] value() {
-		final ValueCollector target = new ValueCollector(new byte[this.length], 0);
+		final var target = new ValueCollector(new byte[this.length], 0);
 		this.extract(target);
 		return target.array;
 	}
@@ -998,9 +989,9 @@ public abstract class FEMBinary implements FEMValue , Iterable<Byte>, Comparable
 
 	@Override
 	public int hashCode() {
-		final HashCollector hasher = new HashCollector();
+		final var hasher = new HashCollector();
 		this.extract(hasher);
-		final int result = hasher.hash;
+		final var result = hasher.hash;
 		return result != 0 ? result : -11;
 	}
 
@@ -1042,9 +1033,9 @@ public abstract class FEMBinary implements FEMValue , Iterable<Byte>, Comparable
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
 	@Override
 	public final int compareTo(final FEMBinary that) throws NullPointerException {
-		final int length = Math.min(this.length, that.length);
-		for (int i = 0; i < length; i++) {
-			final int result = Comparators.compare(this.customGet(i) & 255, that.customGet(i) & 255);
+		final var length = Math.min(this.length, that.length);
+		for (var i = 0; i < length; i++) {
+			final var result = Comparators.compare(this.customGet(i) & 255, that.customGet(i) & 255);
 			if (result != 0) return result;
 		}
 		return Comparators.compare(this.length, that.length);
@@ -1092,7 +1083,7 @@ public abstract class FEMBinary implements FEMValue , Iterable<Byte>, Comparable
 	 * @param header {@code true}, wenn die Zeichenkette mit {@code "0x"} beginnen soll.
 	 * @return Textdarstellung. */
 	public final String toString(final boolean header) {
-		final StringCollector target = new StringCollector(header, this.length);
+		final var target = new StringCollector(header, this.length);
 		this.extract(target);
 		return new String(target.array, 0, target.array.length);
 	}

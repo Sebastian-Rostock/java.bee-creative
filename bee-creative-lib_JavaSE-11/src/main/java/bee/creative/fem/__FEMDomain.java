@@ -241,17 +241,17 @@ class __FEMDomain extends BaseObject {
 
 	/** Diese Methode liefert die beschriftete {@link FEMException Ausnahme} zum gegebeen Abschnitt. */
 	protected FEMException parseErrorData(final FEMToken src, final Throwable cause) throws NullPointerException { // XXX DONE
-		String str = src.token().toString();
+		var str = src.token().toString();
 		str = str.length() > 40 ? str.substring(0, 39) + "…" : str;
-		final String parseErrorMessage = String.format("Fehler an Position %s:%s gefunden: %s", src.rowIndex(), src.colIndex(), str);
+		final var parseErrorMessage = String.format("Fehler an Position %s:%s gefunden: %s", src.rowIndex(), src.colIndex(), str);
 		return FEMException.from(cause).push(parseErrorMessage);
 	}
 
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} den {@link Token Abschnitt} der Eingabe bis zum nächsten Terminal bzw. Ende der Eingabe als Fehler und
 	 * gibt ihn zurück. Als Abschnittstyp wird der gegebene verwendet. Der Abschnitt wird auch dann geliefert, wenn er leer ist. */
 	protected Token parseErrorToken(final FEMParser src, final int type) throws NullPointerException { // XXX DONE
-		final int pos = src.index();
-		LOOP: for (int sym = src.skip(); sym >= 0; sym = src.skip()) {
+		final var pos = src.index();
+		LOOP: for (var sym = src.skip(); sym >= 0; sym = src.skip()) {
 			switch (sym) {
 				case ':':
 				case ';':
@@ -276,8 +276,8 @@ class __FEMDomain extends BaseObject {
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} den {@link Token Abschnitt} eines Platzhalter- oder Parameternamen und gibt ihn zurück. Als
 	 * Abschnittstyp wird {@link #TYPE_NAME_TOKEN} verwendet. Wenn kein Namen gefunden wurden, wird {@code null} geliefert. */
 	protected Token parseNameToken(final FEMParser src) throws NullPointerException { // XXX DONE
-		final int pos = src.index();
-		LOOP: for (int sym = src.symbol(); !Parser.isWhitespace(sym); sym = src.skip()) {
+		final var pos = src.index();
+		LOOP: for (var sym = src.symbol(); !Parser.isWhitespace(sym); sym = src.skip()) {
 			switch (sym) {
 				case -1:
 				case ';':
@@ -305,9 +305,9 @@ class __FEMDomain extends BaseObject {
 	/** Diese Methode überführt den von {@link #parseIdentToken(FEMParser)} ermittelten Abschnitt in eine Zeichenkette und gibt diese zurück. Für andere
 	 * Abschnitte liefert sie {@code null}. */
 	protected String parseIdentData(final FEMToken src) throws NullPointerException, FEMException { // XXX DONE
-		final Token tok = src.token();
+		final var tok = src.token();
 		if (tok.type() != __FEMDomain.TYPE_IDENT_TOKEN) return null;
-		final String res = this.parseIdent(tok.toString());
+		final var res = this.parseIdent(tok.toString());
 		if (res != null) return res;
 		throw this.parseErrorData(src, null);
 	}
@@ -336,8 +336,8 @@ class __FEMDomain extends BaseObject {
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} den {@link Token Abschnitt} einer Konstanten und gibt ihn zurück. Als Abschnittstyp wird
 	 * {@link #TYPE_CONST_TOKEN} verwendet. Wenn keine Konstante erkant wurde, wird {@code null} geliefet. */
 	protected Token parseConstToken(final FEMParser src) throws NullPointerException { // XXX DONE
-		final int pos = src.index();
-		LOOP: for (int sym = src.symbol(); sym > ' '; sym = src.skip()) {
+		final var pos = src.index();
+		LOOP: for (var sym = src.symbol(); sym > ' '; sym = src.skip()) {
 			switch (sym) {
 				case ';':
 				case '/':
@@ -368,11 +368,11 @@ class __FEMDomain extends BaseObject {
 
 	/** Diese Methode überführt den von {@link #parseScriptToken(FEMParser)} ermittelten Abschnitt in eine Funktionsliste und gibt diese zurück. */
 	protected List<FEMFunction> parseScriptData(final FEMToken src) throws NullPointerException, FEMException { // XXX DONE
-		final Token tok = src.token();
+		final var tok = src.token();
 		if (tok.type() != __FEMDomain.TYPE_SCRIPT_NODE) throw this.parseErrorData(src, null);
 		try {
 			for (final Object val: (Iterable<?>)tok.value()) {
-				final String name = val.toString();
+				final var name = val.toString();
 				src.proxies().put(name, FEMProxy.from(name));
 			}
 		} catch (final Exception cause) {
@@ -386,11 +386,11 @@ class __FEMDomain extends BaseObject {
 	 * als {@link #parseProxyToken(FEMParser, Token) Funktionszeiger} angegebenen {@link FEMParser#proxies() Platzhalter}. Die {@link Token#tokens()
 	 * Kindabschnitte} sind die Abschnitte der {@link #parseFunctionToken(FEMParser, boolean) Funktionen}. */
 	protected Token parseScriptToken(final FEMParser src) throws NullPointerException { // XXX DONE
-		final int pos = src.index();
+		final var pos = src.index();
 		final List<Token> funs = new ArrayList<>();
 		while (true) {
 			this.parseIgnoreToken(src);
-			int sym = src.symbol();
+			var sym = src.symbol();
 			if (sym < 0) {
 				break;
 			} else if (sym == ';') {
@@ -398,7 +398,7 @@ class __FEMDomain extends BaseObject {
 				src.skip();
 				continue;
 			}
-			final Token fun = this.parseFunctionToken(src, true);
+			final var fun = this.parseFunctionToken(src, true);
 			if (fun != null) {
 				funs.add(fun);
 			} else {
@@ -421,18 +421,18 @@ class __FEMDomain extends BaseObject {
 	/** Diese Methode überführt den von {@link #parseProxyToken(FEMParser, Token)} ermittelten Abschnitt in einen Funktionszeiger und gibt diese zurück. Für
 	 * andere Abschnitte liefert sie {@code null}. */
 	protected FEMHandler parseProxyData(FEMToken src) throws NullPointerException, FEMException { // XXX DONE
-		final Token tok = src.token();
+		final var tok = src.token();
 		if (tok.type() != __FEMDomain.TYPE_PROXY_NODE) return null;
 		if (tok.size() != 2) throw this.parseErrorData(src, null);
 		src = src.with(tok.get(0));
-		final String str = this.parseIdentData(src);
-		final String ref = str != null ? str : this.parseConstData(src);
+		final var str = this.parseIdentData(src);
+		final var ref = str != null ? str : this.parseConstData(src);
 		if (ref == null) throw this.parseErrorData(src, null);
 		src = src.with(tok.get(1));
 		final FEMValue han = this.parseHandlerData(src);
 		if (han == null) throw this.parseErrorData(src, null);
 		try {
-			final FEMProxy res = (FEMProxy)src.proxies().get(ref);
+			final var res = (FEMProxy)src.proxies().get(ref);
 			res.set(han.toFunction());
 			return FEMHandler.from(res);
 		} catch (final Exception cause) {
@@ -445,7 +445,7 @@ class __FEMDomain extends BaseObject {
 	 * gefundenen Funktionszeigers}. Wenn kein Funktionszeiger gefunden wurden, wird {@code null} geliefert. */
 	protected Token parseProxyToken(final FEMParser src, final Token name) throws NullPointerException, FEMException { // XXX DONE
 		this.parseIgnoreToken(src);
-		final Token target = this.parseHandler1Token(src);
+		final var target = this.parseHandler1Token(src);
 		if (target == null) return null;
 		if (!src.proxies().add(name.toString())) {
 			if (name.type() == __FEMDomain.TYPE_NAME_TOKEN) {
@@ -462,7 +462,7 @@ class __FEMDomain extends BaseObject {
 	/** Diese Methode überführt den von {@link #parseParamToken(FEMParser)} ermittelten Abschnitt in eine Parameterwerte liefernde Funktion
 	 * ({@link FEMFrame#FUNCTION} oder {@link FEMParam#from(int)}) und gibt diese zurück. Für andere Abschnitte liefert sie {@code null}. */
 	protected FEMFunction parseParamData(final FEMToken src) throws NullPointerException, FEMException { // XXX DONE
-		final Token tok = src.token();
+		final var tok = src.token();
 		if (tok.type() != __FEMDomain.TYPE_PARAM_NODE) return null;
 		if (tok.size() == 0) return FEMFrame.FUNCTION;
 		try {
@@ -479,7 +479,7 @@ class __FEMDomain extends BaseObject {
 	 * Wenn Kennung, Position bzw. Name ungültig sind, wird als deren Abschnittstyp des Elternabschnitts {@link #TYPE_PARAM_ERROR} verwendet. */
 	protected Token parseParamToken(final FEMParser src) throws NullPointerException { // XXX DONE
 		if (src.symbol() != '$') return null;
-		final Token res = src.push(__FEMDomain.TYPE_PARAM_TOKEN);
+		final var res = src.push(__FEMDomain.TYPE_PARAM_TOKEN);
 		src.skip();
 		final Token ident = this.parseIdentToken(src), index, name, ref;
 		if (ident == null) {
@@ -491,7 +491,7 @@ class __FEMDomain extends BaseObject {
 		}
 		final int val;
 		if (index != null) {
-			final String str = index.toString();
+			final var str = index.toString();
 			ref = index;
 			val = Integers.parseInt(str, 0, str.length()) - 1;
 		} else if (name != null) {
@@ -505,7 +505,7 @@ class __FEMDomain extends BaseObject {
 	/** Diese Methode überführt den von {@link #parseArrayToken(FEMParser)} ermittelten Abschnitt in eine Wertliste und gibt diese zurück. Für andere Abschnitte
 	 * liefert sie {@code null}. */
 	protected FEMValue parseArrayData(final FEMToken src) throws NullPointerException, FEMException { // XXX DONE
-		final Token arrayNode = src.token();
+		final var arrayNode = src.token();
 		if (arrayNode.type() != __FEMDomain.TYPE_ARRAY_NODE) return null;
 		final List<FEMValue> values = new ArrayList<>();
 		for (final Token valueNode: arrayNode) {
@@ -518,10 +518,10 @@ class __FEMDomain extends BaseObject {
 	 * des Elternabschnitts wird {@link #TYPE_ARRAY_NODE} verwendet. Die {@link Token#tokens() Kindabschnitte} sind die der
 	 * {@link #parseValueToken(FEMParser, boolean) Werte}. */
 	protected Token parseArrayToken(final FEMParser src) throws NullPointerException { // XXX DONE
-		int sym = src.symbol();
+		var sym = src.symbol();
 		if (sym != '[') return null;
 		final List<Token> values = new ArrayList<>();
-		final Token enter = src.push(__FEMDomain.TYPE_ARRAY_ENTER_TOKEN);
+		final var enter = src.push(__FEMDomain.TYPE_ARRAY_ENTER_TOKEN);
 		src.skip();
 		this.parseIgnoreToken(src);
 		sym = src.symbol();
@@ -532,7 +532,7 @@ class __FEMDomain extends BaseObject {
 			enter.type(__FEMDomain.TYPE_ARRAY_ENTER_ERROR);
 			values.add(this.parseErrorToken(src, __FEMDomain.TYPE_ERROR));
 		} else {
-			Token value = this.parseValueToken(src, false);
+			var value = this.parseValueToken(src, false);
 			if (value == null) {
 				enter.type(__FEMDomain.TYPE_ARRAY_ENTER_ERROR);
 				values.add(this.parseErrorToken(src, __FEMDomain.TYPE_ERROR));
@@ -577,9 +577,9 @@ class __FEMDomain extends BaseObject {
 	/** Diese Methode überführt den von {@link #parseString1Token(FEMParser)} ermittelten Abschnitt in eine Zeichenkette und gibt diese zurück. Für andere
 	 * Abschnitte liefert sie {@code null}. */
 	protected FEMValue parseString1Data(final FEMToken src) throws NullPointerException, FEMException { // XXX DONE
-		final Token tok = src.token();
+		final var tok = src.token();
 		if (tok.type() != __FEMDomain.TYPE_STRING1_TOKEN) return null;
-		final String res = Strings.parseSequence(tok.toString(), '\"', '\\', '\"');
+		final var res = Strings.parseSequence(tok.toString(), '\"', '\\', '\"');
 		if (res != null) return FEMString.from(res);
 		throw this.parseErrorData(src, null);
 	}
@@ -587,9 +587,9 @@ class __FEMDomain extends BaseObject {
 	/** Diese Methode überführt den von {@link #parseString2Token(FEMParser)} ermittelten Abschnitt in eine Zeichenkette und gibt diese zurück. Für andere
 	 * Abschnitte liefert sie {@code null}. */
 	protected FEMValue parseString2Data(final FEMToken src) throws NullPointerException, FEMException { // XXX DONE
-		final Token tok = src.token();
+		final var tok = src.token();
 		if (tok.type() != __FEMDomain.TYPE_STRING2_TOKEN) return null;
-		final String res = Strings.parseSequence(tok.toString(), '\'', '\\', '\'');
+		final var res = Strings.parseSequence(tok.toString(), '\'', '\\', '\'');
 		if (res != null) return FEMString.from(res);
 		throw this.parseErrorData(src, null);
 	}
@@ -611,7 +611,7 @@ class __FEMDomain extends BaseObject {
 	/** Diese Methode überführt den von {@link #parseHandler1Token(FEMParser)} bzw. {@link #parseProxyToken(FEMParser, Token)} ermittelten Abschnitt in eine
 	 * Parameterfunktion und gibt diese zurück. Für andere Abschnitte liefert sie {@code null}. */
 	protected FEMFunction parseClosureData(final FEMToken src) {
-		FEMHandler res = this.parseHandlerData(src);
+		var res = this.parseHandlerData(src);
 		if (res == null) {
 			res = this.parseProxyData(src);
 		}
@@ -622,11 +622,11 @@ class __FEMDomain extends BaseObject {
 	/** Diese Methode überführt den von {@link #parseHandler1Token(FEMParser)} ermittelten Abschnitt in einen Funktionszeiger und gibt diese zurück. Für andere
 	 * Abschnitte liefert sie {@code null}. */
 	protected FEMHandler parseHandlerData(final FEMToken src) throws NullPointerException, FEMException {
-		final Token tok = src.token();
+		final var tok = src.token();
 		if (tok.type() != __FEMDomain.TYPE_HANDLER_NODE) return null;
-		final int next = tok.size() - 1;
+		final var next = tok.size() - 1;
 		if (next < 0) throw this.parseErrorData(src, null);
-		final FEMFunction fun = this.parseFunctionData(src.with(tok.get(next)));
+		final var fun = this.parseFunctionData(src.with(tok.get(next)));
 		return FEMHandler.from(fun);
 	}
 
@@ -635,11 +635,11 @@ class __FEMDomain extends BaseObject {
 	 * Kindabschnitte werden die Abschnitte der Namen und Kennungen sowei der der Funktion verwendet. Wenn Namen bzw. Kennungen ungültig sind, wird als deren
 	 * Fehlerabschnittstyp verwendet. */
 	protected Token parseHandler1Token(final FEMParser src) throws NullPointerException {
-		int sym = src.symbol();
+		var sym = src.symbol();
 		if (sym != '{') return null;
-		final int pos = src.index();
+		final var pos = src.index();
 		final List<Token> toks = new ArrayList<>();
-		final Token enter = src.push(__FEMDomain.TYPE_HANDLER_ENTER_TOKEN);
+		final var enter = src.push(__FEMDomain.TYPE_HANDLER_ENTER_TOKEN);
 		src.skip();
 		this.parseIgnoreToken(src);
 		sym = src.symbol();
@@ -650,7 +650,7 @@ class __FEMDomain extends BaseObject {
 			enter.type(__FEMDomain.TYPE_HANDLER_ENTER_ERROR);
 			toks.add(this.parseErrorToken(src, __FEMDomain.TYPE_ERROR));
 		} else {
-			Token name = this.parseIdentToken(src);
+			var name = this.parseIdentToken(src);
 			if (name == null) {
 				name = this.parseNameToken(src);
 			}
@@ -696,7 +696,7 @@ class __FEMDomain extends BaseObject {
 
 		final List<String> names = new ArrayList<>();
 		for (final Token tok: toks) {
-			final String name = tok.toString();
+			final var name = tok.toString();
 			if (names.contains(name) || src.params().contains(name)) {
 				if (tok.type() == __FEMDomain.TYPE_NAME_TOKEN) {
 					tok.type(__FEMDomain.TYPE_NAME_ERROR);
@@ -710,7 +710,7 @@ class __FEMDomain extends BaseObject {
 		}
 		src.params().addAll(0, names);
 		this.parseIgnoreToken(src);
-		final Token tok = this.parseFunctionToken(src, false);
+		final var tok = this.parseFunctionToken(src, false);
 		if (tok == null) {
 			enter.type(__FEMDomain.TYPE_HANDLER_ENTER_ERROR);
 			toks.add(this.parseErrorToken(src, __FEMDomain.TYPE_ERROR));
@@ -734,14 +734,14 @@ class __FEMDomain extends BaseObject {
 			}
 		}
 		src.params().subList(0, names.size()).clear();
-		final Token sig = src.make(__FEMDomain.TYPE_SIGNATURE_NODE, pos, toks).value(names);
+		final var sig = src.make(__FEMDomain.TYPE_SIGNATURE_NODE, pos, toks).value(names);
 		if (tok == null) return src.make(__FEMDomain.TYPE_HANDLER_NODE, pos, Arrays.asList(sig));
 		return src.make(__FEMDomain.TYPE_HANDLER_NODE, pos, Arrays.asList(sig, tok));
 	}
 
 	/** Diese Methode überführt den von {@link #parseValueToken(FEMParser, boolean)} ermittelten Abschnitt in einen Wert und gibt diesen zurück. */
 	protected FEMValue parseValueData(final FEMToken src) throws NullPointerException, FEMException {
-		FEMValue res = this.parseArrayData(src);
+		var res = this.parseArrayData(src);
 		if (res != null) return res;
 		res = this.parseString1Data(src);
 		if (res != null) return res;
@@ -751,8 +751,8 @@ class __FEMDomain extends BaseObject {
 		if (res != null) return res;
 		res = this.parseProxyData(src);
 		if (res != null) return res;
-		final String str = this.parseIdentData(src);
-		final String ref = str != null ? str : this.parseConstData(src);
+		final var str = this.parseIdentData(src);
+		final var ref = str != null ? str : this.parseConstData(src);
 		if (ref == null) throw this.parseErrorData(src, null);
 		try {
 			res = this.parseValueData(src, ref);
@@ -788,7 +788,7 @@ class __FEMDomain extends BaseObject {
 
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} den {@link Token Abschnitt} eines Werts gibt ihn zurück. */
 	protected Token parseValueToken(final FEMParser src, final boolean allowProxy) throws NullPointerException {
-		Token res = this.parseArrayToken(src);
+		var res = this.parseArrayToken(src);
 		if (res != null) return res;
 		res = this.parseString1Token(src);
 		if (res != null) return res;
@@ -802,14 +802,14 @@ class __FEMDomain extends BaseObject {
 			if (res == null) return null;
 		}
 		if (!allowProxy) return res;
-		final Token res2 = this.parseProxyToken(src, res);
+		final var res2 = this.parseProxyToken(src, res);
 		if (res2 != null) return res2;
 		return res;
 	}
 
 	/** Diese Methode überführt den von {@link #parseFunctionToken(FEMParser, boolean)} ermittelten Abschnitt in eine Funktion und gibt diese zurück. */
 	protected FEMFunction parseFunctionData(final FEMToken src) throws NullPointerException, FEMException {
-		FEMFunction res = this.parseCompositeData(src);
+		var res = this.parseCompositeData(src);
 		if (res != null) return res;
 		res = this.parseParamData(src);
 		if (res != null) return res;
@@ -821,8 +821,8 @@ class __FEMDomain extends BaseObject {
 		if (res != null) return res;
 		res = this.parseClosureData(src);
 		if (res != null) return res;
-		final String str = this.parseIdentData(src);
-		final String ref = str != null ? str : this.parseConstData(src);
+		final var str = this.parseIdentData(src);
+		final var ref = str != null ? str : this.parseConstData(src);
 		if (ref == null) throw this.parseErrorData(src, null);
 		try {
 			res = this.parseFunctionData(src, ref);
@@ -841,7 +841,7 @@ class __FEMDomain extends BaseObject {
 	 * @param ref Kennung bzw. Textdarstellung einer Konstanten.
 	 * @return Funktion der Konstanten oder {@code null}. */
 	protected FEMFunction parseFunctionData(final FEMToken src, final String ref) {
-		final FEMFunction res = src.proxies().get(ref);
+		final var res = src.proxies().get(ref);
 		if (res != null) return res;
 		return FEMUtil.get(ref);
 	}
@@ -874,14 +874,14 @@ class __FEMDomain extends BaseObject {
 	/** Diese Methode überführt den von {@link #parseCompositeToken(FEMParser, Token)} ermittelten Abschnitt in eine Funtionsverkettung und gibt diese zurück. Für
 	 * andere Abschnitte liefert sie {@code null}. */
 	protected FEMFunction parseCompositeData(final FEMToken src) throws NullPointerException, FEMException { // XXX DONE
-		final Token compositeNode = src.token();
+		final var compositeNode = src.token();
 		if (compositeNode.type() != __FEMDomain.TYPE_COMPOSITE_NODE) return null;
 		if (compositeNode.size() != 2) throw this.parseErrorData(src, null);
 		final Token targetNode = compositeNode.get(0), frameNode = compositeNode.get(1);
 		final FEMToken targetToken = src.with(targetNode), frameToken = src.with(frameNode);
-		final FEMFunction target = this.parseFunctionData(targetToken);
+		final var target = this.parseFunctionData(targetToken);
 		if (frameNode.type() != __FEMDomain.TYPE_FRAME_NODE) throw this.parseErrorData(frameToken, null);
-		final List<FEMFunction> params = this.parseFunctionDataList(frameToken);
+		final var params = this.parseFunctionDataList(frameToken);
 		return target.compose(params);
 	}
 
@@ -893,11 +893,11 @@ class __FEMDomain extends BaseObject {
 		while (true) {
 			this.parseIgnoreToken(src);
 			if (src.symbol() != '(') return target;
-			final Token enter = src.push(__FEMDomain.TYPE_FRAME_ENTER_TOKEN);
+			final var enter = src.push(__FEMDomain.TYPE_FRAME_ENTER_TOKEN);
 			src.skip();
 			final List<Token> params = new ArrayList<>();
 			this.parseIgnoreToken(src);
-			Token param = this.parseFunctionToken(src, false);
+			var param = this.parseFunctionToken(src, false);
 			if (param != null) {
 				params.add(param);
 				while (true) {
@@ -905,7 +905,7 @@ class __FEMDomain extends BaseObject {
 					if (src.symbol() != ';') {
 						break;
 					}
-					final Token comma = src.push(__FEMDomain.TYPE_FRAME_COMMA_TOKEN);
+					final var comma = src.push(__FEMDomain.TYPE_FRAME_COMMA_TOKEN);
 					src.skip();
 					this.parseIgnoreToken(src);
 					param = this.parseFunctionToken(src, false);
@@ -934,23 +934,23 @@ class __FEMDomain extends BaseObject {
 	 * @param src Zeichenkette, die geparst werden soll.
 	 * @return aufbereiteter Quelltext. */
 	public Result parseResult(final String src) throws NullPointerException { // XXX DONE
-		final FEMParser parser = new FEMParser(src);
-		final Token res = this.parseScriptToken(parser);
+		final var parser = new FEMParser(src);
+		final var res = this.parseScriptToken(parser);
 		return Result.from(res, parser.tokens());
 	}
 
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} den {@link Token Abschnitt} einer Parameterposition und gibt ihn zurück. Als Abschnittstyp wird
 	 * {@link #TYPE_INDEX_TOKEN} verwendet. Wenn keine Parameterposition gefunden wurden, wird {@code null} geliefert. */
 	protected Token parseIndexToken(final FEMParser src) throws NullPointerException { // XXX DONE
-		final int pos = src.index();
-		for (int sym = src.symbol(); ('0' <= sym) && (sym <= '9'); sym = src.skip()) {}
+		final var pos = src.index();
+		for (var sym = src.symbol(); ('0' <= sym) && (sym <= '9'); sym = src.skip()) {}
 		if (pos != src.index()) return src.push(__FEMDomain.TYPE_INDEX_TOKEN, pos);
 		return null;
 	}
 
 	/** Diese Methode {@link Parser#skip() überspringt} alle Symbole eiens {@link Parser#isWhitespace(int) Leerraums}. */
 	protected void parseSpaceToken(final FEMParser src) throws NullPointerException { // XXX DONE
-		for (int sym = src.symbol(); Parser.isWhitespace(sym); sym = src.skip()) {}
+		for (var sym = src.symbol(); Parser.isWhitespace(sym); sym = src.skip()) {}
 	}
 
 	/** Diese Methode {@link #parseSpaceToken(FEMParser) überspringt Leerraum} und {@link #parseCommentToken(FEMParser) erfasst Kommentare}. */
@@ -976,9 +976,9 @@ class __FEMDomain extends BaseObject {
 	 * @param closeSym Letztes Symbol der Zeichenkette. */
 	protected Token parseSequenceToken(final FEMParser src, final int type, final int errorType, final char openSym, final char maskSym, final char closeSym)
 		throws NullPointerException { // XXX DONE
-		int sym = src.symbol();
+		var sym = src.symbol();
 		if (sym != openSym) return null;
-		final int pos = src.index();
+		final var pos = src.index();
 		while (true) {
 			sym = src.skip();
 			if (sym < 0) {
@@ -1018,7 +1018,7 @@ class __FEMDomain extends BaseObject {
 	 * @param src Zeichenkette.
 	 * @return gegebene bzw. maskierte Zeichenkette. */
 	public String printConst(final String src) throws NullPointerException {
-		final FEMParser par = new FEMParser(src);
+		final var par = new FEMParser(src);
 		this.parseNameToken(par);
 		return !par.isParsed() ? this.printIdent(src) : src;
 	}
@@ -1217,7 +1217,7 @@ class __FEMDomain extends BaseObject {
 		if (src instanceof FEMFuture) {
 			this.printFuture(res, (FEMFuture)src);
 		} else {
-			final int id = src.type().id();
+			final var id = src.type().id();
 			if (id == FEMNative.ID) {
 				this.printNative(res, src.data());
 			} else if (id == FEMVoid.ID) {
@@ -1325,7 +1325,7 @@ class __FEMDomain extends BaseObject {
 	 * @throws NullPointerException NullPointerException Wenn {@code src} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code src} nicht formatiert werden kann. */
 	public FEMPrinter toPrinter(final Result src) throws NullPointerException, IllegalArgumentException {
-		final FEMPrinter res = new FEMPrinter();
+		final var res = new FEMPrinter();
 		this.printResult(res, src);
 		return res;
 	}
@@ -1342,7 +1342,7 @@ class __FEMDomain extends BaseObject {
 	 * @throws NullPointerException NullPointerException Wenn {@code src} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code src} nicht formatiert werden kann. */
 	public FEMPrinter toPrinter(final Iterable<? extends FEMFunction> src) throws NullPointerException, IllegalArgumentException {
-		final FEMPrinter res = new FEMPrinter();
+		final var res = new FEMPrinter();
 		this.printGroup(res, src);
 		return res;
 	}

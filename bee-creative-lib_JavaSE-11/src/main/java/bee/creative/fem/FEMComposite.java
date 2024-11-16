@@ -20,7 +20,6 @@ import bee.creative.util.Iterators;
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class FEMComposite extends BaseFunction implements Emuable, Array2<FEMFunction>, UseToString {
 
-	
 	public static final class FEMCompositeF extends FEMComposite {
 
 		FEMCompositeF(final FEMFunction target, final FEMFunction[] params) {
@@ -39,7 +38,6 @@ public abstract class FEMComposite extends BaseFunction implements Emuable, Arra
 
 	}
 
-	
 	public static final class FEMCompositeT extends FEMComposite {
 
 		FEMCompositeT(final FEMFunction target, final FEMFunction[] params) {
@@ -119,7 +117,7 @@ public abstract class FEMComposite extends BaseFunction implements Emuable, Arra
 
 	@Override
 	public final FEMComposite trace(final FEMTracer tracer) throws NullPointerException {
-		final FEMFunction[] params = this.params.clone();
+		final var params = this.params.clone();
 		for (int i = 0, size = params.length; i < size; i++) {
 			params[i] = params[i].trace(tracer);
 		}
@@ -133,7 +131,7 @@ public abstract class FEMComposite extends BaseFunction implements Emuable, Arra
 
 	@Override
 	public final int hashCode() {
-		int result = this.hash;
+		var result = this.hash;
 		if (result != 0) return result;
 		result = Objects.hashPush(Objects.hash((Object[])this.params), Objects.hash(this.target));
 		return this.hash = result != 0 ? result : -1;
@@ -143,7 +141,7 @@ public abstract class FEMComposite extends BaseFunction implements Emuable, Arra
 	public final boolean equals(final Object object) {
 		if (object == this) return true;
 		if (!(object instanceof FEMComposite)) return false;
-		final FEMComposite that = (FEMComposite)object;
+		final var that = (FEMComposite)object;
 		return (this.isConcat() == that.isConcat()) && (this.hashCode() == that.hashCode()) && Objects.equals(this.target, that.target)
 			&& Objects.equals(this.params, that.params);
 	}
