@@ -11,7 +11,7 @@ public class Filters {
 
 	/** Diese Klasse implementiert einen {@link Filter2}, der alle Datensätze akzeptiert, die nicht {@code null} sind. Die Akzeptanz eines Datensatzes
 	 * {@code item} ist {@code item != null}. */
-	@SuppressWarnings ("javadoc")
+	
 	public static class EmptyFilter extends AbstractFilter<Object> {
 
 		public static final Filter<?> INSTANCE = new EmptyFilter();
@@ -19,7 +19,7 @@ public class Filters {
 	}
 
 	/** Diese Klasse implementiert einen {@link Filter2}, der alle Datensätze akzeptiert. Die Akzeptanz ist stets {@code true}. */
-	@SuppressWarnings ("javadoc")
+	
 	public static class AcceptFilter extends AbstractFilter<Object> {
 
 		public static final Filter<?> INSTANCE = new AcceptFilter();
@@ -32,7 +32,7 @@ public class Filters {
 	}
 
 	/** Diese Klasse implementiert einen {@link Filter2}, der alle Datensätze ablehnt. Die Akzeptanz ist stets {@code false}. */
-	@SuppressWarnings ("javadoc")
+	
 	public static class RejectFilter extends AbstractFilter<Object> {
 
 		public static final Filter<?> INSTANCE = new RejectFilter();
@@ -48,7 +48,7 @@ public class Filters {
 	 * Datensatzes {@code item} ist {@code this.that.isInstance(item)}.
 	 *
 	 * @param <GItem> Typ der Datensätze. */
-	@SuppressWarnings ("javadoc")
+	
 	public static class ClassFilter<GItem> extends AbstractFilter<GItem> {
 
 		public final Class<?> that;
@@ -73,7 +73,7 @@ public class Filters {
 	 * Akzeptanz eines Datensatzes {@code item} ist {@code this.that.compareTo(item) == 0}.
 	 *
 	 * @param <GItem> Typ der Datensätze. */
-	@SuppressWarnings ("javadoc")
+	
 	public static class EqualFilter<GItem> extends AbstractFilter<GItem> {
 
 		public final Comparable<? super GItem> that;
@@ -98,7 +98,7 @@ public class Filters {
 	 * Akzeptanz eines Datensatzes {@code item} ist {@code this.that.compareTo(item) > 0}.
 	 *
 	 * @param <GItem> Typ der Datensätze. */
-	@SuppressWarnings ("javadoc")
+	
 	public static class LowerFilter<GItem> extends AbstractFilter<GItem> {
 
 		public final Comparable<? super GItem> that;
@@ -123,7 +123,7 @@ public class Filters {
 	 * Akzeptanz eines Datensatzes {@code item} ist {@code this.that.compareTo(item) < 0}.
 	 *
 	 * @param <GItem> Typ der Datensätze. */
-	@SuppressWarnings ("javadoc")
+	
 	public static class HigherFilter<GItem> extends AbstractFilter<GItem> {
 
 		public final Comparable<? super GItem> that;
@@ -146,7 +146,7 @@ public class Filters {
 
 	/** Diese Klasse implementiert einen {@link Filter2}, welcher nur die Datensätz akzeptiert, die in einer gegebenen {@link Collection} enthalten sind. Die
 	 * Akzeptanz eines Datensatzes {@code item} ist {@link Collection#contains(Object) this.that.contains(item)}. */
-	@SuppressWarnings ("javadoc")
+	
 	public static class ContainsFilter extends AbstractFilter<Object> {
 
 		public final Collection<?> that;
@@ -171,7 +171,7 @@ public class Filters {
 	 * Akzeptanz eines Datensatzen {@code item} ist {@code !this.that.accept(item)}.
 	 *
 	 * @param <GItem> Typ der Datensätze. */
-	@SuppressWarnings ("javadoc")
+	
 	public static class NegationFilter<GItem> extends AbstractFilter<GItem> {
 
 		public final Filter<? super GItem> that;
@@ -202,7 +202,7 @@ public class Filters {
 	 *
 	 * @param <GItem> Typ der Datensätze.
 	 * @param <GItem2> Typ der Datensätze des gegebenen {@link Filter}. */
-	@SuppressWarnings ("javadoc")
+	
 	public static class TranslatedFilter<GItem, GItem2> extends AbstractFilter<GItem> {
 
 		public final Filter<? super GItem2> that;
@@ -230,7 +230,7 @@ public class Filters {
 	 * werden. Die Akzeptanz eines Datensatzes {@code item} ist {@code this.that1.accept(item) || this.that2.accept(item)}.
 	 *
 	 * @param <GItem> Typ der Datensätze. */
-	@SuppressWarnings ("javadoc")
+	
 	public static class DisjunctionFilter<GItem> extends AbstractFilter<GItem> {
 
 		public final Filter<? super GItem> that1;
@@ -258,7 +258,7 @@ public class Filters {
 	 * Akzeptanz eines Datensatzes {@code item} ist {@code this.that1.accept(item) && this.that2.accept(item)}.
 	 *
 	 * @param <GItem> Typ der Datensätze. */
-	@SuppressWarnings ("javadoc")
+	
 	public static class ConjunctionFilter<GItem> extends AbstractFilter<GItem> {
 
 		public final Filter<? super GItem> that1;
@@ -286,7 +286,7 @@ public class Filters {
 	 * Synchronisationsobjekt {@code null} ist, wird {@code this} verwendet.
 	 *
 	 * @param <GItem> Typ des Datensatzes. */
-	@SuppressWarnings ("javadoc")
+	
 	public static class SynchronizedFilter<GItem> extends AbstractFilter<GItem> {
 
 		public final Filter<? super GItem> that;

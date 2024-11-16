@@ -13,7 +13,7 @@ public class Comparators {
 	/** Diese Klasse implementiert einen {@link Comparator2}, der Zahlen über ihren {@link Number#intValue()} vergleicht.
 	 *
 	 * @see Comparators#compare(int, int) */
-	@SuppressWarnings ("javadoc")
+	
 	public static class IntComparator extends AbstractComparator<Number> {
 
 		public static final Comparator2<Number> INSTANCE = new IntComparator();
@@ -28,7 +28,7 @@ public class Comparators {
 	/** Diese Klasse implementiert einen {@link Comparator2}, der Zahlen über ihren {@link Number#longValue()} vergleicht. *
 	 *
 	 * @see Comparators#compare(long, long) */
-	@SuppressWarnings ("javadoc")
+	
 	public static class LongComparator extends AbstractComparator<Number> {
 
 		public static final Comparator2<Number> INSTANCE = new LongComparator();
@@ -43,7 +43,7 @@ public class Comparators {
 	/** Diese Klasse implementiert einen {@link Comparator2}, der Zahlen über ihren {@link Number#floatValue()} vergleicht. *
 	 *
 	 * @see Comparators#compare(float, float) */
-	@SuppressWarnings ("javadoc")
+	
 	public static class FloatComparator extends AbstractComparator<Number> {
 
 		public static final Comparator2<Number> INSTANCE = new FloatComparator();
@@ -58,7 +58,7 @@ public class Comparators {
 	/** Diese Klasse implementiert einen {@link Comparator}, der Zahlen über ihren {@link Number#doubleValue()} vergleicht.
 	 *
 	 * @see Comparators#compare(double, double) */
-	@SuppressWarnings ("javadoc")
+	
 	public static class DoubleComparator extends AbstractComparator<Number> {
 
 		public static final Comparator2<Number> INSTANCE = new DoubleComparator();
@@ -71,7 +71,7 @@ public class Comparators {
 	}
 
 	/** Diese Klasse implementiert einen {@link Comparator2}, der als Zeichenkette kodierte Dezimalzahlen vergleicht. */
-	@SuppressWarnings ("javadoc")
+	
 	public static class NumericalComparator extends AbstractComparator<String> {
 
 		public static final Comparator2<String> INSTANCE = new NumericalComparator();
@@ -130,7 +130,7 @@ public class Comparators {
 	}
 
 	/** Diese Klasse implementiert einen {@link Comparator2}, der Zeichenketten in vergleicht und die Groß-/Kleinschreibung ignoriert. */
-	@SuppressWarnings ("javadoc")
+	
 	public static class AlphabeticalComparator extends AbstractComparator<String> {
 
 		public static final Comparator2<String> INSTANCE = new AlphabeticalComparator();
@@ -144,7 +144,7 @@ public class Comparators {
 
 	/** Diese Klasse implementiert einen {@link Comparator2}, der Zeichenkette aus kodierten Dezimalzahlen und normalem Text vergleicht und dabei
 	 * Groß-/Kleinschreibung ignoriert. */
-	@SuppressWarnings ("javadoc")
+	
 	public static class AlphanumericalComparator extends AbstractComparator<String> {
 
 		public static final Comparator2<String> INSTANCE = new AlphanumericalComparator();
@@ -227,7 +227,7 @@ public class Comparators {
 
 	/** Diese Klasse implementiert den neutralen {@link Comparator2}, der als {@link Comparator#compare(Object, Object) Vergleichswert} stets {@code 0}
 	 * liefert. */
-	@SuppressWarnings ("javadoc")
+	
 	public static class NeutralComparator extends AbstractComparator<Object> {
 
 		public static final Comparator2<?> INSTANCE = new NeutralComparator();
@@ -236,7 +236,7 @@ public class Comparators {
 
 	/** Diese Klasse implementiert den natürlichen {@link Comparator2}, der den {@link Comparator#compare(Object, Object) Vergleichswert} der gegebenen
 	 * {@link Comparable} liefert. */
-	@SuppressWarnings ("javadoc")
+	
 	public static class NaturalComparator extends AbstractComparator<Comparable<Object>> {
 
 		public static final Comparator2<?> INSTANCE = new NaturalComparator();
@@ -252,7 +252,7 @@ public class Comparators {
 	 * {@link Comparator} liefert, sofern dieser ungleich {@code 0} ist, und sonst den eines zweiten gegebenen {@link Comparator} verwendet.
 	 *
 	 * @param <GItem> Typ der Eingabe. */
-	@SuppressWarnings ("javadoc")
+	
 	public static class ConcatComparator<GItem> extends AbstractComparator<GItem> {
 
 		public final Comparator<? super GItem> that1;
@@ -282,7 +282,7 @@ public class Comparators {
 	 * {@link Comparator} mit umgekehrten Vorzeichen liefert.
 	 *
 	 * @param <GItem> Typ der Elemente. */
-	@SuppressWarnings ("javadoc")
+	
 	public static class ReverseComparator<GItem> extends AbstractComparator<GItem> {
 
 		public final Comparator<? super GItem> that;
@@ -311,7 +311,7 @@ public class Comparators {
 	/** Diese Klasse implementiert den {@link Comparator2} zu {@link Comparators#compare(Iterable, Iterable, Comparator)}.
 	 *
 	 * @param <GItem> Typ der in den {@link Iterable} enthaltenen sowie vom gegebenen {@link Comparator} zu vergleichenden Elemente. */
-	@SuppressWarnings ("javadoc")
+	
 	public static class IterableComparator<GItem> extends AbstractComparator<Iterable<? extends GItem>> {
 
 		public final Comparator<? super GItem> that;
@@ -337,7 +337,7 @@ public class Comparators {
 	 *
 	 * @param <GItem> Typ der Eingabe des {@link Getter} sowie der Eingabe dieses {@link Comparator2}.
 	 * @param <GItem2> Typ der Ausgabe des {@link Getter} sowie der Eingabe des gegebenen {@link Comparator}. */
-	@SuppressWarnings ("javadoc")
+	
 	public static class TranslatedComparator<GItem, GItem2> extends AbstractComparator<GItem> {
 
 		public final Comparator<? super GItem2> that;
@@ -364,7 +364,7 @@ public class Comparators {
 	/** Diese Klasse implementiert den {@link Comparator2} zu {@link Comparators#compare(Object, Object, Comparator)}.
 	 *
 	 * @param <GItem> Typ der Eingabe. */
-	@SuppressWarnings ("javadoc")
+	
 	public static class OptionalizedComparator<GItem> extends AbstractComparator<GItem> {
 
 		public final Comparator<? super GItem> that;

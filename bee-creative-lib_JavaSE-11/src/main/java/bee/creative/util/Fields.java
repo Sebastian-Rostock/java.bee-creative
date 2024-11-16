@@ -68,7 +68,7 @@ public final class Fields {
 	 *
 	 * @param <GItem> Typ des Datensatzes.
 	 * @param <GValue> Typ des Werts. */
-	@SuppressWarnings ("javadoc")
+	
 	public static class SetupField<GItem, GValue> extends AbstractField<GItem, GValue> {
 
 		public final Field<? super GItem, GValue> that;
@@ -106,7 +106,7 @@ public final class Fields {
 	 *
 	 * @param <GItem> Typ der Eingabe.
 	 * @param <GValue> Typ des Werts der Eigenschaft. */
-	@SuppressWarnings ("javadoc")
+	
 	public static class CompositeField<GItem, GValue> extends AbstractField<GItem, GValue> {
 
 		public final Getter<? super GItem, ? extends GValue> get;

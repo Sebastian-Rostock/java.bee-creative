@@ -34,7 +34,7 @@ import com.sun.javadoc.WildcardType;
  * Der Name dieser Datei wird über die Option {@value #OPTION_TARGET} angegeben.
  *
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-@SuppressWarnings ("javadoc")
+
 @Deprecated
   class Deprecated_JavaDocGen extends Doclet {
 

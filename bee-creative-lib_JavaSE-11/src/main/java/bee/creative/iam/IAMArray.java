@@ -248,7 +248,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 
 	}
 
-	@SuppressWarnings ("javadoc")
+	
 	public static class ConcatArray extends IAMArray {
 
 		private static final byte[] MODES = { //
@@ -347,7 +347,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 
 	}
 
-	@SuppressWarnings ("javadoc")
+	
 	public static class SectionArray extends IAMArray {
 
 		public final IAMArray array;

@@ -8,7 +8,7 @@ import bee.creative.lang.Objects;
 public class Hashers {
 
 	/** Diese Klasse implementiert einen {@link Hasher}, der an {@link Objects#deepHash(Object)} und {@link Objects#deepEquals(Object, Object)} delegiert. */
-	@SuppressWarnings ("javadoc")
+	
 	public static class DeepHasher extends AbstractHasher {
 
 		public static final Hasher2 INSTANCE = new DeepHasher();
@@ -26,7 +26,7 @@ public class Hashers {
 	}
 
 	/** Diese Klasse implementiert einen {@link Hasher}, der an {@link Objects#hash(Object)} und {@link Objects#equals(Object, Object)} delegiert. */
-	@SuppressWarnings ("javadoc")
+	
 	public static class NaturalHasher extends AbstractHasher {
 
 		public static final Hasher2 INSTANCE = new NaturalHasher();
@@ -35,7 +35,7 @@ public class Hashers {
 
 	/** Diese Klasse implementiert einen {@link Hasher}, der an {@link Objects#identityHash(Object)} und {@link Objects#identityEquals(Object, Object)}
 	 * delegiert. */
-	@SuppressWarnings ("javadoc")
+	
 	public static class IdentityHasher extends AbstractHasher {
 
 		public static final Hasher2 INSTANCE = new IdentityHasher();
@@ -54,7 +54,7 @@ public class Hashers {
 
 	/** Diese Klasse implementiert einen übersetzten {@link Hasher}, der Streuwert und Äquivalenz über einen gegebenen {@link Hasher} zu den über einen gegebenen
 	 * {@link Getter} umgewandelten Objekten ermittelt. */
-	@SuppressWarnings ("javadoc")
+	
 	public static class TranslatedHasher extends AbstractHasher {
 
 		public final Hasher that;

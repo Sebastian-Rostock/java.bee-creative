@@ -17,7 +17,7 @@ import bee.creative.lang.Objects;
 public class Iterators {
 
 	/** Diese Klasse implementiert einen leeren {@link Iterator2}, der keine Elemente liefert. */
-	@SuppressWarnings ("javadoc")
+	
 	public static class EmptyIterator extends AbstractIterator<Object> {
 
 		public static final Iterator<?> INSTANCE = new EmptyIterator();
@@ -27,7 +27,7 @@ public class Iterators {
 	/** Diese Klasse implementiert einen {@link Iterator2}, der die Elemente eines Abschnitts eines gegebenen {@link Array} liefert.
 	 *
 	 * @param <GItem> Typ der Elemente. */
-	@SuppressWarnings ("javadoc")
+	
 	public static class ArrayIterator<GItem> extends AbstractIterator<GItem> {
 
 		public final Array<? extends GItem> that;
@@ -66,7 +66,7 @@ public class Iterators {
 
 	/** Diese Klasse implementiert einen {@link Iterator2}, der eine gegebene Anzahl an {@link Integer Zahlen} beginnend mit {@code 0} liefert, d.h {@code 0},
 	 * {@code 1}, ..., {@code this.count-1}. */
-	@SuppressWarnings ("javadoc")
+	
 	public static class CountIterator extends AbstractIterator<Integer> {
 
 		public final int count;
@@ -99,7 +99,7 @@ public class Iterators {
 	 * Iteratoren dürfen dabei {@code null} sein.
 	 *
 	 * @param <GItem> Typ der Elemente. */
-	@SuppressWarnings ("javadoc")
+	
 	public static class ConcatIterator<GItem> extends AbstractIterator<GItem> {
 
 		public final Iterator<? extends Iterator<? extends GItem>> that;
@@ -145,7 +145,7 @@ public class Iterators {
 	 * gelieferten Elemente in einer gegebenen {@link Collection} gepuffert.
 	 *
 	 * @param <GItem> Typ der Elemente. */
-	@SuppressWarnings ("javadoc")
+	
 	public static class UniqueIterator<GItem> extends AbstractIterator<GItem> {
 
 		public final Iterator<? extends GItem> that;
@@ -187,7 +187,7 @@ public class Iterators {
 	/** Diese Klasse implementiert einen {@link Iterator2}, der ein gegebenes Element eine gegebene Anzahl mal liefert.
 	 *
 	 * @param <GItem> Typ des Elements. */
-	@SuppressWarnings ("javadoc")
+	
 	public static class UniformIterator<GItem> extends AbstractIterator<GItem> {
 
 		public final GItem item;
@@ -223,7 +223,7 @@ public class Iterators {
 	 * liefert.
 	 *
 	 * @param <GItem> Typ der Elemente. */
-	@SuppressWarnings ("javadoc")
+	
 	public static class LimitedIterator<GItem> extends AbstractIterator<GItem> {
 
 		public final Iterator<? extends GItem> that;
@@ -264,7 +264,7 @@ public class Iterators {
 	 * {@link Iterator} liefert.
 	 *
 	 * @param <GItem> Typ der Elemente. */
-	@SuppressWarnings ("javadoc")
+	
 	public static class FilteredIterator<GItem> extends AbstractIterator<GItem> {
 
 		public final Iterator<? extends GItem> that;
@@ -314,7 +314,7 @@ public class Iterators {
 	 *
 	 * @param <GItem> Typ der Elemente.
 	 * @param <GItem2> Typ der Elemente des gegebenen {@link Iterator}. */
-	@SuppressWarnings ("javadoc")
+	
 	public static class TranslatedIterator<GItem, GItem2> extends AbstractIterator<GItem> {
 
 		public final Iterator<? extends GItem2> that;
@@ -352,7 +352,7 @@ public class Iterators {
 	 * auslöst.
 	 *
 	 * @param <GItem> Typ der Elemente. */
-	@SuppressWarnings ("javadoc")
+	
 	public static class UnmodifiableIterator<GItem> extends AbstractIterator<GItem> {
 
 		public final Iterator<? extends GItem> that;
@@ -383,7 +383,7 @@ public class Iterators {
 	 * Ordnung liefern.
 	 *
 	 * @param <GItem> Typ der Elemente. */
-	@SuppressWarnings ("javadoc")
+	
 	public static class UnionIterator<GItem> extends AbstractIterator<GItem> {
 
 		public final Comparator<? super GItem> order;
@@ -457,7 +457,7 @@ public class Iterators {
 	 * aufsteigend bezüglich einer gegebenen Ordnung liefern.
 	 *
 	 * @param <GItem> Typ der Elemente. */
-	@SuppressWarnings ("javadoc")
+	
 	public static class ExceptIterator<GItem> extends AbstractIterator<GItem> {
 
 		public final Comparator<? super GItem> order;
@@ -521,7 +521,7 @@ public class Iterators {
 	 * bezüglich einer gegebenen Ordnung liefern.
 	 *
 	 * @param <GItem> Typ der Elemente. */
-	@SuppressWarnings ("javadoc")
+	
 	public static class IntersectIterator<GItem> extends AbstractIterator<GItem> {
 
 		public final Comparator<? super GItem> order;

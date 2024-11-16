@@ -75,7 +75,7 @@ public class Comparables {
 	 * umgekehrten Vorzeichen liefert.
 	 *
 	 * @param <GItem> Typ der Eingabe. */
-	@SuppressWarnings ("javadoc")
+	
 	public static class ReverseComparable<GItem> extends AbstractComparable<GItem> {
 
 		public final Comparable<? super GItem> comparable;
@@ -102,7 +102,7 @@ public class Comparables {
 	 *
 	 * @param <GItem> Typ der Eingabe.
 	 * @param <GItem2> Typ der Eingabe des gegebenen {@link Comparable}. */
-	@SuppressWarnings ("javadoc")
+	
 	public static class TranslatedComparable<GItem, GItem2> extends AbstractComparable<GItem> {
 
 		public final Comparable<? super GItem2> that;
@@ -130,7 +130,7 @@ public class Comparables {
 	 * {@link Comparable} delegiert. Der Navigationswert für eine Eingaben {@code item} ist {@code ((item == null) ? 1 : this.that.compareTo(item))}.
 	 *
 	 * @param <GItem> Typ der Eingabe. */
-	@SuppressWarnings ("javadoc")
+	
 	public static class OptionalizedComparable<GItem> extends AbstractComparable<GItem> {
 
 		public final Comparable<? super GItem> that;

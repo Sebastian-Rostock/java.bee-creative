@@ -112,7 +112,7 @@ import bee.creative.lang.Objects;
 public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 
 	/** Diese Klasse implementiert das {@link Entry} für {@link AbstractHashData.HashIterator#nextEntry()}. */
-	@SuppressWarnings ("javadoc")
+	
 	protected static class HashEntry<GKey, GValue> implements Entry<GKey, GValue> {
 
 		protected final AbstractHashData<GKey, GValue> entryData;
@@ -159,7 +159,7 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 	}
 
 	/** Diese Klasse implementiert das unveränderliche {@link AbstractHashData.HashEntry}. */
-	@SuppressWarnings ("javadoc")
+	
 	protected static class HashEntry2<GKey, GValue> extends HashEntry<GKey, GValue> {
 
 		public HashEntry2(AbstractHashData<GKey, GValue> entryData, int entryIndex) {
@@ -174,7 +174,7 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 	}
 
 	/** Diese Klasse implementiert den abstrakten {@link Iterator} über die Schlüssel, Werte und Einträge. */
-	@SuppressWarnings ("javadoc")
+	
 	protected static abstract class HashIterator<GKey, GValue, GItem> extends AbstractIterator<GItem> {
 
 		protected final AbstractHashData<GKey, GValue> entryData;
@@ -256,7 +256,7 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 	}
 
 	/** Diese Klasse implementiert {@link AbstractHashData#newKeysImpl()}. */
-	@SuppressWarnings ("javadoc")
+	
 	protected static class Keys<GKey> extends AbstractSet2<GKey> {
 
 		protected final AbstractHashData<GKey, ?> entryData;
@@ -362,7 +362,7 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 	}
 
 	/** Diese Klasse implementiert {@link AbstractHashData#newValuesIteratorImpl()}. */
-	@SuppressWarnings ("javadoc")
+	
 	protected static class ValuesIterator<GKey, GValue> extends HashIterator<GKey, GValue, GValue> {
 
 		public ValuesIterator(AbstractHashData<GKey, GValue> entryData) {
@@ -377,7 +377,7 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 	}
 
 	/** Diese Klasse implementiert {@link AbstractHashData#newEntriesImpl()}. */
-	@SuppressWarnings ("javadoc")
+	
 	protected static class Entries<GKey, GValue> extends AbstractSet2<Entry<GKey, GValue>> {
 
 		protected final AbstractHashData<GKey, GValue> entryData;
@@ -418,7 +418,7 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 	}
 
 	/** Diese Klasse implementiert {@link AbstractHashData#newEntriesIteratorImpl()}. */
-	@SuppressWarnings ("javadoc")
+	
 	protected static class EntriesIterator<GKey, GValue> extends HashIterator<GKey, GValue, Entry<GKey, GValue>> {
 
 		public EntriesIterator(AbstractHashData<GKey, GValue> entryData) {
