@@ -2,14 +2,19 @@ package bee.creative.util;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap.KeySetView;
 import bee.creative.lang.Objects;
 
-/** Diese Klasse implementiert eine {@link AbstractProxyMap}, deren Inhalt über ein gegebenen {@link Property} angebunden wird.
+/** Diese Klasse implementiert eine {@link AbstractProxyMap}, deren Inhalt über ein gegebenen {@link Property} angebunden werden kann.
  *
  * @param <K> Typ der Schlüssel.
  * @param <V> Typ der Werte. */
 public class ProxyMap<K, V> extends AbstractProxyMap<K, V, Map<K, V>> {
 
+	/** Diese Methode liefert eine {@link ProxyMap}, die über {@code getValue} eine {@link Map} oder {@code null} liest und über {@code setValue} eine {@link Map}
+	 * oder {@code null} schreibt.
+	 *
+	 * @throws NullPointerException */
 	public static <K, V> ProxyMap<K, V> from(Producer<Map<K, V>> getValue, Consumer<Map<K, V>> setValue) throws NullPointerException {
 		return ProxyMap.from(Producers.translate(getValue, value -> {
 			if (value instanceof HashMap2) return value;
@@ -32,12 +37,18 @@ public class ProxyMap<K, V> extends AbstractProxyMap<K, V, Map<K, V>> {
 		return new ProxyMap<>(getValue, setValue, getConst);
 	}
 
+	/** Dieses Feld speichert die Funktion zum Lesen der veränderlichen und ggf. kopierten {@link Map}. */
 	public final Producer<Map<K, V>> getValue;
 
+	/** Dieses Feld speichert die Funktion zum Schreiben der {@link Map}, die über {@link #getValue} ermittelt wurde. */
 	public final Consumer<Map<K, V>> setValue;
 
+	/** Dieses Feld speichert die Funktion zum Lesen der ggf. unveränderlichen {@link Map}. */
 	public final Producer<Map<K, V>> getConst;
 
+	/** Dieser Konstruktor initialisiert {@link #getValue}, {@link KeySetView} und {@link #getConst}.
+	 *
+	 * @throws NullPointerException */
 	public ProxyMap(Producer<Map<K, V>> getValue, Consumer<Map<K, V>> setValue, Producer<Map<K, V>> getConst) throws NullPointerException {
 		this.getValue = Objects.notNull(getValue);
 		this.setValue = Objects.notNull(setValue);
