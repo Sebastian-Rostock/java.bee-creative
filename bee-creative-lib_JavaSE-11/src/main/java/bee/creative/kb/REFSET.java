@@ -56,13 +56,17 @@ public final class REFSET {
 	/** Diese Methode liefert die 1-basierte Position der gegebenen Referenz {@code ref} in der gegebenen Referenzmenge {@code refset}, wenn die Referenz ungleich
 	 * {@code 0} ist. Wenn die Referenz nicht in der Referenzmenge enthalten ist, wird {@code 0} geliefert. **/
 	public static int getIdx(int[] refset, int ref) {
-		var idx = ref & REFSET.getMask(refset);
+		var idx = REFSET.hash(ref) & REFSET.getMask(refset);
 		var res = /* refset.head_item_next[idx].head */ refset[(idx * 3) + 3];
 		while (res != 0) {
 			if (ref == /* refset.head_item_next[res-1].item */ refset[(res * 3) + 2]) return res;
 			res = /* refset.head_item_next[res-1].next */ refset[(res * 3) + 1];
 		}
 		return 0;
+	}
+
+	static int hash(int ref) {
+		return ref ^ (ref >>> 16);
 	}
 
 	/** Diese Methode liefert eine der Referenzen der gegebenen Referenzmenge {@code refset}. Wenn die Referenzmenge leer ist, wird {@code 0} geliefert. */
@@ -85,7 +89,7 @@ public final class REFSET {
 	 * {@code 0} ist. Wenn die Referenz nicht in der Referenzmenge enthalten ist, wird sie eingefügt. Wenn die Kapazität erschöpft ist, wird {@code 0}
 	 * geliefert. **/
 	public static int putRef(int[] refset, int ref) {
-		var idx = ref & REFSET.getMask(refset);
+		var idx = REFSET.hash(ref) & REFSET.getMask(refset);
 		var res = /* refset.head_item_next[idx].head */ refset[(idx * 3) + 3];
 		while (res != 0) {
 			if (ref == /* refset.head_item_next[res-1].item */ refset[(res * 3) + 2]) return res;
@@ -116,7 +120,7 @@ public final class REFSET {
 	 * wenn die Referenz ungleich {@code 0} ist. Wenn die Referenz nicht in der Referenzmenge enthalten ist, wird {@code 0} geliefert. **/
 	public static int popRef(int[] refset, int ref) {
 		if (REFSET.size(refset) == 0) return 0;
-		var idx = ref & REFSET.getMask(refset);
+		var idx = REFSET.hash(ref) & REFSET.getMask(refset);
 		var res = /* refset.head_item_next[idx].head */ refset[(idx * 3) + 3];
 		if (res == 0) return 0;
 		if (ref == /* refset.head_item_next[res-1].item */ refset[(res * 3) + 2]) {
@@ -414,7 +418,7 @@ public final class REFSET {
 		for (var off = refset.length - 1; 3 < off; off -= 3) {
 			var ref = refset[off];
 			if (ref != 0) {
-				var idx = ref & mask;
+				var idx = REFSET.hash(ref) & mask;
 				/* refset2.head_item_next[free-1].next */ refset2[(free * 3) + 1] = /* refset2.head_item_next[idx].head */ refset2[(idx * 3) + 3];
 				/* refset2.head_item_next[idx].head */ refset2[(idx * 3) + 3] = free;
 				/* refset2.head_item_next[free-1].item */ refset2[(free * 3) + 2] = ref;
