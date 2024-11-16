@@ -97,10 +97,10 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 		if ((offset < 0) || (length < 0) || ((offset + length) > items.length)) throw new IllegalArgumentException();
 		if (length == 0) return FEMString.EMPTY;
 		if (length == 1) return new UniformString(1, items[offset]);
-		if (!copy) return new CompactStringINT32(items, offset, length);
+		if (!copy) return new CompactStringINT32(0, items, offset, length);
 		var items2 = new int[length];
 		System.arraycopy(items, offset, items2, 0, length);
-		return new CompactStringINT32(items2, 0, length);
+		return new CompactStringINT32(0, items2, 0, length);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, boolean, byte[], int, int) FEMString.from(true, false, items, 0, items.length)}.
@@ -177,16 +177,16 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 		if (asUTF8) {
 			var count = FEMString.utf8Count(items, offset, length);
 			if (count == 1) return new UniformString(1, FEMString.utf8Value(items, offset));
-			if (!copy) return new CompactStringUTF8(items, offset, count);
+			if (!copy) return new CompactStringUTF8(0, items, offset, count);
 			var items2 = new byte[length];
 			System.arraycopy(items, offset, items2, 0, length);
-			return new CompactStringUTF8(items2, 0, count);
+			return new CompactStringUTF8(0, items2, 0, count);
 		} else {
 			if (length == 1) return new UniformString(1, items[offset] & 255);
-			if (!copy) return new CompactStringINT8(items, offset, length);
+			if (!copy) return new CompactStringINT8(0, items, offset, length);
 			var items2 = new byte[length];
 			System.arraycopy(items, offset, items2, 0, length);
-			return new CompactStringINT8(items2, 0, length);
+			return new CompactStringINT8(0, items2, 0, length);
 		}
 	}
 
@@ -236,10 +236,10 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 		if ((offset < 0) || (length < 0) || ((offset + length) > items.length)) throw new IllegalArgumentException();
 		if (length == 0) return FEMString.EMPTY;
 		if (length == 1) return new UniformString(1, items[offset] & 65535);
-		if (!copy) return new CompactStringINT16(items, offset, length);
+		if (!copy) return new CompactStringINT16(0, items, offset, length);
 		var items2 = new short[length];
 		System.arraycopy(items, offset, items2, 0, length);
-		return new CompactStringINT16(items2, 0, length);
+		return new CompactStringINT16(0, items2, 0, length);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, char[]) FEMString.from(false, string.toCharArray())}.
@@ -283,10 +283,10 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 		if (length == 0) return FEMString.EMPTY;
 		var count = FEMString.utf16Count(items, offset, length);
 		if (count == 1) return new UniformString(1, FEMString.utf16Value(items, offset));
-		if (!copy) return new CompactStringUTF16(items, offset, count);
+		if (!copy) return new CompactStringUTF16(0, items, offset, count);
 		var items2 = new char[length];
 		System.arraycopy(items, offset, items2, 0, length);
-		return new CompactStringUTF16(items2, 0, count);
+		return new CompactStringUTF16(0, items2, 0, count);
 	}
 
 	/** Diese Methode konvertiert die gegebenen Codepoints in eine Zeichenkette und gibt diese zurück.
@@ -681,9 +681,35 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 
 	public static class ConcatString extends HashString implements Emuable {
 
+		public static ConcatString from(FEMString string1, FEMString string2) throws IllegalArgumentException {
+			var size1 = ConcatString.size(string1);
+			var size2 = ConcatString.size(string2);
+			if ((size1 + 1) < size2) {
+				var cs2 = (ConcatString)string2;
+				if (!(cs2 instanceof ConcatString1)) return ConcatString.from(ConcatString.from(string1, cs2.string1), cs2.string2);
+				var cs21 = (ConcatString)cs2.string1;
+				return ConcatString.from(ConcatString.from(string1, cs21.string1), ConcatString.from(cs21.string2, cs2.string2));
+			}
+			if ((size2 + 1) < size1) {
+				var cs1 = (ConcatString)string1;
+				if (!(cs1 instanceof ConcatString2)) return ConcatString.from(cs1.string1, ConcatString.from(cs1.string2, string2));
+				var cs12 = (ConcatString)cs1.string2;
+				return ConcatString.from(ConcatString.from(cs1.string1, cs12.string1), ConcatString.from(cs12.string2, string2));
+			}
+			if (size1 > size2) return new ConcatString1(string1, string2);
+			if (size1 < size2) return new ConcatString2(string1, string2);
+			return new ConcatString(string1, string2);
+		}
+
 		public final FEMString string1;
 
 		public final FEMString string2;
+
+		public ConcatString(FEMString string1, FEMString string2) throws IllegalArgumentException {
+			super(string1.length + string2.length);
+			this.string1 = string1;
+			this.string2 = string2;
+		}
 
 		@Override
 		public long emu() {
@@ -720,7 +746,7 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 			return this.string1.section(offset, -offset2).concat(this.string2.section(0, length2));
 		}
 
-		static int size(FEMString string) {
+		private static int size(FEMString string) {
 			for (var size = 0; true; size++) {
 				if (string instanceof ConcatString2) {
 					string = ((ConcatString)string).string2;
@@ -730,37 +756,11 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 			}
 		}
 
-		static ConcatString from(FEMString string1, FEMString string2) throws IllegalArgumentException {
-			var size1 = ConcatString.size(string1);
-			var size2 = ConcatString.size(string2);
-			if ((size1 + 1) < size2) {
-				var cs2 = (ConcatString)string2;
-				if (!(cs2 instanceof ConcatString1)) return ConcatString.from(ConcatString.from(string1, cs2.string1), cs2.string2);
-				var cs21 = (ConcatString)cs2.string1;
-				return ConcatString.from(ConcatString.from(string1, cs21.string1), ConcatString.from(cs21.string2, cs2.string2));
-			}
-			if ((size2 + 1) < size1) {
-				var cs1 = (ConcatString)string1;
-				if (!(cs1 instanceof ConcatString2)) return ConcatString.from(cs1.string1, ConcatString.from(cs1.string2, string2));
-				var cs12 = (ConcatString)cs1.string2;
-				return ConcatString.from(ConcatString.from(cs1.string1, cs12.string1), ConcatString.from(cs12.string2, string2));
-			}
-			if (size1 > size2) return new ConcatString1(string1, string2);
-			if (size1 < size2) return new ConcatString2(string1, string2);
-			return new ConcatString(string1, string2);
-		}
-
-		ConcatString(FEMString string1, FEMString string2) throws IllegalArgumentException {
-			super(string1.length + string2.length);
-			this.string1 = string1;
-			this.string2 = string2;
-		}
-
 	}
 
 	public static final class ConcatString1 extends ConcatString {
 
-		ConcatString1(FEMString string1, FEMString string2) throws IllegalArgumentException {
+		public ConcatString1(FEMString string1, FEMString string2) throws IllegalArgumentException {
 			super(string1, string2);
 		}
 
@@ -768,7 +768,7 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 
 	public static final class ConcatString2 extends ConcatString {
 
-		ConcatString2(FEMString string1, FEMString string2) throws IllegalArgumentException {
+		public ConcatString2(FEMString string1, FEMString string2) throws IllegalArgumentException {
 			super(string1, string2);
 		}
 
@@ -783,6 +783,12 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 		@Override
 		public long emu() {
 			return EMU.fromObject(this) + EMU.from(this.string);
+		}
+
+		public SectionString(FEMString string, int offset, int length) throws IllegalArgumentException {
+			super(length);
+			this.string = string;
+			this.offset = offset;
 		}
 
 		@Override
@@ -806,17 +812,16 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 			return this.string.section(this.offset + offset2, length2);
 		}
 
-		SectionString(FEMString string, int offset, int length) throws IllegalArgumentException {
-			super(length);
-			this.string = string;
-			this.offset = offset;
-		}
-
 	}
 
 	public static final class ReverseString extends HashString implements Emuable {
 
 		public final FEMString string;
+
+		public ReverseString(FEMString string) throws IllegalArgumentException {
+			super(string.length);
+			this.string = string;
+		}
 
 		@Override
 		public long emu() {
@@ -854,16 +859,16 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 			return this.string.section(this.length - offset2 - length2, length2).reverse();
 		}
 
-		ReverseString(FEMString string) throws IllegalArgumentException {
-			super(string.length);
-			this.string = string;
-		}
-
 	}
 
 	public static final class UniformString extends HashString {
 
 		public final int item;
+
+		public UniformString(int length, int value) throws IllegalArgumentException {
+			super(length);
+			this.item = value;
+		}
 
 		@Override
 		public FEMString reverse() {
@@ -904,17 +909,14 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 			return true;
 		}
 
-		UniformString(int length, int value) throws IllegalArgumentException {
-			super(length);
-			this.item = value;
-		}
-
 	}
 
 	public static final class CompactStringINT8 extends HashString implements Emuable {
 
 		public CompactStringINT8(int hash, byte[] items, int offset, int length) throws IllegalArgumentException {
-			this(items, offset, length);
+			super(length);
+			this.items = items;
+			this.offset = offset;
 			this.hash = hash;
 		}
 
@@ -945,26 +947,21 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 
 		@Override
 		protected FEMString customSection(int offset, int length) {
-			return new CompactStringINT8(this.items, this.offset + offset, length);
+			return new CompactStringINT8(0, this.items, this.offset + offset, length);
 		}
 
-		/** Dieses Feld speichert das Array der Codepoints, das nicht verändert werden sollte. */
-		final byte[] items;
+		private final byte[] items;
 
-		final int offset;
-
-		CompactStringINT8(byte[] items, int offset, int length) throws IllegalArgumentException {
-			super(length);
-			this.items = items;
-			this.offset = offset;
-		}
+		private final int offset;
 
 	}
 
 	public static final class CompactStringINT16 extends HashString implements Emuable {
 
 		public CompactStringINT16(int hash, short[] items, int offset, int length) throws IllegalArgumentException {
-			this(items, offset, length);
+			super(length);
+			this.items = items;
+			this.offset = offset;
 			this.hash = hash;
 		}
 
@@ -995,25 +992,21 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 
 		@Override
 		protected FEMString customSection(int offset, int length) {
-			return new CompactStringINT16(this.items, this.offset + offset, length);
+			return new CompactStringINT16(0, this.items, this.offset + offset, length);
 		}
 
-		final short[] items;
+		private final short[] items;
 
-		final int offset;
-
-		CompactStringINT16(short[] items, int offset, int length) throws IllegalArgumentException {
-			super(length);
-			this.items = items;
-			this.offset = offset;
-		}
+		private final int offset;
 
 	}
 
 	public static final class CompactStringINT32 extends HashString implements Emuable {
 
 		public CompactStringINT32(int hash, int[] items, int offset, int length) throws IllegalArgumentException {
-			this(items, offset, length);
+			super(length);
+			this.items = items;
+			this.offset = offset;
 			this.hash = hash;
 		}
 
@@ -1049,25 +1042,21 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 
 		@Override
 		protected FEMString customSection(int offset, int length) {
-			return new CompactStringINT32(this.items, this.offset + offset, length);
+			return new CompactStringINT32(0, this.items, this.offset + offset, length);
 		}
 
-		final int[] items;
+		private final int[] items;
 
-		final int offset;
-
-		CompactStringINT32(int[] items, int offset, int length) throws IllegalArgumentException {
-			super(length);
-			this.items = items;
-			this.offset = offset;
-		}
+		private final int offset;
 
 	}
 
 	public static final class CompactStringUTF8 extends HashString implements Emuable {
 
 		public CompactStringUTF8(int hash, byte[] items, int offset, int length) throws IllegalArgumentException {
-			this(items, offset, length);
+			super(length);
+			this.items = items;
+			this.offset = offset;
 			this.hash = hash;
 		}
 
@@ -1116,25 +1105,21 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 
 		@Override
 		protected FEMString customSection(int offset, int length) {
-			return new CompactStringUTF8(this.items, FEMString.utf8Offset(this.items, this.offset, offset), length);
+			return new CompactStringUTF8(0, this.items, FEMString.utf8Offset(this.items, this.offset, offset), length);
 		}
 
-		final byte[] items;
+		private final byte[] items;
 
-		final int offset;
-
-		CompactStringUTF8(byte[] items, int offset, int length) throws IllegalArgumentException {
-			super(length);
-			this.items = items;
-			this.offset = offset;
-		}
+		private final int offset;
 
 	}
 
 	public static final class CompactStringUTF16 extends HashString implements Emuable {
 
 		public CompactStringUTF16(int hash, char[] items, int offset, int length) throws IllegalArgumentException {
-			this(items, offset, length);
+			super(length);
+			this.items = items;
+			this.offset = offset;
 			this.hash = hash;
 		}
 
@@ -1178,18 +1163,12 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 
 		@Override
 		protected FEMString customSection(int offset, int length) {
-			return new CompactStringUTF16(this.items, FEMString.utf16Offset(this.items, this.offset, offset), length);
+			return new CompactStringUTF16(0, this.items, FEMString.utf16Offset(this.items, this.offset, offset), length);
 		}
 
-		final char[] items;
+		private final char[] items;
 
-		final int offset;
-
-		CompactStringUTF16(char[] items, int offset, int length) throws IllegalArgumentException {
-			super(length);
-			this.items = items;
-			this.offset = offset;
-		}
+		private final int offset;
 
 	}
 

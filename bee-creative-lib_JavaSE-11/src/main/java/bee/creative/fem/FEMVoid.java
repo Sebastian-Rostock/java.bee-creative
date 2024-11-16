@@ -55,7 +55,7 @@ public final class FEMVoid implements FEMValue {
 		return "null";
 	}
 
-	FEMVoid() {
+	private FEMVoid() {
 	}
 
 }

@@ -74,7 +74,6 @@ public class FEMToken {
 
 	private final Map<String, FEMFunction> proxies;
 
-	/** Dieser Konstruktor initialisiert das Objekt mit dem gegebenen Abschnitt sowie der Plazhalterabbildung des gegebenen Objekts. */
 	private FEMToken(FEMToken parent, Token token) throws NullPointerException {
 		this.token = token;
 		this.proxies = parent.proxies;
