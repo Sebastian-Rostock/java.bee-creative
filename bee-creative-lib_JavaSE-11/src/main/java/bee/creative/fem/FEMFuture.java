@@ -1,5 +1,7 @@
 package bee.creative.fem;
 
+import bee.creative.lang.Objects;
+
 /** Diese Klasse implementiert einen Wert, der als Ergebniswert einer Funktion mit <em>return-by-reference</em>-Semantik sowie als Parameterwert eines Aufrufs
  * mit <em>call-by-reference</em>-Semantik eingesetzt werden kann. Der Wert kapselt dazu eine gegebene {@link #target() Funktion} sowie einen gegebenen
  * {@link #frame() Stapelrahmen} und wertet diese Funktion erst dann mit diesem Stapelrahmen einmalig aus, wenn auf {@link #type() Datentyp} oder {@link #data()
@@ -9,6 +11,11 @@ package bee.creative.fem;
  *
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMFuture implements FEMValue {
+
+	public FEMFuture(FEMFrame frame, FEMFunction function) throws NullPointerException {
+		this.frame = Objects.notNull(frame);
+		this.target = Objects.notNull(function);
+	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn der {@link #result() Ergebniswert} ausgewertet wurde, d.h. wenn {@link #target()} einen
 	 * {@link FEMValue} liefert.
@@ -85,13 +92,8 @@ public final class FEMFuture implements FEMValue {
 		return this.result().toFunction();
 	}
 
-	FEMFrame frame;
+	private FEMFrame frame;
 
-	FEMFunction target;
-
-	FEMFuture(FEMFrame frame, FEMFunction function) {
-		this.frame = frame;
-		this.target = function;
-	}
+	private FEMFunction target;
 
 }

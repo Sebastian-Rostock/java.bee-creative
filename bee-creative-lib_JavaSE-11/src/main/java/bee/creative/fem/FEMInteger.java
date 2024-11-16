@@ -118,10 +118,9 @@ public final class FEMInteger implements FEMValue, Comparable<FEMInteger> {
 		return this.value;
 	}
 
-	/** Dieses Feld speichert die interne Darstellung der Dezimalzahl. */
-	final long value;
+	private final long value;
 
-	FEMInteger(long value) {
+	private FEMInteger(long value) {
 		this.value = value;
 	}
 

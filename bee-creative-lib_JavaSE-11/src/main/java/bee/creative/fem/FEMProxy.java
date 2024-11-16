@@ -95,13 +95,13 @@ public final class FEMProxy implements FEMFunction, Property<FEMFunction>, Emuab
 		return FEMDomain.DEFAULT.printConst(this.name.toString());
 	}
 
-	private	final FEMValue id;
+	private final FEMValue id;
 
-	private	final FEMString name;
+	private final FEMString name;
 
-	private	FEMFunction target;
+	private FEMFunction target;
 
-	FEMProxy(FEMValue id, FEMString name) {
+	private FEMProxy(FEMValue id, FEMString name) {
 		this.id = id;
 		this.name = name;
 	}

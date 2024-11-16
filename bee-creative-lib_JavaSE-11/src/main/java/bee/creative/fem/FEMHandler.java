@@ -83,9 +83,9 @@ public final class FEMHandler implements FEMValue {
 		return this.value;
 	}
 
-	final FEMFunction value;
+	private final FEMFunction value;
 
-	FEMHandler(FEMFunction value) {
+	private FEMHandler(FEMFunction value) {
 		this.value = value;
 	}
 

@@ -96,11 +96,9 @@ public final class FEMException extends Exception2 {
 		return this;
 	}
 
-	/** Dieses Feld speichert den Wert. */
-	FEMValue value;
+	private FEMValue value;
 
-	/** Dieses Feld speichert den Kontextobjekt. */
-	FEMContext context;
+	private FEMContext context;
 
 	private static final long serialVersionUID = -2654985371977072939L;
 

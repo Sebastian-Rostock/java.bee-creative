@@ -79,7 +79,7 @@ public interface FEMFunction {
 	 *
 	 * @return Wert. */
 	default FEMValue toValue() {
-		return new FEMHandler(this);
+		return FEMHandler.from(this);
 	}
 
 	/** Diese Methode gibt diese Funktion mit {@code return-by-reference}-Semantik zurück. Der Ergebniswert der gelieferten Funktion wird über
@@ -98,7 +98,7 @@ public interface FEMFunction {
 	 * @return Ergebniswert ggf. als {@link FEMFuture}.
 	 * @throws NullPointerException Wenn {@code frame} {@code null} ist. */
 	default FEMValue toFuture(FEMFrame frame) throws NullPointerException {
-		return new FEMFuture(Objects.notNull(frame), this);
+		return new FEMFuture(frame, this);
 	}
 
 	public static abstract class BaseFunction implements FEMFunction {

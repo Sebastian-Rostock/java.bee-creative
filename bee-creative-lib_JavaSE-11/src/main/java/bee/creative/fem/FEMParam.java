@@ -80,7 +80,7 @@ public final class FEMParam implements FEMFunction {
 		return "$" + (this.index + 1);
 	}
 
-	static final FEMParam[] CACHE = { //
+	private static final FEMParam[] CACHE = { //
 		new FEMParam(0), new FEMParam(1), new FEMParam(2), new FEMParam(3), new FEMParam(4), new FEMParam(5), new FEMParam(6), new FEMParam(7), //
 		new FEMParam(8), new FEMParam(9), new FEMParam(10), new FEMParam(11), new FEMParam(12), new FEMParam(13), new FEMParam(14), new FEMParam(15)};
 

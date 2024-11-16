@@ -191,11 +191,11 @@ public final class FEMObject implements FEMValue, Comparable<FEMObject> {
 		return "@" + this.ownerValue() + "." + this.refValue() + ":" + this.typeValue();
 	}
 
-	static void checkMin(int value) throws IllegalArgumentException {
+	private static void checkMin(int value) throws IllegalArgumentException {
 		if (value < 0) throw new IllegalArgumentException();
 	}
 
-	static void checkMax(int value) throws IllegalArgumentException {
+	private static void checkMax(int value) throws IllegalArgumentException {
 		FEMObject.checkMin(value);
 		if (value > 65535) throw new IllegalArgumentException();
 	}

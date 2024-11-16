@@ -34,9 +34,6 @@ public final class FEMNative implements FEMValue {
 		return new FEMNative(data);
 	}
 
-	/** Dieses Feld speichert das native Objekt. */
-	final Object data;
-
 	/** Dieser Konstruktor initialisiert das native Objekt.
 	 *
 	 * @param data Objekt. */
@@ -72,5 +69,8 @@ public final class FEMNative implements FEMValue {
 	public String toString() {
 		return Objects.toString(this.data);
 	}
+
+	/** Dieses Feld speichert das native Objekt. */
+	private	final Object data;
 
 }
