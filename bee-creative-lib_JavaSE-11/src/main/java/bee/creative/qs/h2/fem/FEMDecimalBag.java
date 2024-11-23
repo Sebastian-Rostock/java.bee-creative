@@ -15,7 +15,7 @@ public class FEMDecimalBag extends H2QIRangeBag<FEMDecimal, FEMDecimalBag> {
 
 	@Override
 	protected FEMDecimal customItem(final ResultSet next) throws SQLException {
-		return new FEMDecimal(next.getDouble(2));
+		return FEMDecimal.from(next.getDouble(2));
 	}
 
 	@Override

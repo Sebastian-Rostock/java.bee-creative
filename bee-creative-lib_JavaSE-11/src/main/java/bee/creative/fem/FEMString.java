@@ -576,8 +576,7 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 
 	public void toInts(int[] items, int offset) throws IndexOutOfBoundsException {
 		if ((offset < 0) || ((offset + this.length) > items.length)) throw new IllegalArgumentException();
-		var encoder = new INT32Encoder(items, offset);
-		this.collect(encoder);
+		this.collect(new INT32Encoder(items, offset));
 	}
 
 	/** Diese Methode gibt die 8-Bit-einzelwertkodierten Codepoint zurück. Codepoint größer als {@code 255} werden zu {@code 0}.
@@ -591,8 +590,7 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 
 	public void toBytes(byte[] items, int offset) throws IndexOutOfBoundsException {
 		if ((offset < 0) || ((offset + this.length) > items.length)) throw new IllegalArgumentException();
-		var encoder = new INT8Encoder(items, offset);
-		this.collect(encoder);
+		this.collect(new INT8Encoder(items, offset));
 	}
 
 	/** Diese Methode gibt die Codepoint in 8-Bit-Kodierung zurück.
@@ -620,8 +618,7 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 
 	public void toShorts(short[] items, int offset) throws IndexOutOfBoundsException {
 		if ((offset < 0) || ((offset + this.length) > items.length)) throw new IllegalArgumentException();
-		var encoder = new INT16Encoder(items, offset);
-		this.collect(encoder);
+		this.collect(new INT16Encoder(items, offset));
 	}
 
 	/** Diese Methode gibt die Codepoint in UTF16-Kodierung zurück.
@@ -630,9 +627,9 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 	public char[] toChars() {
 		var counter = new UTF16Counter();
 		this.collect(counter);
-		var encoder = new UTF16Encoder(new char[counter.count], 0);
-		this.collect(encoder);
-		return encoder.items;
+		var items = new char[counter.count];
+		this.collect(new UTF16Encoder(items, 0));
+		return items;
 	}
 
 	/** Diese Methode gibt diesen Zeichenkette als {@link String} zurück.
@@ -909,13 +906,18 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 			return true;
 		}
 
+		@Override
+		protected FEMString customSection(int offset, int length) {
+			return new UniformString(length, this.item);
+		}
+
 	}
 
 	public static final class CompactStringINT8 extends HashString implements Emuable {
 
 		public CompactStringINT8(int hash, byte[] items, int offset, int length) throws IllegalArgumentException {
 			super(length);
-			this.items = items;
+			this.items = Objects.notNull(items);
 			this.offset = offset;
 			this.hash = hash;
 		}
@@ -960,7 +962,7 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 
 		public CompactStringINT16(int hash, short[] items, int offset, int length) throws IllegalArgumentException {
 			super(length);
-			this.items = items;
+			this.items = Objects.notNull(items);
 			this.offset = offset;
 			this.hash = hash;
 		}
@@ -1005,7 +1007,7 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 
 		public CompactStringINT32(int hash, int[] items, int offset, int length) throws IllegalArgumentException {
 			super(length);
-			this.items = items;
+			this.items = Objects.notNull(items);
 			this.offset = offset;
 			this.hash = hash;
 		}
@@ -1055,7 +1057,7 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 
 		public CompactStringUTF8(int hash, byte[] items, int offset, int length) throws IllegalArgumentException {
 			super(length);
-			this.items = items;
+			this.items = Objects.notNull(items);
 			this.offset = offset;
 			this.hash = hash;
 		}
@@ -1118,7 +1120,7 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 
 		public CompactStringUTF16(int hash, char[] items, int offset, int length) throws IllegalArgumentException {
 			super(length);
-			this.items = items;
+			this.items = Objects.notNull(items);
 			this.offset = offset;
 			this.hash = hash;
 		}
@@ -1442,8 +1444,6 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 
 	private final class ItemIter extends AbstractIterator<Integer> {
 
-		int index = 0;
-
 		@Override
 		public Integer next() {
 			return FEMString.this.customGet(this.index++);
@@ -1453,6 +1453,8 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 		public boolean hasNext() {
 			return this.index < FEMString.this.length;
 		}
+
+		int index = 0;
 
 	}
 
@@ -1561,8 +1563,8 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 
 		public int index;
 
-		public INT8Encoder(byte[] array, int index) {
-			this.items = array;
+		public INT8Encoder(byte[] items, int index) {
+			this.items = items;
 			this.index = index;
 		}
 
