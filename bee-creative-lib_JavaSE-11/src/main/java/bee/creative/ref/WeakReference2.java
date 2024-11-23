@@ -14,7 +14,7 @@ public class WeakReference2<GValue> extends WeakReference<GValue> implements Pro
 	static private final ReferenceQueue2<Object> QUEUE = new ReferenceQueue2<>() {
 
 		@Override
-		protected void customRemove(final Reference<?> reference) {
+		protected void customRemove(Reference<?> reference) {
 			((WeakReference2<?>)reference).customRemove();
 		}
 
