@@ -30,6 +30,109 @@ import bee.creative.util.Map3;
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable<FEMValue>, UseToString {
 
+	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
+	public static final int ID = 1;
+
+	/** Dieses Feld speichert den {@link #type() Datentyp}. */
+	public static final FEMType<FEMArray> TYPE = FEMType.from(FEMArray.ID);
+
+	/** Dieses Feld speichert die leere Wertliste. */
+	public static final FEMArray EMPTY = new UniformArray2(0, FEMVoid.INSTANCE);
+
+	/** Diese Methode gibt eine uniforme Wertliste mit der gegebenen Länge zurück, deren Werte alle gleich dem gegebenen sind.
+	 *
+	 * @param length Länge.
+	 * @param item Wert.
+	 * @return Wertliste.
+	 * @throws NullPointerException Wenn {@code item} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn {@code length < 0} ist. */
+	public static FEMArray from(int length, FEMValue item) throws NullPointerException, IllegalArgumentException {
+		Objects.notNull(item);
+		if (length == 0) return FEMArray.EMPTY;
+		return new UniformArray(length, item);
+	}
+
+	/** Diese Methode konvertiert die gegebenen Werte in eine Wertliste und gibt diese zurück und ist eine Abkürzung für {@link #from(boolean, FEMValue...)
+	 * FEMArray.from(true, items)}
+	 *
+	 * @param items Werte.
+	 * @return Wertliste.
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist oder enthält. */
+	public static FEMArray from(FEMValue... items) throws NullPointerException {
+		return FEMArray.from(true, items);
+	}
+
+	/** Diese Methode konvertiert die gegebenen Werte in eine Wertliste und gibt diese zurück.
+	 *
+	 * @param copy {@code true}, wenn das gegebene Array kopiert werden soll.
+	 * @param items Werte.
+	 * @return Wertliste.
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist oder enthält. */
+	public static FEMArray from(boolean copy, FEMValue... items) throws NullPointerException {
+		if (items.length == 0) return FEMArray.EMPTY;
+		if (items.length == 1) return new UniformArray(1, items[0]);
+		return new CompactArray(copy ? items.clone() : items);
+	}
+
+	/** Diese Methode gibt eine Wertliste mit den Werten im gegebenen Abschnitt zurück. Der gegebene Abschnitt wird kopiert.
+	 *
+	 * @param items Werte.
+	 * @param offset Beginn des Abschnitts.
+	 * @param length Länge des Abschnitts.
+	 * @return Wertliste.
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist oder der Abschnitt {@code null} enthält.
+	 * @throws IllegalArgumentException Wenn der Abschnitt ungültig ist. */
+	public static FEMArray from(FEMValue[] items, int offset, int length) throws NullPointerException, IllegalArgumentException {
+		if ((offset < 0) || (length < 0) || ((offset + length) > items.length)) throw new IllegalArgumentException();
+		if (length == 0) return FEMArray.EMPTY;
+		if (length == 1) return new UniformArray(1, Objects.notNull(items[offset]));
+		var result = new FEMValue[length];
+		System.arraycopy(items, offset, result, 0, length);
+		return new CompactArray(result);
+	}
+
+	/** Diese Methode konvertiert die gegebenen Werte in eine Wertliste und gibt diese zurück.
+	 *
+	 * @see #from(FEMValue...)
+	 * @see Iterables#toArray(Iterable, Object[])
+	 * @param items Werte.
+	 * @return Wertliste.
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
+	public static FEMArray from(final Iterable<? extends FEMValue> items) throws NullPointerException {
+		if (items instanceof FEMArray) return (FEMArray)items;
+		return FEMArray.from(Iterables.toArray(items, new FEMValue[0]));
+	}
+
+	/** Diese Methode überführt die {@link Entry Einträge} der gegebenen {@link Map Abbildung} in eine {@link #compact(boolean) indizierte Schlüsselliste} sowie
+	 * eine {@link #compact() kompaktierte Wertliste} und liefert eine neue Wertliste, die diese beiden Listen in dieser Reihenfolge enthält.
+	 *
+	 * @see #toMap()
+	 * @param entries Abbildung.
+	 * @return Wertliste mit Schlüsselliste und Wertliste.
+	 * @throws NullPointerException Wenn {@code entries} {@code null} ist. */
+	public static FEMArray from(final Map<? extends FEMValue, ? extends FEMValue> entries) throws NullPointerException {
+		if (entries instanceof ItemMap) return ((ItemMap)entries).toArray();
+		final ArrayList<FEMValue> keys = new ArrayList<>(), values = new ArrayList<>();
+		for (final Entry<? extends FEMValue, ? extends FEMValue> entry: entries.entrySet()) {
+			keys.add(entry.getKey());
+			values.add(entry.getValue());
+		}
+		return FEMArray.from(FEMArray.from(keys).compact(true), FEMArray.from(values).compact());
+	}
+
+	/** Diese Methode gibt die Verkettung der gegebenen Wertlisten zurück.
+	 *
+	 * @see #concat(FEMArray)
+	 * @param values Wertlisten.
+	 * @return Verkettung der Wertlisten.
+	 * @throws NullPointerException Wenn {@code values} {@code null} ist oder enthält. */
+	public static FEMArray concatAll(final FEMArray... values) throws NullPointerException {
+		final var length = values.length;
+		if (length == 0) return FEMArray.EMPTY;
+		if (length == 1) return values[0].data();
+		return FEMArray.concatAll(values, 0, length - 1);
+	}
+
 	/** Diese Schnittstelle definiert ein Objekt zum geordneten Sammeln von Werten einer Wertliste in der Methode {@link FEMArray#extract(Collector)}. */
 	public static interface Collector {
 
@@ -803,111 +906,6 @@ public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable<FE
 			return true;
 		}
 
-	}
-
-	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
-	public static final int ID = 1;
-
-	/** Dieses Feld speichert den {@link #type() Datentyp}. */
-	public static final FEMType<FEMArray> TYPE = FEMType.from(FEMArray.ID);
-
-	/** Dieses Feld speichert die leere Wertliste. */
-	public static final FEMArray EMPTY = new UniformArray2(0, FEMVoid.INSTANCE);
-
-	private static final FEMValue[] VALUES = new FEMValue[0];
-
-	/** Diese Methode gibt eine uniforme Wertliste mit der gegebenen Länge zurück, deren Werte alle gleich dem gegebenen sind.
-	 *
-	 * @param length Länge.
-	 * @param item Wert.
-	 * @return Wertliste.
-	 * @throws NullPointerException Wenn {@code item} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@code length < 0} ist. */
-	public static FEMArray from(int length, FEMValue item) throws NullPointerException, IllegalArgumentException {
-		Objects.notNull(item);
-		if (length == 0) return FEMArray.EMPTY;
-		return new UniformArray(length, item);
-	}
-
-	/** Diese Methode konvertiert die gegebenen Werte in eine Wertliste und gibt diese zurück und ist eine Abkürzung für {@link #from(boolean, FEMValue...)
-	 * FEMArray.from(true, items)}
-	 *
-	 * @param items Werte.
-	 * @return Wertliste.
-	 * @throws NullPointerException Wenn {@code items} {@code null} ist oder enthält. */
-	public static FEMArray from(FEMValue... items) throws NullPointerException {
-		return FEMArray.from(true, items);
-	}
-
-	/** Diese Methode konvertiert die gegebenen Werte in eine Wertliste und gibt diese zurück.
-	 *
-	 * @param copy {@code true}, wenn das gegebene Array kopiert werden soll.
-	 * @param items Werte.
-	 * @return Wertliste.
-	 * @throws NullPointerException Wenn {@code items} {@code null} ist oder enthält. */
-	public static FEMArray from(boolean copy, FEMValue... items) throws NullPointerException {
-		if (items.length == 0) return FEMArray.EMPTY;
-		if (items.length == 1) return new UniformArray(1, items[0]);
-		return new CompactArray(copy ? items.clone() : items);
-	}
-
-	/** Diese Methode gibt eine Wertliste mit den Werten im gegebenen Abschnitt zurück. Der gegebene Abschnitt wird kopiert.
-	 *
-	 * @param items Werte.
-	 * @param offset Beginn des Abschnitts.
-	 * @param length Länge des Abschnitts.
-	 * @return Wertliste.
-	 * @throws NullPointerException Wenn {@code items} {@code null} ist oder der Abschnitt {@code null} enthält.
-	 * @throws IllegalArgumentException Wenn der Abschnitt ungültig ist. */
-	public static FEMArray from(FEMValue[] items, int offset, int length) throws NullPointerException, IllegalArgumentException {
-		if ((offset < 0) || (length < 0) || ((offset + length) > items.length)) throw new IllegalArgumentException();
-		if (length == 0) return FEMArray.EMPTY;
-		if (length == 1) return new UniformArray(1, Objects.notNull(items[offset]));
-		var result = new FEMValue[length];
-		System.arraycopy(items, offset, result, 0, length);
-		return new CompactArray(result);
-	}
-
-	/** Diese Methode konvertiert die gegebenen Werte in eine Wertliste und gibt diese zurück.
-	 *
-	 * @see #from(FEMValue...)
-	 * @see Iterables#toArray(Iterable, Object[])
-	 * @param items Werte.
-	 * @return Wertliste.
-	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
-	public static FEMArray from(final Iterable<? extends FEMValue> items) throws NullPointerException {
-		if (items instanceof FEMArray) return (FEMArray)items;
-		return FEMArray.from(Iterables.toArray(items, FEMArray.VALUES));
-	}
-
-	/** Diese Methode überführt die {@link Entry Einträge} der gegebenen {@link Map Abbildung} in eine {@link #compact(boolean) indizierte Schlüsselliste} sowie
-	 * eine {@link #compact() kompaktierte Wertliste} und liefert eine neue Wertliste, die diese beiden Listen in dieser Reihenfolge enthält.
-	 *
-	 * @see #toMap()
-	 * @param entries Abbildung.
-	 * @return Wertliste mit Schlüsselliste und Wertliste.
-	 * @throws NullPointerException Wenn {@code entries} {@code null} ist. */
-	public static FEMArray from(final Map<? extends FEMValue, ? extends FEMValue> entries) throws NullPointerException {
-		if (entries instanceof ItemMap) return ((ItemMap)entries).toArray();
-		final ArrayList<FEMValue> keys = new ArrayList<>(), values = new ArrayList<>();
-		for (final Entry<? extends FEMValue, ? extends FEMValue> entry: entries.entrySet()) {
-			keys.add(entry.getKey());
-			values.add(entry.getValue());
-		}
-		return FEMArray.from(FEMArray.from(keys).compact(true), FEMArray.from(values).compact());
-	}
-
-	/** Diese Methode gibt die Verkettung der gegebenen Wertlisten zurück.
-	 *
-	 * @see #concat(FEMArray)
-	 * @param values Wertlisten.
-	 * @return Verkettung der Wertlisten.
-	 * @throws NullPointerException Wenn {@code values} {@code null} ist oder enthält. */
-	public static FEMArray concatAll(final FEMArray... values) throws NullPointerException {
-		final var length = values.length;
-		if (length == 0) return FEMArray.EMPTY;
-		if (length == 1) return values[0].data();
-		return FEMArray.concatAll(values, 0, length - 1);
 	}
 
 	static FEMArray concatAll(final FEMArray[] values, final int min, final int max) throws NullPointerException {
