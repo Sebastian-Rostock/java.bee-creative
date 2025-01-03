@@ -11,6 +11,6 @@ public interface Array<GItem> {
 	 * @param index Index.
 	 * @return {@code index}-tes Element.
 	 * @throws IndexOutOfBoundsException Wenn der gegebene Index ungültig ist. */
-	public GItem get(int index) throws IndexOutOfBoundsException;
+	GItem get(int index) throws IndexOutOfBoundsException;
 
 }
