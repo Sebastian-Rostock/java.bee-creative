@@ -5,20 +5,6 @@ package bee.creative.lang;
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Integers {
 
-	final static byte[] digitTenArray = {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '2', '2', '2', '2',
-		'2', '2', '2', '2', '2', '2', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '4', '4', '4', '4', '4', '4', '4', '4', '4', '4', '5', '5', '5', '5', '5',
-		'5', '5', '5', '5', '5', '6', '6', '6', '6', '6', '6', '6', '6', '6', '6', '7', '7', '7', '7', '7', '7', '7', '7', '7', '7', '8', '8', '8', '8', '8', '8',
-		'8', '8', '8', '8', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9'};
-
-	final static byte[] digitOneArray = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3',
-		'4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4',
-		'5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5',
-		'6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
-
-	final static String[] sizeUnitArray = {" B", " KB", " MB", " GB", " TB", " PB", " EB"};
-
-	final static String[] timeUnitArray = {" ns", " µs", " ms", " s", " ks", " MS", " GS"};
-
 	/** Diese Methode gibt die Anzahl an Zeichen zurück, die zur Darstellung der gegebenen positiven Dezimalzahl nötig sind.
 	 * <p>
 	 * <b>Ungültige Eingaben werden nicht geprüft!</b>
@@ -282,41 +268,6 @@ public class Integers {
 		}
 	}
 
-	static StringBuilder appendSizeImpl(final StringBuilder res, long value) {
-		if (value < 1024) return res.append((int)value).append(Integers.sizeUnitArray[0]);
-		int unit = 1;
-		if (value < 102400) {
-			value = (value * 100) / 1024;
-		} else {
-			value = (value / 1024) * 100;
-		}
-		while (value >= 102400) {
-			unit++;
-			value /= 1024;
-		}
-		return Integers.appendPercentImpl(res, (int)value).append(Integers.sizeUnitArray[unit]);
-	}
-
-	static StringBuilder appendTimeImpl(final StringBuilder res, long value) {
-		if (value < 1000) return res.append((int)value).append(Integers.timeUnitArray[0]);
-		value /= 10;
-		int unit = 1;
-		while (value >= 100000) {
-			unit++;
-			value /= 1000;
-		}
-		return Integers.appendPercentImpl(res, (int)value).append(Integers.timeUnitArray[unit]);
-	}
-
-	static StringBuilder appendPercentImpl(final StringBuilder res, final int value) {
-		final int div = value / 100, mod = value % 100;
-		res.append(div);
-		if ((div >= 100) || (mod == 0) || ((div >= 10) && (mod < 10))) return res;
-		res.append('.').append((char)Integers.digitTenArray[mod]);
-		if ((div >= 10) || ((mod % 10) == 0)) return res;
-		return res.append((char)Integers.digitOneArray[mod]);
-	}
-
 	/** Diese Methode gibt die gegebennen 16-Bit-Werte als 32-Bit-Wert zurück.
 	 *
 	 * @param int16H MSB 16-Bit-Wert.
@@ -397,6 +348,55 @@ public class Integers {
 	 * @return 64-Bit-Wert */
 	public static long toLong(final int int32H, final int int32L) {
 		return ((long)int32H << 32) | (int32L & 0xFFFFFFFFL);
+	}
+
+	final static byte[] digitTenArray = {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '2', '2', '2', '2',
+	'2', '2', '2', '2', '2', '2', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '4', '4', '4', '4', '4', '4', '4', '4', '4', '4', '5', '5', '5', '5', '5',
+	'5', '5', '5', '5', '5', '6', '6', '6', '6', '6', '6', '6', '6', '6', '6', '7', '7', '7', '7', '7', '7', '7', '7', '7', '7', '8', '8', '8', '8', '8', '8',
+	'8', '8', '8', '8', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9'};
+
+	final static byte[] digitOneArray = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3',
+	'4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4',
+	'5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5',
+	'6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+
+	final static String[] sizeUnitArray = {" B", " KB", " MB", " GB", " TB", " PB", " EB"};
+
+	final static String[] timeUnitArray = {" ns", " µs", " ms", " s", " ks", " MS", " GS"};
+
+	static StringBuilder appendSizeImpl(final StringBuilder res, long value) {
+		if (value < 1024) return res.append((int)value).append(Integers.sizeUnitArray[0]);
+		int unit = 1;
+		if (value < 102400) {
+			value = (value * 100) / 1024;
+		} else {
+			value = (value / 1024) * 100;
+		}
+		while (value >= 102400) {
+			unit++;
+			value /= 1024;
+		}
+		return Integers.appendPercentImpl(res, (int)value).append(Integers.sizeUnitArray[unit]);
+	}
+
+	static StringBuilder appendTimeImpl(final StringBuilder res, long value) {
+		if (value < 1000) return res.append((int)value).append(Integers.timeUnitArray[0]);
+		value /= 10;
+		int unit = 1;
+		while (value >= 100000) {
+			unit++;
+			value /= 1000;
+		}
+		return Integers.appendPercentImpl(res, (int)value).append(Integers.timeUnitArray[unit]);
+	}
+
+	static StringBuilder appendPercentImpl(final StringBuilder res, final int value) {
+		final int div = value / 100, mod = value % 100;
+		res.append(div);
+		if ((div >= 100) || (mod == 0) || ((div >= 10) && (mod < 10))) return res;
+		res.append('.').append((char)Integers.digitTenArray[mod]);
+		if ((div >= 10) || ((mod % 10) == 0)) return res;
+		return res.append((char)Integers.digitOneArray[mod]);
 	}
 
 }
