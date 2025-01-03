@@ -11,88 +11,6 @@ import java.util.ListIterator;
  * @param <GData> Typ des Inhalts. */
 public abstract class AbstractProxyList<GItem, GData extends List<GItem>> extends AbstractList2<GItem> {
 
-	class Iter implements ListIterator<GItem> {
-
-		final GData data;
-
-		final ListIterator<GItem> iter;
-
-		Iter(int index) {
-			this.data = AbstractProxyList.this.getData(false);
-			this.iter = this.data.listIterator(index);
-		}
-
-		@Override
-		public boolean hasNext() {
-			return this.iter.hasNext();
-		}
-
-		@Override
-		public GItem next() {
-			return this.iter.next();
-		}
-
-		@Override
-		public boolean hasPrevious() {
-			return this.iter.hasPrevious();
-		}
-
-		@Override
-		public GItem previous() {
-			return this.iter.previous();
-		}
-
-		@Override
-		public int nextIndex() {
-			return this.iter.nextIndex();
-		}
-
-		@Override
-		public int previousIndex() {
-			return this.iter.previousIndex();
-		}
-
-		@Override
-		public void remove() {
-			this.iter.remove();
-			AbstractProxyList.this.setData(this.data);
-		}
-
-		@Override
-		public void set(GItem e) {
-			this.iter.set(e);
-			AbstractProxyList.this.setData(this.data);
-		}
-
-		@Override
-		public void add(GItem e) {
-			this.iter.add(e);
-			AbstractProxyList.this.setData(this.data);
-		}
-
-	}
-
-	/** Diese Methode gibt den Inhalt zum Lesen bzw. Schreiben zurück. Zum Lesen wird er nur in {@link #size()}, {@link #isEmpty()}, {@link #get(int)},
-	 * {@link #indexOf(Object)}, {@link #lastIndexOf(Object)}, {@link #contains(Object)}, {@link #containsAll(Collection)}, {@link #equals(Object)},
-	 * {@link #hashCode()}, {@link #iterator()}, {@link #toArray()}, {@link #toArray(Object[])} und {@link #toString()} angefordert.
-	 *
-	 * @param readonly {@code true}, wenn der Inhalt nur zum Lesen verwendet wird und eine Kopie damit nicht nötig ist.<br>
-	 *        {@code false}, wenn der Inhalt verändert werden könnte und daher ggf. eine Kopie nötig ist.
-	 * @return Inhalt. */
-	protected abstract GData getData(boolean readonly);
-
-	/** Diese Methode setzt den Inhalt. Dieser wurde zuvor über {@link #getData(boolean)} zum Schreiben beschafft und anschließend verändert.
-	 *
-	 * @param items neuer Inhalt. */
-	protected abstract void setData(GData items);
-
-	@Override
-	protected void removeRange(int fromIndex, int toIndex) {
-		var data = this.getData(false);
-		data.subList(fromIndex, toIndex).clear();
-		this.setData(data);
-	}
-
 	@Override
 	public int size() {
 		return this.getData(true).size();
@@ -200,11 +118,6 @@ public abstract class AbstractProxyList<GItem, GData extends List<GItem>> extend
 	}
 
 	@Override
-	public ListIterator<GItem> listIterator() {
-		return this.listIterator(0);
-	}
-
-	@Override
 	public ListIterator<GItem> listIterator(int index) {
 		return new Iter(index);
 	}
@@ -244,6 +157,89 @@ public abstract class AbstractProxyList<GItem, GData extends List<GItem>> extend
 	@Override
 	public String toString() {
 		return this.getData(true).toString();
+	}
+
+	@Override
+	protected void removeRange(int fromIndex, int toIndex) {
+		if (fromIndex == toIndex) return;
+		var data = this.getData(false);
+		data.subList(fromIndex, toIndex).clear();
+		this.setData(data);
+	}
+
+	/** Diese Methode gibt den Inhalt zum Lesen bzw. Schreiben zurück. Zum Lesen wird er nur in {@link #size()}, {@link #isEmpty()}, {@link #get(int)},
+	 * {@link #indexOf(Object)}, {@link #lastIndexOf(Object)}, {@link #contains(Object)}, {@link #containsAll(Collection)}, {@link #equals(Object)},
+	 * {@link #hashCode()}, {@link #iterator()}, {@link #toArray()}, {@link #toArray(Object[])} und {@link #toString()} angefordert.
+	 *
+	 * @param readonly {@code true}, wenn der Inhalt nur zum Lesen verwendet wird und eine Kopie damit nicht nötig ist.<br>
+	 *        {@code false}, wenn der Inhalt verändert werden könnte und daher ggf. eine Kopie nötig ist.
+	 * @return Inhalt. */
+	protected abstract GData getData(boolean readonly);
+
+	/** Diese Methode setzt den Inhalt. Dieser wurde zuvor über {@link #getData(boolean)} zum Schreiben beschafft und anschließend verändert.
+	 *
+	 * @param items neuer Inhalt. */
+	protected abstract void setData(GData items);
+
+	class Iter implements ListIterator<GItem> {
+
+		final GData data;
+
+		final ListIterator<GItem> iter;
+
+		Iter(int index) {
+			this.data = AbstractProxyList.this.getData(false);
+			this.iter = this.data.listIterator(index);
+		}
+
+		@Override
+		public boolean hasNext() {
+			return this.iter.hasNext();
+		}
+
+		@Override
+		public GItem next() {
+			return this.iter.next();
+		}
+
+		@Override
+		public boolean hasPrevious() {
+			return this.iter.hasPrevious();
+		}
+
+		@Override
+		public GItem previous() {
+			return this.iter.previous();
+		}
+
+		@Override
+		public int nextIndex() {
+			return this.iter.nextIndex();
+		}
+
+		@Override
+		public int previousIndex() {
+			return this.iter.previousIndex();
+		}
+
+		@Override
+		public void remove() {
+			this.iter.remove();
+			AbstractProxyList.this.setData(this.data);
+		}
+
+		@Override
+		public void set(GItem e) {
+			this.iter.set(e);
+			AbstractProxyList.this.setData(this.data);
+		}
+
+		@Override
+		public void add(GItem e) {
+			this.iter.add(e);
+			AbstractProxyList.this.setData(this.data);
+		}
+
 	}
 
 }
