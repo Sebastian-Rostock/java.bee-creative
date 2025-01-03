@@ -11,7 +11,7 @@ public interface List2<E> extends List<E>, Collection2<E> {
 	Iterator2<E> iterator();
 
 	/** Diese Methode ist eine Abkürzung für {@link Collections#reverse(List) Collections.reverse(this)}. */
-	default List2<E> reverse(final List<E> items) throws NullPointerException {
+	default List2<E> reverse() throws NullPointerException {
 		return Collections.reverse(this);
 	}
 
