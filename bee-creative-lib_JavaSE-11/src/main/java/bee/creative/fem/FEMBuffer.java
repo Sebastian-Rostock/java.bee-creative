@@ -1042,7 +1042,7 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 
 	/** Diese Methode gibt die Dezimalzahl mit den gegebenen Daten ({@code -value: 58}) zurück. */
 	protected FEMInteger getIntegerByData2(final long data) throws IllegalArgumentException {
-		return  FEMInteger.from(-data);
+		return FEMInteger.from(-data);
 	}
 
 	/** Diese Methode gibt die im gegebenen Speicherbereich ({@code value: long}) enthaltene Dezimalzahl zurück. */
