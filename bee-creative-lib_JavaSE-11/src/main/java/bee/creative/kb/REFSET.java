@@ -6,6 +6,7 @@ import bee.creative.emu.EMU;
 import bee.creative.emu.Emuator;
 import bee.creative.lang.Objects;
 import bee.creative.util.AbstractIterator;
+import bee.creative.util.HashMapII;
 import bee.creative.util.Iterator2;
 
 /** Diese Klasse implementiert Methoden zur Verarbeitung einer steuwertbasierten Menge von Referenen ungleich {@code 0} mit durchschnittlich vier
@@ -56,7 +57,7 @@ public final class REFSET {
 	/** Diese Methode liefert die 1-basierte Position der gegebenen Referenz {@code ref} in der gegebenen Referenzmenge {@code refset}, wenn die Referenz ungleich
 	 * {@code 0} ist. Wenn die Referenz nicht in der Referenzmenge enthalten ist, wird {@code 0} geliefert. **/
 	public static int getIdx(int[] refset, int ref) {
-		var idx = REFSET.hash(ref) & REFSET.getMask(refset);
+		var idx = hash(refset, ref);
 		var res = /* refset.head_item_next[idx].head */ refset[(idx * 3) + 3];
 		while (res != 0) {
 			if (ref == /* refset.head_item_next[res-1].item */ refset[(res * 3) + 2]) return res;
@@ -65,8 +66,8 @@ public final class REFSET {
 		return 0;
 	}
 
-	static int hash(int ref) {
-		return ref ^ (ref >>> 16);
+	private static int hash(int[] refset, int ref) {
+		return ref & REFSET.getMask(refset);
 	}
 
 	/** Diese Methode liefert eine der Referenzen der gegebenen Referenzmenge {@code refset}. Wenn die Referenzmenge leer ist, wird {@code 0} geliefert. */
@@ -89,7 +90,7 @@ public final class REFSET {
 	 * {@code 0} ist. Wenn die Referenz nicht in der Referenzmenge enthalten ist, wird sie eingefügt. Wenn die Kapazität erschöpft ist, wird {@code 0}
 	 * geliefert. **/
 	public static int putRef(int[] refset, int ref) {
-		var idx = REFSET.hash(ref) & REFSET.getMask(refset);
+		var idx = hash(refset, ref);
 		var res = /* refset.head_item_next[idx].head */ refset[(idx * 3) + 3];
 		while (res != 0) {
 			if (ref == /* refset.head_item_next[res-1].item */ refset[(res * 3) + 2]) return res;
@@ -120,7 +121,7 @@ public final class REFSET {
 	 * wenn die Referenz ungleich {@code 0} ist. Wenn die Referenz nicht in der Referenzmenge enthalten ist, wird {@code 0} geliefert. **/
 	public static int popRef(int[] refset, int ref) {
 		if (REFSET.size(refset) == 0) return 0;
-		var idx = REFSET.hash(ref) & REFSET.getMask(refset);
+		var idx = hash(refset, ref);
 		var res = /* refset.head_item_next[idx].head */ refset[(idx * 3) + 3];
 		if (res == 0) return 0;
 		if (ref == /* refset.head_item_next[res-1].item */ refset[(res * 3) + 2]) {
@@ -218,7 +219,7 @@ public final class REFSET {
 	 * weitere Referenz ist. Andernfalls liefert sie eine Kopie mit doppelter Kapazität. */
 	public static int[] grow(int[] refset) {
 		if (REFSET.getFree(refset) != 0) return refset;
-		var mask = REFSET.getMask(refset) << 1;
+		var mask = (REFSET.getMask(refset) << 1) | 1;
 		if (mask > 536870911) return refset;
 		return REFSET.tryCopy(refset, mask);
 	}
@@ -315,6 +316,20 @@ public final class REFSET {
 		var refs = REFSET.toArray(refset);
 		Arrays.sort(refs);
 		return Arrays.toString(refs);
+	}
+
+	// 1 je 5 min => 12 pro stunde
+
+	public static HashMapII toColls(int[] refset) {
+		var result = new HashMapII(10);
+		for (var off = refset.length - 3; 2 < off; off -= 3) {
+			var head = /* refset.head_item_next[idx].head */ refset[off];
+			var size = 1;
+			for (var next = head; next != 0; next = /* refset.head_item_next[res-1].next */ refset[(next * 3) + 1]) {
+				result.add(size++, 1);
+			}
+		}
+		return result;
 	}
 
 	/** @see Emuator#emu(Object) */
@@ -415,18 +430,18 @@ public final class REFSET {
 		if (mask == REFSET.getMask(refset)) return refset;
 		var free = 1;
 		var refset2 = new int[(mask * 3) + 6];
+		REFSET.setSize(refset2, REFSET.size(refset));
+		REFSET.setMask(refset2, mask);
 		for (var off = refset.length - 1; 3 < off; off -= 3) {
 			var ref = refset[off];
 			if (ref != 0) {
-				var idx = REFSET.hash(ref) & mask;
+				var idx = REFSET.hash(refset2, ref);
 				/* refset2.head_item_next[free-1].next */ refset2[(free * 3) + 1] = /* refset2.head_item_next[idx].head */ refset2[(idx * 3) + 3];
 				/* refset2.head_item_next[idx].head */ refset2[(idx * 3) + 3] = free;
 				/* refset2.head_item_next[free-1].item */ refset2[(free * 3) + 2] = ref;
 				free++;
 			}
 		}
-		REFSET.setSize(refset2, REFSET.size(refset));
-		REFSET.setMask(refset2, mask);
 		REFSET.setFree(refset2, free);
 		while (free <= mask) {
 			/* refset2.head_item_next[free-1].next */ refset2[(free * 3) + 1] = ++free;

@@ -13,6 +13,20 @@ import bee.creative.util.Tester;
 
 class TEST {
 
+	public static void main_(String[] args) throws IOException {
+		for (int x = 0; x < 3; x++)
+		Tester.run(() -> {
+			var set1 = REFSET.create();
+			for (int i = 1; i < 10000000; i++) {
+				set1 = REFSET.grow(set1);
+				REFSET.putRef(set1, i);
+			}
+//			System.out.println(REFSET.toColls(set1));
+			//System.out.println(REFSET.toString(set1));
+		});
+
+	}
+
 	public static void main(String[] args) throws IOException {
 
 		{
@@ -103,11 +117,11 @@ class TEST {
 				this.putEdge(vontarifpunkt, bewertungList.get(r.nextInt(bewertungList.size())), nachtarifpunkt);
 
 			}
-			buffer.commit();
+			// buffer.commit();
 			System.out //
 				.append(": EDGES=").append(this.edgeCount + "") //
-			//	.append(": EMU=").append(Integers.printSize(this.buffer.emu())) //
-		//		.append(" BYTES=").append(Integers.printSize(EMU.from(ZIPDOS.deflate(this.buffer::persist)))) //
+			// .append(": EMU=").append(Integers.printSize(this.buffer.emu())) //
+			// .append(" BYTES=").append(Integers.printSize(EMU.from(ZIPDOS.deflate(this.buffer::persist)))) //
 			;
 			System.out.println();
 		}
@@ -117,12 +131,11 @@ class TEST {
 		System.out.println("PERSIST");
 		var persisted = Tester.get(() -> ZIPDOS.deflate(this.buffer::persist));
 		System.out.println(Integers.printSize(persisted.length));
-		
 
 		System.out.println("RESTORE");
 		var restored = Tester.get(() -> ZIPDIS.inflate(persisted, KBState::from));
 		System.out.println(Integers.printSize(restored.emu()));
-		
+
 		System.out.println("INSERTS");
 		var ins = Tester.get(() -> KBState.from(this.buffer, restored));
 		System.out.println(ins);

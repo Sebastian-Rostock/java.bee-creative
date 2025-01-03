@@ -8,6 +8,7 @@ import bee.creative.emu.Emuator;
 import bee.creative.lang.Objects;
 import bee.creative.util.AbstractIterator;
 import bee.creative.util.Entries;
+import bee.creative.util.HashMapIO;
 import bee.creative.util.Iterator2;
 
 /** Diese Klasse implementiert Methoden zur Verarbeitung einer steuwertbasierten Abbildung von Referenen ungleich {@code 0} auf Elemente ungleich {@code null}.
@@ -154,7 +155,9 @@ public final class REFMAP {
 
 	/** Diese Methode liefert die Textdarstellung der gegebenen Referenzabbildung {@code refmap}. */
 	public static String toString(Object[] refmap) {
-		return REFSET.toString(REFMAP.getKeys(refmap));
+		var result = new HashMapIO<>(REFMAP.size(refmap));
+		REFMAP.forEach(refmap, result::put);
+		return result.toString();
 	}
 
 	/** Diese Schnittstelle definiert den Empfänger der Referenzen und Elementen für {@link REFMAP#forEach(Object[], RUN)}. */

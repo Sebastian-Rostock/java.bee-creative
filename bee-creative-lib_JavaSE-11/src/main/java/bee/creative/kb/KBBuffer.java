@@ -240,6 +240,14 @@ public class KBBuffer extends KBState {
 		this.reset();
 	}
 
+	public void undoAll(KBState inserts, KBState deletes) {
+
+	}
+
+	public void rendoAll(KBState inserts, KBState deletes) {
+
+	}
+
 	/** Diese Methode füt diesem Wissenspuffer alle {@link #edges() Kanten} und {@link #values() Textwerte} des gegebenen {@link KBState Wissensstandes} hinzu und
 	 * übernimmt dessen Referenzen {@link #getIndexRef()}, {@link #getInternalRef()} und {@link #getExternalRef()}. */
 	public void insertAll(KBState inserts) {
