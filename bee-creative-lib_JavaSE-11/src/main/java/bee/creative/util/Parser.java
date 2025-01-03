@@ -275,11 +275,6 @@ public class Parser {
 		}
 
 		@Override
-		public Iterator<Token> iterator() {
-			return Iterators.fromArray(this, 0, this.size());
-		}
-
-		@Override
 		public int compareTo(final Token value) {
 			return Comparators.compare(this.offset, value.offset);
 		}
@@ -397,10 +392,10 @@ public class Parser {
 		 *
 		 * @see #find(int) */
 		public int[] path(final int index) {
-			final CompactIntegerArray res = new CompactIntegerArray(10);
-			final Comparable2<Token> comp = Token.containing(index);
-			for (Token tok = this.root; true;) {
-				final int pos = tok.find(comp);
+			var comp = Token.containing(index);
+			var res = new CompactIntegerArray(10, 0f);
+			for (var tok = this.root; true;) {
+				var pos = tok.find(comp);
 				if (pos < 0) return res.toArray();
 				res.add(pos);
 				tok = tok.get(pos);
@@ -427,11 +422,6 @@ public class Parser {
 		@Override
 		public Token get(final int index) throws IndexOutOfBoundsException {
 			return this.tokens[index];
-		}
-
-		@Override
-		public Iterator<Token> iterator() {
-			return Iterators.fromArray(this, 0, this.size());
 		}
 
 		@Override

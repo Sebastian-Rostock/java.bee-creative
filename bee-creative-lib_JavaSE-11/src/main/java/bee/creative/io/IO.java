@@ -187,7 +187,7 @@ public class IO {
 	}
 
 	static ByteBuffer inputBufferFrom(final ByteArraySection object) {
-		return ByteBuffer.wrap(object.array(), object.startIndex(), object.size()).order(Bytes.NATIVE_ORDER);
+		return ByteBuffer.wrap(object.array(), object.offset(), object.length()).order(Bytes.NATIVE_ORDER);
 	}
 
 	static ByteBuffer inputBufferFrom(final File object) throws IOException {
@@ -232,7 +232,7 @@ public class IO {
 	}
 
 	static InputStream inputStreamFrom(final ByteArraySection object) {
-		return new ByteArrayInputStream(object.array(), object.startIndex(), object.size());
+		return new ByteArrayInputStream(object.array(), object.offset(), object.length());
 	}
 
 	/** Diese Methode erzeugt aus dem gegebenen Objekt einen {@link Reader} und gibt diesen zurück. Hierbei werden folgende Datentypen für {@code object}
@@ -269,7 +269,7 @@ public class IO {
 	}
 
 	static Reader inputReaderFrom(final CharacterArraySection object) throws IOException {
-		return new CharArrayReader(object.array(), object.startIndex(), object.size());
+		return new CharArrayReader(object.array(), object.offset(), object.length());
 	}
 
 	/** Diese Methode erzeugt aus dem gegebenen Objekt ein {@link DataTarget} und gibt dieses zurück. Hierbei werden folgende Datentypen für {@code object}
@@ -318,7 +318,7 @@ public class IO {
 
 			@Override
 			public void write(final byte[] b, final int off, final int len) throws IOException {
-				object.addAll(ByteArraySection.from(b, off, off + len));
+				object.addAll(ByteArraySection.from(b, off, len));
 			}
 
 		};
@@ -372,7 +372,7 @@ public class IO {
 	}
 
 	static ByteBuffer outputBufferFrom(final ByteArraySection object) {
-		return ByteBuffer.wrap(object.array(), object.startIndex(), object.size()).order(Bytes.NATIVE_ORDER);
+		return ByteBuffer.wrap(object.array(), object.offset(), object.length()).order(Bytes.NATIVE_ORDER);
 	}
 
 	/** Diese Methode erzeugt aus dem gegebenen Objekt einen {@link OutputStream} und gibt diesen zurück. Hierbei werden folgende Datentypen für {@code object}

@@ -1,21 +1,16 @@
 package bee.creative.array;
 
-import java.util.List;
+import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert eine {@link ArraySection} für {@code boolean}-Arrays.
  *
- * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @see ArraySection */
-public abstract class BooleanArraySection extends ArraySection<boolean[]> {
+ * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
+public abstract class BooleanArraySection extends ArraySection<boolean[], Boolean> {
 
-	/** Diese Methode erzeugt eine neue {@link BooleanArraySection} und gibt sie zurück. Der Rückgabewert entspricht:
-	 * <pre>BooleanArraySection.from(array, 0, array.length)</pre>
-	 *
-	 * @param array Array.
-	 * @return {@link BooleanArraySection}.
-	 * @throws NullPointerException Wenn das gegebene Array {@code null} ist. */
-	public static BooleanArraySection from(final boolean... array) throws NullPointerException {
-		return ArraySection.validate(new BooleanArraySection() {
+	/** Diese Methode liefert eine {@link BooleanArraySection} zum gegebenen {@code boolean}-Array. */
+	public static BooleanArraySection from(boolean... array) throws NullPointerException {
+		Objects.notNull(array);
+		return new BooleanArraySection() {
 
 			@Override
 			public boolean[] array() {
@@ -23,30 +18,22 @@ public abstract class BooleanArraySection extends ArraySection<boolean[]> {
 			}
 
 			@Override
-			public int startIndex() {
+			public int offset() {
 				return 0;
 			}
 
 			@Override
-			public int finalIndex() {
+			public int length() {
 				return array.length;
 			}
 
-		});
+		};
 	}
 
-	/** Diese Methode erzeugt eine neue {@link BooleanArraySection} und gibt sie zurück.
-	 *
-	 * @param array Array.
-	 * @param startIndex Index des ersten Werts im Abschnitt.
-	 * @param finalIndex Index des ersten Werts nach dem Abschnitt.
-	 * @return {@link BooleanArraySection}.
-	 * @throws NullPointerException Wenn das gegebene Array {@code null} ist.
-	 * @throws IndexOutOfBoundsException Wenn {@code startIndex < 0} oder {@code finalIndex > array.length}.
-	 * @throws IllegalArgumentException Wenn {@code finalIndex < startIndex}. */
-	public static BooleanArraySection from(final boolean[] array, final int startIndex, final int finalIndex)
-		throws NullPointerException, IndexOutOfBoundsException, IllegalArgumentException {
-		return ArraySection.validate(new BooleanArraySection() {
+	/** Diese Methode liefert eine {@link BooleanArraySection} zum gegebenene Abschnitt des gegebenen {@code byte}-Arrays. */
+	public static BooleanArraySection from(boolean[] array, int offset, int length) throws NullPointerException, IllegalArgumentException {
+		ArraySection.checkSection(offset, length, array.length);
+		return new BooleanArraySection() {
 
 			@Override
 			public boolean[] array() {
@@ -54,58 +41,63 @@ public abstract class BooleanArraySection extends ArraySection<boolean[]> {
 			}
 
 			@Override
-			public int startIndex() {
-				return startIndex;
+			public int offset() {
+				return offset;
 			}
 
 			@Override
-			public int finalIndex() {
-				return finalIndex;
+			public int length() {
+				return length;
 			}
 
-		});
+		};
 	}
 
 	@Override
-	protected int customLength(final boolean[] array) {
-		return array.length;
+	public BooleanArraySection section(int offset, int length) throws IllegalArgumentException {
+		this.checkSection(offset, length);
+		return BooleanArraySection.from(this.array(), offset, length);
 	}
 
 	@Override
-	protected int customHash(final boolean[] array, final int index) {
+	public boolean equals(Object object) {
+		if (object == this) return true;
+		if (!(object instanceof BooleanArraySection)) return false;
+		return this.defaultEquals((BooleanArraySection)object);
+	}
+
+	@Override
+	protected Boolean customGet(boolean[] array, int index) {
+		return array[index];
+	}
+
+	@Override
+	protected void customSet(boolean[] array, int index, Boolean value) {
+		array[index] = value;
+	}
+
+	@Override
+	protected int customHash(boolean[] array, int index) {
 		return (array[index] ? 1231 : 1237);
 	}
 
 	@Override
-	protected boolean customEquals(final boolean[] array1, final boolean[] array2, final int index1, final int index2) {
+	protected boolean customEquals(boolean[] array1, boolean[] array2, int index1, int index2) {
 		return array1[index1] == array2[index2];
 	}
 
 	@Override
-	protected int customCompare(final boolean[] array1, final boolean[] array2, final int index1, final int index2) {
-		final boolean value1 = array1[index1], value2 = array2[index2];
+	protected int customCompare(boolean[] array1, boolean[] array2, int index1, int index2) {
+		var value1 = array1[index1];
+		var value2 = array2[index2];
 		if (value1 == value2) return 0;
 		if (value2) return -1;
 		return 1;
 	}
 
 	@Override
-	protected void customPrint(final boolean[] array, final int index, final StringBuilder target) {
-		target.append(array[index]);
-	}
-
-	/** Diese Methode gibt diese {@link BooleanArraySection} als {@link List} zurück und ist eine Abkürzung für {@code new CompactBooleanArray(this).values()}.
-	 *
-	 * @return {@link Boolean}-{@link List}. */
-	public List<Boolean> asList() {
-		return new CompactBooleanArray(this).values();
-	}
-
-	@Override
-	public boolean equals(final Object object) {
-		if (object == this) return true;
-		if (!(object instanceof BooleanArraySection)) return false;
-		return this.defaultEquals((BooleanArraySection)object);
+	protected void customPrint(boolean[] array, int index, StringBuilder result) {
+		result.append(array[index]);
 	}
 
 }

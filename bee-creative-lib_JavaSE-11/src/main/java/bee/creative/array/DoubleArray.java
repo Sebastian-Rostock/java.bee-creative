@@ -1,33 +1,16 @@
 package bee.creative.array;
 
-import java.util.List;
-
 /** Diese Schnittstelle definiert ein modifizierbares {@code double}-{@link Array}.
  *
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public interface DoubleArray extends Array<double[], Double> {
-
-	@Override
-	public int size();
-
-	@Override
-	public void clear();
-
-	@Override
-	public boolean isEmpty();
-
-	@Override
-	public List<Double> values();
-
-	@Override
-	public DoubleArraySection section();
 
 	/** Diese Methode gibt den {@code index}-ten Wert zurück.
 	 *
 	 * @param index Position.
 	 * @return {@code index}-ter Wert.
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index >= size()}). */
-	public double get(int index) throws IndexOutOfBoundsException;
+	double get(int index) throws IndexOutOfBoundsException;
 
 	/** Diese Methode füllt das gegebene {@code double}-Array mit den Werten ab der gegebenen Position.
 	 *
@@ -37,20 +20,16 @@ public interface DoubleArray extends Array<double[], Double> {
 	 * @param values {@code double}-Array.
 	 * @throws NullPointerException Wenn das gegebene {@code double}-Array {@code null} ist.
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index + values.length > size()}). */
-	public void getAll(int index, double[] values) throws NullPointerException, IndexOutOfBoundsException;
-
-	@Override
-	public void getAll(int index, Array<? super double[], ? super Double> values) throws NullPointerException, IndexOutOfBoundsException;
-
-	@Override
-	public void getAll(int index, ArraySection<? super double[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	default void getAll(int index, double[] values) throws NullPointerException, IndexOutOfBoundsException {
+		this.getAll(index, DoubleArraySection.from(values));
+	}
 
 	/** Diese Methode setzt den {@code index}-ten Wert.
 	 *
 	 * @param index Position.
 	 * @param value Wert.
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index >= size()}). */
-	public void set(int index, double value) throws IndexOutOfBoundsException;
+	void set(int index, double value) throws IndexOutOfBoundsException;
 
 	/** Diese Methode kopiert die Werte des gegebenen {@code double}-Arrays an die gegebene Position.
 	 *
@@ -60,18 +39,16 @@ public interface DoubleArray extends Array<double[], Double> {
 	 * @param values {@code double}-Array.
 	 * @throws NullPointerException Wenn das gegebene {@code double}-Array {@code null} ist.
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index + values.size() > size()}). */
-	public void setAll(int index, double[] values) throws NullPointerException, IndexOutOfBoundsException;
-
-	@Override
-	public void setAll(int index, Array<? extends double[], ? extends Double> values) throws NullPointerException, IndexOutOfBoundsException;
-
-	@Override
-	public void setAll(int index, ArraySection<? extends double[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	default void setAll(int index, double[] values) throws NullPointerException, IndexOutOfBoundsException {
+		this.setAll(index, DoubleArraySection.from(values));
+	}
 
 	/** Diese Methode fügt den gegebenen Werte am Ende ein.
 	 *
 	 * @param value Wert. */
-	public void add(double value);
+	default void add(double value) {
+		this.add(this.size(), value);
+	}
 
 	/** Diese Methode fügt die Werte des gegebenen {@code double}-Arrays am Ende ein.
 	 *
@@ -79,20 +56,19 @@ public interface DoubleArray extends Array<double[], Double> {
 	 * @see DoubleArraySection#from(double[])
 	 * @param values {@code double}-Array.
 	 * @throws NullPointerException Wenn das gegebene {@code double}-Array {@code null} ist. */
-	public void addAll(double[] values) throws NullPointerException;
-
-	@Override
-	public void addAll(Array<? extends double[], ? extends Double> values) throws NullPointerException;
-
-	@Override
-	public void addAll(ArraySection<? extends double[]> values) throws NullPointerException;
+	default void addAll(double[] values) throws NullPointerException {
+		this.addAll(DoubleArraySection.from(values));
+	}
 
 	/** Diese Methode fügt den gegebenen Wert an der gegebenen Position ein.
 	 *
 	 * @param index Position.
 	 * @param value Wert.
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index > size()}). */
-	public void add(int index, double value) throws IndexOutOfBoundsException;
+	default void add(int index, double value) throws IndexOutOfBoundsException {
+		this.insert(index, 1);
+		this.set(index, value);
+	}
 
 	/** Diese Methode fügt die Werte des gegebenen {@code double}-Arrays an der gegebenen Position ein.
 	 *
@@ -102,24 +78,11 @@ public interface DoubleArray extends Array<double[], Double> {
 	 * @param values {@code double}-Array.
 	 * @throws NullPointerException Wenn da gegebene {@code double}-Array {@code null} ist.
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index > size()}). */
-	public void addAll(int index, double[] values) throws NullPointerException, IndexOutOfBoundsException;
+	default void addAll(int index, double[] values) throws NullPointerException, IndexOutOfBoundsException {
+		this.addAll(this.size(), DoubleArraySection.from(values));
+	}
 
 	@Override
-	public void addAll(int index, Array<? extends double[], ? extends Double> values) throws NullPointerException, IndexOutOfBoundsException;
-
-	@Override
-	public void addAll(int index, ArraySection<? extends double[]> values) throws NullPointerException, IndexOutOfBoundsException;
-
-	@Override
-	public void insert(int index, int count);
-
-	@Override
-	public void remove(int index, int count);
-
-	@Override
-	public DoubleArray subArray(int fromIndex, int toIndex);
-
-	@Override
-	public double[] toArray();
+	DoubleArraySection section();
 
 }

@@ -1,21 +1,16 @@
 package bee.creative.array;
 
-import java.util.List;
+import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert eine {@link ArraySection} für {@code int}-Arrays.
  *
- * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @see ArraySection */
-public abstract class IntegerArraySection extends ArraySection<int[]> {
+ * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
+public abstract class IntegerArraySection extends ArraySection<int[], Integer> {
 
-	/** Diese Methode erzeugt eine neue {@link IntegerArraySection} und gibt sie zurück. Der Rückgabewert entspricht:
-	 * <pre>IntegerArraySection.from(array, 0, array.length)</pre>
-	 *
-	 * @param array Array.
-	 * @return {@link IntegerArraySection}.
-	 * @throws NullPointerException Wenn das gegebene Array {@code null} ist. */
-	public static IntegerArraySection from(final int... array) throws NullPointerException {
-		return ArraySection.validate(new IntegerArraySection() {
+	/** Diese Methode liefert eine {@link IntegerArraySection} zum gegebenen {@code int}-Array. */
+	public static IntegerArraySection from(int... array) throws NullPointerException {
+		Objects.notNull(array);
+		return new IntegerArraySection() {
 
 			@Override
 			public int[] array() {
@@ -23,30 +18,22 @@ public abstract class IntegerArraySection extends ArraySection<int[]> {
 			}
 
 			@Override
-			public int startIndex() {
+			public int offset() {
 				return 0;
 			}
 
 			@Override
-			public int finalIndex() {
+			public int length() {
 				return array.length;
 			}
 
-		});
+		};
 	}
 
-	/** Diese Methode erzeugt eine neue {@link IntegerArraySection} und gibt sie zurück.
-	 *
-	 * @param array Array.
-	 * @param startIndex Index des ersten Werts im Abschnitt.
-	 * @param finalIndex Index des ersten Werts nach dem Abschnitt.
-	 * @return {@link IntegerArraySection}.
-	 * @throws NullPointerException Wenn das gegebene Array {@code null} ist.
-	 * @throws IndexOutOfBoundsException Wenn {@code startIndex < 0} oder {@code finalIndex > array.length}.
-	 * @throws IllegalArgumentException Wenn {@code finalIndex < startIndex}. */
-	public static IntegerArraySection from(final int[] array, final int startIndex, final int finalIndex)
-		throws NullPointerException, IndexOutOfBoundsException, IllegalArgumentException {
-		return ArraySection.validate(new IntegerArraySection() {
+	/** Diese Methode liefert eine {@link IntegerArraySection} zum gegebenene Abschnitt des gegebenen {@code int}-Arrays. */
+	public static IntegerArraySection from(int[] array, int offset, int length) throws NullPointerException, IllegalArgumentException {
+		ArraySection.checkSection(offset, length, array.length);
+		return new IntegerArraySection() {
 
 			@Override
 			public int[] array() {
@@ -54,58 +41,62 @@ public abstract class IntegerArraySection extends ArraySection<int[]> {
 			}
 
 			@Override
-			public int startIndex() {
-				return startIndex;
+			public int offset() {
+				return offset;
 			}
 
 			@Override
-			public int finalIndex() {
-				return finalIndex;
+			public int length() {
+				return length;
 			}
 
-		});
+		};
 	}
 
 	@Override
-	protected int customLength(final int[] array) {
-		return array.length;
+	public IntegerArraySection section(int offset, int length) throws IllegalArgumentException {
+		this.checkSection(offset, length);
+		return IntegerArraySection.from(this.array(), offset, length);
 	}
 
 	@Override
-	protected int customHash(final int[] array, final int index) {
+	public boolean equals(Object object) {
+		if (object == this) return true;
+		if (!(object instanceof IntegerArraySection)) return false;
+		return this.defaultEquals((IntegerArraySection)object);
+	}
+
+	@Override
+	protected Integer customGet(int[] array, int index) {
 		return array[index];
 	}
 
 	@Override
-	protected boolean customEquals(final int[] array1, final int[] array2, final int index1, final int index2) {
+	protected void customSet(int[] array, int index, Integer value) {
+		array[index] = value;
+	}
+
+	@Override
+	protected int customHash(int[] array, int index) {
+		return array[index];
+	}
+
+	@Override
+	protected boolean customEquals(int[] array1, int[] array2, int index1, int index2) {
 		return array1[index1] == array2[index2];
 	}
 
 	@Override
-	protected int customCompare(final int[] array1, final int[] array2, final int index1, final int index2) {
-		final int value1 = array1[index1], value2 = array2[index2];
+	protected int customCompare(int[] array1, int[] array2, int index1, int index2) {
+		int value1 = array1[index1], value2 = array2[index2];
 		if (value1 == value2) return 0;
 		if (value1 < value2) return -1;
 		return 1;
 	}
 
 	@Override
-	protected void customPrint(final int[] array, final int index, final StringBuilder target) {
+	protected void customPrint(int[] array, int index, StringBuilder target) {
 		target.append(array[index]);
-	}
-
-	/** Diese Methode gibt diese {@link IntegerArraySection} als {@link List} zurück und ist eine Abkürzung für {@code new CompactIntegerArray(this).values()}.
-	 *
-	 * @return {@link Integer}-{@link List}. */
-	public List<Integer> asList() {
-		return new CompactIntegerArray(this).values();
-	}
-
-	@Override
-	public boolean equals(final Object object) {
-		if (object == this) return true;
-		if (!(object instanceof IntegerArraySection)) return false;
-		return this.defaultEquals((IntegerArraySection)object);
 	}
 
 }

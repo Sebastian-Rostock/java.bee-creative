@@ -1,21 +1,16 @@
 package bee.creative.array;
 
-import java.util.List;
+import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert eine {@link ArraySection} für {@code short}-Arrays.
  *
- * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @see ArraySection */
-public abstract class ShortArraySection extends ArraySection<short[]> {
+ * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
+public abstract class ShortArraySection extends ArraySection<short[], Short> {
 
-	/** Diese Methode erzeugt eine neue {@link ShortArraySection} und gibt sie zurück. Der Rückgabewert entspricht:
-	 * <pre>ShortArraySection.from(array, 0, array.length)</pre>
-	 *
-	 * @param array Array.
-	 * @return {@link ShortArraySection}.
-	 * @throws NullPointerException Wenn das gegebene Array {@code null} ist. */
-	public static ShortArraySection from(final short... array) throws NullPointerException {
-		return ArraySection.validate(new ShortArraySection() {
+	/** Diese Methode liefert eine {@link ShortArraySection} zum gegebenen {@code short}-Array. */
+	public static ShortArraySection from(short... array) throws NullPointerException {
+		Objects.notNull(array);
+		return new ShortArraySection() {
 
 			@Override
 			public short[] array() {
@@ -23,30 +18,22 @@ public abstract class ShortArraySection extends ArraySection<short[]> {
 			}
 
 			@Override
-			public int startIndex() {
+			public int offset() {
 				return 0;
 			}
 
 			@Override
-			public int finalIndex() {
+			public int length() {
 				return array.length;
 			}
 
-		});
+		};
 	}
 
-	/** Diese Methode erzeugt eine neue {@link ShortArraySection} und gibt sie zurück.
-	 *
-	 * @param array Array.
-	 * @param startIndex Index des ersten Werts im Abschnitt.
-	 * @param finalIndex Index des ersten Werts nach dem Abschnitt.
-	 * @return {@link ShortArraySection}.
-	 * @throws NullPointerException Wenn das gegebene Array {@code null} ist.
-	 * @throws IndexOutOfBoundsException Wenn {@code startIndex < 0} oder {@code finalIndex > array.length}.
-	 * @throws IllegalArgumentException Wenn {@code finalIndex < startIndex}. */
-	public static ShortArraySection from(final short[] array, final int startIndex, final int finalIndex)
-		throws NullPointerException, IndexOutOfBoundsException, IllegalArgumentException {
-		return ArraySection.validate(new ShortArraySection() {
+	/** Diese Methode liefert eine {@link ShortArraySection} zum gegebenene Abschnitt des gegebenen {@code byte}-Arrays. */
+	public static ShortArraySection from(short[] array, int offset, int length) throws NullPointerException, IllegalArgumentException {
+		ArraySection.checkSection(offset, length, array.length);
+		return new ShortArraySection() {
 
 			@Override
 			public short[] array() {
@@ -54,55 +41,59 @@ public abstract class ShortArraySection extends ArraySection<short[]> {
 			}
 
 			@Override
-			public int startIndex() {
-				return startIndex;
+			public int offset() {
+				return offset;
 			}
 
 			@Override
-			public int finalIndex() {
-				return finalIndex;
+			public int length() {
+				return length;
 			}
 
-		});
+		};
 	}
 
 	@Override
-	protected int customLength(final short[] array) {
-		return array.length;
+	public ShortArraySection section(int offset, int length) throws IllegalArgumentException {
+		this.checkSection(offset, length);
+		return ShortArraySection.from(this.array(), offset, length);
 	}
 
 	@Override
-	protected int customHash(final short[] array, final int index) {
+	public boolean equals(Object object) {
+		if (object == this) return true;
+		if (!(object instanceof ShortArraySection)) return false;
+		return this.defaultEquals((ShortArraySection)object);
+	}
+
+	@Override
+	protected Short customGet(short[] array, int index) {
 		return array[index];
 	}
 
 	@Override
-	protected boolean customEquals(final short[] array1, final short[] array2, final int index1, final int index2) {
+	protected void customSet(short[] array, int index, Short value) {
+		array[index] = value;
+	}
+
+	@Override
+	protected int customHash(short[] array, int index) {
+		return array[index];
+	}
+
+	@Override
+	protected boolean customEquals(short[] array1, short[] array2, int index1, int index2) {
 		return array1[index1] == array2[index2];
 	}
 
 	@Override
-	protected int customCompare(final short[] array1, final short[] array2, final int index1, final int index2) {
+	protected int customCompare(short[] array1, short[] array2, int index1, int index2) {
 		return array1[index1] - array2[index2];
 	}
 
 	@Override
-	protected void customPrint(final short[] array, final int index, final StringBuilder target) {
+	protected void customPrint(short[] array, int index, StringBuilder target) {
 		target.append(array[index]);
-	}
-
-	/** Diese Methode gibt diese {@link ShortArraySection} als {@link List} zurück und ist eine Abkürzung für {@code new CompactShortArray(this).values()}.
-	 *
-	 * @return {@link Short}-{@link List}. */
-	public List<Short> asList() {
-		return new CompactShortArray(this).values();
-	}
-
-	@Override
-	public boolean equals(final Object object) {
-		if (object == this) return true;
-		if (!(object instanceof ShortArraySection)) return false;
-		return this.defaultEquals((ShortArraySection)object);
 	}
 
 }

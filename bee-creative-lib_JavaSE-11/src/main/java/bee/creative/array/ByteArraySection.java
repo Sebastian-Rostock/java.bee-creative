@@ -1,21 +1,16 @@
 package bee.creative.array;
 
-import java.util.List;
+import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert eine {@link ArraySection} für {@code byte}-Arrays.
  *
- * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @see ArraySection */
-public abstract class ByteArraySection extends ArraySection<byte[]> {
+ * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
+public abstract class ByteArraySection extends ArraySection<byte[], Byte> {
 
-	/** Diese Methode erzeugt eine neue {@link ByteArraySection} und gibt sie zurück. Der Rückgabewert entspricht:
-	 * <pre>ByteArraySection.from(array, 0, array.length)</pre>
-	 *
-	 * @param array Array.
-	 * @return {@link ByteArraySection}.
-	 * @throws NullPointerException Wenn das gegebene Array {@code null} ist. */
-	public static ByteArraySection from(final byte... array) throws NullPointerException {
-		return ArraySection.validate(new ByteArraySection() {
+	/** Diese Methode liefert eine {@link ByteArraySection} zum gegebenen {@code byte}-Array. */
+	public static ByteArraySection from(byte... array) throws NullPointerException {
+		Objects.notNull(array);
+		return new ByteArraySection() {
 
 			@Override
 			public byte[] array() {
@@ -23,30 +18,22 @@ public abstract class ByteArraySection extends ArraySection<byte[]> {
 			}
 
 			@Override
-			public int startIndex() {
+			public int offset() {
 				return 0;
 			}
 
 			@Override
-			public int finalIndex() {
+			public int length() {
 				return array.length;
 			}
 
-		});
+		};
 	}
 
-	/** Diese Methode erzeugt eine neue {@link ByteArraySection} und gibt sie zurück.
-	 *
-	 * @param array Array.
-	 * @param startIndex Index des ersten Werts im Abschnitt.
-	 * @param finalIndex Index des ersten Werts nach dem Abschnitt.
-	 * @return {@link ByteArraySection}.
-	 * @throws NullPointerException Wenn das gegebene Array {@code null} ist.
-	 * @throws IndexOutOfBoundsException Wenn {@code startIndex < 0} oder {@code finalIndex > array.length}.
-	 * @throws IllegalArgumentException Wenn {@code finalIndex < startIndex}. */
-	public static ByteArraySection from(final byte[] array, final int startIndex, final int finalIndex)
-		throws NullPointerException, IndexOutOfBoundsException, IllegalArgumentException {
-		return ArraySection.validate(new ByteArraySection() {
+	/** Diese Methode liefert eine {@link ByteArraySection} zum gegebenene Abschnitt des gegebenen {@code byte}-Arrays. */
+	public static ByteArraySection from(byte[] array, int offset, int length) throws NullPointerException, IllegalArgumentException {
+		ArraySection.checkSection(offset, length, array.length);
+		return new ByteArraySection() {
 
 			@Override
 			public byte[] array() {
@@ -54,55 +41,59 @@ public abstract class ByteArraySection extends ArraySection<byte[]> {
 			}
 
 			@Override
-			public int startIndex() {
-				return startIndex;
+			public int offset() {
+				return offset;
 			}
 
 			@Override
-			public int finalIndex() {
-				return finalIndex;
+			public int length() {
+				return length;
 			}
 
-		});
+		};
 	}
 
 	@Override
-	protected int customLength(final byte[] array) {
-		return array.length;
+	public ByteArraySection section(int offset, int length) throws IllegalArgumentException {
+		this.checkSection(offset, length);
+		return ByteArraySection.from(this.array(), offset, length);
 	}
 
 	@Override
-	protected int customHash(final byte[] array, final int index) {
+	public boolean equals(Object object) {
+		if (object == this) return true;
+		if (!(object instanceof ByteArraySection)) return false;
+		return this.defaultEquals((ByteArraySection)object);
+	}
+
+	@Override
+	protected Byte customGet(byte[] array, int index) {
 		return array[index];
 	}
 
 	@Override
-	protected boolean customEquals(final byte[] array1, final byte[] array2, final int index1, final int index2) {
+	protected void customSet(byte[] array, int index, Byte value) {
+		array[index] = value;
+	}
+
+	@Override
+	protected int customHash(byte[] array, int index) {
+		return array[index];
+	}
+
+	@Override
+	protected boolean customEquals(byte[] array1, byte[] array2, int index1, int index2) {
 		return array1[index1] == array2[index2];
 	}
 
 	@Override
-	protected int customCompare(final byte[] array1, final byte[] array2, final int index1, final int index2) {
+	protected int customCompare(byte[] array1, byte[] array2, int index1, int index2) {
 		return array1[index1] - array2[index2];
 	}
 
 	@Override
-	protected void customPrint(final byte[] array, final int index, final StringBuilder target) {
-		target.append(array[index]);
-	}
-
-	/** Diese Methode gibt diese {@link ByteArraySection} als {@link List} zurück und ist eine Abkürzung für {@code new CompactByteArray(this).values()}.
-	 *
-	 * @return {@link Byte}-{@link List}. */
-	public List<Byte> asList() {
-		return new CompactByteArray(this).values();
-	}
-
-	@Override
-	public boolean equals(final Object object) {
-		if (object == this) return true;
-		if (!(object instanceof ByteArraySection)) return false;
-		return this.defaultEquals((ByteArraySection)object);
+	protected void customPrint(byte[] array, int index, StringBuilder result) {
+		result.append(array[index]);
 	}
 
 }

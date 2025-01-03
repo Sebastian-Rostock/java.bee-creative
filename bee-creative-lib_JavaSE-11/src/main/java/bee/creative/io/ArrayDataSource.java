@@ -48,11 +48,9 @@ public class ArrayDataSource extends BaseDataSource {
 
 	@Override
 	public void readFully(final byte[] array, final int offset, final int length) throws IOException {
-		final ByteArraySection data = this.data;
-		final int index = this.index, index2 = index + length;
-		if (index2 > data.size()) throw new EOFException();
-		System.arraycopy(data.array(), data.startIndex() + index, array, offset, length);
-		this.index = index2;
+		if ((this.index + length) > this.data.size()) throw new EOFException();
+		this.data.getAll(this.index, ByteArraySection.from(array, offset, length));
+		this.index += length;
 	}
 
 	@Override

@@ -17,6 +17,27 @@ package bee.creative.array;
  *        oder {@code boolean[]}). */
 public abstract class ArrayData<GArray> {
 
+	/** Diese Methode gibt die Anzahl der Elementen zurück, die ohne erneuter Speicherreervierung verwaltet werden kann.
+	 *
+	 * @return Kapazität. */
+	public final int capacity() {
+		return this.customGetCapacity();
+	}
+
+	/** Diese Methode vergrößert die Kapazität, sodass dieses die gegebene Anzahl an Elementen verwaltet werden kann.
+	 *
+	 * @param capacity Anzahl.
+	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als {@code 0} ist. */
+	public final void allocate(int capacity) throws IllegalArgumentException {
+		if (capacity < 0) throw new IllegalArgumentException("capacity < 0");
+		this.customSetCapacity(this.customNewCapacity(capacity));
+	}
+
+	/** Diese Methode verkleinert die Kapazität auf das Minimum. */
+	public final void compact() {
+		this.customSetCapacity(this.size);
+	}
+
 	/** Dieses Feld speichert den Index des ersten Elements. */
 	protected int from;
 
@@ -37,6 +58,12 @@ public abstract class ArrayData<GArray> {
 		return space / 2;
 	}
 
+	/** Diese Methode gibt ein neues Array mit der gegebenen Länge zurück.
+	 *
+	 * @param length Länge des neuen Arrays.
+	 * @return neues Array. */
+	protected abstract GArray customNewArray(int length);
+
 	/** Diese Methode gibt das interne Array zurück.
 	 *
 	 * @return internes Array. */
@@ -46,12 +73,6 @@ public abstract class ArrayData<GArray> {
 	 *
 	 * @param array Array. */
 	protected abstract void customSetArray(GArray array);
-
-	/** Diese Methode gibt ein neues Array mit der gegebenen Länge zurück.
-	 *
-	 * @param length Länge des neuen Arrays.
-	 * @return neues Array. */
-	protected abstract GArray customNewArray(int length);
 
 	/** Diese Methode leert den gegebenen Bereich im internen Array. Dies ist sinnvoll für Arrays von Objekten.
 	 *
@@ -192,27 +213,6 @@ public abstract class ArrayData<GArray> {
 			System.arraycopy(array, from, array, from2, index2);
 			this.customClearArray(from, from2);
 		}
-	}
-
-	/** Diese Methode gibt die Anzahl der Elementen zurück, die ohne erneuter Speicherreervierung verwaltet werden kann.
-	 *
-	 * @return Kapazität. */
-	public final int capacity() {
-		return this.customGetCapacity();
-	}
-
-	/** Diese Methode vergrößert die Kapazität, sodass dieses die gegebene Anzahl an Elementen verwaltet werden kann.
-	 *
-	 * @param capacity Anzahl.
-	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als {@code 0} ist. */
-	public final void allocate(int capacity) throws IllegalArgumentException {
-		if (capacity < 0) throw new IllegalArgumentException("capacity < 0");
-		this.customSetCapacity(this.customNewCapacity(capacity));
-	}
-
-	/** Diese Methode verkleinert die Kapazität auf das Minimum. */
-	public final void compact() {
-		this.customSetCapacity(this.size);
 	}
 
 }

@@ -579,8 +579,8 @@ class __Parser {
 		 *  ...
 		 *  </pre> */
 		public int[] path(int index) {
+			var buffer = new CompactIntegerArray(10, 0f);
 			var comp = Token.containing(index);
-			var buffer = new CompactIntegerArray(10);
 			for (var token = this.root; true;) {
 				var position = token.find(comp);
 				if (position < 0) return buffer.toArray();

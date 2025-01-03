@@ -1,33 +1,16 @@
 package bee.creative.array;
 
-import java.util.List;
-
 /** Diese Schnittstelle definiert ein modifizierbares {@code float}-{@link Array}.
  *
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public interface FloatArray extends Array<float[], Float> {
-
-	@Override
-	public int size();
-
-	@Override
-	public void clear();
-
-	@Override
-	public boolean isEmpty();
-
-	@Override
-	public List<Float> values();
-
-	@Override
-	public FloatArraySection section();
 
 	/** Diese Methode gibt den {@code index}-ten Wert zurück.
 	 *
 	 * @param index Position.
 	 * @return {@code index}-ter Wert.
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index >= size()}). */
-	public float get(int index) throws IndexOutOfBoundsException;
+	float get(int index) throws IndexOutOfBoundsException;
 
 	/** Diese Methode füllt das gegebene {@code float}-Array mit den Werten ab der gegebenen Position.
 	 *
@@ -37,20 +20,16 @@ public interface FloatArray extends Array<float[], Float> {
 	 * @param values {@code float}-Array.
 	 * @throws NullPointerException Wenn das gegebene {@code float}-Array {@code null} ist.
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index + values.length > size()}). */
-	public void getAll(int index, float[] values) throws NullPointerException, IndexOutOfBoundsException;
-
-	@Override
-	public void getAll(int index, Array<? super float[], ? super Float> values) throws NullPointerException, IndexOutOfBoundsException;
-
-	@Override
-	public void getAll(int index, ArraySection<? super float[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	default void getAll(int index, float[] values) throws NullPointerException, IndexOutOfBoundsException {
+		this.getAll(index, FloatArraySection.from(values));
+	}
 
 	/** Diese Methode setzt den {@code index}-ten Wert.
 	 *
 	 * @param index Position.
 	 * @param value Wert.
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index >= size()}). */
-	public void set(int index, float value) throws IndexOutOfBoundsException;
+	void set(int index, float value) throws IndexOutOfBoundsException;
 
 	/** Diese Methode kopiert die Werte des gegebenen {@code float}-Arrays an die gegebene Position.
 	 *
@@ -60,18 +39,16 @@ public interface FloatArray extends Array<float[], Float> {
 	 * @param values {@code float}-Array.
 	 * @throws NullPointerException Wenn das gegebene {@code float}-Array {@code null} ist.
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index + values.size() > size()}). */
-	public void setAll(int index, float[] values) throws NullPointerException, IndexOutOfBoundsException;
-
-	@Override
-	public void setAll(int index, Array<? extends float[], ? extends Float> values) throws NullPointerException, IndexOutOfBoundsException;
-
-	@Override
-	public void setAll(int index, ArraySection<? extends float[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	default void setAll(int index, float[] values) throws NullPointerException, IndexOutOfBoundsException {
+		this.setAll(index, FloatArraySection.from(values));
+	}
 
 	/** Diese Methode fügt den gegebenen Werte am Ende ein.
 	 *
 	 * @param value Wert. */
-	public void add(float value);
+	default void add(float value) {
+		this.add(this.size(), value);
+	}
 
 	/** Diese Methode fügt die Werte des gegebenen {@code float}-Arrays am Ende ein.
 	 *
@@ -79,20 +56,19 @@ public interface FloatArray extends Array<float[], Float> {
 	 * @see FloatArraySection#from(float[])
 	 * @param values {@code float}-Array.
 	 * @throws NullPointerException Wenn das gegebene {@code float}-Array {@code null} ist. */
-	public void addAll(float[] values) throws NullPointerException;
-
-	@Override
-	public void addAll(Array<? extends float[], ? extends Float> values) throws NullPointerException;
-
-	@Override
-	public void addAll(ArraySection<? extends float[]> values) throws NullPointerException;
+	default void addAll(float[] values) throws NullPointerException {
+		this.addAll(FloatArraySection.from(values));
+	}
 
 	/** Diese Methode fügt den gegebenen Wert an der gegebenen Position ein.
 	 *
 	 * @param index Position.
 	 * @param value Wert.
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index > size()}). */
-	public void add(int index, float value) throws IndexOutOfBoundsException;
+	default void add(int index, float value) throws IndexOutOfBoundsException {
+		this.insert(index, 1);
+		this.set(index, value);
+	}
 
 	/** Diese Methode fügt die Werte des gegebenen {@code float}-Arrays an der gegebenen Position ein.
 	 *
@@ -102,24 +78,11 @@ public interface FloatArray extends Array<float[], Float> {
 	 * @param values {@code float}-Array.
 	 * @throws NullPointerException Wenn da gegebene {@code float}-Array {@code null} ist.
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index > size()}). */
-	public void addAll(int index, float[] values) throws NullPointerException, IndexOutOfBoundsException;
+	default void addAll(int index, float[] values) throws NullPointerException, IndexOutOfBoundsException {
+		this.addAll(this.size(), FloatArraySection.from(values));
+	}
 
 	@Override
-	public void addAll(int index, Array<? extends float[], ? extends Float> values) throws NullPointerException, IndexOutOfBoundsException;
-
-	@Override
-	public void addAll(int index, ArraySection<? extends float[]> values) throws NullPointerException, IndexOutOfBoundsException;
-
-	@Override
-	public void insert(int index, int count);
-
-	@Override
-	public void remove(int index, int count);
-
-	@Override
-	public FloatArray subArray(int fromIndex, int toIndex);
-
-	@Override
-	public float[] toArray();
+	FloatArraySection section();
 
 }

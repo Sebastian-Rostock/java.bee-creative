@@ -1,6 +1,7 @@
 package bee.creative.io;
 
 import java.io.IOException;
+import bee.creative.array.ByteArraySection;
 import bee.creative.array.CompactByteArray;
 import bee.creative.lang.Objects;
 
@@ -22,10 +23,9 @@ public class ArrayDataTarget extends BaseDataTarget {
 
 	/** Dieser Konstruktor initialisiert die Nutzdaten mit der gegebenen Größe.
 	 *
-	 * @see CompactByteArray#CompactByteArray(int)
 	 * @param size Größe. */
 	public ArrayDataTarget(final int size) {
-		this(new CompactByteArray(size));
+		this(new CompactByteArray(size, 0f));
 		this.data.setAlignment(0);
 	}
 
@@ -44,12 +44,8 @@ public class ArrayDataTarget extends BaseDataTarget {
 
 	@Override
 	public void write(final byte[] array, final int offset, final int length) throws IOException {
-		if ((offset < 0) || ((offset + length) > array.length)) throw new IndexOutOfBoundsException();
-		final CompactByteArray data = this.data;
-		final int size = data.size(), index = this.index, index2 = index + length;
-		data.insert(size, Math.max(index2 - size, 0));
-		System.arraycopy(array, offset, data.array(), data.startIndex() + index, length);
-		this.index = index2;
+		this.data.addAll(this.index, ByteArraySection.from(array, offset, length));
+		this.index += length;
 	}
 
 	@Override
@@ -69,8 +65,8 @@ public class ArrayDataTarget extends BaseDataTarget {
 
 	@Override
 	public void allocate(final long value) throws IOException {
-		final int size = this.data.size();
-		final int count = (int)value - size;
+		final var size = this.data.size();
+		final var count = (int)value - size;
 		if (count < 0) {
 			this.data.remove(size - count, count);
 			this.index = Math.min(this.index, size - count);

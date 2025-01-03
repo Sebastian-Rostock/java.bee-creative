@@ -310,10 +310,11 @@ public class MappedBuffer2 extends MappedBuffer {
 	 * @param limit maximale Anzahl der gelieferten Größen.
 	 * @return Liste der Größen. */
 	public synchronized CompactLongArray reuseSizes(int limit) {
-		final CompactLongArray result = new CompactLongArray(16);
-		long node = this.getNodeNext(16);
+		var node = this.getNodeNext(16);
+		var result = new CompactLongArray(16, 0f);
 		while ((node != 16) && (limit > 0)) {
-			final long size = -this.getNodeSize(node), next = this.getNodeNext(node);
+			var size = -this.getNodeSize(node);
+			var next = this.getNodeNext(node);
 			result.add(size);
 			node = next;
 			limit--;
@@ -326,11 +327,12 @@ public class MappedBuffer2 extends MappedBuffer {
 	 * @param limit maximale Anzahl der gelieferten Größen.
 	 * @return Liste der Größen. */
 	public synchronized CompactLongArray regionSizes(int limit) {
-		final CompactLongArray result = new CompactLongArray(16);
-		final long free = this.getLong(32);
-		long node = 48;
+		var free = this.getLong(32);
+		var result = new CompactLongArray(16, 0f);
+		var node = 48L;
 		while ((node < free) && (limit > 0)) {
-			final long size = this.getNodeSize(node), next = node + Math.abs(size) + 16;
+			var size = this.getNodeSize(node);
+			var next = node + Math.abs(size) + 16;
 			result.add(size);
 			node = next;
 			limit--;

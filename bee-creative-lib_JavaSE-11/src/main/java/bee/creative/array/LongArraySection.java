@@ -1,21 +1,16 @@
 package bee.creative.array;
 
-import java.util.List;
+import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert eine {@link ArraySection} für {@code long}-Arrays.
  *
- * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @see ArraySection */
-public abstract class LongArraySection extends ArraySection<long[]> {
+ * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
+public abstract class LongArraySection extends ArraySection<long[], Long> {
 
-	/** Diese Methode erzeugt eine neue {@link LongArraySection} und gibt sie zurück. Der Rückgabewert entspricht:
-	 * <pre>LongArraySection.from(array, 0, array.length)</pre>
-	 *
-	 * @param array Array.
-	 * @return {@link LongArraySection}.
-	 * @throws NullPointerException Wenn das gegebene Array {@code null} ist. */
-	public static LongArraySection from(final long... array) throws NullPointerException {
-		return ArraySection.validate(new LongArraySection() {
+	/** Diese Methode liefert eine {@link LongArraySection} zum gegebenen {@code long}-Array. */
+	public static LongArraySection from(long... array) throws NullPointerException {
+		Objects.notNull(array);
+		return new LongArraySection() {
 
 			@Override
 			public long[] array() {
@@ -23,30 +18,22 @@ public abstract class LongArraySection extends ArraySection<long[]> {
 			}
 
 			@Override
-			public int startIndex() {
+			public int offset() {
 				return 0;
 			}
 
 			@Override
-			public int finalIndex() {
+			public int length() {
 				return array.length;
 			}
 
-		});
+		};
 	}
 
-	/** Diese Methode erzeugt eine neue {@link LongArraySection} und gibt sie zurück.
-	 *
-	 * @param array Array.
-	 * @param startIndex Index des ersten Werts im Abschnitt.
-	 * @param finalIndex Index des ersten Werts nach dem Abschnitt.
-	 * @return {@link LongArraySection}.
-	 * @throws NullPointerException Wenn das gegebene Array {@code null} ist.
-	 * @throws IndexOutOfBoundsException Wenn {@code startIndex < 0} oder {@code finalIndex > array.length}.
-	 * @throws IllegalArgumentException Wenn {@code finalIndex < startIndex}. */
-	public static LongArraySection from(final long[] array, final int startIndex, final int finalIndex)
-		throws NullPointerException, IndexOutOfBoundsException, IllegalArgumentException {
-		return ArraySection.validate(new LongArraySection() {
+	/** Diese Methode liefert eine {@link LongArraySection} zum gegebenene Abschnitt des gegebenen {@code long}-Arrays. */
+	public static LongArraySection from(long[] array, int offset, int length) throws NullPointerException, IllegalArgumentException {
+		ArraySection.checkSection(offset, length, array.length);
+		return new LongArraySection() {
 
 			@Override
 			public long[] array() {
@@ -54,59 +41,63 @@ public abstract class LongArraySection extends ArraySection<long[]> {
 			}
 
 			@Override
-			public int startIndex() {
-				return startIndex;
+			public int offset() {
+				return offset;
 			}
 
 			@Override
-			public int finalIndex() {
-				return finalIndex;
+			public int length() {
+				return length;
 			}
 
-		});
+		};
 	}
 
 	@Override
-	protected int customLength(final long[] array) {
-		return array.length;
+	public LongArraySection section(int offset, int length) throws IllegalArgumentException {
+		this.checkSection(offset, length);
+		return LongArraySection.from(this.array(), offset, length);
 	}
 
 	@Override
-	protected int customHash(final long[] array, final int index) {
-		final long value = array[index];
+	public boolean equals(Object object) {
+		if (object == this) return true;
+		if (!(object instanceof LongArraySection)) return false;
+		return this.defaultEquals((LongArraySection)object);
+	}
+
+	@Override
+	protected Long customGet(long[] array, int index) {
+		return array[index];
+	}
+
+	@Override
+	protected void customSet(long[] array, int index, Long value) {
+		array[index] = value;
+	}
+
+	@Override
+	protected int customHash(long[] array, int index) {
+		long value = array[index];
 		return (int)(value ^ (value >>> 32));
 	}
 
 	@Override
-	protected boolean customEquals(final long[] array1, final long[] array2, final int index1, final int index2) {
+	protected boolean customEquals(long[] array1, long[] array2, int index1, int index2) {
 		return array1[index1] == array2[index2];
 	}
 
 	@Override
-	protected int customCompare(final long[] array1, final long[] array2, final int index1, final int index2) {
-		final long value1 = array1[index1], value2 = array2[index2];
+	protected int customCompare(long[] array1, long[] array2, int index1, int index2) {
+		long value1 = array1[index1], value2 = array2[index2];
 		if (value1 == value2) return 0;
 		if (value1 < value2) return -1;
 		return 1;
 	}
 
 	@Override
-	protected void customPrint(final long[] array, final int index, final StringBuilder target) {
+	protected void customPrint(long[] array, int index, StringBuilder target) {
 		target.append(array[index]);
-	}
-
-	/** Diese Methode gibt diese {@link LongArraySection} als {@link List} zurück und ist eine Abkürzung für {@code new CompactLongArray(this).values()}.
-	 *
-	 * @return {@link Long}-{@link List}. */
-	public List<Long> asList() {
-		return new CompactLongArray(this).values();
-	}
-
-	@Override
-	public boolean equals(final Object object) {
-		if (object == this) return true;
-		if (!(object instanceof LongArraySection)) return false;
-		return this.defaultEquals((LongArraySection)object);
 	}
 
 }
