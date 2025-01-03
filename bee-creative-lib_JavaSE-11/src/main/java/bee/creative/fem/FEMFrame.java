@@ -201,11 +201,6 @@ public abstract class FEMFrame implements Array2<FEMValue>, UseToString {
 	public abstract FEMFunction param(int index) throws IndexOutOfBoundsException;
 
 	@Override
-	public final Iterator<FEMValue> iterator() {
-		return Iterators.fromArray(this, 0, this.size());
-	}
-
-	@Override
 	public final String toString() {
 		final var res = new FEMPrinter();
 		FEMDomain.DEFAULT.printFrame(res, this.params());
