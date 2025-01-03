@@ -4,7 +4,6 @@ import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -195,64 +194,6 @@ public class Collections {
 	 * @param <GItem> Typ der Elemente. */
 	public static class ReverseList<GItem> extends AbstractList2<GItem> {
 
-		class Iter implements ListIterator<GItem> {
-
-			final ListIterator<GItem> that;
-
-			Iter(int index) {
-				var items = ReverseList.this.items;
-				this.that = items.listIterator(items.size() - index);
-			}
-
-			@Override
-			public boolean hasNext() {
-				return this.that.hasPrevious();
-			}
-
-			@Override
-			public boolean hasPrevious() {
-				return this.that.hasNext();
-			}
-
-			@Override
-			public void set(GItem item2) {
-				this.that.set(item2);
-			}
-
-			@Override
-			public void add(GItem item2) {
-				this.that.add(item2);
-				this.that.hasPrevious();
-				this.that.previous();
-			}
-
-			@Override
-			public GItem next() {
-				return this.that.previous();
-			}
-
-			@Override
-			public int nextIndex() {
-				return ReverseList.this.items.size() - this.that.previousIndex() - 1;
-			}
-
-			@Override
-			public GItem previous() {
-				return this.that.next();
-			}
-
-			@Override
-			public int previousIndex() {
-				return ReverseList.this.items.size() - this.that.nextIndex() - 1;
-			}
-
-			@Override
-			public void remove() {
-				this.that.remove();
-			}
-
-		}
-
 		public final List<GItem> items;
 
 		public ReverseList(List<GItem> items) {
@@ -330,16 +271,6 @@ public class Collections {
 		@Override
 		public boolean containsAll(Collection<?> items2) {
 			return this.items.containsAll(items2);
-		}
-
-		@Override
-		public Iterator2<GItem> iterator() {
-			return Iterators.from(this.listIterator(0));
-		}
-
-		@Override
-		public ListIterator<GItem> listIterator(int index) {
-			return new Iter(index);
 		}
 
 	}
@@ -453,79 +384,6 @@ public class Collections {
 			return this.items1.contains(item) || this.items2.contains(item);
 		}
 
-		@Override
-		public Iterator2<GItem> iterator() {
-			return Iterators.concat(this.items1.iterator(), this.items2.iterator());
-		}
-
-		@Override
-		public ListIterator<GItem> listIterator(int index) {
-			var size = this.items1.size();
-			var iterator1 = index < size ? this.items1.listIterator(index) : this.items1.listIterator(size);
-			var iterator2 = index < size ? this.items2.listIterator(0) : this.items2.listIterator(index - size);
-			size = 0;
-			return new ListIterator<>() {
-
-				int size = ConcatList.this.items1.size();
-
-				ListIterator<GItem> iterator = index < this.size ? iterator1 : iterator2;
-
-				@Override
-				public boolean hasNext() {
-					return this.iterator.hasNext() || (this.iterator = iterator2).hasNext();
-				}
-
-				@Override
-				public boolean hasPrevious() {
-					return this.iterator.hasPrevious() || (this.iterator = iterator1).hasPrevious();
-				}
-
-				@Override
-				public void set(GItem item) {
-					this.iterator.set(item);
-				}
-
-				@Override
-				public void add(GItem item) {
-					if ((iterator2.nextIndex() != 0) || (iterator1.nextIndex() != this.size)) {
-						this.iterator.add(item);
-					} else if (ConcatList.this.extendMode) {
-						iterator1.add(item);
-					} else {
-						iterator2.add(item);
-					}
-					this.size = ConcatList.this.items1.size();
-				}
-
-				@Override
-				public GItem next() {
-					return this.iterator.next();
-				}
-
-				@Override
-				public int nextIndex() {
-					return this.iterator == iterator2 ? iterator2.nextIndex() + this.size : iterator1.nextIndex();
-				}
-
-				@Override
-				public GItem previous() {
-					return this.iterator.previous();
-				}
-
-				@Override
-				public int previousIndex() {
-					return this.iterator == iterator2 ? iterator2.previousIndex() + this.size : iterator1.previousIndex();
-				}
-
-				@Override
-				public void remove() {
-					this.iterator.remove();
-					if (this.iterator == iterator2) return;
-					this.size = ConcatList.this.items1.size();
-				}
-
-			};
-		}
 	}
 
 	/** Diese Klasse implementiert eine verkettete {@link Collection} als Sicht auf zwei gegebene {@link Collection}. Wenn Elemente angefügt werden sollen,
