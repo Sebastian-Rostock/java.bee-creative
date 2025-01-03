@@ -83,7 +83,7 @@ public abstract class FEMBinary implements FEMValue, Iterable<Byte>, Comparable<
 		if (length == 0) return FEMBinary.EMPTY;
 		if (length == 1) return new UniformBinary(1, items[offset]);
 		if (!copy) return new CompactBinary(0, items, offset, length);
-		final var result = new byte[length];
+		var result = new byte[length];
 		System.arraycopy(items, offset, result, 0, length);
 		return new CompactBinary(0, result, 0, length);
 	}
