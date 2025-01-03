@@ -99,11 +99,6 @@ public abstract class FEMComposite extends BaseFunction implements Emuable, Arra
 			&& Objects.equals(this.params, that.params);
 	}
 
-	@Override
-	public final Iterator<FEMFunction> iterator() {
-		return Iterators.fromArray(this, 0, this.size());
-	}
-
 	final FEMFunction target;
 
 	final FEMFunction[] params;
