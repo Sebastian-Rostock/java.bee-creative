@@ -66,56 +66,45 @@ public class ReferenceQueue2<T> extends ReferenceQueue<T> {
 		private QueueNode() {
 			super(null);
 			this.prev = (this.next = this);
-			new QueueThread();
+			var thread = new Thread(() -> {
+				while (true) {
+					var head = this;
+					var node = head;
+					synchronized (head) {
+						node = head.next;
+					}
+					while (head != node) {
+						var queue = node.get();
+						if (queue != null) {
+							try {
+								queue.pollAll();
+							} catch (Throwable ignored) {}
+							synchronized (head) {
+								node = node.next;
+							}
+						} else {
+							synchronized (head) {
+								node = ((node.next.prev = node.prev).next = node.next);
+							}
+						}
+					}
+					try {
+						Thread.sleep(1000);
+					} catch (Throwable ignored) {}
+				}
+			}, "ReferenceQueue2-Thread");
+			thread.setDaemon(true);
+			thread.start();
 		}
 
-		public QueueNode(ReferenceQueue2<?> referent) {
-			super(referent);
+		public QueueNode(ReferenceQueue2<?> queue) {
+			super(queue);
 			var head = QueueNode.head;
 			synchronized (head) {
 				head.prev = ((this.prev = (this.next = head).prev).next = this);
 			}
 		}
 
-	}
-
-	private static final class QueueThread extends Thread {
-
-		public QueueThread() {
-			super("PointerQueue-Thread");
-			this.setPriority(Thread.MAX_PRIORITY);
-			this.setDaemon(true);
-			this.start();
-		}
-
-		@Override
-		public void run() {
-			while (true) {
-				var head = QueueNode.head;
-				QueueNode node;
-				synchronized (head) {
-					node = head.next;
-				}
-				while (head != node) {
-					final ReferenceQueue2<?> queue = node.get();
-					if (queue != null) {
-						try {
-							queue.pollAll();
-						} catch (final Throwable ignored) {}
-						synchronized (head) {
-							node = node.next;
-						}
-					} else {
-						synchronized (head) {
-							node = ((node.next.prev = node.prev).next = node.next);
-						}
-					}
-				}
-				try {
-					Thread.sleep(1000);
-				} catch (final Throwable ignored) {}
-			}
-		}
 	}
 
 }

@@ -11,7 +11,6 @@ import java.lang.reflect.Modifier;
 import java.util.Iterator;
 import bee.creative.lang.Natives;
 import bee.creative.lang.Objects;
-import bee.creative.ref.References;
 
 /** Diese Klasse implementiert grundlegende {@link Getter}.
  *
@@ -146,8 +145,8 @@ public class Getters {
 	/** Diese Klasse implementiert einen gepufferten {@link Getter3}, der das {@link #get(Object) Lesen} an einen {@link #that gegebenen} {@link Getter} delegiert
 	 * und den ermittelten Wert zur Wiederverwendung in einem {@link #buffer Puffer} ablegt, sofern der Puffer den Wert zum Datensatz noch nicht enthält, und
 	 * sonst den im Puffer abgelegte Wert liefert. Der Abgleich der Datensätze erfolgt über einen gegebenen {@link Hasher}. Die Ablage der Werte zu den
-	 * Datensätzen erfolgt über {@link Reference Verweise} der {@lonk #mode gegebenen} Stärke ({@link References#HARD}, {@link References#SOFT},
-	 * {@link References#WEAK}).
+	 * Datensätzen erfolgt über {@link Reference Verweise} der {@lonk #mode gegebenen} Stärke ({@link BufferedGetter#HARD}, {@link BufferedGetter#SOFT},
+	 * {@link BufferedGetter#WEAK}).
 	 *
 	 * @param <GItem> Typ des Datensatzes.
 	 * @param <GValue> Typ des Werts der Eigenschaft. */
@@ -203,12 +202,21 @@ public class Getters {
 
 		GValue value;
 
+		/** Dieses Feld identifiziert die direkte Referenz. */
+		public static final int HARD = 0;
+
+		/** Dieses Feld identifiziert die {@link WeakReference}. */
+		public static final int WEAK = 1;
+
+		/** Dieses Feld identifiziert die {@link SoftReference}. */
+		public static final int SOFT = 2;
+
 		public BufferedGetter(final Getter<? super GItem, ? extends GValue> that, final int mode, final Hasher hasher)
 			throws NullPointerException, IllegalArgumentException {
 			this.that = Objects.notNull(that);
 			this.mode = mode;
 			this.hasher = Objects.notNull(hasher);
-			if (mode == References.HARD) {
+			if (mode == BufferedGetter.HARD) {
 				this.queue = null;
 				this.buffer = HashMap.from(hasher, new Field<GItem, GValue>() {
 
@@ -223,7 +231,7 @@ public class Getters {
 					}
 
 				});
-			} else if (mode == References.SOFT) {
+			} else if (mode == BufferedGetter.SOFT) {
 				this.queue = new ReferenceQueue<>();
 				this.buffer = HashMap.from(hasher, new Field<GItem, SoftRef>() {
 
@@ -240,7 +248,7 @@ public class Getters {
 					}
 
 				});
-			} else if (mode == References.WEAK) {
+			} else if (mode == BufferedGetter.WEAK) {
 				this.queue = new ReferenceQueue<>();
 				this.buffer = HashMap.from(hasher, new Field<GItem, WeakRef>() {
 
@@ -603,7 +611,7 @@ public class Getters {
 
 	/** Diese Methode ist eine Abkürzung für {@link #buffer(Getter, int, Hasher) Getters.buffer(that, References.SOFT, Hashers.natural())}. */
 	public static <GItem, GValue> Getter3<GItem, GValue> buffer(final Getter<? super GItem, ? extends GValue> that) throws NullPointerException {
-		return Getters.buffer(that, References.SOFT, Hashers.natural());
+		return Getters.buffer(that, BufferedGetter.SOFT, Hashers.natural());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link BufferedGetter new BufferedGetter<>(that, mode, hasher)}. */

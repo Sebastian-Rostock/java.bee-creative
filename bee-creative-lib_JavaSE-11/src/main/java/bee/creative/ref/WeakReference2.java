@@ -11,17 +11,8 @@ import bee.creative.util.Producer;
  * @param <GValue> Typ des referenzierten Objekts. */
 public class WeakReference2<GValue> extends WeakReference<GValue> implements Producer<GValue> {
 
-	static private final ReferenceQueue2<Object> QUEUE = new ReferenceQueue2<>() {
-
-		@Override
-		protected void customRemove(Reference<?> reference) {
-			((WeakReference2<?>)reference).customRemove();
-		}
-
-	};
-
 	/** Dieser Konstruktor initialisiert das referenzierte Objekt. */
-	public WeakReference2(final GValue value) {
+	public WeakReference2(GValue value) {
 		super(value, WeakReference2.QUEUE);
 	}
 
@@ -31,5 +22,14 @@ public class WeakReference2<GValue> extends WeakReference<GValue> implements Pro
 	 * @see ReferenceQueue2#customRemove(Reference) */
 	protected void customRemove() {
 	}
+
+	static private final ReferenceQueue2<Object> QUEUE = new ReferenceQueue2<>() {
+
+		@Override
+		protected void customRemove(Reference<?> reference) {
+			((WeakReference2<?>)reference).customRemove();
+		}
+
+	};
 
 }
