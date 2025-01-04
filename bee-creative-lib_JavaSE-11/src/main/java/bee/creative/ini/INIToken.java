@@ -150,7 +150,7 @@ public final class INIToken {
 	/** Dieses Feld speichert {@link #value()}, {@link #comment()} oder {@code null}. */
 	final String string2;
 
-	INIToken(final String string1, final String string2) {
+	INIToken(String string1, String string2) {
 		this.string1 = string1;
 		this.string2 = string2;
 	}
