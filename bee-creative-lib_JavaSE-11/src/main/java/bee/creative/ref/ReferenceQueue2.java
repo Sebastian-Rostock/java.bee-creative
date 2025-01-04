@@ -57,11 +57,19 @@ public class ReferenceQueue2<T> extends ReferenceQueue<T> {
 
 	private static final class QueueNode extends WeakReference<ReferenceQueue2<?>> {
 
-		public static final QueueNode head = new QueueNode();
+		QueueNode prev;
 
-		public QueueNode prev;
+		QueueNode next;
 
-		public QueueNode next;
+		QueueNode(ReferenceQueue2<?> queue) {
+			super(queue);
+			var head = QueueNode.head;
+			synchronized (head) {
+				head.prev = ((this.prev = (this.next = head).prev).next = this);
+			}
+		}
+
+		private static final QueueNode head = new QueueNode();
 
 		private QueueNode() {
 			super(null);
@@ -95,14 +103,6 @@ public class ReferenceQueue2<T> extends ReferenceQueue<T> {
 			}, "ReferenceQueue2-Thread");
 			thread.setDaemon(true);
 			thread.start();
-		}
-
-		public QueueNode(ReferenceQueue2<?> queue) {
-			super(queue);
-			var head = QueueNode.head;
-			synchronized (head) {
-				head.prev = ((this.prev = (this.next = head).prev).next = this);
-			}
 		}
 
 	}
