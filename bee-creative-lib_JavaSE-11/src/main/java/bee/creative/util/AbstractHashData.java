@@ -1189,10 +1189,7 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 		for (var index = 0; index < length; ++index) {
 			var count = 0;
 			for (var entry = table[index]; entry >= 0; entry = nexts[entry]) {
-				count++;
-			}
-			if (count != 0) {
-				result.add(count, count);
+				result.add(++count, 1);
 			}
 		}
 		var count = this.count;
