@@ -57,17 +57,13 @@ public final class REFSET {
 	/** Diese Methode liefert die 1-basierte Position der gegebenen Referenz {@code ref} in der gegebenen Referenzmenge {@code refset}, wenn die Referenz ungleich
 	 * {@code 0} ist. Wenn die Referenz nicht in der Referenzmenge enthalten ist, wird {@code 0} geliefert. **/
 	public static int getIdx(int[] refset, int ref) {
-		var idx = hash(refset, ref);
+		var idx = ref & REFSET.getMask(refset);
 		var res = /* refset.head_item_next[idx].head */ refset[(idx * 3) + 3];
 		while (res != 0) {
 			if (ref == /* refset.head_item_next[res-1].item */ refset[(res * 3) + 2]) return res;
 			res = /* refset.head_item_next[res-1].next */ refset[(res * 3) + 1];
 		}
 		return 0;
-	}
-
-	private static int hash(int[] refset, int ref) {
-		return ref & REFSET.getMask(refset);
 	}
 
 	/** Diese Methode liefert eine der Referenzen der gegebenen Referenzmenge {@code refset}. Wenn die Referenzmenge leer ist, wird {@code 0} geliefert. */
@@ -90,7 +86,7 @@ public final class REFSET {
 	 * {@code 0} ist. Wenn die Referenz nicht in der Referenzmenge enthalten ist, wird sie eingefügt. Wenn die Kapazität erschöpft ist, wird {@code 0}
 	 * geliefert. **/
 	public static int putRef(int[] refset, int ref) {
-		var idx = hash(refset, ref);
+		var idx = ref & REFSET.getMask(refset);
 		var res = /* refset.head_item_next[idx].head */ refset[(idx * 3) + 3];
 		while (res != 0) {
 			if (ref == /* refset.head_item_next[res-1].item */ refset[(res * 3) + 2]) return res;
@@ -121,7 +117,7 @@ public final class REFSET {
 	 * wenn die Referenz ungleich {@code 0} ist. Wenn die Referenz nicht in der Referenzmenge enthalten ist, wird {@code 0} geliefert. **/
 	public static int popRef(int[] refset, int ref) {
 		if (REFSET.size(refset) == 0) return 0;
-		var idx = hash(refset, ref);
+		var idx = ref & REFSET.getMask(refset);
 		var res = /* refset.head_item_next[idx].head */ refset[(idx * 3) + 3];
 		if (res == 0) return 0;
 		if (ref == /* refset.head_item_next[res-1].item */ refset[(res * 3) + 2]) {
@@ -208,6 +204,19 @@ public final class REFSET {
 			}
 		}
 		return refset1;
+	}
+
+	/** Diese Methode liefert eine Abbildung von der Kollisionsanzahl auf die Anzahl der betroffenen Schlüssel der gegebenen Referenzmenge {@code refset}. */
+	public static HashMapII collisions(int[] refset) {
+		var result = new HashMapII(10);
+		for (var off = refset.length - 3; 2 < off; off -= 3) {
+			var head = /* refset.head_item_next[idx].head */ refset[off];
+			var size = 1;
+			for (var next = head; next != 0; next = /* refset.head_item_next[res-1].next */ refset[(next * 3) + 1]) {
+				result.add(size++, 1);
+			}
+		}
+		return result;
 	}
 
 	/** Diese Methode liefert die Anzahl der Referenzen in der gegebenen Referenzmenge {@code refset}. */
@@ -318,20 +327,6 @@ public final class REFSET {
 		return Arrays.toString(refs);
 	}
 
-	// 1 je 5 min => 12 pro stunde
-
-	public static HashMapII toColls(int[] refset) {
-		var result = new HashMapII(10);
-		for (var off = refset.length - 3; 2 < off; off -= 3) {
-			var head = /* refset.head_item_next[idx].head */ refset[off];
-			var size = 1;
-			for (var next = head; next != 0; next = /* refset.head_item_next[res-1].next */ refset[(next * 3) + 1]) {
-				result.add(size++, 1);
-			}
-		}
-		return result;
-	}
-
 	/** @see Emuator#emu(Object) */
 	public static long emu(int[] refset) {
 		return refset != null ? EMU.align(12 + (4L * refset.length)) : 0;
@@ -435,7 +430,7 @@ public final class REFSET {
 		for (var off = refset.length - 1; 3 < off; off -= 3) {
 			var ref = refset[off];
 			if (ref != 0) {
-				var idx = REFSET.hash(refset2, ref);
+				var idx = ref & mask;
 				/* refset2.head_item_next[free-1].next */ refset2[(free * 3) + 1] = /* refset2.head_item_next[idx].head */ refset2[(idx * 3) + 3];
 				/* refset2.head_item_next[idx].head */ refset2[(idx * 3) + 3] = free;
 				/* refset2.head_item_next[free-1].item */ refset2[(free * 3) + 2] = ref;
