@@ -32,20 +32,26 @@ import bee.creative.lang.Objects;
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class BEXAdapter {
 
+	/** Diese Methode gibt das gegebene {@link BEXFile} als {@link Document} zurück.
+	 *
+	 * @param file {@link BEXFile}.
+	 * @return {@link Document}.
+	 * @throws NullPointerException Wenn {@code file} {@code null} ist. */
+	public static Document wrap(BEXFile file) throws NullPointerException {
+		return new BEXDocuAdapter(file);
+	}
+
 	/** Diese Klasse implementiert ein {@link Attr} als {@link BEXNodeAdapter}.
 	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static class BEXAttrAdapter extends BEXNodeAdapter implements Attr {
-
-		/** Dieses Feld speichert den Elternknoten. */
-		protected final Element parent;
 
 		/** Dieser Konstruktor initialisiert {@link BEXNode} und Elternknoten.
 		 *
 		 * @param node {@link BEXNode}.
 		 * @param parent Elternknoten.
 		 * @throws NullPointerException Wenn {@code node} bzw. {@code parent} {@code null} ist. */
-		public BEXAttrAdapter(final BEXNode node, final Element parent) throws NullPointerException {
+		public BEXAttrAdapter(BEXNode node, Element parent) throws NullPointerException {
 			super(node);
 			this.parent = Objects.notNull(parent);
 		}
@@ -91,7 +97,7 @@ public class BEXAdapter {
 		}
 
 		@Override
-		public void setValue(final String value) throws DOMException {
+		public void setValue(String value) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
@@ -121,12 +127,12 @@ public class BEXAdapter {
 		}
 
 		@Override
-		public boolean isSameNode(final Node object) {
+		public boolean isSameNode(Node object) {
 			return this.equals(object) && this.getParentNode().isSameNode(object.getParentNode());
 		}
 
 		@Override
-		public boolean isEqualNode(final Node object) {
+		public boolean isEqualNode(Node object) {
 			return this.equals(object);
 		}
 
@@ -136,10 +142,10 @@ public class BEXAdapter {
 		}
 
 		@Override
-		public boolean equals(final Object object) {
+		public boolean equals(Object object) {
 			if (object == this) return true;
 			if (!(object instanceof BEXAttrAdapter)) return false;
-			final BEXAttrAdapter data = (BEXAttrAdapter)object;
+			var data = (BEXAttrAdapter)object;
 			return Objects.equals(this.node, data.node);
 		}
 
@@ -147,6 +153,9 @@ public class BEXAdapter {
 		public String toString() {
 			return this.getNodeName() + "=" + Objects.toString(this.getNodeValue());
 		}
+
+		/** Dieses Feld speichert den Elternknoten. */
+		protected final Element parent;
 
 	}
 
@@ -160,7 +169,7 @@ public class BEXAdapter {
 		 * @param node {@link BEXNode}.
 		 * @param parent Elternknoten.
 		 * @throws NullPointerException Wenn {@code node} bzw. {@code parent} {@code null} ist. */
-		public BEXTextAdapter(final BEXNode node, final Node parent) throws NullPointerException {
+		public BEXTextAdapter(BEXNode node, Node parent) throws NullPointerException {
 			super(node, parent);
 		}
 
@@ -185,7 +194,7 @@ public class BEXAdapter {
 		}
 
 		@Override
-		public void setData(final String data) throws DOMException {
+		public void setData(String data) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
@@ -205,59 +214,59 @@ public class BEXAdapter {
 		}
 
 		@Override
-		public String substringData(final int offset, final int count) throws DOMException {
+		public String substringData(int offset, int count) throws DOMException {
 			try {
 				return this.getNodeValue().substring(offset, offset + count);
-			} catch (final IndexOutOfBoundsException cause) {
+			} catch (IndexOutOfBoundsException cause) {
 				throw new DOMException(DOMException.INDEX_SIZE_ERR, cause.getMessage());
 			}
 		}
 
 		@Override
-		public Text splitText(final int offset) throws DOMException {
+		public Text splitText(int offset) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
 		@Override
-		public void insertData(final int offset, final String arg) throws DOMException {
+		public void insertData(int offset, String arg) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
 		@Override
-		public void deleteData(final int offset, final int count) throws DOMException {
+		public void deleteData(int offset, int count) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
 		@Override
-		public void appendData(final String arg) throws DOMException {
+		public void appendData(String arg) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
 		@Override
-		public void replaceData(final int offset, final int count, final String arg) throws DOMException {
+		public void replaceData(int offset, int count, String arg) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
 		@Override
-		public Text replaceWholeText(final String content) throws DOMException {
+		public Text replaceWholeText(String content) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
 		@Override
-		public boolean isSameNode(final Node object) {
+		public boolean isSameNode(Node object) {
 			return this.equals(object) && this.getParentNode().isSameNode(object.getParentNode());
 		}
 
 		@Override
-		public boolean isEqualNode(final Node object) {
+		public boolean isEqualNode(Node object) {
 			return this.equals(object);
 		}
 
 		@Override
 		public boolean isElementContentWhitespace() {
-			final String nodeValue = this.getNodeValue();
+			var nodeValue = this.getNodeValue();
 			for (int i = 0, size = nodeValue.length(); i < size; i++) {
-				final char value = nodeValue.charAt(i);
+				var value = nodeValue.charAt(i);
 				if ((value > 0x20) || (value < 0x09) || ((value != 0x0A) && (value != 0x0D))) return false;
 			}
 			return true;
@@ -269,10 +278,10 @@ public class BEXAdapter {
 		}
 
 		@Override
-		public boolean equals(final Object object) {
+		public boolean equals(Object object) {
 			if (object == this) return true;
 			if (!(object instanceof BEXTextAdapter)) return false;
-			final BEXTextAdapter data = (BEXTextAdapter)object;
+			var data = (BEXTextAdapter)object;
 			return Objects.equals(this.node, data.node);
 		}
 
@@ -288,27 +297,12 @@ public class BEXAdapter {
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static class BEXElemAdapter extends BEXChldAdapter implements Element {
 
-		/** Diese Methode implementeirt {@link #getTextContent()}.
-		 *
-		 * @param result Puffer mit dem bisher gesammelten Texten.
-		 * @param children {@link BEXList} der rekursiv analysierten Kindknoten.
-		 * @throws NullPointerException Wenn eine der Eingabe {@code null} ist. */
-		static void collectContent(final StringBuilder result, final BEXList children) throws NullPointerException {
-			for (final BEXNode child: children) {
-				if (child.type() == BEXNode.ELEM_NODE) {
-					BEXElemAdapter.collectContent(result, child.children());
-				} else {
-					result.append(child.value());
-				}
-			}
-		}
-
 		/** Dieser Konstruktor initialisiert {@link BEXNode} und Elternknoten.
 		 *
 		 * @param node {@link BEXNode}.
 		 * @param parent Elternknoten.
 		 * @throws NullPointerException Wenn {@code node} bzw. {@code parent} {@code null} ist. */
-		public BEXElemAdapter(final BEXNode node, final Node parent) throws NullPointerException {
+		public BEXElemAdapter(BEXNode node, Node parent) throws NullPointerException {
 			super(node, parent);
 		}
 
@@ -344,19 +338,19 @@ public class BEXAdapter {
 
 		@Override
 		public Node getFirstChild() {
-			final NodeList c = this.getChildNodes();
+			var c = this.getChildNodes();
 			return c.item(0);
 		}
 
 		@Override
 		public Node getLastChild() {
-			final NodeList c = this.getChildNodes();
+			var c = this.getChildNodes();
 			return c.item(c.getLength() - 1);
 		}
 
 		@Override
 		public boolean hasChildNodes() {
-			return this.node.children().length() != 0;
+			return this.node.children().size() != 0;
 		}
 
 		@Override
@@ -371,85 +365,85 @@ public class BEXAdapter {
 
 		@Override
 		public boolean hasAttributes() {
-			return this.node.attributes().length() != 0;
+			return this.node.attributes().size() != 0;
 		}
 
 		@Override
-		public String getAttribute(final String name) {
+		public String getAttribute(String name) {
 			return this.getAttributeNS(XMLConstants.NULL_NS_URI, name);
 		}
 
 		@Override
-		public boolean hasAttribute(final String name) {
+		public boolean hasAttribute(String name) {
 			return this.hasAttributeNS(XMLConstants.NULL_NS_URI, name);
 		}
 
 		@Override
-		public void setAttribute(final String name, final String value) throws DOMException {
+		public void setAttribute(String name, String value) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
 		@Override
-		public String getAttributeNS(final String uri, final String name) throws DOMException {
-			final BEXList attributes = this.node.attributes();
-			final int index = attributes.find(uri, name, 0);
+		public String getAttributeNS(String uri, String name) throws DOMException {
+			var attributes = this.node.attributes();
+			var index = attributes.find(uri, name, 0);
 			if (index < 0) return "";
 			return attributes.get(index).value();
 		}
 
 		@Override
-		public boolean hasAttributeNS(final String uri, final String name) throws DOMException {
-			final BEXList attributes = this.node.attributes();
-			final int index = attributes.find(uri, name, 0);
+		public boolean hasAttributeNS(String uri, String name) throws DOMException {
+			var attributes = this.node.attributes();
+			var index = attributes.find(uri, name, 0);
 			return index >= 0;
 		}
 
 		@Override
-		public void setAttributeNS(final String namespaceURI, final String qualifiedName, final String value) throws DOMException {
+		public void setAttributeNS(String namespaceURI, String qualifiedName, String value) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
 		@Override
-		public Attr getAttributeNode(final String name) {
+		public Attr getAttributeNode(String name) {
 			return this.getAttributeNodeNS(XMLConstants.NULL_NS_URI, name);
 		}
 
 		@Override
-		public Attr setAttributeNode(final Attr newAttr) throws DOMException {
+		public Attr setAttributeNode(Attr newAttr) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
 		@Override
-		public Attr getAttributeNodeNS(final String uri, final String name) throws DOMException {
-			final BEXList attributes = this.node.attributes();
-			final int index = attributes.find(uri, name, 0);
+		public Attr getAttributeNodeNS(String uri, String name) throws DOMException {
+			var attributes = this.node.attributes();
+			var index = attributes.find(uri, name, 0);
 			if (index < 0) return null;
 			return new BEXAttrAdapter(attributes.get(index), this);
 		}
 
 		@Override
-		public Attr setAttributeNodeNS(final Attr newAttr) throws DOMException {
+		public Attr setAttributeNodeNS(Attr newAttr) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
 		@Override
-		public void setIdAttribute(final String name, final boolean isId) throws DOMException {
+		public void setIdAttribute(String name, boolean isId) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
 		@Override
-		public void setIdAttributeNS(final String namespaceURI, final String localName, final boolean isId) throws DOMException {
+		public void setIdAttributeNS(String namespaceURI, String localName, boolean isId) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
 		@Override
-		public void setIdAttributeNode(final Attr idAttr, final boolean isId) throws DOMException {
+		public void setIdAttributeNode(Attr idAttr, boolean isId) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
 		@Override
 		public String getTextContent() throws DOMException {
-			final StringBuilder content = new StringBuilder();
+			var content = new StringBuilder();
 			BEXElemAdapter.collectContent(content, this.node.children());
 			return content.toString();
 		}
@@ -460,37 +454,37 @@ public class BEXAdapter {
 		}
 
 		@Override
-		public void removeAttribute(final String name) throws DOMException {
+		public void removeAttribute(String name) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
 		@Override
-		public void removeAttributeNS(final String namespaceURI, final String localName) throws DOMException {
+		public void removeAttributeNS(String namespaceURI, String localName) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
 		@Override
-		public Attr removeAttributeNode(final Attr oldAttr) throws DOMException {
+		public Attr removeAttributeNode(Attr oldAttr) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
 		@Override
-		public NodeList getElementsByTagName(final String name) {
+		public NodeList getElementsByTagName(String name) {
 			return this.getElementsByTagNameNS(XMLConstants.NULL_NS_URI, name);
 		}
 
 		@Override
-		public NodeList getElementsByTagNameNS(final String uri, final String name) throws DOMException {
+		public NodeList getElementsByTagNameNS(String uri, String name) throws DOMException {
 			return new BEXElemCollector(this, uri, name, false);
 		}
 
 		@Override
-		public boolean isSameNode(final Node object) {
+		public boolean isSameNode(Node object) {
 			return this.isEqualNode(object) && this.getParentNode().isSameNode(object.getParentNode());
 		}
 
 		@Override
-		public boolean isEqualNode(final Node object) {
+		public boolean isEqualNode(Node object) {
 			return this.equals(object);
 		}
 
@@ -500,16 +494,31 @@ public class BEXAdapter {
 		}
 
 		@Override
-		public boolean equals(final Object object) {
+		public boolean equals(Object object) {
 			if (object == this) return true;
 			if (!(object instanceof BEXElemAdapter)) return false;
-			final BEXElemAdapter data = (BEXElemAdapter)object;
+			var data = (BEXElemAdapter)object;
 			return Objects.equals(this.node, data.node);
 		}
 
 		@Override
 		public String toString() {
 			return "<" + this.getNodeName() + this.getAttributes() + ">";
+		}
+
+		/** Diese Methode implementeirt {@link #getTextContent()}.
+		 *
+		 * @param result Puffer mit dem bisher gesammelten Texten.
+		 * @param children {@link BEXList} der rekursiv analysierten Kindknoten.
+		 * @throws NullPointerException Wenn eine der Eingabe {@code null} ist. */
+		static void collectContent(StringBuilder result, BEXList children) throws NullPointerException {
+			for (BEXNode child: children) {
+				if (child.type() == BEXNode.ELEM_NODE) {
+					BEXElemAdapter.collectContent(result, child.children());
+				} else {
+					result.append(child.value());
+				}
+			}
 		}
 
 	}
@@ -533,7 +542,7 @@ public class BEXAdapter {
 			}
 
 			@Override
-			public boolean isDerivedFrom(final String typeNamespaceArg, final String typeNameArg, final int derivationMethod) {
+			public boolean isDerivedFrom(String typeNamespaceArg, String typeNameArg, int derivationMethod) {
 				return false;
 			}
 
@@ -543,7 +552,7 @@ public class BEXAdapter {
 		public static final NodeList VOID_NODE_LIST = new NodeList() {
 
 			@Override
-			public Node item(final int index) {
+			public Node item(int index) {
 				return null;
 			}
 
@@ -558,7 +567,7 @@ public class BEXAdapter {
 		public static final DOMConfiguration VOID_DOM_CONFIGURATION = new DOMConfiguration() {
 
 			@Override
-			public void setParameter(final String name, final Object value) throws DOMException {
+			public void setParameter(String name, Object value) throws DOMException {
 				throw new DOMException(DOMException.NOT_SUPPORTED_ERR, null);
 			}
 
@@ -568,14 +577,14 @@ public class BEXAdapter {
 			}
 
 			@Override
-			public Object getParameter(final String name) throws DOMException {
+			public Object getParameter(String name) throws DOMException {
 				if (BEXDocuAdapter.defaultParameterListTrue.contains(name)) return Boolean.TRUE;
 				if (BEXDocuAdapter.defaultParameterListFalse.contains(name)) return Boolean.FALSE;
 				throw new DOMException(DOMException.NOT_FOUND_ERR, null);
 			}
 
 			@Override
-			public boolean canSetParameter(final String name, final Object value) {
+			public boolean canSetParameter(String name, Object value) {
 				return false;
 			}
 
@@ -585,68 +594,32 @@ public class BEXAdapter {
 		public static final DOMImplementation VOID_DOM_IMPLEMENTATION = new DOMImplementation() {
 
 			@Override
-			public boolean hasFeature(final String feature, final String version) {
+			public boolean hasFeature(String feature, String version) {
 				return false;
 			}
 
 			@Override
-			public Object getFeature(final String feature, final String version) {
+			public Object getFeature(String feature, String version) {
 				return null;
 			}
 
 			@Override
-			public DocumentType createDocumentType(final String qualifiedName, final String publicId, final String systemId) throws DOMException {
+			public DocumentType createDocumentType(String qualifiedName, String publicId, String systemId) throws DOMException {
 				throw new DOMException(DOMException.NOT_SUPPORTED_ERR, null);
 			}
 
 			@Override
-			public Document createDocument(final String namespaceURI, final String qualifiedName, final DocumentType doctype) throws DOMException {
+			public Document createDocument(String namespaceURI, String qualifiedName, DocumentType doctype) throws DOMException {
 				throw new DOMException(DOMException.NOT_SUPPORTED_ERR, null);
 			}
 
 		};
-
-		/** Dieses Feld speichert die {@link DOMStringList} der leeren {@link DOMConfiguration}.
-		 *
-		 * @see DOMConfiguration#getParameterNames() */
-		static final DOMStringList defaultParameterList = new DOMStringList() {
-
-			@Override
-			public String item(final int index) {
-				final int offset = BEXDocuAdapter.defaultParameterListTrue.size();
-				if (index < offset) return BEXDocuAdapter.defaultParameterListTrue.get(index);
-				return BEXDocuAdapter.defaultParameterListFalse.get(index - offset);
-			}
-
-			@Override
-			public int getLength() {
-				return BEXDocuAdapter.defaultParameterListTrue.size() + BEXDocuAdapter.defaultParameterListFalse.size();
-			}
-
-			@Override
-			public boolean contains(final String str) {
-				return BEXDocuAdapter.defaultParameterListTrue.contains(str) || BEXDocuAdapter.defaultParameterListFalse.contains(str);
-			}
-
-		};
-
-		/** Dieses Feld speichert die {@code true-Parameter} der leeren {@link DOMConfiguration}.
-		 *
-		 * @see DOMConfiguration#getParameter(String) */
-		static final List<String> defaultParameterListTrue = Collections.unmodifiableList(
-			Arrays.asList("comments", "datatype-normalization", "well-formed", "namespaces", "namespace-declarations", "element-content-whitespace"));
-
-		/** Dieses Feld speichert die {@code false-Parameter} der leeren {@link DOMConfiguration}.
-		 *
-		 * @see DOMConfiguration#getParameter(String) */
-		static final List<String> defaultParameterListFalse = Collections.unmodifiableList(Arrays.asList("cdata-sections", "entities", "split-cdata-sections",
-			"validate", "infoset", "normalize-characters", "canonical-form", "validate-if-schema", "check-character-normalization"));
 
 		/** Dieser Konstruktor initialisiert das {@link BEXFile}.
 		 *
 		 * @param file {@link BEXFile}.
 		 * @throws NullPointerException Wenn {@code file} {@code null} ist. */
-		public BEXDocuAdapter(final BEXFile file) throws NullPointerException {
+		public BEXDocuAdapter(BEXFile file) throws NullPointerException {
 			super(file.root());
 		}
 
@@ -685,7 +658,7 @@ public class BEXAdapter {
 			return new NodeList() {
 
 				@Override
-				public Node item(final int index) {
+				public Node item(int index) {
 					if (index != 0) return null;
 					return BEXDocuAdapter.this.getDocumentElement();
 				}
@@ -729,32 +702,32 @@ public class BEXAdapter {
 		}
 
 		@Override
-		public String lookupPrefix(final String namespaceURI) {
+		public String lookupPrefix(String namespaceURI) {
 			return null;
 		}
 
 		@Override
-		public String lookupNamespaceURI(final String prefix) {
+		public String lookupNamespaceURI(String prefix) {
 			return null;
 		}
 
 		@Override
-		public boolean isDefaultNamespace(final String uri) {
+		public boolean isDefaultNamespace(String uri) {
 			return false;
 		}
 
 		@Override
-		public Element getElementById(final String elementId) {
+		public Element getElementById(String elementId) {
 			return null;
 		}
 
 		@Override
-		public NodeList getElementsByTagName(final String name) {
+		public NodeList getElementsByTagName(String name) {
 			return this.getElementsByTagNameNS(XMLConstants.NULL_NS_URI, name);
 		}
 
 		@Override
-		public NodeList getElementsByTagNameNS(final String uri, final String name) {
+		public NodeList getElementsByTagNameNS(String uri, String name) {
 			return new BEXElemCollector(this, uri, name, true);
 		}
 
@@ -764,7 +737,7 @@ public class BEXAdapter {
 		}
 
 		@Override
-		public Element createElement(final String tagName) throws DOMException {
+		public Element createElement(String tagName) throws DOMException {
 			throw new DOMException(DOMException.NOT_SUPPORTED_ERR, null);
 		}
 
@@ -774,47 +747,47 @@ public class BEXAdapter {
 		}
 
 		@Override
-		public Text createTextNode(final String data) {
+		public Text createTextNode(String data) {
 			throw new DOMException(DOMException.NOT_SUPPORTED_ERR, null);
 		}
 
 		@Override
-		public Comment createComment(final String data) {
+		public Comment createComment(String data) {
 			throw new DOMException(DOMException.NOT_SUPPORTED_ERR, null);
 		}
 
 		@Override
-		public CDATASection createCDATASection(final String data) throws DOMException {
+		public CDATASection createCDATASection(String data) throws DOMException {
 			throw new DOMException(DOMException.NOT_SUPPORTED_ERR, null);
 		}
 
 		@Override
-		public ProcessingInstruction createProcessingInstruction(final String target, final String data) throws DOMException {
+		public ProcessingInstruction createProcessingInstruction(String target, String data) throws DOMException {
 			throw new DOMException(DOMException.NOT_SUPPORTED_ERR, null);
 		}
 
 		@Override
-		public Attr createAttribute(final String name) throws DOMException {
+		public Attr createAttribute(String name) throws DOMException {
 			throw new DOMException(DOMException.NOT_SUPPORTED_ERR, null);
 		}
 
 		@Override
-		public EntityReference createEntityReference(final String name) throws DOMException {
+		public EntityReference createEntityReference(String name) throws DOMException {
 			throw new DOMException(DOMException.NOT_SUPPORTED_ERR, null);
 		}
 
 		@Override
-		public Node importNode(final Node importedNode, final boolean deep) throws DOMException {
+		public Node importNode(Node importedNode, boolean deep) throws DOMException {
 			throw new DOMException(DOMException.NOT_SUPPORTED_ERR, null);
 		}
 
 		@Override
-		public Element createElementNS(final String namespaceURI, final String qualifiedName) throws DOMException {
+		public Element createElementNS(String namespaceURI, String qualifiedName) throws DOMException {
 			throw new DOMException(DOMException.NOT_SUPPORTED_ERR, null);
 		}
 
 		@Override
-		public Attr createAttributeNS(final String namespaceURI, final String qualifiedName) throws DOMException {
+		public Attr createAttributeNS(String namespaceURI, String qualifiedName) throws DOMException {
 			throw new DOMException(DOMException.NOT_SUPPORTED_ERR, null);
 		}
 
@@ -834,7 +807,7 @@ public class BEXAdapter {
 		}
 
 		@Override
-		public void setXmlStandalone(final boolean xmlStandalone) throws DOMException {
+		public void setXmlStandalone(boolean xmlStandalone) throws DOMException {
 			throw new DOMException(DOMException.NOT_SUPPORTED_ERR, null);
 		}
 
@@ -844,7 +817,7 @@ public class BEXAdapter {
 		}
 
 		@Override
-		public void setXmlVersion(final String xmlVersion) throws DOMException {
+		public void setXmlVersion(String xmlVersion) throws DOMException {
 			throw new DOMException(DOMException.NOT_SUPPORTED_ERR, null);
 		}
 
@@ -854,7 +827,7 @@ public class BEXAdapter {
 		}
 
 		@Override
-		public void setStrictErrorChecking(final boolean strictErrorChecking) {
+		public void setStrictErrorChecking(boolean strictErrorChecking) {
 		}
 
 		@Override
@@ -863,11 +836,11 @@ public class BEXAdapter {
 		}
 
 		@Override
-		public void setDocumentURI(final String documentURI) {
+		public void setDocumentURI(String documentURI) {
 		}
 
 		@Override
-		public Node adoptNode(final Node source) throws DOMException {
+		public Node adoptNode(Node source) throws DOMException {
 			throw new DOMException(DOMException.NOT_SUPPORTED_ERR, null);
 		}
 
@@ -881,17 +854,17 @@ public class BEXAdapter {
 		}
 
 		@Override
-		public Node renameNode(final Node n, final String namespaceURI, final String qualifiedName) throws DOMException {
+		public Node renameNode(Node n, String namespaceURI, String qualifiedName) throws DOMException {
 			throw new DOMException(DOMException.NOT_SUPPORTED_ERR, null);
 		}
 
 		@Override
-		public boolean isSameNode(final Node object) {
+		public boolean isSameNode(Node object) {
 			return this.equals(object);
 		}
 
 		@Override
-		public boolean isEqualNode(final Node object) {
+		public boolean isEqualNode(Node object) {
 			return this.equals(object);
 		}
 
@@ -906,10 +879,10 @@ public class BEXAdapter {
 		}
 
 		@Override
-		public boolean equals(final Object object) {
+		public boolean equals(Object object) {
 			if (object == this) return true;
 			if (!(object instanceof BEXDocuAdapter)) return false;
-			final BEXDocuAdapter data = (BEXDocuAdapter)object;
+			var data = (BEXDocuAdapter)object;
 			return Objects.equals(this.node, data.node);
 		}
 
@@ -918,6 +891,42 @@ public class BEXAdapter {
 			return this.getDocumentElement().toString();
 		}
 
+		/** Dieses Feld speichert die {@link DOMStringList} der leeren {@link DOMConfiguration}.
+		 *
+		 * @see DOMConfiguration#getParameterNames() */
+		static final DOMStringList defaultParameterList = new DOMStringList() {
+
+			@Override
+			public String item(int index) {
+				var offset = BEXDocuAdapter.defaultParameterListTrue.size();
+				if (index < offset) return BEXDocuAdapter.defaultParameterListTrue.get(index);
+				return BEXDocuAdapter.defaultParameterListFalse.get(index - offset);
+			}
+
+			@Override
+			public int getLength() {
+				return BEXDocuAdapter.defaultParameterListTrue.size() + BEXDocuAdapter.defaultParameterListFalse.size();
+			}
+
+			@Override
+			public boolean contains(String str) {
+				return BEXDocuAdapter.defaultParameterListTrue.contains(str) || BEXDocuAdapter.defaultParameterListFalse.contains(str);
+			}
+
+		};
+
+		/** Dieses Feld speichert die {@code true-Parameter} der leeren {@link DOMConfiguration}.
+		 *
+		 * @see DOMConfiguration#getParameter(String) */
+		static final List<String> defaultParameterListTrue = Collections.unmodifiableList(
+			Arrays.asList("comments", "datatype-normalization", "well-formed", "namespaces", "namespace-declarations", "element-content-whitespace"));
+
+		/** Dieses Feld speichert die {@code false-Parameter} der leeren {@link DOMConfiguration}.
+		 *
+		 * @see DOMConfiguration#getParameter(String) */
+		static final List<String> defaultParameterListFalse = Collections.unmodifiableList(Arrays.asList("cdata-sections", "entities", "split-cdata-sections",
+			"validate", "infoset", "normalize-characters", "canonical-form", "validate-if-schema", "check-character-normalization"));
+
 	}
 
 	/** Diese Klasse implementiert einen abstrakten {@link Node}, dessen Methoden keine Modifikation zulassen.
@@ -925,14 +934,11 @@ public class BEXAdapter {
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static abstract class BEXNodeAdapter implements Node {
 
-		/** Dieses Feld speichert den {@link BEXNode}. */
-		protected final BEXNode node;
-
 		/** Dieser Konstruktor initialisiert den {@link BEXNode}.
 		 *
 		 * @param node {@link BEXNode}.
 		 * @throws NullPointerException Wenn {@code node} {@code null} ist. */
-		public BEXNodeAdapter(final BEXNode node) throws NullPointerException {
+		public BEXNodeAdapter(BEXNode node) throws NullPointerException {
 			this.node = Objects.notNull(node);
 		}
 
@@ -942,7 +948,7 @@ public class BEXAdapter {
 		}
 
 		@Override
-		public void setPrefix(final String prefix) throws DOMException {
+		public void setPrefix(String prefix) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
@@ -1002,47 +1008,47 @@ public class BEXAdapter {
 		}
 
 		@Override
-		public void setNodeValue(final String nodeValue) throws DOMException {
+		public void setNodeValue(String nodeValue) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
 		@Override
-		public void setTextContent(final String textContent) throws DOMException {
+		public void setTextContent(String textContent) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
 		@Override
-		public String lookupPrefix(final String uri) {
+		public String lookupPrefix(String uri) {
 			return null;
 		}
 
 		@Override
-		public String lookupNamespaceURI(final String prefix) {
+		public String lookupNamespaceURI(String prefix) {
 			return null;
 		}
 
 		@Override
-		public boolean isDefaultNamespace(final String uri) {
+		public boolean isDefaultNamespace(String uri) {
 			return false;
 		}
 
 		@Override
-		public Object getFeature(final String feature, final String version) {
+		public Object getFeature(String feature, String version) {
 			return null;
 		}
 
 		@Override
-		public boolean isSupported(final String feature, final String version) {
+		public boolean isSupported(String feature, String version) {
 			return false;
 		}
 
 		@Override
-		public Object getUserData(final String key) {
+		public Object getUserData(String key) {
 			return null;
 		}
 
 		@Override
-		public Object setUserData(final String key, final Object data, final UserDataHandler handler) {
+		public Object setUserData(String key, Object data, UserDataHandler handler) {
 			return null;
 		}
 
@@ -1052,27 +1058,27 @@ public class BEXAdapter {
 		}
 
 		@Override
-		public Node insertBefore(final Node newChild, final Node refChild) throws DOMException {
+		public Node insertBefore(Node newChild, Node refChild) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
 		@Override
-		public Node replaceChild(final Node newChild, final Node oldChild) throws DOMException {
+		public Node replaceChild(Node newChild, Node oldChild) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
 		@Override
-		public Node cloneNode(final boolean deep) {
+		public Node cloneNode(boolean deep) {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
 		@Override
-		public Node removeChild(final Node node) throws DOMException {
+		public Node removeChild(Node node) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
 		@Override
-		public Node appendChild(final Node node) throws DOMException {
+		public Node appendChild(Node node) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
@@ -1081,9 +1087,12 @@ public class BEXAdapter {
 		}
 
 		@Override
-		public short compareDocumentPosition(final Node node) throws DOMException {
+		public short compareDocumentPosition(Node node) throws DOMException {
 			throw new DOMException(DOMException.NOT_SUPPORTED_ERR, null);
 		}
+
+		/** Dieses Feld speichert den {@link BEXNode}. */
+		protected final BEXNode node;
 
 	}
 
@@ -1093,15 +1102,12 @@ public class BEXAdapter {
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static abstract class BEXChldAdapter extends BEXNodeAdapter {
 
-		/** Dieses Feld speichert den Elternknoten. */
-		protected final Node parent;
-
 		/** Dieser Konstruktor initialisiert {@link BEXNode} und Elternknoten.
 		 *
 		 * @param node {@link BEXNode}.
 		 * @param parent Elternknoten.
 		 * @throws NullPointerException Wenn {@code node} bzw. {@code parent} {@code null} ist. */
-		public BEXChldAdapter(final BEXNode node, final Node parent) throws NullPointerException {
+		public BEXChldAdapter(BEXNode node, Node parent) throws NullPointerException {
 			super(node);
 			this.parent = parent;
 		}
@@ -1113,21 +1119,24 @@ public class BEXAdapter {
 
 		@Override
 		public Node getPreviousSibling() {
-			final Node parent = this.getParentNode();
+			var parent = this.getParentNode();
 			if (parent == null) return null;
-			final int index = this.node.index();
+			var index = this.node.index();
 			if (index < 0) return null;
 			return parent.getChildNodes().item(index - 1);
 		}
 
 		@Override
 		public Node getNextSibling() {
-			final Node parent = this.getParentNode();
+			var parent = this.getParentNode();
 			if (parent == null) return null;
-			final int index = this.node.index();
+			var index = this.node.index();
 			if (index < 0) return null;
 			return parent.getChildNodes().item(index + 1);
 		}
+
+		/** Dieses Feld speichert den Elternknoten. */
+		protected final Node parent;
 
 	}
 
@@ -1136,74 +1145,74 @@ public class BEXAdapter {
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static class BEXAttrListAdapter implements NamedNodeMap {
 
-		/** Dieses Feld speichert den {@link BEXList}. */
-		protected final BEXList list;
-
-		/** Dieses Feld speichert den Elternknoten. */
-		protected final Element parent;
-
 		/** Dieser Konstruktor initialisiert {@link BEXList} und Elternknoten.
 		 *
 		 * @param list {@link BEXList}.
 		 * @param parent Elternknoten.
 		 * @throws NullPointerException Wenn {@code node} bzw. {@code parent} {@code null} ist. */
-		public BEXAttrListAdapter(final BEXList list, final Element parent) throws NullPointerException {
+		public BEXAttrListAdapter(BEXList list, Element parent) throws NullPointerException {
 			this.list = Objects.notNull(list);
 			this.parent = Objects.notNull(parent);
 		}
 
 		@Override
-		public Node item(final int index) {
-			final BEXNode node = this.list.get(index);
+		public Node item(int index) {
+			var node = this.list.get(index);
 			if (node.type() == BEXNode.VOID_NODE) return null;
 			return new BEXAttrAdapter(node, this.parent);
 		}
 
 		@Override
 		public int getLength() {
-			return this.list.length();
+			return this.list.size();
 		}
 
 		@Override
-		public Node getNamedItem(final String name) {
+		public Node getNamedItem(String name) {
 			return this.getNamedItemNS(XMLConstants.NULL_NS_URI, name);
 		}
 
 		@Override
-		public Node setNamedItem(final Node arg) throws DOMException {
+		public Node setNamedItem(Node arg) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
 		@Override
-		public Node getNamedItemNS(final String namespaceURI, final String localName) throws DOMException {
-			final int index = this.list.find(namespaceURI, localName, 0);
+		public Node getNamedItemNS(String namespaceURI, String localName) throws DOMException {
+			var index = this.list.find(namespaceURI, localName, 0);
 			if (index < 0) return null;
 			return new BEXAttrAdapter(this.list.get(index), this.parent);
 		}
 
 		@Override
-		public Node setNamedItemNS(final Node arg) throws DOMException {
+		public Node setNamedItemNS(Node arg) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
 		@Override
-		public Node removeNamedItem(final String name) throws DOMException {
+		public Node removeNamedItem(String name) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
 		@Override
-		public Node removeNamedItemNS(final String namespaceURI, final String localName) throws DOMException {
+		public Node removeNamedItemNS(String namespaceURI, String localName) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
 		@Override
 		public String toString() {
-			final StringBuilder builder = new StringBuilder();
+			var builder = new StringBuilder();
 			for (int i = 0, size = this.getLength(); i < size; i++) {
 				builder.append(' ').append(this.item(i));
 			}
 			return builder.toString();
 		}
+
+		/** Dieses Feld speichert den {@link BEXList}. */
+		protected final BEXList list;
+
+		/** Dieses Feld speichert den Elternknoten. */
+		protected final Element parent;
 
 	}
 
@@ -1212,25 +1221,19 @@ public class BEXAdapter {
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static class BEXChldListAdapter implements NodeList {
 
-		/** Dieses Feld speichert den {@link BEXList}. */
-		protected final BEXList list;
-
-		/** Dieses Feld speichert den Elternknoten. */
-		protected final Node parent;
-
 		/** Dieser Konstruktor initialisiert {@link BEXList} und Elternknoten.
 		 *
 		 * @param list {@link BEXList}.
 		 * @param parent Elternknoten.
 		 * @throws NullPointerException Wenn {@code node} bzw. {@code parent} {@code null} ist. */
-		public BEXChldListAdapter(final BEXList list, final Node parent) throws NullPointerException {
+		public BEXChldListAdapter(BEXList list, Node parent) throws NullPointerException {
 			this.list = Objects.notNull(list);
 			this.parent = Objects.notNull(parent);
 		}
 
 		@Override
-		public Node item(final int index) {
-			final BEXNode node = this.list.get(index);
+		public Node item(int index) {
+			var node = this.list.get(index);
 			if (node.type() == BEXNode.VOID_NODE) return null;
 			if (node.type() == BEXNode.ELEM_NODE) return new BEXElemAdapter(node, this.parent);
 			return new BEXTextAdapter(node, this.parent);
@@ -1238,17 +1241,23 @@ public class BEXAdapter {
 
 		@Override
 		public int getLength() {
-			return this.list.length();
+			return this.list.size();
 		}
 
 		@Override
 		public String toString() {
-			final StringBuilder builder = new StringBuilder();
+			var builder = new StringBuilder();
 			for (int i = 0, size = this.getLength(); i < size; i++) {
 				builder.append(this.item(i));
 			}
 			return builder.toString();
 		}
+
+		/** Dieses Feld speichert den {@link BEXList}. */
+		protected final BEXList list;
+
+		/** Dieses Feld speichert den Elternknoten. */
+		protected final Node parent;
 
 	}
 
@@ -1259,18 +1268,6 @@ public class BEXAdapter {
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static class BEXElemCollector implements NodeList {
 
-		/** Dieses Feld speichert die gesuchte {@link BEXNode#uri()} oder {@code "*"}. */
-		protected final String uri;
-
-		/** Dieses Feld speichert den gesuchten {@link BEXNode#name()} oder {@code "*"}. */
-		protected final String name;
-
-		/** Dieses Feld speichert die gesammelten Elementknoten. */
-		protected final List<Node> list;
-
-		/** Dieses Feld speichert die Anzahl der gesammelten Elementknoten. */
-		protected final int size;
-
 		/** Dieser Konstruktor initialisiert die Parameter zur Zusammenstellung der {@link BEXNodeAdapter}.
 		 *
 		 * @param node Elementknoten, dessen Kindknoten rekursiv analysiert werden.
@@ -1278,7 +1275,7 @@ public class BEXAdapter {
 		 * @param name Name oder {@code "*"}.
 		 * @param self {@code true}, wenn der gegebene Elementknoten selbst auch analysiert werden soll.
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist. */
-		public BEXElemCollector(final BEXNodeAdapter node, final String uri, final String name, final boolean self) throws NullPointerException {
+		public BEXElemCollector(BEXNodeAdapter node, String uri, String name, boolean self) throws NullPointerException {
 			this.uri = Objects.notNull(uri);
 			this.name = Objects.notNull(name);
 			this.list = new ArrayList<>();
@@ -1298,16 +1295,39 @@ public class BEXAdapter {
 			this.size = this.list.size();
 		}
 
+		@Override
+		public Node item(int index) {
+			if (index < this.size) return this.list.get(index);
+			return null;
+		}
+
+		@Override
+		public int getLength() {
+			return this.size;
+		}
+
+		/** Dieses Feld speichert die gesuchte {@link BEXNode#uri()} oder {@code "*"}. */
+		protected final String uri;
+
+		/** Dieses Feld speichert den gesuchten {@link BEXNode#name()} oder {@code "*"}. */
+		protected final String name;
+
+		/** Dieses Feld speichert die gesammelten Elementknoten. */
+		protected final List<Node> list;
+
+		/** Dieses Feld speichert die Anzahl der gesammelten Elementknoten. */
+		protected final int size;
+
 		/** Diese Methode sammelt alle Elementknoten.
 		 *
 		 * @param node Elementknoten.
 		 * @param self {@code true}, wenn der gegebene Elementknoten selbst analysiert werden soll. */
-		void collectElements(final BEXNodeAdapter node, final boolean self) {
+		void collectElements(BEXNodeAdapter node, boolean self) {
 			if (node.node.type() == BEXNode.ELEM_NODE) {
 				if (self) {
 					this.list.add(node);
 				}
-				final NodeList children = node.getChildNodes();
+				var children = node.getChildNodes();
 				for (int i = 0, length = children.getLength(); i < length; i++) {
 					this.collectElements((BEXNodeAdapter)children.item(i), true);
 				}
@@ -1318,12 +1338,12 @@ public class BEXAdapter {
 		 *
 		 * @param node Elementknoten.
 		 * @param self {@code true}, wenn der gegebene Elementknoten selbst analysiert werden soll. */
-		void collectElementsByUri(final BEXNodeAdapter node, final boolean self) {
+		void collectElementsByUri(BEXNodeAdapter node, boolean self) {
 			if (node.node.type() == BEXNode.ELEM_NODE) {
 				if (self && this.uri.equals(node.node.uri())) {
 					this.list.add(node);
 				}
-				final NodeList children = node.getChildNodes();
+				var children = node.getChildNodes();
 				for (int i = 0, length = children.getLength(); i < length; i++) {
 					this.collectElementsByUri((BEXNodeAdapter)children.item(i), true);
 				}
@@ -1334,12 +1354,12 @@ public class BEXAdapter {
 		 *
 		 * @param node Elementknoten.
 		 * @param self {@code true}, wenn der gegebene Elementknoten selbst analysiert werden soll. */
-		void collectElementsByName(final BEXNodeAdapter node, final boolean self) {
+		void collectElementsByName(BEXNodeAdapter node, boolean self) {
 			if (node.node.type() == BEXNode.ELEM_NODE) {
 				if (self && this.name.equals(node.node.name())) {
 					this.list.add(node);
 				}
-				final NodeList children = node.getChildNodes();
+				var children = node.getChildNodes();
 				for (int i = 0, length = children.getLength(); i < length; i++) {
 					this.collectElementsByName((BEXNodeAdapter)children.item(i), true);
 				}
@@ -1350,38 +1370,18 @@ public class BEXAdapter {
 		 *
 		 * @param node Elementknoten.
 		 * @param self {@code true}, wenn der gegebene Elementknoten selbst analysiert werden soll. */
-		void collectElementsByLabel(final BEXNodeAdapter node, final boolean self) {
+		void collectElementsByLabel(BEXNodeAdapter node, boolean self) {
 			if (node.node.type() == BEXNode.ELEM_NODE) {
 				if (self && this.name.equals(node.node.name()) && this.uri.equals(node.node.uri())) {
 					this.list.add(node);
 				}
-				final NodeList children = node.getChildNodes();
+				var children = node.getChildNodes();
 				for (int i = 0, length = children.getLength(); i < length; i++) {
 					this.collectElementsByLabel((BEXNodeAdapter)children.item(i), true);
 				}
 			}
 		}
 
-		@Override
-		public Node item(final int index) {
-			if (index < this.size) return this.list.get(index);
-			return null;
-		}
-
-		@Override
-		public int getLength() {
-			return this.size;
-		}
-
-	}
-
-	/** Diese Methode gibt das gegebene {@link BEXFile} als {@link Document} zurück.
-	 *
-	 * @param file {@link BEXFile}.
-	 * @return {@link Document}.
-	 * @throws NullPointerException Wenn {@code file} {@code null} ist. */
-	public static Document wrap(final BEXFile file) throws NullPointerException {
-		return new BEXDocuAdapter(file);
 	}
 
 }

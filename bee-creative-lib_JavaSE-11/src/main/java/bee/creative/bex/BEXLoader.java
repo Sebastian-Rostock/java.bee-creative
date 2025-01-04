@@ -24,116 +24,36 @@ public class BEXLoader {
 		/** Dieses Feld speichert den leeren {@link BEXFileLoader}. */
 		public static final BEXFileLoader EMPTY = new BEXFileLoader();
 
-		/** Dieses Feld speichert die Referenz des Wurzelelements. */
-		final int rootRef;
-
-		/** Dieses Feld speichert das die Zahlenfolgen verwaltende Inhaltsverzeichnis. */
-		final IAMIndex fileData;
-
-		/** Dieses Feld speichert die URI der Attributknoten. */
-		final BEXStringLoader attrUriText;
-
-		/** Dieses Feld speichert die Namen der Attributknoten. */
-		final BEXStringLoader attrNameText;
-
-		/** Dieses Feld speichert die Werte der Attributknoten. */
-		final BEXStringLoader attrValueText;
-
-		/** Dieses Feld speichert die URI der Elementknoten. */
-		final BEXStringLoader chldUriText;
-
-		/** Dieses Feld speichert die Namen der Elementknoten. */
-		final BEXStringLoader chldNameText;
-
-		/** Dieses Feld speichert die Werte der Textknoten. */
-		final BEXStringLoader chldValueText;
-
-		/** Dieses Feld speichert die URI-Spalte der Attributknotentabelle. */
-		final IAMArray attrUriRef;
-
-		/** Dieses Feld speichert die Name-Spalte der Attributknotentabelle. */
-		final IAMArray attrNameRef;
-
-		/** Dieses Feld speichert die Wert-Spalte der Attributknotentabelle. */
-		final IAMArray attrValueRef;
-
-		/** Dieses Feld speichert die Elternknoten-Spalte der Attributknotentabelle. */
-		final IAMArray attrParentRef;
-
-		/** Dieses Feld speichert die URI-Spalte der Kindknotentabelle. */
-		final IAMArray chldUriRef;
-
-		/** Dieses Feld speichert die Name-Spalte der Kindknotentabelle. */
-		final IAMArray chldNameRef;
-
-		/** Dieses Feld speichert die Inhalt-Spalte der Kindknotentabelle. */
-		final IAMArray chldContentRef;
-
-		/** Dieses Feld speichert die Attribut-Spalte der Kindknotentabelle. */
-		final IAMArray chldAttributesRef;
-
-		/** Dieses Feld speichert die Elternknoten-Spalte der Kindknotentabelle. */
-		final IAMArray chldParentRef;
-
-		/** Dieses Feld speichert Kindknotenlisten als Abschnitte der Kindknotentabelle. */
-		final IAMArray chldListRange;
-
-		/** Dieses Feld speichert Attributknotenlisten als Abschnitte der Attributknotentabelle. */
-		final IAMArray attrListRange;
-
-		/** Dieser Konstruktor initialisiert den leeren {@link BEXFileLoader}. */
-		BEXFileLoader() {
-			this.rootRef = -1;
-			this.fileData = IAMIndex.EMPTY;
-			this.attrUriText = BEXStringLoader.EMPTY;
-			this.attrNameText = BEXStringLoader.EMPTY;
-			this.attrValueText = BEXStringLoader.EMPTY;
-			this.chldUriText = BEXStringLoader.EMPTY;
-			this.chldNameText = BEXStringLoader.EMPTY;
-			this.chldValueText = BEXStringLoader.EMPTY;
-			this.attrUriRef = IAMArray.EMPTY;
-			this.attrNameRef = IAMArray.EMPTY;
-			this.attrValueRef = IAMArray.EMPTY;
-			this.attrParentRef = IAMArray.EMPTY;
-			this.chldUriRef = IAMArray.EMPTY;
-			this.chldNameRef = IAMArray.EMPTY;
-			this.chldContentRef = IAMArray.EMPTY;
-			this.chldAttributesRef = IAMArray.EMPTY;
-			this.chldParentRef = IAMArray.EMPTY;
-			this.chldListRange = IAMArray.EMPTY;
-			this.attrListRange = IAMArray.EMPTY;
-		}
-
 		/** Dieser Kontrukteur initialisiert das {@link BEXFile} als Sicht auf den gegebenen {@link IAMIndex}.
 		 *
 		 * @param fileData {@link IAMIndex}.
 		 * @throws IAMException Wenn {@code index} strukturell oder referenzienn ungültig ist.
 		 * @throws NullPointerException Wenn {@code index} {@code null} ist. */
-		public BEXFileLoader(final IAMIndex fileData) throws IAMException, NullPointerException {
+		public BEXFileLoader(IAMIndex fileData) throws IAMException, NullPointerException {
 
 			if (false || //
 				(fileData.mappingCount() != 0) || //
 				(fileData.listingCount() != 18) //
 			) throw new IAMException(IAMException.INVALID_VALUE);
 
-			final IAMListing headRootListing = fileData.listing(0);
-			final IAMListing attrUriTextListing = fileData.listing(1);
-			final IAMListing attrNameTextListing = fileData.listing(2);
-			final IAMListing attrValueTextListing = fileData.listing(3);
-			final IAMListing chldUriTextListing = fileData.listing(4);
-			final IAMListing chldNameTextListing = fileData.listing(5);
-			final IAMListing chldValueTextListing = fileData.listing(6);
-			final IAMListing attrUriRefListing = fileData.listing(7);
-			final IAMListing attrNameRefListing = fileData.listing(8);
-			final IAMListing attrValueRefListing = fileData.listing(9);
-			final IAMListing attrParentRefListing = fileData.listing(10);
-			final IAMListing chldUriRefListing = fileData.listing(11);
-			final IAMListing chldNameRefListing = fileData.listing(12);
-			final IAMListing chldContentRefListing = fileData.listing(13);
-			final IAMListing chldAttributesRefListing = fileData.listing(14);
-			final IAMListing chldParentRefListing = fileData.listing(15);
-			final IAMListing attrListRangeListing = fileData.listing(16);
-			final IAMListing chldListRangeListing = fileData.listing(17);
+			var headRootListing = fileData.listing(0);
+			var attrUriTextListing = fileData.listing(1);
+			var attrNameTextListing = fileData.listing(2);
+			var attrValueTextListing = fileData.listing(3);
+			var chldUriTextListing = fileData.listing(4);
+			var chldNameTextListing = fileData.listing(5);
+			var chldValueTextListing = fileData.listing(6);
+			var attrUriRefListing = fileData.listing(7);
+			var attrNameRefListing = fileData.listing(8);
+			var attrValueRefListing = fileData.listing(9);
+			var attrParentRefListing = fileData.listing(10);
+			var chldUriRefListing = fileData.listing(11);
+			var chldNameRefListing = fileData.listing(12);
+			var chldContentRefListing = fileData.listing(13);
+			var chldAttributesRefListing = fileData.listing(14);
+			var chldParentRefListing = fileData.listing(15);
+			var attrListRangeListing = fileData.listing(16);
+			var chldListRangeListing = fileData.listing(17);
 
 			if (false || //
 				(headRootListing.itemCount() != 1) || //
@@ -150,23 +70,23 @@ public class BEXLoader {
 				(chldListRangeListing.itemCount() != 1) //
 			) throw new IAMException(IAMException.INVALID_VALUE);
 
-			final IAMArray headRoot = headRootListing.item(0);
-			final IAMArray attrUriRef = attrUriRefListing.item(0);
-			final IAMArray attrNameRef = attrNameRefListing.item(0);
-			final IAMArray attrValueRef = attrValueRefListing.item(0);
-			final IAMArray attrParentRef = attrParentRefListing.item(0);
-			final IAMArray chldUriRef = chldUriRefListing.item(0);
-			final IAMArray chldNameRef = chldNameRefListing.item(0);
-			final IAMArray chldContentRef = chldContentRefListing.item(0);
-			final IAMArray chldAttributesRef = chldAttributesRefListing.item(0);
-			final IAMArray chldParentRef = chldParentRefListing.item(0);
-			final IAMArray chldListRange = chldListRangeListing.item(0);
-			final IAMArray attrListRange = attrListRangeListing.item(0);
+			var headRoot = headRootListing.item(0);
+			var attrUriRef = attrUriRefListing.item(0);
+			var attrNameRef = attrNameRefListing.item(0);
+			var attrValueRef = attrValueRefListing.item(0);
+			var attrParentRef = attrParentRefListing.item(0);
+			var chldUriRef = chldUriRefListing.item(0);
+			var chldNameRef = chldNameRefListing.item(0);
+			var chldContentRef = chldContentRefListing.item(0);
+			var chldAttributesRef = chldAttributesRefListing.item(0);
+			var chldParentRef = chldParentRefListing.item(0);
+			var chldListRange = chldListRangeListing.item(0);
+			var attrListRange = attrListRangeListing.item(0);
 
-			final int headVal = headRoot.get(0);
-			final int rootRef = headRoot.get(1);
-			final int attrCount = attrNameRef.length();
-			final int chldCount = chldNameRef.length();
+			var headVal = headRoot.get(0);
+			var rootRef = headRoot.get(1);
+			var attrCount = attrNameRef.length();
+			var chldCount = chldNameRef.length();
 
 			if (false || //
 				(headVal != 0xBE10BA5E) || //
@@ -254,7 +174,7 @@ public class BEXLoader {
 		}
 
 		@Override
-		public BEXList list(final int key) {
+		public BEXList list(int key) {
 			switch (BEXLoader.typeOf(key)) {
 				case BEX_ATTR_LIST:
 					return this.node(BEXLoader.keyOf(BEXLoader.BEX_ELEM_NODE, BEXLoader.refOf(key))).attributes();
@@ -266,31 +186,111 @@ public class BEXLoader {
 		}
 
 		@Override
-		public BEXNode node(final int key) {
+		public BEXNode node(int key) {
 			switch (BEXLoader.typeOf(key)) {
 				case BEX_ATTR_NODE: {
-					final int ref = BEXLoader.refOf(key);
+					var ref = BEXLoader.refOf(key);
 					if (ref >= this.attrNameRef.length()) return new BEXNodeLoader(this);
 					return new BEXNodeLoader(BEXLoader.keyOf(BEXLoader.BEX_ATTR_NODE, ref), this);
 				}
 				case BEX_ELEM_NODE: {
-					final int ref = BEXLoader.refOf(key);
+					var ref = BEXLoader.refOf(key);
 					if (this.chldNameRef.get(ref) == 0) return new BEXNodeLoader(this);
 					return new BEXNodeLoader(BEXLoader.keyOf(BEXLoader.BEX_ELEM_NODE, ref), this);
 				}
 				case BEX_TEXT_NODE: {
-					final int ref = BEXLoader.refOf(key);
-					final IAMArray names = this.chldNameRef;
+					var ref = BEXLoader.refOf(key);
+					var names = this.chldNameRef;
 					if ((ref >= names.length()) || (names.get(ref) != 0)) return new BEXNodeLoader(this);
 					return new BEXNodeLoader(BEXLoader.keyOf(BEXLoader.BEX_TEXT_NODE, ref), this);
 				}
 				case BEX_ELTX_NODE: {
-					final int ref = BEXLoader.refOf(key);
+					var ref = BEXLoader.refOf(key);
 					if ((this.chldNameRef.get(ref) == 0) || (this.chldContentRef.get(ref) < 0)) return new BEXNodeLoader(this);
 					return new BEXNodeLoader(BEXLoader.keyOf(BEXLoader.BEX_ELTX_NODE, ref), this);
 				}
 			}
 			return new BEXNodeLoader(this);
+		}
+
+		/** Dieses Feld speichert die Referenz des Wurzelelements. */
+		final int rootRef;
+
+		/** Dieses Feld speichert das die Zahlenfolgen verwaltende Inhaltsverzeichnis. */
+		final IAMIndex fileData;
+
+		/** Dieses Feld speichert die URI der Attributknoten. */
+		final BEXStringLoader attrUriText;
+
+		/** Dieses Feld speichert die Namen der Attributknoten. */
+		final BEXStringLoader attrNameText;
+
+		/** Dieses Feld speichert die Werte der Attributknoten. */
+		final BEXStringLoader attrValueText;
+
+		/** Dieses Feld speichert die URI der Elementknoten. */
+		final BEXStringLoader chldUriText;
+
+		/** Dieses Feld speichert die Namen der Elementknoten. */
+		final BEXStringLoader chldNameText;
+
+		/** Dieses Feld speichert die Werte der Textknoten. */
+		final BEXStringLoader chldValueText;
+
+		/** Dieses Feld speichert die URI-Spalte der Attributknotentabelle. */
+		final IAMArray attrUriRef;
+
+		/** Dieses Feld speichert die Name-Spalte der Attributknotentabelle. */
+		final IAMArray attrNameRef;
+
+		/** Dieses Feld speichert die Wert-Spalte der Attributknotentabelle. */
+		final IAMArray attrValueRef;
+
+		/** Dieses Feld speichert die Elternknoten-Spalte der Attributknotentabelle. */
+		final IAMArray attrParentRef;
+
+		/** Dieses Feld speichert die URI-Spalte der Kindknotentabelle. */
+		final IAMArray chldUriRef;
+
+		/** Dieses Feld speichert die Name-Spalte der Kindknotentabelle. */
+		final IAMArray chldNameRef;
+
+		/** Dieses Feld speichert die Inhalt-Spalte der Kindknotentabelle. */
+		final IAMArray chldContentRef;
+
+		/** Dieses Feld speichert die Attribut-Spalte der Kindknotentabelle. */
+		final IAMArray chldAttributesRef;
+
+		/** Dieses Feld speichert die Elternknoten-Spalte der Kindknotentabelle. */
+		final IAMArray chldParentRef;
+
+		/** Dieses Feld speichert Kindknotenlisten als Abschnitte der Kindknotentabelle. */
+		final IAMArray chldListRange;
+
+		/** Dieses Feld speichert Attributknotenlisten als Abschnitte der Attributknotentabelle. */
+		final IAMArray attrListRange;
+
+		/** Dieser Konstruktor initialisiert den leeren {@link BEXFileLoader}. */
+		BEXFileLoader() {
+			this.rootRef = -1;
+			this.fileData = IAMIndex.EMPTY;
+			this.attrUriText = BEXStringLoader.EMPTY;
+			this.attrNameText = BEXStringLoader.EMPTY;
+			this.attrValueText = BEXStringLoader.EMPTY;
+			this.chldUriText = BEXStringLoader.EMPTY;
+			this.chldNameText = BEXStringLoader.EMPTY;
+			this.chldValueText = BEXStringLoader.EMPTY;
+			this.attrUriRef = IAMArray.EMPTY;
+			this.attrNameRef = IAMArray.EMPTY;
+			this.attrValueRef = IAMArray.EMPTY;
+			this.attrParentRef = IAMArray.EMPTY;
+			this.chldUriRef = IAMArray.EMPTY;
+			this.chldNameRef = IAMArray.EMPTY;
+			this.chldContentRef = IAMArray.EMPTY;
+			this.chldAttributesRef = IAMArray.EMPTY;
+			this.chldParentRef = IAMArray.EMPTY;
+			this.chldListRange = IAMArray.EMPTY;
+			this.attrListRange = IAMArray.EMPTY;
 		}
 
 	}
@@ -302,36 +302,6 @@ public class BEXLoader {
 
 		/** Dieses Feld speichert den leeren {@link BEXListLoader}. */
 		public static final BEXListLoader EMPTY = new BEXListLoader(BEXFileLoader.EMPTY);
-
-		/** Dieses Feld speichert den Schlüssel. */
-		final int key;
-
-		/** Dieses Feld speichert die Referenz.
-		 *
-		 * @see BEXFileLoader#attrListRange
-		 * @see BEXFileLoader#chldListRange */
-		final int ref;
-
-		/** Dieses Feld speichert den Besitzer. */
-		final BEXFileLoader owner;
-
-		/** Dieser Konstruktor initialisiert die undefinierte Knotenliste.
-		 *
-		 * @param owner Besitzer. */
-		BEXListLoader(final BEXFileLoader owner) {
-			this(BEXLoader.keyOf(BEXLoader.BEX_VOID_TYPE, 0), 0, owner);
-		}
-
-		/** Dieser Konstruktor initialisiert Schlüssel, Index und Besitzer.
-		 *
-		 * @param key Schlüssel mit dem Index des Elternknoten.
-		 * @param ref Referenz auf die Knotenliste.
-		 * @param owner Besitzer. */
-		BEXListLoader(final int key, final int ref, final BEXFileLoader owner) {
-			this.key = key;
-			this.ref = ref;
-			this.owner = owner;
-		}
 
 		@Override
 		public int key() {
@@ -358,25 +328,25 @@ public class BEXLoader {
 		}
 
 		@Override
-		public BEXNode get(final int index) {
-			final int key = this.key;
-			final BEXFileLoader owner = this.owner;
+		public BEXNode get(int index) {
+			var key = this.key;
+			var owner = this.owner;
 			switch (BEXLoader.typeOf(key)) {
 				case BEX_VOID_TYPE:
 					return new BEXNodeLoader(owner);
 				case BEX_ATTR_LIST: {
 					if (index < 0) return new BEXNodeLoader(owner);
-					final IAMArray array = owner.attrListRange;
-					final int ref = this.ref;
-					final int result = array.get(ref) + index;
+					var array = owner.attrListRange;
+					var ref = this.ref;
+					var result = array.get(ref) + index;
 					if (result >= array.get(ref + 1)) return new BEXNodeLoader(owner);
 					return new BEXNodeLoader(BEXLoader.keyOf(BEXLoader.BEX_ATTR_NODE, result), owner);
 				}
 				case BEX_CHLD_LIST: {
 					if (index < 0) return new BEXNodeLoader(owner);
-					final IAMArray array = this.owner.chldListRange;
-					final int ref = this.ref;
-					final int result = array.get(ref) + index;
+					var array = this.owner.chldListRange;
+					var ref = this.ref;
+					var result = array.get(ref) + index;
 					if (result >= array.get(ref + 1)) return new BEXNodeLoader(owner);
 					if (owner.chldNameRef.get(result) == 0) return new BEXNodeLoader(BEXLoader.keyOf(BEXLoader.BEX_TEXT_NODE, result), owner);
 					return new BEXNodeLoader(BEXLoader.keyOf(BEXLoader.BEX_ELEM_NODE, result), owner);
@@ -390,25 +360,25 @@ public class BEXLoader {
 		}
 
 		@Override
-		public int find(final String uri, final String name, final int start) throws NullPointerException {
-			final int key = this.key;
-			final BEXFileLoader owner = this.owner;
+		public int find(String uri, String name, int start) throws NullPointerException {
+			var key = this.key;
+			var owner = this.owner;
 			switch (BEXLoader.typeOf(key)) {
 				case BEX_ATTR_LIST: {
 					if (start < 0) return -1;
-					final boolean useUri = uri.length() != 0, useName = name.length() != 0;
-					final IAMArray array = owner.attrListRange, uriArray = BEXFile.arrayFrom(uri), nameArray = BEXFile.arrayFrom(name);
-					int ref = this.ref;
-					final int startRef = array.get(ref), finalRef = array.get(ref + 1);
+					boolean useUri = uri.length() != 0, useName = name.length() != 0;
+					IAMArray array = owner.attrListRange, uriArray = BEXFile.arrayFrom(uri), nameArray = BEXFile.arrayFrom(name);
+					var ref = this.ref;
+					int startRef = array.get(ref), finalRef = array.get(ref + 1);
 					for (ref = startRef + start; ref < finalRef; ref++) {
 						if (useUri) {
-							final IAMArray attrUri = owner.attrUriText.item(owner.attrUriRef.get(ref));
+							var attrUri = owner.attrUriText.item(owner.attrUriRef.get(ref));
 							if (!attrUri.equals(uriArray)) {
 								continue;
 							}
 						}
 						if (useName) {
-							final IAMArray nameUri = owner.attrNameText.item(owner.attrNameRef.get(ref));
+							var nameUri = owner.attrNameText.item(owner.attrNameRef.get(ref));
 							if (!nameUri.equals(nameArray)) {
 								continue;
 							}
@@ -419,23 +389,23 @@ public class BEXLoader {
 				}
 				case BEX_CHLD_LIST: {
 					if (start < 0) return -1;
-					final boolean useUri = uri.length() != 0, useName = name.length() != 0;
-					final IAMArray array = owner.chldListRange, uriArray = BEXFile.arrayFrom(uri), nameArray = BEXFile.arrayFrom(name);
-					int ref = this.ref;
-					final int startRef = array.get(ref), finalRef = array.get(ref + 1);
+					boolean useUri = uri.length() != 0, useName = name.length() != 0;
+					IAMArray array = owner.chldListRange, uriArray = BEXFile.arrayFrom(uri), nameArray = BEXFile.arrayFrom(name);
+					var ref = this.ref;
+					int startRef = array.get(ref), finalRef = array.get(ref + 1);
 					for (ref = startRef + start; ref < finalRef; ref++) {
-						final int nameRef = owner.chldNameRef.get(ref);
+						var nameRef = owner.chldNameRef.get(ref);
 						if (nameRef == 0) {
 							continue;
 						}
 						if (useUri) {
-							final IAMArray _attrUri = owner.chldUriText.item(owner.chldUriRef.get(ref));
+							var _attrUri = owner.chldUriText.item(owner.chldUriRef.get(ref));
 							if (!_attrUri.equals(uriArray)) {
 								continue;
 							}
 						}
 						if (useName) {
-							final IAMArray nameUri = owner.chldNameText.item(owner.chldNameRef.get(ref));
+							var nameUri = owner.chldNameText.item(owner.chldNameRef.get(ref));
 							if (!nameUri.equals(nameArray)) {
 								continue;
 							}
@@ -452,19 +422,19 @@ public class BEXLoader {
 		}
 
 		@Override
-		public int length() {
-			final int key = this.key;
+		public int size() {
+			var key = this.key;
 			switch (BEXLoader.typeOf(key)) {
 				case BEX_VOID_TYPE:
 					return 0;
 				case BEX_ATTR_LIST: {
-					final IAMArray array = this.owner.attrListRange;
-					final int ref = this.ref;
+					var array = this.owner.attrListRange;
+					var ref = this.ref;
 					return array.get(ref + 1) - array.get(ref);
 				}
 				case BEX_CHLD_LIST: {
-					final IAMArray array = this.owner.chldListRange;
-					final int ref = this.ref;
+					var array = this.owner.chldListRange;
+					var ref = this.ref;
 					return array.get(ref + 1) - array.get(ref);
 				}
 				case BEX_CHTX_LIST:
@@ -475,8 +445,8 @@ public class BEXLoader {
 
 		@Override
 		public BEXNode parent() {
-			final int key = this.key;
-			final BEXFileLoader owner = this.owner;
+			var key = this.key;
+			var owner = this.owner;
 			switch (BEXLoader.typeOf(key)) {
 				case BEX_VOID_TYPE:
 					return new BEXNodeLoader(owner);
@@ -488,6 +458,36 @@ public class BEXLoader {
 			throw new IAMException(IAMException.INVALID_HEADER);
 		}
 
+		/** Dieses Feld speichert den Schlüssel. */
+		final int key;
+
+		/** Dieses Feld speichert die Referenz.
+		 *
+		 * @see BEXFileLoader#attrListRange
+		 * @see BEXFileLoader#chldListRange */
+		final int ref;
+
+		/** Dieses Feld speichert den Besitzer. */
+		final BEXFileLoader owner;
+
+		/** Dieser Konstruktor initialisiert die undefinierte Knotenliste.
+		 *
+		 * @param owner Besitzer. */
+		BEXListLoader(BEXFileLoader owner) {
+			this(BEXLoader.keyOf(BEXLoader.BEX_VOID_TYPE, 0), 0, owner);
+		}
+
+		/** Dieser Konstruktor initialisiert Schlüssel, Index und Besitzer.
+		 *
+		 * @param key Schlüssel mit dem Index des Elternknoten.
+		 * @param ref Referenz auf die Knotenliste.
+		 * @param owner Besitzer. */
+		BEXListLoader(int key, int ref, BEXFileLoader owner) {
+			this.key = key;
+			this.ref = ref;
+			this.owner = owner;
+		}
+
 	}
 
 	/** Diese Klasse implementiert einen {@link BEXNode}, der seine Daten aus dem {@link IAMIndex} seines Besitzers bezieht.
@@ -497,28 +497,6 @@ public class BEXLoader {
 
 		/** Dieses Feld speichert den leeren {@link BEXNodeLoader}. */
 		public static final BEXNodeLoader EMPTY = new BEXNodeLoader(BEXFileLoader.EMPTY);
-
-		/** Dieses Feld speichert den Schlüssel. */
-		final int key;
-
-		/** Dieses Feld speichert den Besitzer. */
-		final BEXFileLoader owner;
-
-		/** Dieser Konstruktor initialisiert den undefinierten Knoten.
-		 *
-		 * @param owner Besitzer. */
-		BEXNodeLoader(final BEXFileLoader owner) {
-			this(BEXLoader.keyOf(BEXLoader.BEX_VOID_TYPE, 0), owner);
-		}
-
-		/** Dieser Konstruktor initialisiert Schlüssel und Besitzer.
-		 *
-		 * @param key Schlüssel.
-		 * @param owner Besitzer. */
-		BEXNodeLoader(final int key, final BEXFileLoader owner) {
-			this.key = key;
-			this.owner = owner;
-		}
 
 		@Override
 		public int key() {
@@ -548,8 +526,8 @@ public class BEXLoader {
 
 		@Override
 		public String uri() {
-			final int key = this.key;
-			final BEXFileLoader owner = this.owner;
+			var key = this.key;
+			var owner = this.owner;
 			switch (BEXLoader.typeOf(key)) {
 				case BEX_ATTR_NODE:
 					return owner.attrUriText.get(owner.attrUriRef.get(BEXLoader.refOf(key)));
@@ -565,8 +543,8 @@ public class BEXLoader {
 
 		@Override
 		public String name() {
-			final int key = this.key;
-			final BEXFileLoader owner = this.owner;
+			var key = this.key;
+			var owner = this.owner;
 			switch (BEXLoader.typeOf(key)) {
 				case BEX_ATTR_NODE:
 					return owner.attrNameText.get(owner.attrNameRef.get(BEXLoader.refOf(key)));
@@ -582,16 +560,16 @@ public class BEXLoader {
 
 		@Override
 		public String value() {
-			final int key = this.key;
-			final BEXFileLoader owner = this.owner;
+			var key = this.key;
+			var owner = this.owner;
 			switch (BEXLoader.typeOf(key)) {
 				case BEX_VOID_TYPE:
 					return "";
 				case BEX_ATTR_NODE:
 					return owner.attrValueText.get(owner.attrValueRef.get(BEXLoader.refOf(key)));
 				case BEX_ELEM_NODE: {
-					final int ref = BEXLoader.refOf(key);
-					final int contentRef = owner.chldContentRef.get(ref);
+					var ref = BEXLoader.refOf(key);
+					var contentRef = owner.chldContentRef.get(ref);
 					if (contentRef >= 0) return owner.chldValueText.get(contentRef);
 					return new BEXListLoader(BEXLoader.keyOf(BEXLoader.BEX_CHLD_LIST, ref), -contentRef, this.owner).get(0).value();
 				}
@@ -604,29 +582,29 @@ public class BEXLoader {
 
 		@Override
 		public int index() {
-			final int key = this.key;
-			final BEXFileLoader owner = this.owner;
+			var key = this.key;
+			var owner = this.owner;
 			switch (BEXLoader.typeOf(key)) {
 				case BEX_VOID_TYPE:
 					return -1;
 				case BEX_ATTR_NODE: {
-					final IAMArray array = owner.attrParentRef;
+					var array = owner.attrParentRef;
 					if (array.length() == 0) return -1;
-					final int ref = BEXLoader.refOf(key);
+					var ref = BEXLoader.refOf(key);
 					return ref - owner.attrListRange.get(owner.chldAttributesRef.get(array.get(ref)));
 				}
 				case BEX_ELEM_NODE: {
-					final IAMArray array = owner.chldParentRef;
+					var array = owner.chldParentRef;
 					if (array.length() == 0) return -1;
-					final int ref = BEXLoader.refOf(key);
-					final int parentRef = array.get(ref);
+					var ref = BEXLoader.refOf(key);
+					var parentRef = array.get(ref);
 					if (ref == parentRef) return -1;
 					return ref - owner.chldListRange.get(-owner.chldContentRef.get(parentRef));
 				}
 				case BEX_TEXT_NODE: {
-					final IAMArray array = owner.chldParentRef;
+					var array = owner.chldParentRef;
 					if (array.length() == 0) return -1;
-					final int ref = BEXLoader.refOf(key);
+					var ref = BEXLoader.refOf(key);
 					return ref - owner.chldListRange.get(-owner.chldContentRef.get(array.get(ref)));
 				}
 				case BEX_ELTX_NODE:
@@ -637,26 +615,26 @@ public class BEXLoader {
 
 		@Override
 		public BEXNode parent() {
-			final int key = this.key;
-			final BEXFileLoader owner = this.owner;
+			var key = this.key;
+			var owner = this.owner;
 			switch (BEXLoader.typeOf(key)) {
 				case BEX_VOID_TYPE:
 					return new BEXNodeLoader(owner);
 				case BEX_ATTR_NODE: {
-					final IAMArray array = owner.attrParentRef;
+					var array = owner.attrParentRef;
 					if (array.length() == 0) return new BEXNodeLoader(owner);
 					return new BEXNodeLoader(BEXLoader.keyOf(BEXLoader.BEX_ELEM_NODE, array.get(BEXLoader.refOf(key))), owner);
 				}
 				case BEX_ELEM_NODE: {
-					final IAMArray array = owner.chldParentRef;
+					var array = owner.chldParentRef;
 					if (array.length() == 0) return new BEXNodeLoader(owner);
-					final int ref = BEXLoader.refOf(key);
-					final int parentRef = array.get(ref);
+					var ref = BEXLoader.refOf(key);
+					var parentRef = array.get(ref);
 					if (ref == parentRef) return new BEXNodeLoader(owner);
 					return new BEXNodeLoader(BEXLoader.keyOf(BEXLoader.BEX_ELEM_NODE, parentRef), owner);
 				}
 				case BEX_TEXT_NODE: {
-					final IAMArray array = owner.chldParentRef;
+					var array = owner.chldParentRef;
 					if (array.length() == 0) return new BEXNodeLoader(owner);
 					return new BEXNodeLoader(BEXLoader.keyOf(BEXLoader.BEX_ELEM_NODE, array.get(BEXLoader.refOf(key))), owner);
 				}
@@ -668,12 +646,12 @@ public class BEXLoader {
 
 		@Override
 		public BEXList children() {
-			final int key = this.key;
-			final BEXFileLoader owner = this.owner;
+			var key = this.key;
+			var owner = this.owner;
 			switch (BEXLoader.typeOf(key)) {
 				case BEX_ELEM_NODE: {
-					final int ref = BEXLoader.refOf(key);
-					final int contentRef = owner.chldContentRef.get(ref);
+					var ref = BEXLoader.refOf(key);
+					var contentRef = owner.chldContentRef.get(ref);
 					if (contentRef >= 0) return new BEXListLoader(BEXLoader.keyOf(BEXLoader.BEX_CHTX_LIST, ref), 0, owner);
 					return new BEXListLoader(BEXLoader.keyOf(BEXLoader.BEX_CHLD_LIST, ref), -contentRef, owner);
 				}
@@ -688,11 +666,11 @@ public class BEXLoader {
 
 		@Override
 		public BEXList attributes() {
-			final int key = this.key;
-			final BEXFileLoader owner = this.owner;
+			var key = this.key;
+			var owner = this.owner;
 			switch (BEXLoader.typeOf(key)) {
 				case BEX_ELEM_NODE: {
-					final int ref = BEXLoader.refOf(key);
+					var ref = BEXLoader.refOf(key);
 					return new BEXListLoader(BEXLoader.keyOf(BEXLoader.BEX_ATTR_LIST, ref), owner.chldAttributesRef.get(ref), owner);
 				}
 				case BEX_VOID_TYPE:
@@ -702,6 +680,28 @@ public class BEXLoader {
 					return new BEXListLoader(owner);
 			}
 			throw new IAMException(IAMException.INVALID_HEADER);
+		}
+
+		/** Dieses Feld speichert den Schlüssel. */
+		final int key;
+
+		/** Dieses Feld speichert den Besitzer. */
+		final BEXFileLoader owner;
+
+		/** Dieser Konstruktor initialisiert den undefinierten Knoten.
+		 *
+		 * @param owner Besitzer. */
+		BEXNodeLoader(BEXFileLoader owner) {
+			this(BEXLoader.keyOf(BEXLoader.BEX_VOID_TYPE, 0), owner);
+		}
+
+		/** Dieser Konstruktor initialisiert Schlüssel und Besitzer.
+		 *
+		 * @param key Schlüssel.
+		 * @param owner Besitzer. */
+		BEXNodeLoader(int key, BEXFileLoader owner) {
+			this.key = key;
+			this.owner = owner;
 		}
 
 	}
@@ -716,25 +716,12 @@ public class BEXLoader {
 		/** Dieses Feld speichert den leeren {@link BEXStringLoader}. */
 		public static final BEXStringLoader EMPTY = new BEXStringLoader(IAMListing.EMPTY);
 
-		/** Dieses Feld speichert die Elemente, deren Zeichenketten verwaltet werden. */
-		final IAMListing items;
-
-		/** Dieses Feld puffert die Zeichenketten der Elemente. */
-		String[] cache;
-
-		/** Dieser Konstruktor initialisiert die Elemente, deren Zeichenketten verwaltet werden.
-		 *
-		 * @param items Elemente. */
-		BEXStringLoader(final IAMListing items) {
-			this.items = items;
-		}
-
 		/** Diese Methode gibt das {@code index}-te Element zurück.
 		 *
 		 * @see IAMListing#item(int)
 		 * @param index Index.
 		 * @return {@code index}-tes Element. */
-		public IAMArray item(final int index) {
+		public IAMArray item(int index) {
 			return this.items.item(index);
 		}
 
@@ -751,11 +738,11 @@ public class BEXLoader {
 		 *
 		 * @see #get(int)
 		 * @param value {@code true}, wenn die Pufferung aktiviert ist. */
-		public void setEnabled(final boolean value) {
+		public void setEnabled(boolean value) {
 			if (!value) {
 				this.cache = null;
 			} else if (this.cache == null) {
-				final int count = this.items.itemCount();
+				var count = this.items.itemCount();
 				if (count == 0) return;
 				this.cache = new String[count];
 			}
@@ -766,16 +753,16 @@ public class BEXLoader {
 		 * @param index Index.
 		 * @return {@code index}-te Zeichenkette oder {@code ""}. */
 		@Override
-		public String get(final int index) {
-			final String[] cache = this.cache;
+		public String get(int index) {
+			var cache = this.cache;
 			if (cache != null) {
 				if ((index < 0) || (index >= cache.length)) return "";
-				String result = cache[index];
+				var result = cache[index];
 				if (result != null) return result;
 				cache[index] = result = BEXFile.stringFrom(this.items.item(index));
 				return result;
 			} else {
-				final String result = BEXFile.stringFrom(this.items.item(index));
+				var result = BEXFile.stringFrom(this.items.item(index));
 				return result;
 			}
 		}
@@ -783,6 +770,19 @@ public class BEXLoader {
 		@Override
 		public String toString() {
 			return Objects.toString(true, Iterables.filter(Arrays.asList(this.cache), Filters.empty()));
+		}
+
+		/** Dieses Feld speichert die Elemente, deren Zeichenketten verwaltet werden. */
+		final IAMListing items;
+
+		/** Dieses Feld puffert die Zeichenketten der Elemente. */
+		String[] cache;
+
+		/** Dieser Konstruktor initialisiert die Elemente, deren Zeichenketten verwaltet werden.
+		 *
+		 * @param items Elemente. */
+		BEXStringLoader(IAMListing items) {
+			this.items = items;
 		}
 
 	}
@@ -816,7 +816,7 @@ public class BEXLoader {
 	 * @see #keyOf(int, int)
 	 * @param key Schlüssel.
 	 * @return Referenz. */
-	static int refOf(final int key) {
+	static int refOf(int key) {
 		return (key >> 3) & 0x1FFFFFFF;
 	}
 
@@ -827,7 +827,7 @@ public class BEXLoader {
 	 * @param type Typkennung (0..7).
 	 * @param ref Referenz als Zeilennummer des Datensatzes.
 	 * @return Schlüssel. */
-	static int keyOf(final int type, final int ref) {
+	static int keyOf(int type, int ref) {
 		return (ref << 3) | (type << 0);
 	}
 
@@ -836,7 +836,7 @@ public class BEXLoader {
 	 * @see #keyOf(int, int)
 	 * @param key Schlüssel.
 	 * @return Typkennung. */
-	static int typeOf(final int key) {
+	static int typeOf(int key) {
 		return (key >> 0) & 7;
 	}
 

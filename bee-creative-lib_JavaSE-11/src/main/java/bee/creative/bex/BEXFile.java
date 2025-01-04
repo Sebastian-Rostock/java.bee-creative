@@ -25,7 +25,7 @@ public class BEXFile {
 	 * @return {@link BEXFile}.
 	 * @throws IOException Wenn {@link IAMIndex#from(Object)} eine entsprechende Ausnahme auslöst.
 	 * @throws IAMException Wenn {@link IAMIndex#from(Object)} bzw. {@link BEXFileLoader#BEXFileLoader(IAMIndex)} eine entsprechende Ausnahme auslöst. */
-	public static BEXFile from(final Object object) throws IOException, IAMException {
+	public static BEXFile from(Object object) throws IOException, IAMException {
 		if (object instanceof BEXFile) return (BEXFile)object;
 		return new BEXFileLoader(IAMIndex.from(object));
 	}
@@ -36,10 +36,10 @@ public class BEXFile {
 	 * @param string Zeichenkette.
 	 * @return Zahlenfolge.
 	 * @throws NullPointerException Wenn {@code string} {@code null} ist. */
-	public static IAMArray arrayFrom(final String string) throws NullPointerException {
-		final int length = string.length();
-		final short[] shorts = new short[length + 1];
-		for (int i = 0; i < length; i++) {
+	public static IAMArray arrayFrom(String string) throws NullPointerException {
+		var length = string.length();
+		var shorts = new short[length + 1];
+		for (var i = 0; i < length; i++) {
 			shorts[i] = (short)string.charAt(i);
 		}
 		return IAMArray.from(shorts);
@@ -51,12 +51,12 @@ public class BEXFile {
 	 * @return Zeichenkette.
 	 * @throws NullPointerException Wenn {@code array} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code array} leer ist oder nicht mit {@code 0} endet. */
-	public static String stringFrom(final IAMArray array) throws NullPointerException, IllegalArgumentException {
-		final int length = array.length() - 1;
+	public static String stringFrom(IAMArray array) throws NullPointerException, IllegalArgumentException {
+		var length = array.length() - 1;
 		if ((length < 0) || (array.get(length) != 0)) throw new IllegalArgumentException();
-		final short[] shorts = array.toShorts();
-		final char[] chars = new char[length];
-		for (int i = 0; i < length; i++) {
+		var shorts = array.toShorts();
+		var chars = new char[length];
+		for (var i = 0; i < length; i++) {
 			chars[i] = (char)shorts[i];
 		}
 		return new String(chars);
@@ -75,7 +75,7 @@ public class BEXFile {
 	 * @see BEXList#VOID_LIST
 	 * @param key Identifikator.
 	 * @return Knotenliste. */
-	public BEXList list(final int key) {
+	public BEXList list(int key) {
 		return BEXList.EMPTY;
 	}
 
@@ -85,7 +85,7 @@ public class BEXFile {
 	 * @see BEXNode#VOID_NODE
 	 * @param key Identifikator.
 	 * @return Knoten. */
-	public BEXNode node(final int key) {
+	public BEXNode node(int key) {
 		return BEXNode.EMPTY;
 	}
 
