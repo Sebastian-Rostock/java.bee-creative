@@ -132,6 +132,11 @@ public class KBBuffer extends KBState {
 		return this.insertValueStr(valueStr);
 	}
 
+	public void putValue(int valueRef, FEMString valueStr) {
+		this.backupValues();
+		this.insertValue(valueRef, valueStr);
+	}
+	
 	public HashMapOI<FEMString> putAllValues(FEMString... values) {
 		return this.putAllValues(Arrays.asList(values));
 	}

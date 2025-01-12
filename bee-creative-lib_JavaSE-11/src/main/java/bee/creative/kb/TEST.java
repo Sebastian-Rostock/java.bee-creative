@@ -1,8 +1,6 @@
 package bee.creative.kb;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Random;
 import bee.creative.emu.EMU;
 import bee.creative.fem.FEMString;
@@ -12,20 +10,6 @@ import bee.creative.util.HashMapOI;
 import bee.creative.util.Tester;
 
 class TEST {
-
-	public static void main_(String[] args) throws IOException {
-		for (int x = 0; x < 3; x++)
-		Tester.run(() -> {
-			var set1 = REFSET.create();
-			for (int i = 1; i < 10000000; i++) {
-				set1 = REFSET.grow(set1);
-				REFSET.putRef(set1, i);
-			}
-//			System.out.println(REFSET.toColls(set1));
-			//System.out.println(REFSET.toString(set1));
-		});
-
-	}
 
 	public static void main(String[] args) throws IOException {
 
@@ -93,38 +77,31 @@ class TEST {
 
 		var r = new Random(0);
 
-		var bewertungList = new ArrayList<Integer>();
-
-		for (int bewertungsdaten: bewertungsdatenList) {
-			for (int wegevariante: wegevarianteList) {
-				var bewertung = this.putItem(TYPE_istBewertung);
-
-				this.putEdge(bewertung, LINK_istBewertungVonTarifmodul, tarifmodul);
-				this.putEdge(bewertung, LINK_istBewertungMitBewertungstyp, bewertungstyp);
-				this.putEdge(bewertung, LINK_istBewertungMitUeberwegevariante, wegevariante);
-				this.putEdge(bewertung, LINK_istBewertungMitVerkehrsmittellinienbezug, verkehrsmittellinienbezug);
-				this.putEdge(bewertung, LINK_istBewertungMitBewertungsdaten, bewertungsdaten);
-
-				bewertungList.add(bewertung);
-			}
-		}
-
 		for (int vontarifpunkt: tarifpunktList) {
-			System.out.print(vontarifpunkt);
-			System.out.print(": ");
 			for (int nachtarifpunkt: tarifpunktList) {
+				for (int wegevarianteCount = r.nextInt(4) + 1; wegevarianteCount != 0; wegevarianteCount--) {
 
-				this.putEdge(vontarifpunkt, bewertungList.get(r.nextInt(bewertungList.size())), nachtarifpunkt);
+					var bewertung = this.putItem(TYPE_istBewertung);
+
+					this.putEdge(bewertung, LINK_istBewertungVonTarifmodul, tarifmodul);
+					this.putEdge(bewertung, LINK_istBewertungMitBewertungstyp, bewertungstyp);
+					this.putEdge(bewertung, LINK_istBewertungMitUeberwegevariante, wegevarianteList[r.nextInt(wegevarianteList.length)]);
+					this.putEdge(bewertung, LINK_istBewertungMitVerkehrsmittellinienbezug, verkehrsmittellinienbezug);
+					this.putEdge(bewertung, LINK_istBewertungMitBewertungsdaten, bewertungsdatenList[r.nextInt(bewertungsdatenList.length)]);
+					this.putEdge(bewertung, LINK_istBewertungMitVontarifpunkt, vontarifpunkt);
+					this.putEdge(bewertung, LINK_istBewertungMitNachtarifpunkt, nachtarifpunkt);
+
+				}
 
 			}
-			// buffer.commit();
-			System.out //
-				.append(": EDGES=").append(this.edgeCount + "") //
-			// .append(": EMU=").append(Integers.printSize(this.buffer.emu())) //
-			// .append(" BYTES=").append(Integers.printSize(EMU.from(ZIPDOS.deflate(this.buffer::persist)))) //
-			;
-			System.out.println();
 		}
+		buffer.commit();
+//		System.out //
+//		.append(": EDGES=").append(this.edgeCount + "") //
+//		.append(": EMU=").append(Integers.printSize(this.buffer.emu())) //
+//		.append(" BYTES=").append(Integers.printSize(EMU.from(ZIPDOS.deflate(this.buffer::persist)))) //
+//		;
+		System.out.println();
 
 		System.out.println(Objects.toStringCall(true, true, this, "linkMap", this.linkMap, "typeMap", this.typeMap, "buffer", this.buffer));
 
@@ -136,13 +113,15 @@ class TEST {
 		var restored = Tester.get(() -> ZIPDIS.inflate(persisted, KBState::from));
 		System.out.println(Integers.printSize(restored.emu()));
 
-		System.out.println("INSERTS");
-		var ins = Tester.get(() -> KBState.from(this.buffer, restored));
-		System.out.println(ins);
-		System.out.println("DELETES");
-		var del = Tester.get(() -> KBState.from(restored, this.buffer));
-		System.out.println(del);
-		System.out.println(restored);
+//		System.out.println("INSERTS");
+//		var ins = Tester.get(() -> KBState.from(this.buffer, restored));
+//		System.out.println(ins);
+		
+//		System.out.println("DELETES");
+//		var del = Tester.get(() -> KBState.from(restored, this.buffer));
+//		System.out.println(del);
+		
+//		System.out.println(restored);
 	}
 
 	int putItem() {
