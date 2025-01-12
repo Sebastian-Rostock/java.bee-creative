@@ -111,10 +111,12 @@ public class LOGBuilder implements Iterable<LOGEntry> {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #pushEntry(Object) this.pushEntry(logger)}. */
+	// TODO anders
 	public void pushLogger(LOGBuilder logger) throws NullPointerException {
 		this.pushEntry(logger);
 	}
 
+	@Deprecated // logger bekommt printer
 	public void pushLogger(LOGBuilder logger, LOGPrinter printer) throws NullPointerException {
 		for (var entry: printer.get(logger)) {
 			this.pushEntry(entry);
@@ -124,12 +126,14 @@ public class LOGBuilder implements Iterable<LOGEntry> {
 
 	/** Diese Methode entfernt alle bisher erfassten Protokollzeilen. */
 	public void clear() {
-		this.head.delete();
+		synchronized (this.head) {
+			this.head.delete();
+		}
 	}
 
 	@Override
 	public Iterator<LOGEntry> iterator() {
-		return new Iter(this.head);
+		return new ITER(this.head);
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn bisher keine verbleibenden Protokollzeilen erfasst wurden.
@@ -168,66 +172,76 @@ public class LOGBuilder implements Iterable<LOGEntry> {
 	/** Dieses Feld speichert den Ring der erfassten Protokollzeilen. */
 	final LOGEntry head = new LOGEntry(null, null);
 
-	void enterScopeImpl(Object text, Object[] args) {
-		this.head.pushEnter(text, args);
-	}
-
-	void leaveScopeImpl(Object text, Object[] args) {
-		var prev = this.head.prev;
-		if (prev.indent() > 0) {
-			prev.delete();
-		} else {
-			this.head.pushLeave(text, args);
+	private void enterScopeImpl(Object text, Object[] args) {
+		synchronized (this.head) {
+			this.head.pushEnter(text, args);
 		}
 	}
 
-	void pushEntryImpl(Object text, Object[] args) {
-		if ((text == null) && (args == null)) return;
-		this.head.pushEntry(text, args);
-	}
-
-	void pushErrorImpl(Throwable cause, Object text, Object[] args) {
-		this.head.pushEnter(text, args);
-		this.head.pushLeave(cause, null);
-	}
-
-	static final class Iter extends AbstractIterator<LOGEntry> {
-
-		final LOGEntry head;
-
-		LOGEntry prev;
-
-		LOGEntry next;
-
-		Iterator<LOGEntry> iter = Iterators.empty();
-
-		public Iter(LOGEntry head) {
-			this.prev = this.head = head;
-			this.next = this.nextImpl();
+	private void leaveScopeImpl(Object text, Object[] args) {
+		synchronized (this.head) {
+			var prev = this.head.prev;
+			if (prev.indent() > 0) {
+				prev.delete();
+			} else {
+				this.head.pushLeave(text, args);
+			}
 		}
+	}
+
+	private void pushEntryImpl(Object text, Object[] args) {
+		synchronized (this.head) {
+			if ((text == null) && (args == null)) return;
+			this.head.pushEntry(text, args);
+		}
+	}
+
+	private void pushErrorImpl(Throwable cause, Object text, Object[] args) {
+		synchronized (this.head) {
+			this.head.pushEnter(text, args);
+			this.head.pushLeave(cause, null);
+		}
+	}
+
+	private static final class ITER extends AbstractIterator<LOGEntry> {
 
 		@Override
 		public LOGEntry next() {
 			var next = this.next;
 			if (next == null) return super.next();
-			this.next = this.nextImpl();
+			this.next = this.seek();
 			return next;
-		}
-
-		LOGEntry nextImpl() {
-			while (true) {
-				if (this.iter.hasNext()) return this.iter.next();
-				this.prev = this.prev.next;
-				if (this.prev == this.head) return null;
-				var text = this.prev.text;
-				if (!(text instanceof LOGBuilder)) return this.prev;
-				this.iter = ((LOGBuilder)text).iterator();
-			}
 		}
 
 		@Override
 		public boolean hasNext() {
 			return this.next != null;
+		}
+
+		ITER(LOGEntry head) {
+			this.prev = this.head = head;
+			this.next = this.seek();
+		}
+
+		private final LOGEntry head;
+
+		private LOGEntry prev;
+
+		private LOGEntry next;
+
+		private Iterator<LOGEntry> iter = Iterators.empty();
+
+		private LOGEntry seek() {
+			while (true) {
+				if (this.iter.hasNext()) return this.iter.next();
+				synchronized (this.head) {
+					this.prev = this.prev.next;
+					if (this.prev == this.head) return null;
+					var text = this.prev.text;
+					if (!(text instanceof LOGBuilder)) return this.prev;
+					this.iter = ((LOGBuilder)text).iterator();
+				}
+			}
 		}
 
 	}

@@ -14,7 +14,7 @@ import bee.creative.util.Producer;
  * @author [cc-by] 2019 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class LOGPrinter implements Producer<String[]>, Getter<Iterable<? extends LOGEntry>, String[]> {
 
-	/** Diese Methode gibt die Textdarstellungen der {@link #print(String) erfassten} Protokollzeilen zurück.
+	/** Diese Methode gibt die Textdarstellungen der {@link #push(String) erfassten} Protokollzeilen zurück.
 	 *
 	 * @return Textdarstellungen. */
 	@Override
@@ -36,9 +36,21 @@ public class LOGPrinter implements Producer<String[]>, Getter<Iterable<? extends
 	 * wird dazu über {@link #customIndent(int)} ermittelt.
 	 *
 	 * @param text Zeichenkette oder {@code null}. */
-	public void print(String text) {
+	public void push(String text) {
 		if (text == null) return;
-		this.result.add(this.customIndent(this.indent).concat(text));
+		this.result.add(indent(text));
+	}
+	
+	// TODO push zum anfügen mit einrückung vs. print zur erzeugung des textes ohne einrückung
+	// wenn entry ein logger ist, dann seine entries iterieren, per print und seinem printer formatieren, dann push mit indent seiner entries
+	
+	public void push(String text, int indent) {
+		
+		this.indent += indent;
+	}
+
+	private String indent(String text) {
+		return this.customIndent(this.indent).concat(text);
 	}
 
 	/** Diese Methode {@link #customPrint(Object, Object[]) erfasst} die gegebene Protokollzeile.
@@ -69,13 +81,13 @@ public class LOGPrinter implements Producer<String[]>, Getter<Iterable<? extends
 	 * <li>Wenn das Objekt {@code text} ein {@link LOGBuilder} ist, werden dessen Protokollzeilen rekursiv {@link #printAll(Iterable) erfasst}. Die Rekursion ist
 	 * nicht gegen Endlosschleifen abgesichert.</li>
 	 * <li>Wenn die Objektliste {@code args} {@code null} ist, wird die Protokollzeile über {@link #customText(Object) this.print(this.customText(text))}
-	 * {@link #print(String) erfasst}. Solche Protokollzeilen werden durch {@link LOGBuilder#enterScope(Object)}, {@link LOGBuilder#pushEntry(Object)}, und
+	 * {@link #push(String) erfasst}. Solche Protokollzeilen werden durch {@link LOGBuilder#enterScope(Object)}, {@link LOGBuilder#pushEntry(Object)}, und
 	 * {@link LOGBuilder#leaveScope(Object)} bereitgestellt.</li>
 	 * <li>Wenn das Objekt {@code text} {@code null} ist, wird die über {@link #customArgs(Object[]) Strings.join(this.customArgs(args))} erzeugte Zeichenkette
-	 * {@link #print(String) erfast}. Solche Protokollzeilen können durch {@link LOGBuilder#enterScope(String, Object...)},
+	 * {@link #push(String) erfast}. Solche Protokollzeilen können durch {@link LOGBuilder#enterScope(String, Object...)},
 	 * {@link LOGBuilder#pushEntry(String, Object...)}, {@link LOGBuilder#pushError(Throwable, String, Object...)} und
 	 * {@link LOGBuilder#leaveScope(String, Object...)} erzeugt werden, wenn als Formattext {@code null} eingesetzt wird.</li>
-	 * <li>Andernfalls wird die über {@code String.format(this.customText(text), this.customArgs(args)))} erzeugte Zeichenkette {@link #print(String)
+	 * <li>Andernfalls wird die über {@code String.format(this.customText(text), this.customArgs(args)))} erzeugte Zeichenkette {@link #push(String)
 	 * erfasst}.</li>
 	 * </ul>
 	 *
@@ -83,13 +95,13 @@ public class LOGPrinter implements Producer<String[]>, Getter<Iterable<? extends
 	 * @param args Textbausteine, Formatargumente oder {@code null}. */
 	protected void customPrint(Object text, Object[] args) {
 		if (text instanceof LOGBuilder) {
-			this.printAll((LOGBuilder)text);
+			this.printAll((LOGBuilder)text); // TODO
 		} else if (args == null) {
-			this.print(this.customText(text));
+			this.push(this.customText(text));
 		} else if (text == null) {
-			this.print(Strings.join(this.customArgs(args)));
+			this.push(Strings.join(this.customArgs(args)));
 		} else {
-			this.print(String.format(this.customText(text), this.customArgs(args)));
+			this.push(String.format(this.customText(text), this.customArgs(args)));
 		}
 	}
 
