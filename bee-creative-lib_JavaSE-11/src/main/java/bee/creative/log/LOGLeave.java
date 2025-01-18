@@ -7,8 +7,8 @@ class LOGLeave extends LOGEntry {
 		return -1;
 	}
 
-	LOGLeave(Object text, Object[] args) {
-		super(text, args);
+	LOGLeave(LOGBuilder owner, Object text, Object[] args) {
+		super(owner, text, args);
 	}
 
 }

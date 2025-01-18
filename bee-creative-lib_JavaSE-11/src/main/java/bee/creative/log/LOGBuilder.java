@@ -1,17 +1,19 @@
 package bee.creative.log;
 
-import java.util.Arrays;
 import java.util.Iterator;
 import bee.creative.lang.Objects;
-import bee.creative.lang.Strings;
 import bee.creative.util.AbstractIterator;
 import bee.creative.util.Iterators;
 
-/** Diese Klasse dient der Erfassung hierarchischer Protokollzeilen. Diese werden in der {@link #toStrings() Textdarstellung} innerhalb von Protokollebenen
+/** Diese Klasse dient der Erfassung hierarchischer Protokollzeilen. Diese werden in der {@link #toString() Textdarstellung} innerhalb von Protokollebenen
  * entsprechend eingerückt dargestellt.
  *
  * @author [cc-by] 2019 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class LOGBuilder implements Iterable<LOGEntry> {
+
+	public void setPrinter(LOGPrinter printer) throws NullPointerException {
+		this.printer = Objects.notNull(printer);
+	}
 
 	/** Diese Methode öffnet eine neue Protokollebene, wodurch alle danach erfassten Protokollzeilen um eins weiter eingerückt werden. */
 	public void enterScope() {
@@ -111,17 +113,8 @@ public class LOGBuilder implements Iterable<LOGEntry> {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #pushEntry(Object) this.pushEntry(logger)}. */
-	// TODO anders
 	public void pushLogger(LOGBuilder logger) throws NullPointerException {
 		this.pushEntry(logger);
-	}
-
-	@Deprecated // logger bekommt printer
-	public void pushLogger(LOGBuilder logger, LOGPrinter printer) throws NullPointerException {
-		for (var entry: printer.get(logger)) {
-			this.pushEntry(entry);
-		}
-
 	}
 
 	/** Diese Methode entfernt alle bisher erfassten Protokollzeilen. */
@@ -131,12 +124,16 @@ public class LOGBuilder implements Iterable<LOGEntry> {
 		}
 	}
 
+	public LOGPrinter printer() {
+		return this.printer;
+	}
+
 	@Override
 	public Iterator<LOGEntry> iterator() {
 		return new ITER(this.head);
 	}
 
-	/** Diese Methode gibt nur dann {@code true} zurück, wenn bisher keine verbleibenden Protokollzeilen erfasst wurden.
+	/** Diese Methode liefert nur dann {@code true}, wenn bisher keine verbleibenden Protokollzeilen erfasst wurden.
 	 *
 	 * @see #leaveScope()
 	 * @see #leaveScope(Object)
@@ -148,29 +145,23 @@ public class LOGBuilder implements Iterable<LOGEntry> {
 		return true;
 	}
 
-	/** Diese Methode gibt nur dann {@code true} zurück, wenn aktuell keine Protokollzeilen erfasst sind.
+	/** Diese Methode liefert nur dann {@code true}, wenn aktuell keine Protokollzeilen erfasst sind.
 	 *
 	 * @return {@code true}, wenn das Protokoll leer ist. */
 	public boolean isEmpty() {
 		return !this.iterator().hasNext();
 	}
 
-	/** Diese Methode gibt die Textdarstellung der erfassten Protokollzeilen zurück. Diese entsteht aus {@link #toStrings() Strings.join("\n",
-	 * this.toStrings())}. */
+	/** Diese Methode liefert die Textdarstellung der erfassten Protokollzeilen. */
 	@Override
 	public String toString() {
-		return Strings.join("\n", Arrays.asList(this.toStrings()));
-	}
-
-	/** Diese Methode gibt die {@link LOGPrinter Textdarstellungen} aller erfassten Protokollzeilen zurück.
-	 *
-	 * @return Textdarstellungen. */
-	public String[] toStrings() {
-		return new LOGPrinter().get(this);
+		return this.printer.printAll(this);
 	}
 
 	/** Dieses Feld speichert den Ring der erfassten Protokollzeilen. */
-	final LOGEntry head = new LOGEntry(null, null);
+	final LOGEntry head = new LOGEntry(this, null, null);
+
+	LOGPrinter printer = new LOGPrinter();
 
 	private void enterScopeImpl(Object text, Object[] args) {
 		synchronized (this.head) {

@@ -7,8 +7,8 @@ class LOGEnter extends LOGEntry {
 		return +1;
 	}
 
-	LOGEnter(Object text, Object[] args) {
-		super(text, args);
+	LOGEnter(LOGBuilder owner, Object text, Object[] args) {
+		super(owner, text, args);
 	}
 
 }

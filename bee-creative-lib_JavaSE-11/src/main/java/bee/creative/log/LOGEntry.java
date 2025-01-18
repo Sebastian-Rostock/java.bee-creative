@@ -1,7 +1,5 @@
 package bee.creative.log;
 
-import bee.creative.lang.Objects;
-
 /** Diese Klasse implementiert die Protokollzeile eines {@link LOGBuilder} als Grundlage für einen Zeilentext.
  * <ul>
  * <li>Wenn das {@link #text()} einen {@link LOGBuilder} liefert, werden dessen Protokollzeilen rekursiv iteriert. Die Rekursion ist nicht gegen Endlosschleifen
@@ -43,7 +41,7 @@ public class LOGEntry {
 
 	@Override
 	public String toString() {
-		return Objects.toInvokeString(this, this.text, this.args);
+		return this.owner.printer.print(this);
 	}
 
 	/** Dieses Feld speichert den {@link LOGBuilder}, Zeilentext, Formattext oder {@code null}. */
@@ -52,30 +50,34 @@ public class LOGEntry {
 	/** Dieses Feld speichert die Zeilenteile, Formatargumente oder {@code null}. */
 	final Object[] args;
 
+	/** Dieses Feld speichert den Besitzer mit dem {@link LOGPrinter}. */
+	final LOGBuilder owner;
+
 	/** Dieses Feld speichert den vorherigen Knoten des Rings. */
 	LOGEntry prev = this;
 
 	/** Dieses Feld speichert den nächsten Knoten des Rings. */
 	LOGEntry next = this;
 
-	LOGEntry(Object text, Object[] args) {
+	LOGEntry(LOGBuilder owner, Object text, Object[] args) {
 		this.text = text;
 		this.args = args;
+		this.owner = owner;
 	}
 
 	/** Diese Methode {@link #insert(LOGEntry) fügt} einen neuen {@link LOGEntry} ein. */
 	void pushEntry(Object text, Object[] args) {
-		this.insert(new LOGEntry(text, args));
+		this.insert(new LOGEntry(this.owner, text, args));
 	}
 
 	/** Diese Methode {@link #insert(LOGEntry) fügt} einen neuen {@link LOGEnter} ein. */
 	void pushEnter(Object text, Object[] args) {
-		this.insert(new LOGEnter(text, args));
+		this.insert(new LOGEnter(this.owner, text, args));
 	}
 
 	/** Diese Methode {@link #insert(LOGEntry) fügt} einen neuen {@link LOGLeave} ein. */
 	void pushLeave(Object text, Object[] args) {
-		this.insert(new LOGLeave(text, args));
+		this.insert(new LOGLeave(this.owner, text, args));
 	}
 
 	/** Diese Methode fügt den gegebenen Knoten als neuen {@link #prev} ein. */
