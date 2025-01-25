@@ -4,14 +4,14 @@ package bee.creative.util;
  * Navigation verstanden werden.
  *
  * @author [cc-by] 2017 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GItem> Typ des Datensatzes.
- * @param <GValue> Typ des Werts der Eigenschaft. */
-public interface Getter<GItem, GValue> {
+ * @param <ITEM> Typ des Datensatzes.
+ * @param <VALUE> Typ des Werts der Eigenschaft. */
+public interface Getter<ITEM, VALUE> {
 
 	/** Diese Methode gibt den Wert der Eigenschaft des gegebenen Datensatzes zurück.
 	 *
 	 * @param item Datensatz.
 	 * @return Wert der Eigenschaft. */
-	public abstract GValue get(GItem item);
+	public abstract VALUE get(ITEM item);
 
 }
