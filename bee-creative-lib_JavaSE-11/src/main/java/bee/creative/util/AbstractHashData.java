@@ -112,7 +112,6 @@ import bee.creative.lang.Objects;
 public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 
 	/** Diese Klasse implementiert das {@link Entry} für {@link AbstractHashData.HashIterator#nextEntry()}. */
-	
 	protected static class HashEntry<GKey, GValue> implements Entry<GKey, GValue> {
 
 		protected final AbstractHashData<GKey, GValue> entryData;
@@ -159,7 +158,7 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 	}
 
 	/** Diese Klasse implementiert das unveränderliche {@link AbstractHashData.HashEntry}. */
-	
+
 	protected static class HashEntry2<GKey, GValue> extends HashEntry<GKey, GValue> {
 
 		public HashEntry2(AbstractHashData<GKey, GValue> entryData, int entryIndex) {
@@ -174,7 +173,7 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 	}
 
 	/** Diese Klasse implementiert den abstrakten {@link Iterator} über die Schlüssel, Werte und Einträge. */
-	
+
 	protected static abstract class HashIterator<GKey, GValue, GItem> extends AbstractIterator<GItem> {
 
 		protected final AbstractHashData<GKey, GValue> entryData;
@@ -256,7 +255,7 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 	}
 
 	/** Diese Klasse implementiert {@link AbstractHashData#newKeysImpl()}. */
-	
+
 	protected static class Keys<GKey> extends AbstractSet2<GKey> {
 
 		protected final AbstractHashData<GKey, ?> entryData;
@@ -362,7 +361,7 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 	}
 
 	/** Diese Klasse implementiert {@link AbstractHashData#newValuesIteratorImpl()}. */
-	
+
 	protected static class ValuesIterator<GKey, GValue> extends HashIterator<GKey, GValue, GValue> {
 
 		public ValuesIterator(AbstractHashData<GKey, GValue> entryData) {
@@ -377,7 +376,7 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 	}
 
 	/** Diese Klasse implementiert {@link AbstractHashData#newEntriesImpl()}. */
-	
+
 	protected static class Entries<GKey, GValue> extends AbstractSet2<Entry<GKey, GValue>> {
 
 		protected final AbstractHashData<GKey, GValue> entryData;
@@ -418,7 +417,7 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 	}
 
 	/** Diese Klasse implementiert {@link AbstractHashData#newEntriesIteratorImpl()}. */
-	
+
 	protected static class EntriesIterator<GKey, GValue> extends HashIterator<GKey, GValue, Entry<GKey, GValue>> {
 
 		public EntriesIterator(AbstractHashData<GKey, GValue> entryData) {
@@ -740,40 +739,43 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 	 * <b>Achtung:</b> Innerhalb der Methoden {@code installKey} und {@code installValue} dürfen Einträge nicht {@link #putKeyImpl(Object) eingefügt},
 	 * {@link #popIndexImpl(Object) entfernt} oder {@link #allocateImpl(int) reserviert} werden.
 	 *
-	 * @param key Schlüssel des Eintrags.
+	 * @param key2 Schlüssel des Eintrags.
 	 * @param installKey Methode zur Überführung des gegebenen Schlüssels in den einzutragenden Schlüssel.
 	 * @param installValue Methode zur Überführung des einzutragenden Schlüssels in den einzutragenden Wert.
 	 * @return Index des gefundenen oder erzeugten Eintrags. */
-	protected final int installImpl(GKey key, Getter<? super GKey, ? extends GKey> installKey, Getter<? super GKey, ? extends GValue> installValue) {
+	protected final <KEY2 extends GKey> int installImpl(KEY2 key2, Getter<? super KEY2, ? extends KEY2> installKey,
+		Getter<? super KEY2, ? extends GValue> installValue) {
 		var count = this.count;
-		var index = this.putIndexImpl(key);
+		var index = this.putIndexImpl(key2);
 		if (count == this.count) return index;
-		var key2 = installKey.get(key);
+		key2 = installKey.get(key2);
 		this.customSetKey(index, key2);
 		var value = installValue.get(key2);
 		this.customSetValue(index, value);
 		return index;
 	}
 
-	protected final GValue updateImpl(GKey key, Getter<? super GKey, ? extends GKey> installKey, Reducer<? super GKey, GValue> updateValue) {
-		var index = this.getIndexImpl(key);
-		GValue value;
+	protected final <KEY2 extends GKey> GValue updateImpl(KEY2 key2, Getter<? super KEY2, ? extends KEY2> installKey, Reducer<? super GKey, GValue> updateValue) {
+		var index = this.getIndexImpl(key2);
 		if (index < 0) {
-			value = updateValue.get(key = installKey.get(key), null);
+			key2 = installKey.get(key2);
+			var value = updateValue.get(key2, null);
 			if (value == null) return null;
-			index = this.putIndexImpl(key);
+			index = this.putIndexImpl(key2);
 			this.customSetValue(index, value);
+			return value;
 		} else {
-			value = updateValue.get(key = this.customGetKey(index), this.customGetValue(index));
+			var key = this.customGetKey(index);
+			var value = updateValue.get(key, this.customGetValue(index));
 			if (value == null) {
 				index = this.popIndexImpl(key);
 				if (index < 0) return null;
 				this.customClearValue(index);
-				return null;
+			} else {
+				this.customSetValue(index, value);
 			}
+			return value;
 		}
-		this.customSetValue(index, value);
-		return value;
 	}
 
 	/** Diese Methode gibt die Anzahl der Einträge zurück.
