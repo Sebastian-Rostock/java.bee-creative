@@ -41,7 +41,7 @@ public class LOGEntry {
 
 	@Override
 	public String toString() {
-		return this.owner.printer.print(this);
+		return this.owner.printer.toString(this.text, this.args);
 	}
 
 	/** Dieses Feld speichert den {@link LOGBuilder}, Zeilentext, Formattext oder {@code null}. */

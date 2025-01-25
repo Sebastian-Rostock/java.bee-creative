@@ -3,6 +3,7 @@ package bee.creative.log;
 import java.util.Iterator;
 import bee.creative.lang.Objects;
 import bee.creative.util.AbstractIterator;
+import bee.creative.util.Iterator2;
 import bee.creative.util.Iterators;
 
 /** Diese Klasse dient der Erfassung hierarchischer Protokollzeilen. Diese werden in der {@link #toString() Textdarstellung} innerhalb von Protokollebenen
@@ -129,7 +130,7 @@ public class LOGBuilder implements Iterable<LOGEntry> {
 	}
 
 	@Override
-	public Iterator<LOGEntry> iterator() {
+	public Iterator2<LOGEntry> iterator() {
 		return new ITER(this.head);
 	}
 
@@ -152,10 +153,31 @@ public class LOGBuilder implements Iterable<LOGEntry> {
 		return !this.iterator().hasNext();
 	}
 
-	/** Diese Methode liefert die Textdarstellung der erfassten Protokollzeilen. */
 	@Override
 	public String toString() {
-		return this.printer.printAll(this);
+		var result = new StringBuilder();
+		var indent = 0;
+		for (var entry: this) {
+			var text = entry.toString();
+			var prev = 0;
+			while (true) {
+				for (var i = -indent; i < indent; i++) {
+					result.append(' ');
+				}
+				var next = text.indexOf('\n', prev) + 1;
+				if (next <= 0) {
+					result.append(text, prev, text.length()).append('\n');
+					break;
+				} else {
+					result.append(text, prev, next);
+					prev = next;
+				}
+			}
+			indent += entry.indent();
+		}
+		if (result.length() == 0) return "";
+		result.setLength(result.length() - 1);
+		return result.toString();
 	}
 
 	/** Dieses Feld speichert den Ring der erfassten Protokollzeilen. */
