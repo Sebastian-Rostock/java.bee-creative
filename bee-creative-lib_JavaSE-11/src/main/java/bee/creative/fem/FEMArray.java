@@ -11,7 +11,6 @@ import java.util.Map.Entry;
 import java.util.RandomAccess;
 import bee.creative.emu.EMU;
 import bee.creative.emu.Emuable;
-import bee.creative.iam.IAMMapping;
 import bee.creative.lang.Array;
 import bee.creative.lang.Objects;
 import bee.creative.lang.Objects.UseToString;
@@ -849,7 +848,7 @@ public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable<FE
 
 		CompactArray3(FEMValue[] items) throws IllegalArgumentException {
 			super(items);
-			final int length = this.length, mask = IAMMapping.mask(length), count = mask + 2;
+			final int length = this.length, mask = Objects.mask(length), count = mask + 2;
 			final int[] table = new int[count + length], hashes = new int[length];
 			for (var i = 0; i < length; i++) {
 				final var hash = (items[i].hashCode() & mask) + 1;

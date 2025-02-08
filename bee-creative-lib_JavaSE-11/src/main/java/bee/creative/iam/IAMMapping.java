@@ -88,7 +88,7 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 			final int rangeMask;
 			final int[] rangeOffset;
 			if (that.mode()) {
-				rangeMask = IAMMapping.mask(entryCount);
+				rangeMask = Objects.mask(entryCount);
 				final int rangeCount = rangeMask + 2;
 				final int[] bucketIndex = new int[entryCount];
 				rangeOffset = new int[rangeCount];
@@ -311,26 +311,6 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 		return new IAMMappingLoader(array.as(IAMMappingLoader.HEADER.orderOf(array)));
 	}
 
-	/** Diese Methode gibt die Bitmaske zurück, die der Umrechnung des {@link IAMArray#hash() Streuwerts} eines gesuchten {@link #key(int) Schlüssels} in den
-	 * Index des einzigen Schlüsselbereichs dient, in dem ein gesuchter Schlüssel enthalten sein kann. Die Bitmaske ist eine um {@code 1} verringerte Potenz von
-	 * {@code 2}. Ein Algorithmus zur Ermittlung der Bitmaske ist:<pre>
-	 * int result = 2;
-	 * while (result < entryCount) result = result << 1;
-	 * return (result – 1) & 536870911;</pre>
-	 *
-	 * @param entryCount Anzahl der Einträge der Abbildung.
-	 * @return Bitmaske. */
-	public static int mask(int entryCount) {
-		if (entryCount <= 0) return 0;
-		--entryCount;
-		entryCount |= (entryCount >> 1);
-		entryCount |= (entryCount >> 2);
-		entryCount |= (entryCount >> 4);
-		entryCount |= (entryCount >> 8);
-		entryCount |= (entryCount >> 16);
-		return entryCount & 536870911;
-	}
-
 	/** Diese Methode gibt den Streuwert der gegebenen Zahlenfolge zurück.
 	 *
 	 * @see IAMArray#hash()
@@ -499,7 +479,7 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 
 		if (this.mode()) {
 
-			rangeMask = IAMMapping.mask(entryCount);
+			rangeMask = Objects.mask(entryCount);
 			rangeCount = rangeMask + 2;
 			rangeData = new int[rangeCount];
 			rangeDataType = SizeStats.computeSizeType(entryCount);

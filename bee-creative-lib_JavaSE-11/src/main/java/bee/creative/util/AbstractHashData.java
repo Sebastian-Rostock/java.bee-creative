@@ -10,7 +10,6 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import bee.creative.emu.EMU;
 import bee.creative.emu.Emuable;
-import bee.creative.iam.IAMMapping;
 import bee.creative.lang.Objects;
 
 /** Diese abstrakte Klasse implementiert eine transponierte {@link Object#hashCode() streuwertbasierte} Datenhaltung als Grundlage einer {@link Map} oder eines
@@ -806,7 +805,7 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 			this.table = AbstractHashData.EMPTY_TABLE;
 			this.nexts = AbstractHashData.EMPTY_INTEGERS;
 		} else if (capacity <= AbstractHashData.MAX_CAPACITY) {
-			var newMask = IAMMapping.mask(capacity);
+			var newMask = Objects.mask(capacity);
 			var oldTable = this.table;
 			var newTable = new int[newMask + 1];
 			var newNexts = new int[capacity];
