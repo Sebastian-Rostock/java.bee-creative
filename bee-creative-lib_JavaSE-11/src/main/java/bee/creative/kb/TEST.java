@@ -6,6 +6,7 @@ import bee.creative.emu.EMU;
 import bee.creative.fem.FEMString;
 import bee.creative.lang.Integers;
 import bee.creative.lang.Objects;
+import bee.creative.log.LOGBuilder;
 import bee.creative.util.HashMapOI;
 import bee.creative.util.Tester;
 
@@ -13,6 +14,15 @@ class TEST {
 
 	public static void main(String[] args) throws IOException {
 
+		var log = new LOGBuilder();
+		log.enterScope("LALALA\nAAAA\nBBB");
+		log.pushEntry("CC\nDD\nEE\n");
+		log.pushEntry("54646546546.");
+		log.leaveScope("close");
+		
+		System.out.println(log);
+		
+		
 		{
 			System.out.println("Value Test");
 			var buf = new KBBuffer();

@@ -8,7 +8,6 @@ import java.util.NoSuchElementException;
 import bee.creative.emu.EMU;
 import bee.creative.emu.Emuable;
 import bee.creative.fem.FEMString;
-import bee.creative.fem.FEMString.CompactStringUTF8;
 import bee.creative.lang.Objects;
 import bee.creative.util.Getter;
 import bee.creative.util.HashMapIO;
@@ -24,8 +23,8 @@ import bee.creative.util.Iterators;
  * <p>
  * Eine Wissensstand kann in eine {@link #persist(ZIPDOS) Wissensabschrift} überführt werden.
  * <p>
- * Die über {@link #getIndexRef()}, {@link #getExternalRef()} und {@link #getInternalRef()} und bereitgestellten Referenzen haben Bedeutung für {@link KBBuffer}
- * und {@link KBUpdate}.
+ * Die über {@link #getIndexRef()}, {@link #getExternalRef()} und {@link #getInternalRef()} und bereitgestellten Referenzen haben Bedeutung für
+ * {@link KBBuffer}.
  * <p>
  * ({@link KBEdge#sourceRef()}, {@link KBEdge#relationRef()} und {@link KBEdge#targetRef()})
  *
@@ -52,7 +51,7 @@ public class KBState implements Emuable {
 	/** Diese Methode liefert einen neuen {@link KBState Wissensstand} mit den gegebenen {@link KBEdge Kanten}. */
 	public static KBState from(Iterable<KBEdge> edges) {
 		var result = new KBState();
-		edges.forEach(edge -> result.insertEdge(edge.sourceRef, edge.targetRef, edge.relationRef));
+		edges.forEach(edge -> result.insertEdgeNow(edge.sourceRef, edge.targetRef, edge.relationRef));
 		return result;
 	}
 
@@ -64,125 +63,23 @@ public class KBState implements Emuable {
 		result.externalRef = state.externalRef;
 		result.valueRefMap = (ValueRefMap)state.valueRefMap.clone();
 		result.valueStrMap = (ValueStrMap)state.valueStrMap.clone();
-		state.forEachEdge(result::insertEdge); // TODO effizientere deep copy
+		state.forEachEdge(result::insertEdgeNow); // TODO effizientere deep copy
 		return result;
 	}
 
 	/** Diese Methode liefert einen neuen {@link KBState Wissensstand} mit den {@link #edges() Kanten} und {@link #values() Textwerte} des Wissensstands
-	 * {@code newState} ohne denen des Wissensstands {@code oldState}, bspw. für {@link KBUpdate#getInserts()} und {@link KBUpdate#getDeletes()}.
+	 * {@code newState} ohne denen des Wissensstands {@code oldState}.
 	 *
 	 * @param oldState alter Wissensstands.
 	 * @param newState neuer Wissensstands.
 	 * @return Wissensstand mit neuem und ohne altem Wissen. */
 	public static KBState from(KBState oldState, KBState newState) {
 		var result = new KBState();
-		if (oldState == newState) return result;
 		result.indexRef = newState.indexRef;
 		result.internalRef = newState.internalRef;
 		result.externalRef = newState.externalRef;
-		var oldSourceMap = oldState.sourceMap;
-		var newSourceMap = newState.sourceMap;
-		var newSourceKeys = REFMAP.getKeys(newSourceMap);
-		for (var newSourceIdx = newSourceMap.length - 1; 0 < newSourceIdx; newSourceIdx--) {
-			var newRelationMap = KBState.asRefMap(REFMAP.getVal(newSourceMap, newSourceIdx));
-			if (newRelationMap != null) {
-				var sourceRef = REFSET.getRef(newSourceKeys, newSourceIdx);
-				var oldSourceIdx = REFMAP.getIdx(oldSourceMap, sourceRef);
-				if (oldSourceIdx == 0) {
-					// COPY newRelationMap
-					var newRelationKeys = REFMAP.getKeys(newRelationMap);
-					for (var newRelationIdx = newRelationMap.length - 1; 0 < newRelationIdx; newRelationIdx--) {
-						var newTargetVal = KBState.asRefVal(REFMAP.getVal(newRelationMap, newRelationIdx));
-						if (newTargetVal != null) {
-							// COPY newTargetVal
-							var relationRef = REFSET.getRef(newRelationKeys, newRelationIdx);
-							if (KBState.isRef(newTargetVal)) {
-								result.insertEdge(sourceRef, KBState.asRef(newTargetVal), relationRef);
-							} else {
-								for (var newTargetIdx = newTargetVal.length - 1; 3 < newTargetIdx; newTargetIdx -= 3) {
-									var newTargetRef = newTargetVal[newTargetIdx];
-									if (newTargetRef != 0) {
-										result.insertEdge(sourceRef, newTargetRef, relationRef);
-									}
-								}
-							}
-						}
-					}
-				} else {
-					var oldRelationMap = KBState.asRefMap(REFMAP.getVal(oldSourceMap, oldSourceIdx));
-					if (newRelationMap != oldRelationMap) {
-						var newRelationKeys = REFMAP.getKeys(newRelationMap);
-						for (var newRelationIdx = newRelationMap.length - 1; 0 < newRelationIdx; newRelationIdx--) {
-							var newTargetVal = KBState.asRefVal(REFMAP.getVal(newRelationMap, newRelationIdx));
-							if (newTargetVal != null) {
-								var relationRef = REFSET.getRef(newRelationKeys, newRelationIdx);
-								var oldRelationIdx = REFMAP.getIdx(oldRelationMap, relationRef);
-								if (oldRelationIdx == 0) {
-									// COPY newTargetVal
-									if (KBState.isRef(newTargetVal)) {
-										result.insertEdge(sourceRef, KBState.asRef(newTargetVal), relationRef);
-									} else {
-										for (var newTargetIdx = newTargetVal.length - 1; 3 < newTargetIdx; newTargetIdx -= 3) {
-											var newTargetRef = newTargetVal[newTargetIdx];
-											if (newTargetRef != 0) {
-												result.insertEdge(sourceRef, newTargetRef, relationRef);
-											}
-										}
-									}
-								} else {
-									var oldTargetVal = KBState.asRefVal(REFMAP.getVal(oldRelationMap, oldRelationIdx));
-									if (newTargetVal != oldTargetVal) {
-										if (KBState.isRef(oldTargetVal)) {
-											var oldTargetRef = KBState.asRef(oldTargetVal);
-											if (KBState.isRef(newTargetVal)) {
-												var newTargetRef = KBState.asRef(newTargetVal);
-												if (oldTargetRef != newTargetRef) {
-													result.insertEdge(sourceRef, newTargetRef, relationRef);
-												}
-											} else {
-												for (var newTargetIdx = newTargetVal.length - 1; 3 < newTargetIdx; newTargetIdx -= 3) {
-													var newTargetRef = newTargetVal[newTargetIdx];
-													if (newTargetRef != 0) {
-														if (oldTargetRef != newTargetRef) {
-															result.insertEdge(sourceRef, newTargetRef, relationRef);
-														}
-													}
-												}
-											}
-										} else {
-											if (KBState.isRef(newTargetVal)) {
-												var newTargetRef = KBState.asRef(newTargetVal);
-												if (REFSET.getIdx(oldTargetVal, newTargetRef) == 0) {
-													result.insertEdge(sourceRef, newTargetRef, relationRef);
-												}
-											} else {
-												for (var newTargetIdx = newTargetVal.length - 1; 3 < newTargetIdx; newTargetIdx -= 3) {
-													var newTargetRef = newTargetVal[newTargetIdx];
-													if (newTargetRef != 0) {
-														if (REFSET.getIdx(oldTargetVal, newTargetRef) == 0) {
-															result.insertEdge(sourceRef, newTargetRef, relationRef);
-														}
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		var oldValueStrMap = oldState.valueStrMap;
-		var newValueStrMap = newState.valueStrMap;
-		if (oldValueStrMap != newValueStrMap) {
-			newValueStrMap.fastForEach((KBValues.RUN)(valueRef, valueStr) -> {
-				if (!valueStr.equals(oldValueStrMap.get(valueRef))) {
-					result.insertValue(valueRef, valueStr);
-				}
-			});
-		}
+		if (oldState == newState) return result;
+		KBState.selectInserts(oldState, newState, result::insertEdgeNow, result::insertValueNow);
 		return result;
 	}
 
@@ -197,113 +94,113 @@ public class KBState implements Emuable {
 	}
 
 	/** Diese Methode liefert den {@link FEMString Textwert} mit der gegebenen Textreferenz {@code valueRef} oder {@code null}. */
-	public FEMString getValue(int valueRef) {
+	public synchronized FEMString getValue(int valueRef) {
 		if (valueRef == 0) return null;
 		return this.valueStrMap.get(valueRef);
 	}
 
 	/** Diese Methode liefert die Textreferenz zum gegebenen {@link FEMString Textwert} {@code valueStr} oder {@code 0}. */
-	public int getValueRef(FEMString valueStr) {
+	public synchronized int getValueRef(FEMString valueStr) {
 		if (valueStr == null) return 0;
 		var valueRef = this.valueRefMap.get(valueStr);
 		return valueRef != null ? valueRef : 0;
 	}
 
 	/** Diese Methode liefert eine Kopie der Textreferenzen dieses Wissenstands. */
-	public int[] getValueRefs() {
+	public synchronized int[] getValueRefs() {
 		return this.valueStrMap.fastKeys();
 	}
 
 	/** Diese Methode liefert die Anzahl der Textreferenzen dieses Wissenstands. */
-	public int getValueCount() {
+	public synchronized int getValueCount() {
 		return this.valueStrMap.size();
 	}
 
-	public int[] getSourceRefs() {
+	public synchronized int[] getSourceRefs() {
 		return REFMAP.toArray(this.sourceMap);
 	}
 
-	public int getSourceCount() {
+	public synchronized int getSourceCount() {
 		return REFMAP.size(this.sourceMap);
 	}
 
-	public int[] getSourceRelationRefs(int sourceRef) {
+	public synchronized int[] getSourceRelationRefs(int sourceRef) {
 		var relationMap = this.getRefmap(this.sourceMap, sourceRef);
 		return REFMAP.toArray(relationMap);
 	}
 
-	public int getSourceRelationCount(int sourceRef) {
+	public synchronized int getSourceRelationCount(int sourceRef) {
 		var relationMap = this.getRefmap(this.sourceMap, sourceRef);
 		return REFMAP.size(relationMap);
 	}
 
-	public int getSourceRelationTargetRef(int sourceRef, int relationRef) {
+	public synchronized int getSourceRelationTargetRef(int sourceRef, int relationRef) {
 		var targetVal = this.getRefset(this.sourceMap, sourceRef, relationRef);
 		return KBState.isRef(targetVal) ? KBState.asRef(targetVal) : REFSET.getRef(targetVal);
 	}
 
-	public int[] getSourceRelationTargetRefs(int sourceRef, int relationRef) {
+	public synchronized int[] getSourceRelationTargetRefs(int sourceRef, int relationRef) {
 		var targetVal = this.getRefset(this.sourceMap, sourceRef, relationRef);
 		return KBState.isRef(targetVal) ? new int[]{KBState.asRef(targetVal)} : REFSET.toArray(targetVal);
 	}
 
-	public int getSourceRelationTargetCount(int sourceRef, int relationRef) {
+	public synchronized int getSourceRelationTargetCount(int sourceRef, int relationRef) {
 		var targetVal = this.getRefset(this.sourceMap, sourceRef, relationRef);
 		return KBState.isRef(targetVal) ? 1 : REFSET.size(targetVal);
 	}
 
-	public int[] getTargetRefs() {
+	public synchronized int[] getTargetRefs() {
 		return REFMAP.toArray(this.targetMap);
 	}
 
-	public int getTargetCount() {
+	public synchronized int getTargetCount() {
 		return REFMAP.size(this.targetMap);
 	}
 
-	public int[] getTargetRelationRefs(int targetRef) {
+	public synchronized int[] getTargetRelationRefs(int targetRef) {
 		var relationMap = this.getRefmap(this.targetMap, targetRef);
 		return REFMAP.toArray(relationMap);
 	}
 
-	public int getTargetRelationCount(int targetRef) {
+	public synchronized int getTargetRelationCount(int targetRef) {
 		var relationMap = this.getRefmap(this.targetMap, targetRef);
 		return REFMAP.size(relationMap);
 	}
 
-	public int getTargetRelationSourceRef(int targetRef, int relationRef) {
+	public synchronized int getTargetRelationSourceRef(int targetRef, int relationRef) {
 		var sourceVal = this.getRefset(this.targetMap, targetRef, relationRef);
 		return KBState.isRef(sourceVal) ? KBState.asRef(sourceVal) : REFSET.getRef(sourceVal);
 	}
 
 	/** Diese Methode liefert die {@link KBEdge#sourceRef() Quellreferenzen} aller {@link KBEdge Kanten} mit der gegebenen {@link KBEdge#targetRef() Zielreferenz}
 	 * {@code targetRef} und der gegebenen {@link KBEdge#relationRef() Beziehungsreferenz} {@code relationRef}. */
-	public int[] getTargetRelationSourceRefs(int targetRef, int relationRef) {
+	public synchronized int[] getTargetRelationSourceRefs(int targetRef, int relationRef) {
 		var sourceVal = this.getRefset(this.targetMap, targetRef, relationRef);
 		return KBState.isRef(sourceVal) ? new int[]{KBState.asRef(sourceVal)} : REFSET.toArray(sourceVal);
 	}
 
 	/** Diese Methode liefert die Anzahl der {@link KBEdge#sourceRef() Quellreferenzen} aller {@link KBEdge Kanten} mit der gegebenen {@link KBEdge#targetRef()
 	 * Zielreferenz} {@code targetRef} und der gegebenen {@link KBEdge#relationRef() Beziehungsreferenz} {@code relationRef}. */
-	public int getTargetRelationSourceCount(int targetRef, int relationRef) {
+	public synchronized int getTargetRelationSourceCount(int targetRef, int relationRef) {
 		var sourceVal = this.getRefset(this.targetMap, targetRef, relationRef);
 		return KBState.isRef(sourceVal) ? 1 : REFSET.size(sourceVal);
 	}
 
 	/** Diese Methode liefert die Referenz auf die Entität des Inhaltsverzeichnisses oder {@code 0}. Wenn dieses Objekt über {@link #from(KBState, KBState)}
 	 * erzeugt wurde, liefert sie {@code newState.getIndexRef()}. */
-	public int getIndexRef() {
+	public synchronized int getIndexRef() {
 		return this.indexRef;
 	}
 
 	/** Diese Methode liefert die Referenz, von der aus die nächste für eine neue interne Entität ohne Textwert verfügbare Referenz gesucht wird. Wenn dieses
 	 * Objekt über {@link #from(KBState, KBState)} erzeugt wurde, liefert sie {@code newState.getInternalRef()}. */
-	public int getInternalRef() {
+	public synchronized int getInternalRef() {
 		return this.internalRef;
 	}
 
 	/** Diese Methode liefert die Referenz, von der aus die nächste für eine neue externe Entität mit Textwert verfügbare Referenz gesucht wird. Wenn dieses
 	 * Objekt über {@link #from(KBState, KBState)} erzeugt wurde, liefert sie {@code newState.getExternalRef()}. */
-	public int getExternalRef() {
+	public synchronized int getExternalRef() {
 		return this.externalRef;
 	}
 
@@ -315,35 +212,35 @@ public class KBState implements Emuable {
 	/** Diese Methode liefert nur dann {@code true}, wenn dieser Wissensstand die {@link KBEdge Kante} mit der gegebenen {@link KBEdge#sourceRef() Quellreferenz}
 	 * {@code sourceRef}, der gegebenen {@link KBEdge#targetRef() Zielreferenz} {@code targetRef} und der gegebenen {@link KBEdge#relationRef()
 	 * Beziehungsreferenz} {@code relationRef} enthält. */
-	public boolean containsEdge(int sourceRef, int targetRef, int relationRef) {
+	public synchronized boolean containsEdge(int sourceRef, int targetRef, int relationRef) {
 		if ((sourceRef == 0) || (targetRef == 0) || (relationRef == 0)) return false;
 		var targetVal = this.getRefset(this.sourceMap, sourceRef, relationRef);
 		return KBState.isRef(targetVal) ? KBState.asRef(targetVal) == targetRef : REFSET.getIdx(targetVal, targetRef) != 0;
 	}
 
 	/** Diese Methode liefert nur dann {@code true}, wenn dieser Wissensstand den gegebenen {@link #getValue(int) Textwert} {@code valueStr} enthält. */
-	public boolean containsValue(FEMString valueStr) {
+	public synchronized boolean containsValue(FEMString valueStr) {
 		if (valueStr == null) return false;
 		return this.valueRefMap.containsKey(valueStr);
 	}
 
 	/** Diese Methode liefert nur dann {@code true}, wenn dieser Wissensstand die gegebene {@link #getValueRef(FEMString) Textwertreferenz} {@code valueRef}
 	 * enthält. */
-	public boolean containsValueRef(int valueRef) {
+	public synchronized boolean containsValueRef(int valueRef) {
 		if (valueRef == 0) return false;
 		return this.valueStrMap.containsKey(valueRef);
 	}
 
 	/** Diese Methode liefert nur dann {@code true}, wenn dieser Wissensstand eine {@link KBEdge Kante} mit der gegebenen {@link KBEdge#sourceRef() Quellreferenz}
 	 * enthält. */
-	public boolean containsSourceRef(int sourceRef) {
+	public synchronized boolean containsSourceRef(int sourceRef) {
 		if (sourceRef == 0) return false;
 		return REFMAP.getIdx(this.sourceMap, sourceRef) != 0;
 	}
 
 	/** Diese Methode liefert nur dann {@code true}, wenn dieser Wissensstand eine {@link KBEdge Kante} mit der gegebenen {@link KBEdge#sourceRef() Quellreferenz}
 	 * {@code sourceRef} und der gegebenen {@link KBEdge#relationRef() Beziehungsreferenz} {@code relationRef} enthält. */
-	public boolean containsSourceRelationRef(int sourceRef, int relationRef) {
+	public synchronized boolean containsSourceRelationRef(int sourceRef, int relationRef) {
 		if ((sourceRef == 0) || (relationRef == 0)) return false;
 		var relationMap = this.getRefmap(this.sourceMap, sourceRef);
 		return REFMAP.getIdx(relationMap, relationRef) != 0;
@@ -351,23 +248,23 @@ public class KBState implements Emuable {
 
 	/** Diese Methode liefert nur dann {@code true}, wenn dieser Wissensstand eine {@link KBEdge Kante} mit der gegebenen {@link KBEdge#targetRef() Zielreferenz}
 	 * {@code targetRef}. */
-	public boolean containsTargetRef(int targetRef) {
+	public synchronized boolean containsTargetRef(int targetRef) {
 		if (targetRef == 0) return false;
 		return REFMAP.getIdx(this.targetMap, targetRef) != 0;
 	}
 
 	/** Diese Methode liefert nur dann {@code true}, wenn dieser Wissensstand eine {@link KBEdge Kante} mit der gegebenen {@link KBEdge#targetRef() Zielreferenz}
 	 * {@code targetRef} und der gegebenen {@link KBEdge#relationRef() Beziehungsreferenz} {@code relationRef} enthält. */
-	public boolean containsTargetRelationRef(int targetRef, int relationRef) {
+	public synchronized boolean containsTargetRelationRef(int targetRef, int relationRef) {
 		if ((targetRef == 0) || (relationRef == 0)) return false;
 		var relationMap = this.getRefmap(this.targetMap, targetRef);
 		return REFMAP.getIdx(relationMap, relationRef) != 0;
 	}
 
 	@Override
-	public long emu() {
-		return EMU.fromObject(this) + this.emuEdges(this.sourceMap) + this.emuEdges(this.targetMap) + this.valueRefMap.emu() + this.valueStrMap.emu()
-			+ this.edges.emu() + this.values.emu();
+	public synchronized long emu() {
+		return EMU.fromObject(this) + KBState.computeEdgeMapEMU(this.sourceMap) + KBState.computeEdgeMapEMU(this.targetMap) + this.valueRefMap.emu()
+			+ this.valueStrMap.emu() + this.edges.emu() + this.values.emu();
 	}
 
 	public byte[] persist() throws IOException {
@@ -376,13 +273,16 @@ public class KBState implements Emuable {
 
 	/** Diese Methode fügt die Wissensabschrift dieses Wissensstandes an den gegebenen {@link ZIPDOS} an. */
 	public void persist(ZIPDOS target) throws IOException {
-		this.persistRefs(target);
-		this.persistEdgeMaps(target);
-		this.persistValueMaps(target);
+		synchronized (this) {
+			this.persistRefs(target);
+			this.persistEdgeMaps(target);
+			this.persistValueMaps(target);
+			this.persistHistorySize(target);
+		}
 	}
 
 	@Override
-	public String toString() {
+	public synchronized String toString() {
 		return Objects.toStringCall(true, true, this, "edges", this.edges, "values", this.values);
 	}
 
@@ -406,6 +306,19 @@ public class KBState implements Emuable {
 		return (Object[])refmap;
 	}
 
+	static long computeEdgeMapEMU(Object[] sourceMap) {
+		var result = new long[]{REFMAP.emu(sourceMap)};
+		REFMAP.forEach(sourceMap, (sourceRef, sourceVal) -> {
+			if (sourceVal == null) return;
+			var relationMap = KBState.asRefMap(sourceVal);
+			result[0] += REFMAP.emu(relationMap);
+			REFMAP.forEach(relationMap, (relationRef, relationVal) -> {
+				result[0] += REFSET.emu(KBState.asRefVal(relationVal));
+			});
+		});
+		return result[0];
+	}
+
 	static <T> T computeSelect(int[] selectRefs, int[] acceptRefset, int[] refuseRefset, Getter<int[], T> useAcceptRefs) {
 		if (refuseRefset != null) return useAcceptRefs.get(REFSET.trim(REFSET.except(REFSET.from(selectRefs), refuseRefset)));
 		if (acceptRefset != null) return useAcceptRefs.get(REFSET.trim(REFSET.intersect(REFSET.from(selectRefs), acceptRefset)));
@@ -423,6 +336,118 @@ public class KBState implements Emuable {
 			return useRefuseRefs.get(REFSET.size(refuseRefset2) == REFSET.size(refuseRefset) ? refuseRefset : refuseRefset2);
 		}
 		return useRefuseRefs.get(REFSET.from(exceptRefs));
+	}
+
+	/** Diese Methode leitet die {@link #edges() Kanten} und {@link #values() Textwerte} des Wissensstands {@code newState} ohne denen des Wissensstands
+	 * {@code oldState} an {@code edgesTask} bzw. {@code valuesTask} weiter.
+	 *
+	 * @param oldState alter Wissensstands.
+	 * @param newState neuer Wissensstands. */
+	static void selectInserts(KBState oldState, KBState newState, KBEdges.RUN edgesTask, KBValues.RUN valuesTask) {
+		if (oldState == newState) return;
+		var oldSourceMap = oldState.sourceMap;
+		var newSourceMap = newState.sourceMap;
+		var newSourceKeys = REFMAP.getKeys(newSourceMap);
+		for (var newSourceIdx = newSourceMap.length - 1; 0 < newSourceIdx; newSourceIdx--) {
+			var newRelationMap = KBState.asRefMap(REFMAP.getVal(newSourceMap, newSourceIdx));
+			if (newRelationMap != null) {
+				var sourceRef = REFSET.getRef(newSourceKeys, newSourceIdx);
+				var oldSourceIdx = REFMAP.getIdx(oldSourceMap, sourceRef);
+				if (oldSourceIdx == 0) {
+					// COPY newRelationMap
+					var newRelationKeys = REFMAP.getKeys(newRelationMap);
+					for (var newRelationIdx = newRelationMap.length - 1; 0 < newRelationIdx; newRelationIdx--) {
+						var newTargetVal = KBState.asRefVal(REFMAP.getVal(newRelationMap, newRelationIdx));
+						if (newTargetVal != null) {
+							// COPY newTargetVal
+							var relationRef = REFSET.getRef(newRelationKeys, newRelationIdx);
+							if (KBState.isRef(newTargetVal)) {
+								edgesTask.run(sourceRef, KBState.asRef(newTargetVal), relationRef);
+							} else {
+								for (var newTargetIdx = newTargetVal.length - 1; 3 < newTargetIdx; newTargetIdx -= 3) {
+									var newTargetRef = newTargetVal[newTargetIdx];
+									if (newTargetRef != 0) {
+										edgesTask.run(sourceRef, newTargetRef, relationRef);
+									}
+								}
+							}
+						}
+					}
+				} else {
+					var oldRelationMap = KBState.asRefMap(REFMAP.getVal(oldSourceMap, oldSourceIdx));
+					if (newRelationMap != oldRelationMap) {
+						var newRelationKeys = REFMAP.getKeys(newRelationMap);
+						for (var newRelationIdx = newRelationMap.length - 1; 0 < newRelationIdx; newRelationIdx--) {
+							var newTargetVal = KBState.asRefVal(REFMAP.getVal(newRelationMap, newRelationIdx));
+							if (newTargetVal != null) {
+								var relationRef = REFSET.getRef(newRelationKeys, newRelationIdx);
+								var oldRelationIdx = REFMAP.getIdx(oldRelationMap, relationRef);
+								if (oldRelationIdx == 0) {
+									// COPY newTargetVal
+									if (KBState.isRef(newTargetVal)) {
+										edgesTask.run(sourceRef, KBState.asRef(newTargetVal), relationRef);
+									} else {
+										for (var newTargetIdx = newTargetVal.length - 1; 3 < newTargetIdx; newTargetIdx -= 3) {
+											var newTargetRef = newTargetVal[newTargetIdx];
+											if (newTargetRef != 0) {
+												edgesTask.run(sourceRef, newTargetRef, relationRef);
+											}
+										}
+									}
+								} else {
+									var oldTargetVal = KBState.asRefVal(REFMAP.getVal(oldRelationMap, oldRelationIdx));
+									if (newTargetVal != oldTargetVal) {
+										if (KBState.isRef(oldTargetVal)) {
+											var oldTargetRef = KBState.asRef(oldTargetVal);
+											if (KBState.isRef(newTargetVal)) {
+												var newTargetRef = KBState.asRef(newTargetVal);
+												if (oldTargetRef != newTargetRef) {
+													edgesTask.run(sourceRef, newTargetRef, relationRef);
+												}
+											} else {
+												for (var newTargetIdx = newTargetVal.length - 1; 3 < newTargetIdx; newTargetIdx -= 3) {
+													var newTargetRef = newTargetVal[newTargetIdx];
+													if (newTargetRef != 0) {
+														if (oldTargetRef != newTargetRef) {
+															edgesTask.run(sourceRef, newTargetRef, relationRef);
+														}
+													}
+												}
+											}
+										} else {
+											if (KBState.isRef(newTargetVal)) {
+												var newTargetRef = KBState.asRef(newTargetVal);
+												if (REFSET.getIdx(oldTargetVal, newTargetRef) == 0) {
+													edgesTask.run(sourceRef, newTargetRef, relationRef);
+												}
+											} else {
+												for (var newTargetIdx = newTargetVal.length - 1; 3 < newTargetIdx; newTargetIdx -= 3) {
+													var newTargetRef = newTargetVal[newTargetIdx];
+													if (newTargetRef != 0) {
+														if (REFSET.getIdx(oldTargetVal, newTargetRef) == 0) {
+															edgesTask.run(sourceRef, newTargetRef, relationRef);
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		var oldValueStrMap = oldState.valueStrMap;
+		var newValueStrMap = newState.valueStrMap;
+		if (oldValueStrMap != newValueStrMap) {
+			newValueStrMap.fastForEach((KBValues.RUN)(valueRef, valueStr) -> {
+				if (!valueStr.equals(oldValueStrMap.get(valueRef))) {
+					valuesTask.run(valueRef, valueStr);
+				}
+			});
+		}
 	}
 
 	int indexRef;
@@ -753,27 +778,22 @@ public class KBState implements Emuable {
 
 	}
 
-	private static final int MAGIC = 0xCBFF2024;
+	private static final int MAGIC = 0xCBFF2501;
 
-	private long emuEdges(Object[] sourceMap) {
-		var result = new long[]{REFMAP.emu(sourceMap)};
-		REFMAP.forEach(sourceMap, (sourceRef, sourceVal) -> {
-			if (sourceVal == null) return;
-			var relationMap = KBState.asRefMap(sourceVal);
-			result[0] += REFMAP.emu(relationMap);
-			REFMAP.forEach(relationMap, (relationRef, relationVal) -> {
-				result[0] += REFSET.emu(KBState.asRefVal(relationVal));
-			});
-		});
-		return result[0];
+	final void insertEdgeNow(int sourceRef, int targetRef, int relationRef) {
+		this.insertEdgeNowIntoSourceMap(sourceRef, targetRef, relationRef);
+		this.insertEdgeNowIntoTargetMap(sourceRef, targetRef, relationRef);
 	}
 
-	private void insertEdge(int sourceRef, int targetRef, int relationRef) {
-		this.sourceMap = this.insertEdge(this.sourceMap, sourceRef, targetRef, relationRef);
-		this.targetMap = this.insertEdge(this.targetMap, targetRef, sourceRef, relationRef);
+	final void insertEdgeNowIntoTargetMap(int sourceRef, int targetRef, int relationRef) {
+		this.targetMap = this.insertEdgeNowIntoMap(this.targetMap, targetRef, sourceRef, relationRef);
 	}
 
-	private Object[] insertEdge(Object[] sourceMap, int sourceRef, int targetRef, int relationRef) {
+	final void insertEdgeNowIntoSourceMap(int sourceRef, int targetRef, int relationRef) {
+		this.sourceMap = this.insertEdgeNowIntoMap(this.sourceMap, sourceRef, targetRef, relationRef);
+	}
+
+	final Object[] insertEdgeNowIntoMap(Object[] sourceMap, int sourceRef, int targetRef, int relationRef) {
 
 		sourceMap = REFMAP.grow(sourceMap);
 
@@ -805,15 +825,23 @@ public class KBState implements Emuable {
 	}
 
 	/** Diese Methode implementiert das Einfügen des gegebene Textwerts für {@link #from(KBState, KBState)}. */
-	private void insertValue(int valueRef, FEMString valueStr) {
+	final void insertValueNow(int valueRef, FEMString valueStr) {
 		var newValueRef = valueRef;
 		var newValueStr = valueStr.data();
+		this.insertValueNowIntoRefMap(newValueRef, newValueStr);
+		this.insertValueNowIntoStrMap(newValueRef, newValueStr);
+	}
+
+	final void insertValueNowIntoRefMap(Integer newValueRef, FEMString newValueStr) {
 		var oldValueRef = this.valueRefMap.put(newValueStr, newValueRef);
 		if (oldValueRef != null) {
-			if (oldValueRef.intValue() == valueRef) return;
-			this.valueRefMap.put(valueStr, oldValueRef);
+			if (oldValueRef.intValue() == newValueRef.intValue()) return;
+			this.valueRefMap.put(newValueStr, oldValueRef);
 			throw new IllegalArgumentException();
 		}
+	}
+
+	final void insertValueNowIntoStrMap(Integer newValueRef, FEMString newValueStr) {
 		var oldValueStr = this.valueStrMap.put(newValueRef, newValueStr);
 		if (oldValueStr != null) {
 			this.valueStrMap.put(newValueRef, oldValueStr);
@@ -925,33 +953,30 @@ public class KBState implements Emuable {
 	 * int[valueCount], valueLength: int[valueCount], valueString: byte[valueSize][valueCount])</pre> */
 	private void persistValueMaps(ZIPDOS result) throws IOException {
 		var valueMap = this.valueStrMap;
+		KBState.persistValueMap(result, valueMap);
+	}
+
+	private void persistHistorySize(ZIPDOS result) throws IOException {
+		result.writeInt(0, 0, 0);
+	}
+
+	static void persistValueMap(ZIPDOS result, ValueStrMap valueMap) throws IOException {
+		// TODO je 1024 werte blockweise
 		var valueCount = valueMap.size();
 		var refArray = new int[valueCount];
-		var hashArray = new int[valueCount];
-		var sizeArray = new int[valueCount];
-		var lengthArray = new int[valueCount];
-		var stringArray = new byte[valueCount][];
+		var strArray = new FEMString[valueCount];
 		var iter = valueMap.fastIterator();
 		for (var i = 0; iter.hasNext(); i++) {
 			var entry = iter.next();
-			var valueRef = entry.getKey();
-			var valueStr = entry.getValue();
-			refArray[i] = valueRef;
-			hashArray[i] = valueStr.hashCode();
-			sizeArray[i] = (stringArray[i] = valueStr.toBytes(true)).length;
-			lengthArray[i] = valueStr.length();
+			refArray[i] = entry.getKey();
+			strArray[i] = entry.getValue();
 		}
 		result.writeInt(valueCount);
 		result.writeInt(refArray);
-		result.writeInt(hashArray);
-		result.writeInt(sizeArray);
-		result.writeInt(lengthArray);
-		for (var i = 0; i < valueCount; i++) {
-			result.writeByte(stringArray[i]);
-		}
+		result.writeStrings(strArray);
 	}
 
-	private void restoreRefs(ZIPDIS source) throws IOException {
+	final void restoreRefs(ZIPDIS source) throws IOException {
 		var header = source.readInt(4);
 		if (header[0] != KBState.MAGIC) throw new IOException();
 		this.indexRef = header[1];
@@ -959,9 +984,18 @@ public class KBState implements Emuable {
 		this.externalRef = header[3];
 	}
 
-	private void restoreEdgeMaps(ZIPDIS source) throws IOException {
-		var index = 0;
+	final void restoreEdgeMaps(ZIPDIS source) throws IOException {
+		this.restoreEdgeMaps(source, this::insertEdgeNow);
+	}
+
+	final void restoreEdgeMaps(ZIPDIS source, KBEdges.RUN task) throws IOException {
 		var count = source.readInt(1)[0];
+		// TODO mehrere blöcke, count array lesen, je count aufrufen
+		this.restoreEdgeMaps(source, count, task);
+	}
+
+	final void restoreEdgeMaps(ZIPDIS source, int count, KBEdges.RUN task) throws IOException {
+		var index = 0;
 		var array = source.readInt(count);
 		var sourceRefCount = array[index++];
 		while (0 < sourceRefCount--) {
@@ -971,32 +1005,34 @@ public class KBState implements Emuable {
 			while (0 < targetRefCount--) {
 				var targetRef = array[index++];
 				var relationRef = array[index++];
-				this.insertEdge(sourceRef, targetRef, relationRef);
+				task.run(sourceRef, targetRef, relationRef);
 			}
 			while (0 < targetSetCount--) {
 				var relationRef = array[index++];
 				var targetCount = array[index++];
 				while (0 < targetCount--) {
 					var targetRef = array[index++];
-					this.insertEdge(sourceRef, targetRef, relationRef);
+					task.run(sourceRef, targetRef, relationRef);
 				}
 			}
 		}
 	}
 
-	private void restoreValueMaps(ZIPDIS source) throws IOException {
-		var valueCount = source.readInt(1)[0];
-		var refArray = source.readInt(valueCount);
-		var hashArray = source.readInt(valueCount);
-		var sizeArray = source.readInt(valueCount);
-		var lengthArray = source.readInt(valueCount);
-		this.valueRefMap.allocate(valueCount);
-		this.valueStrMap.allocate(valueCount);
-		for (var i = 0; i < valueCount; i++) {
-			var valueRef = (Integer)refArray[i];
-			var valueStr = new CompactStringUTF8(hashArray[i], source.readByte(sizeArray[i]), 0, lengthArray[i]);
+	final void restoreValueMaps(ZIPDIS source) throws IOException {
+		var count = source.readInt(1)[0];
+		this.valueRefMap.allocate(count);
+		this.valueStrMap.allocate(count);
+		restoreValueMaps(source, count, (valueRef, valueStr) -> {
 			this.valueRefMap.put(valueStr, valueRef);
 			this.valueStrMap.put(valueRef, valueStr);
+		});
+	}
+
+	final void restoreValueMaps(ZIPDIS source, int count, KBValues.RUN task) throws IOException {
+		var refArray = source.readInt(count);
+		var strArray = source.readStrings(count);
+		for (var i = 0; i < count; i++) {
+			task.run(refArray[i], strArray[i]);
 		}
 	}
 

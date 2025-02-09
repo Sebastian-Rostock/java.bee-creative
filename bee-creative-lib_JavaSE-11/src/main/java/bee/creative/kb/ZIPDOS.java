@@ -13,6 +13,7 @@ import java.nio.LongBuffer;
 import java.nio.ShortBuffer;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
+import bee.creative.fem.FEMString;
 
 /** Diese Klasse implementiert einen {@link DeflaterOutputStream}, der primitive Werte über einen {@link ByteBuffer} mit gegebener {@link ByteOrder} schreibt.
  *
@@ -32,7 +33,7 @@ public class ZIPDOS extends DeflaterOutputStream {
 	/** Diese Methode erzeugt einen neuen {@link ZIPDOS} mit der gegebenen Kompressionsstufe {@code level} ({@link Deflater#DEFAULT_COMPRESSION},
 	 * {@link Deflater#NO_COMPRESSION}..{@link Deflater#BEST_COMPRESSION}) und der gegebenen Bytereihenfolge mit {@code order} auf Basis eines
 	 * {@link ByteArrayOutputStream}, ruft damit die gegebene Funktion {@code task} auf und liefert schließlich die dadurch erzeugte Bytefolge.
-	 * 
+	 *
 	 * @see TASK#run(ZIPDOS)
 	 * @see ZIPDOS#ZIPDOS(OutputStream, int, ByteOrder)
 	 * @see ByteArrayOutputStream#toByteArray() */
@@ -158,6 +159,40 @@ public class ZIPDOS extends DeflaterOutputStream {
 			this.writeBuffer(count * 8);
 			offset += count;
 			length -= count;
+		}
+	}
+
+	public void writeStrings(FEMString[] values) throws IOException {
+		this.writeStrings(values, 0, values.length);
+	}
+
+	public void writeStrings(FEMString[] values, int offset, int length) throws IOException {
+		var hashArray = new int[length];
+		var lengthArray = new int[length];
+		var stringArray = new byte[length][];
+		for (var i = 0; i < length; i++) {
+			var value = values[offset+i];
+			hashArray[i] = value.hashCode();
+			stringArray[i] = value.toBytes(true);
+			lengthArray[i] = value.length();
+		}
+		this.writeInt(hashArray);
+		this.writeInt(lengthArray);
+		this.writeBinaries(stringArray);
+	}
+
+	public void writeBinaries(byte[][] values) throws IOException {
+		this.writeBinaries(values, 0, values.length);
+	}
+
+	public void writeBinaries(byte[][] values, int offset, int length) throws IOException {
+		var sizeArray = new int[length];
+		for (var i = 0; i < length; i++) {
+			sizeArray[i] = values[offset + i].length;
+		}
+		this.writeInt(sizeArray);
+		for (var i = 0; i < length; i++) {
+			this.writeByte(values[offset + i]);
 		}
 	}
 

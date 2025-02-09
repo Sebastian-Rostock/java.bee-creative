@@ -15,6 +15,8 @@ import java.nio.ShortBuffer;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
+import bee.creative.fem.FEMString;
+import bee.creative.fem.FEMString.CompactStringUTF8;
 
 /** Diese Klasse implementiert einen {@link InflaterInputStream}, der primitive Werte über einen {@link ByteBuffer} mit gegebener {@link ByteOrder} liest.
  *
@@ -150,6 +152,32 @@ public class ZIPDIS extends InflaterInputStream {
 			this.bufferAsDouble.rewind().get(values, offset, count);
 			offset += count;
 			length -= count;
+		}
+		return values;
+	}
+
+	public FEMString[] readStrings(int length) throws IOException {
+		return this.readStrings(new FEMString[1], 0, length);
+	}
+
+	public FEMString[] readStrings(FEMString[] values, int offset, int length) throws IOException {
+		var hashArray = this.readInt(length);
+		var lengthArray = this.readInt(length);
+		var binaryArray = this.readBinaries(length);
+		for (var i = 0; i < length; i++) {
+			values[offset + i] = new CompactStringUTF8(hashArray[i], binaryArray[i], 0, lengthArray[i]);
+		}
+		return values;
+	}
+
+	public byte[][] readBinaries(int length) throws IOException {
+		return this.readBinaries(new byte[1][], 0, length);
+	}
+
+	public byte[][] readBinaries(byte[][] values, int offset, int length) throws IOException {
+		var sizeArray = this.readInt(length);
+		for (var i = 0; i < length; i++) {
+			values[i + offset] = this.readByte(sizeArray[i]);
 		}
 		return values;
 	}
