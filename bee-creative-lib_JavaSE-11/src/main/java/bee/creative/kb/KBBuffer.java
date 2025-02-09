@@ -15,6 +15,7 @@ import bee.creative.util.List2;
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class KBBuffer extends KBState {
 
+	/** Dieser Konstruktor erzeugt einen leeren Wissenspuffer. */
 	public KBBuffer() {
 	}
 
@@ -34,6 +35,25 @@ public class KBBuffer extends KBState {
 	public synchronized void setExternalRef(int externalRef) {
 		this.backup();
 		this.externalRef = externalRef;
+	}
+
+	public synchronized FEMString getUndoInfo() {
+		return this.undoInfo;
+	}
+
+	public synchronized void setUndoInfo(FEMString undoInfo) throws NullPointerException {
+		if (undoInfo.equals(this.undoInfo)) return;
+		this.backup();
+		this.undoInfo = undoInfo;
+	}
+
+	public synchronized int getUndoLimit() {
+		return this.undoHistory.getLimit();
+	}
+
+	public synchronized void setUndoLimit(int undoLimit) throws IllegalArgumentException {
+		this.redoHistory.setLimit(undoLimit);
+		this.undoHistory.setLimit(undoLimit);
 	}
 
 	public synchronized int getNextInternalRef() {
@@ -393,27 +413,6 @@ public class KBBuffer extends KBState {
 		this.backupValues = false;
 	}
 
-	{}
-
-	public synchronized FEMString getUndoInfo() {
-		return this.undoInfo;
-	}
-
-	public synchronized void setUndoInfo(FEMString undoInfo) throws NullPointerException {
-		if (undoInfo.equals(this.undoInfo)) return;
-		this.backup();
-		this.undoInfo = undoInfo;
-	}
-
-	public synchronized int getUndoLimit() {
-		return this.undoHistory.getLimit();
-	}
-
-	public synchronized void setUndoLimit(int undoLimit) throws IllegalArgumentException {
-		this.redoHistory.setLimit(undoLimit);
-		this.undoHistory.setLimit(undoLimit);
-	}
-
 	/** Diese Methode liefert nur dann {@code true}, wenn es Änderungen seit dem letzten {@link #commit()}, {@link #rollback()} bzw. der Erzeugung dieses
 	 * Wissenspuffersgibt gab. */
 	public synchronized boolean hasBackup() {
@@ -437,118 +436,21 @@ public class KBBuffer extends KBState {
 		return this.redoHistory;
 	}
 
-	{}
-
-	final DoneList redoHistory = new DoneList(this);
-
-	/** Dieses Feld speichert die umkehrbaren Änderungen und hat eine Potenz von zwei als Kapazität. */
-	final DoneList undoHistory = new DoneList(this);
-
-	FEMString undoInfo = FEMString.EMPTY;
-
 	/** Dieses Feld speichert die Sicherungskopie für {@link #commit()} und {@link #rollback()} oder {@code null}. */
-	KBState backup;
+	private KBState backup;
 
 	/** Dieses Feld speichert nur dann {@code true}, wenn {@link #backupEdges()} aufgerufen wurde. */
-	boolean backupEdges;
+	private boolean backupEdges;
 
 	/** Dieses Feld speichert nur dann {@code true}, wenn {@link #backupValues()} aufgerufen wurde. */
-	boolean backupValues;
+	private boolean backupValues;
 
-	private static class DoneList extends AbstractList2<FEMString> {
+	private FEMString undoInfo = FEMString.EMPTY;
 
-		@Override
-		public FEMString get(int index) {
-			synchronized (this.owner) {
-				if ((index < 0) || (index >= this.size)) throw new IndexOutOfBoundsException(index);
-				return this.items[(this.first + index) & (this.items.length - 1)].info;
-			}
+	/** Dieses Feld speichert die umkehrbaren Änderungen und hat eine Potenz von zwei als Kapazität. */
+	private final History undoHistory = new History(this);
 
-		}
-
-		public void popAll() {
-		}
-
-		@Override
-		public int size() {
-			synchronized (this.owner) {
-				return this.size;
-			}
-		}
-
-		DoneList(KBBuffer owner) {
-			this.owner = owner;
-			this.items = new HistoryItem[1];
-		}
-
-		private final KBBuffer owner;
-
-		private int size;
-
-		private int first;
-
-		private int limit;
-
-		private HistoryItem[] items;
-
-		int getLimit() {
-			return this.limit;
-		}
-
-		void setLimit(int limit) {
-			if ((limit < 0) || (limit > 536870912)) throw new IllegalArgumentException();
-			if (this.limit == limit) return;
-			// TODO
-
-			this.limit = limit;
-		}
-
-		HistoryItem getFirstItem() { // ersten eintrag lesen
-			return this.items[this.first];
-		}
-
-		void popFirstItem() { // ersten einrtag entfernen
-			var first = this.first;
-			this.items[first] = null;
-			this.first = (first + 1) & (this.items.length - 1);
-		}
-
-		void putFirstItem() { // platz für neuen ersten eintrag machen
-			if (this.size < this.limit) {
-				var length = this.items.length;
-				if (this.size < length) return;
-				var items = new HistoryItem[length + length];
-				var count = length - this.first;
-				System.arraycopy(this.items, this.first, items, 0, count);
-				System.arraycopy(this.items, 0, items, count, this.first);
-				this.first = 0;
-				this.items = items;
-			}
-		}
-
-		void addFirstItem(HistoryItem item) { // ersten eintrag anfügen
-			var size = this.size;
-			var mask = this.items.length - 1;
-			this.first = (this.first + mask) & mask;
-			if (size < this.limit) {
-				this.size = size + 1;
-			} else {
-				this.items[(this.first + size) & mask] = null;
-			}
-			this.items[this.first] = item;
-		}
-
-	}
-
-	private static class HistoryItem {
-
-		FEMString info;
-
-		byte[] insertData;
-
-		byte[] deleteData;
-
-	}
+	private final History redoHistory = new History(this);
 
 	private void insertAll(byte[] insertData) throws IOException {
 		ZIPDIS.inflate(insertData, zipdis -> {
@@ -1009,6 +911,101 @@ public class KBBuffer extends KBState {
 			if (ref == ref2) return true;
 		}
 		return false;
+	}
+
+	private static class History extends AbstractList2<FEMString> {
+
+		@Override
+		public FEMString get(int index) {
+			synchronized (this.owner) {
+				if ((index < 0) || (index >= this.size)) throw new IndexOutOfBoundsException(index);
+				return this.items[(this.first + index) & (this.items.length - 1)].info;
+			}
+
+		}
+
+		public void popAll() {
+		}
+
+		@Override
+		public int size() {
+			synchronized (this.owner) {
+				return this.size;
+			}
+		}
+
+		History(KBBuffer owner) {
+			this.owner = owner;
+			this.items = new HistoryItem[1];
+		}
+
+		private final KBBuffer owner;
+
+		private int size;
+
+		private int first;
+
+		private int limit;
+
+		private HistoryItem[] items;
+
+		int getLimit() {
+			return this.limit;
+		}
+
+		void setLimit(int limit) {
+			if ((limit < 0) || (limit > 536870912)) throw new IllegalArgumentException();
+			if (this.limit == limit) return;
+			// TODO
+
+			this.limit = limit;
+		}
+
+		HistoryItem getFirstItem() { // ersten eintrag lesen
+			return this.items[this.first];
+		}
+
+		void popFirstItem() { // ersten einrtag entfernen
+			var first = this.first;
+			this.items[first] = null;
+			this.first = (first + 1) & (this.items.length - 1);
+		}
+
+		void putFirstItem() { // platz für neuen ersten eintrag machen
+			if (this.size < this.limit) {
+				var length = this.items.length;
+				if (this.size < length) return;
+				var items = new HistoryItem[length + length];
+				var count = length - this.first;
+				System.arraycopy(this.items, this.first, items, 0, count);
+				System.arraycopy(this.items, 0, items, count, this.first);
+				this.first = 0;
+				this.items = items;
+			}
+		}
+
+		void addFirstItem(HistoryItem item) { // ersten eintrag anfügen
+			var size = this.size;
+			var mask = this.items.length - 1;
+			this.first = (this.first + mask) & mask;
+			if (size < this.limit) {
+				this.size = size + 1;
+			} else {
+				this.items[(this.first + size) & mask] = null;
+			}
+			this.items[this.first] = item;
+		}
+
+	}
+
+	private static class HistoryItem {
+
+		FEMString info;
+
+		byte[] insertData;
+
+		byte[] deleteData;
+
 	}
 
 }
