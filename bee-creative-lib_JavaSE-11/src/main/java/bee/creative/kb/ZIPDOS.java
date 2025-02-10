@@ -162,7 +162,7 @@ public class ZIPDOS extends DeflaterOutputStream {
 		}
 	}
 
-	public void writeStrings(FEMString[] values) throws IOException {
+	public void writeStrings(FEMString... values) throws IOException {
 		this.writeStrings(values, 0, values.length);
 	}
 
@@ -181,7 +181,7 @@ public class ZIPDOS extends DeflaterOutputStream {
 		this.writeBinaries(stringArray);
 	}
 
-	public void writeBinaries(byte[][] values) throws IOException {
+	public void writeBinaries(byte[]... values) throws IOException {
 		this.writeBinaries(values, 0, values.length);
 	}
 

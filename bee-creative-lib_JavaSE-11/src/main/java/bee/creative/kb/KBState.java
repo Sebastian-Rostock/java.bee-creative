@@ -277,7 +277,7 @@ public class KBState implements Emuable {
 			this.persistRefs(target);
 			this.persistEdgeMaps(target);
 			this.persistValueMaps(target);
-			this.persistHistorySize(target);
+			target.writeInt(0, 0);
 		}
 	}
 
@@ -851,13 +851,13 @@ public class KBState implements Emuable {
 	}
 
 	/** Diese Methode persistiert die Kopfdaten in folgender Struktur: {@code (MAGIC: int, indexRef: int, internalRef: int, externalRef: int)} */
-	private void persistRefs(ZIPDOS target) throws IOException {
+	void persistRefs(ZIPDOS target) throws IOException {
 		target.writeInt(KBState.MAGIC, this.indexRef, this.internalRef, this.externalRef);
 	}
 
 	/** Diese Methode persistiert die Kanen in folgender Struktur:
 	 * {@code (count: int, sourceCount: int, (sourceRef: int, targetRefCount: int, targetSetCount: int, (targetRef: int, relationRef: int)[targetRefCount], (relationRef: int, targetCount: int, targetRef: int[targetCount])[targetSetCount])[sourceCount])} */
-	private void persistEdgeMaps(ZIPDOS result) throws IOException {
+	void persistEdgeMaps(ZIPDOS result) throws IOException {
 		var count = 1;
 		var sourceMap = this.sourceMap;
 		var sourceCount = 0;
@@ -951,13 +951,9 @@ public class KBState implements Emuable {
 
 	/** Diese Methode persistiert die Textwete in folgender Struktur: (valueCount: int, valueRef: int[valueCount], valueHash: int[valueCount], valueSize:
 	 * int[valueCount], valueLength: int[valueCount], valueString: byte[valueSize][valueCount])</pre> */
-	private void persistValueMaps(ZIPDOS result) throws IOException {
+	void persistValueMaps(ZIPDOS result) throws IOException {
 		var valueMap = this.valueStrMap;
 		KBState.persistValueMap(result, valueMap);
-	}
-
-	private void persistHistorySize(ZIPDOS result) throws IOException {
-		result.writeInt(0, 0, 0);
 	}
 
 	static void persistValueMap(ZIPDOS result, ValueStrMap valueMap) throws IOException {

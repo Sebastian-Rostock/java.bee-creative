@@ -273,6 +273,38 @@ public class KBBuffer extends KBState {
 		this.reset();
 	}
 
+	@Override
+	public void persist(ZIPDOS target) throws IOException {
+		var that = new KBBuffer();
+		synchronized (this) {
+			that.reset(this.getBackup());
+			that.undoHistory.setAll(this.undoHistory);
+			that.redoHistory.setAll(this.redoHistory);
+		}
+		that.persistRefs(target);
+		that.persistEdgeMaps(target);
+		that.persistValueMaps(target);
+		that.persistHistoryItems(target, that.undoHistory);
+		that.persistHistoryItems(target, that.redoHistory);
+	}
+	
+	public void restore(ZIPDIS source) throws IOException{
+		// TODO
+	}
+
+	final void persistHistoryItems(ZIPDOS target, History history) throws IOException {
+		var limit = history.getLimit();
+		target.writeInt(limit);
+		if (limit == 0) return;
+		var size = history.size;
+		target.writeInt(size);
+		for (var i = 0; i < size; i++) {
+			var item = history.getItem(i);
+			target.writeStrings(item.info);
+			target.writeBinaries(item.insertData, item.deleteData);
+		}
+	}
+
 	/** Diese Methode füt diesem Wissenspuffer alle {@link #edges() Kanten} und {@link #values() Textwerte} des gegebenen {@link KBState Wissensstandes} hinzu und
 	 * übernimmt dessen Referenzen {@link #getIndexRef()}, {@link #getInternalRef()} und {@link #getExternalRef()}. */
 	public synchronized void insertAll(KBState inserts) {
@@ -325,8 +357,12 @@ public class KBBuffer extends KBState {
 			throw new IOError(shouldNotHappen);
 		} finally {
 			if (!okay) {
-				this.rollback();
+				this.reset(this.backup);
 			}
+			this.undoInfo = FEMString.EMPTY;
+			this.backup = null;
+			this.backupEdges = false;
+			this.backupValues = false;
 		}
 		return true;
 	}
@@ -340,10 +376,8 @@ public class KBBuffer extends KBState {
 		this.backupValues();
 		var okay = false;
 		try {
-			var insertData = undoItem.insertData;
-			this.deleteAll(insertData);
-			var deleteData = undoItem.deleteData;
-			this.insertAll(deleteData);
+			this.deleteAll(undoItem.insertData);
+			this.insertAll(undoItem.deleteData);
 			this.valueStrMap.pack();
 			this.valueRefMap.pack();
 			this.redoHistory.addFirstItem(undoItem);
@@ -353,8 +387,12 @@ public class KBBuffer extends KBState {
 			throw new IOError(shouldNotHappen);
 		} finally {
 			if (!okay) {
-				this.rollback();
+				this.reset(this.backup);
 			}
+			this.undoInfo = FEMString.EMPTY;
+			this.backup = null;
+			this.backupEdges = false;
+			this.backupValues = false;
 		}
 		return true;
 	}
@@ -452,31 +490,6 @@ public class KBBuffer extends KBState {
 
 	private final History redoHistory = new History(this);
 
-	private void insertAll(byte[] insertData) throws IOException {
-		ZIPDIS.inflate(insertData, zipdis -> {
-			var inserts = new KBState();
-			inserts.restoreRefs(zipdis);
-			this.indexRef = inserts.indexRef;
-			this.internalRef = inserts.internalRef;
-			this.externalRef = inserts.externalRef;
-			inserts.restoreEdgeMaps(zipdis, this::insertEdge);
-			var count = zipdis.readInt(1)[0];
-			inserts.restoreValueMaps(zipdis, count, this::insertValue);
-			return inserts;
-		});
-	}
-
-	private void deleteAll(byte[] insertData) throws IOException {
-		ZIPDIS.inflate(insertData, zipdis -> {
-			var deletes = new KBState();
-			deletes.restoreRefs(zipdis);
-			deletes.restoreEdgeMaps(zipdis, this::deleteEdge);
-			var count = zipdis.readInt(1)[0];
-			deletes.restoreValueMaps(zipdis, count, this::deleteValue);
-			return deletes;
-		});
-	}
-
 	private void backup() {
 		if (this.backup != null) return;
 		this.backup = new KBState(this);
@@ -528,6 +541,31 @@ public class KBBuffer extends KBState {
 			internalRef++;
 		}
 		return internalRef;
+	}
+
+	private void insertAll(byte[] insertData) throws IOException {
+		ZIPDIS.inflate(insertData, zipdis -> {
+			var inserts = new KBState();
+			inserts.restoreRefs(zipdis);
+			this.indexRef = inserts.indexRef;
+			this.internalRef = inserts.internalRef;
+			this.externalRef = inserts.externalRef;
+			inserts.restoreEdgeMaps(zipdis, this::insertEdge);
+			var count = zipdis.readInt(1)[0];
+			inserts.restoreValueMaps(zipdis, count, this::insertValue);
+			return inserts;
+		});
+	}
+
+	private void deleteAll(byte[] insertData) throws IOException {
+		ZIPDIS.inflate(insertData, zipdis -> {
+			var deletes = new KBState();
+			deletes.restoreRefs(zipdis);
+			deletes.restoreEdgeMaps(zipdis, this::deleteEdge);
+			var count = zipdis.readInt(1)[0];
+			deletes.restoreValueMaps(zipdis, count, this::deleteValue);
+			return deletes;
+		});
 	}
 
 	private boolean insertEdge(int sourceRef, int targetRef, int relationRef) {
@@ -919,12 +957,24 @@ public class KBBuffer extends KBState {
 		public FEMString get(int index) {
 			synchronized (this.owner) {
 				if ((index < 0) || (index >= this.size)) throw new IndexOutOfBoundsException(index);
-				return this.items[(this.first + index) & (this.items.length - 1)].info;
+				return this.getItem(index).info;
 			}
 
 		}
 
+		HistoryItem getItem(int index) {
+			return this.items[(this.first + index) & (this.items.length - 1)];
+		}
+
+		public void setAll(History that) {
+			this.size = that.size;
+			this.items = that.items.clone();
+			this.first = that.first;
+			this.limit = that.limit;
+		}
+
 		public void popAll() {
+			// TODO
 		}
 
 		@Override
@@ -938,16 +988,6 @@ public class KBBuffer extends KBState {
 			this.owner = owner;
 			this.items = new HistoryItem[1];
 		}
-
-		private final KBBuffer owner;
-
-		private int size;
-
-		private int first;
-
-		private int limit;
-
-		private HistoryItem[] items;
 
 		int getLimit() {
 			return this.limit;
@@ -976,9 +1016,7 @@ public class KBBuffer extends KBState {
 				var length = this.items.length;
 				if (this.size < length) return;
 				var items = new HistoryItem[length + length];
-				var count = length - this.first;
-				System.arraycopy(this.items, this.first, items, 0, count);
-				System.arraycopy(this.items, 0, items, count, this.first);
+				this.getAllItems(items);
 				this.first = 0;
 				this.items = items;
 			}
@@ -995,6 +1033,26 @@ public class KBBuffer extends KBState {
 			}
 			this.items[this.first] = item;
 		}
+
+		void getAllItems(HistoryItem[] items) {
+			var remain = items.length - this.first;
+			if (remain < this.size) {
+				System.arraycopy(this.items, this.first, items, 0, remain);
+				System.arraycopy(this.items, 0, items, remain, this.size - remain);
+			} else {
+				System.arraycopy(this.items, this.first, items, 0, this.size);
+			}
+		}
+
+		private final KBBuffer owner;
+
+		private int size;
+
+		private int first;
+
+		private int limit;
+
+		private HistoryItem[] items;
 
 	}
 
