@@ -33,8 +33,8 @@ class TEST {
 			System.out.println(buf);
 			System.out.println(buf.values().exceptValueRefs(-2));
 
-			var persisted = ZIPDOS.deflate(buf::persist);
-			var restored = ZIPDIS.inflate(persisted, KBState::from);
+			var persisted = KBCodec.persistState(buf);
+			var restored = KBCodec.restoreState(persisted);
 			System.out.println(restored);
 		}
 		new TEST();
@@ -116,11 +116,11 @@ class TEST {
 		System.out.println(Objects.toStringCall(true, true, this, "linkMap", this.linkMap, "typeMap", this.typeMap, "buffer", this.buffer));
 
 		System.out.println("PERSIST");
-		var persisted = Tester.get(() -> ZIPDOS.deflate(this.buffer::persist));
+		var persisted = Tester.get(() -> KBCodec.persistState(this.buffer));
 		System.out.println(Integers.printSize(persisted.length));
 
 		System.out.println("RESTORE");
-		var restored = Tester.get(() -> ZIPDIS.inflate(persisted, KBState::from));
+		var restored = Tester.get(() -> KBCodec.restoreState(persisted));
 		System.out.println(Integers.printSize(restored.emu()));
 
 //		System.out.println("INSERTS");

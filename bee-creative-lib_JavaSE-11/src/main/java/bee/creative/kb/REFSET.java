@@ -233,6 +233,12 @@ public final class REFSET {
 		return REFSET.tryCopy(refset, mask);
 	}
 
+	public static int[] growAndPutRef(int[] refset, int ref) {
+		refset = REFSET.grow(refset);
+		REFSET.putRef(refset, ref);
+		return refset;
+	}
+
 	/** Diese Methode liefert die gegebenen Referenzmenge {@code refset}, wenn sie die minimale Kapazität besitzt oder darin bei halber Kapazität kein Platz für
 	 * eine weitere Referenz ist. Andernfalls liefert sie eine Kopie mit halber Kapazität. */
 	public static int[] pack(int[] refset) {

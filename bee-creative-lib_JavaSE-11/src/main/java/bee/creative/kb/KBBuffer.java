@@ -273,36 +273,10 @@ public class KBBuffer extends KBState {
 		this.reset();
 	}
 
-	@Override
-	public void persist(ZIPDOS target) throws IOException {
-		var that = new KBBuffer();
-		synchronized (this) {
-			that.reset(this.getBackup());
-			that.undoHistory.setAll(this.undoHistory);
-			that.redoHistory.setAll(this.redoHistory);
-		}
-		that.persistRefs(target);
-		that.persistEdgeMaps(target);
-		that.persistValueMaps(target);
-		that.persistHistoryItems(target, that.undoHistory);
-		that.persistHistoryItems(target, that.redoHistory);
-	}
-	
-	public void restore(ZIPDIS source) throws IOException{
-		// TODO
-	}
+ 
 
-	final void persistHistoryItems(ZIPDOS target, History history) throws IOException {
-		var limit = history.getLimit();
-		target.writeInt(limit);
-		if (limit == 0) return;
-		var size = history.size;
-		target.writeInt(size);
-		for (var i = 0; i < size; i++) {
-			var item = history.getItem(i);
-			target.writeStrings(item.info);
-			target.writeBinaries(item.insertData, item.deleteData);
-		}
+	public void restore(ZIPDIS source) throws IOException {
+		// TODO
 	}
 
 	/** Diese Methode füt diesem Wissenspuffer alle {@link #edges() Kanten} und {@link #values() Textwerte} des gegebenen {@link KBState Wissensstandes} hinzu und
@@ -412,16 +386,16 @@ public class KBBuffer extends KBState {
 					inserts.indexRef = this.indexRef;
 					inserts.internalRef = this.internalRef;
 					inserts.externalRef = this.externalRef;
-					KBState.selectInserts(that, this, inserts::insertEdgeNowIntoSourceMap, inserts::insertValueNowIntoStrMap);
-					undo.insertData = inserts.persist();
+					KBState.selectInserts(that, this, inserts::insertEdgeIntoSourceMap, inserts::insertValueNowIntoStrMap);
+					undo.insertData = KBCodec.persistState(inserts);
 				}
 				{
-					var deleteState = new KBState();
-					deleteState.indexRef = that.indexRef;
-					deleteState.internalRef = that.internalRef;
-					deleteState.externalRef = that.externalRef;
-					KBState.selectInserts(this, that, deleteState::insertEdgeNowIntoSourceMap, deleteState::insertValueNowIntoStrMap);
-					undo.deleteData = deleteState.persist();
+					var deletes = new KBState();
+					deletes.indexRef = that.indexRef;
+					deletes.internalRef = that.internalRef;
+					deletes.externalRef = that.externalRef;
+					KBState.selectInserts(this, that, deletes::insertEdgeIntoSourceMap, deletes::insertValueNowIntoStrMap);
+					undo.deleteData = KBCodec.persistState(deletes);
 				}
 				this.undoHistory.addFirstItem(undo);
 				this.redoHistory.popAll();
@@ -486,9 +460,9 @@ public class KBBuffer extends KBState {
 	private FEMString undoInfo = FEMString.EMPTY;
 
 	/** Dieses Feld speichert die umkehrbaren Änderungen und hat eine Potenz von zwei als Kapazität. */
-	private final History undoHistory = new History(this);
+	final History undoHistory = new History(this);
 
-	private final History redoHistory = new History(this);
+	  final History redoHistory = new History(this);
 
 	private void backup() {
 		if (this.backup != null) return;
@@ -546,13 +520,10 @@ public class KBBuffer extends KBState {
 	private void insertAll(byte[] insertData) throws IOException {
 		ZIPDIS.inflate(insertData, zipdis -> {
 			var inserts = new KBState();
-			inserts.restoreRefs(zipdis);
+			KBCodec.restoreState(zipdis, inserts, this::insertEdge, this::insertValue);
 			this.indexRef = inserts.indexRef;
 			this.internalRef = inserts.internalRef;
 			this.externalRef = inserts.externalRef;
-			inserts.restoreEdgeMaps(zipdis, this::insertEdge);
-			var count = zipdis.readInt(1)[0];
-			inserts.restoreValueMaps(zipdis, count, this::insertValue);
 			return inserts;
 		});
 	}
@@ -560,10 +531,7 @@ public class KBBuffer extends KBState {
 	private void deleteAll(byte[] insertData) throws IOException {
 		ZIPDIS.inflate(insertData, zipdis -> {
 			var deletes = new KBState();
-			deletes.restoreRefs(zipdis);
-			deletes.restoreEdgeMaps(zipdis, this::deleteEdge);
-			var count = zipdis.readInt(1)[0];
-			deletes.restoreValueMaps(zipdis, count, this::deleteValue);
+			KBCodec.restoreState(zipdis, deletes, this::deleteEdge, this::deleteValue);
 			return deletes;
 		});
 	}
@@ -951,7 +919,7 @@ public class KBBuffer extends KBState {
 		return false;
 	}
 
-	private static class History extends AbstractList2<FEMString> {
+	static class History extends AbstractList2<FEMString> {
 
 		@Override
 		public FEMString get(int index) {
@@ -1046,7 +1014,7 @@ public class KBBuffer extends KBState {
 
 		private final KBBuffer owner;
 
-		private int size;
+		int size;
 
 		private int first;
 
@@ -1056,7 +1024,7 @@ public class KBBuffer extends KBState {
 
 	}
 
-	private static class HistoryItem {
+	static class HistoryItem {
 
 		FEMString info;
 

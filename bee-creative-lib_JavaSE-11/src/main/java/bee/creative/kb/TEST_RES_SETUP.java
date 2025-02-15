@@ -39,13 +39,13 @@ public class TEST_RES_SETUP {
 					System.err.print("persist: ");
 					Tester.run(() -> {
 						try (var zipdos = new ZIPDOS(new FileOutputStream(new File(root, "RES.kbf")))) {
-							this.buffer.persist(zipdos);
+							KBCodec.persistState(zipdos,buffer);
 						}
 					});
 					System.err.print("restore: ");
 					var r = Tester.get(() -> {
 						try (var zipdis = new ZIPDIS(new FileInputStream(new File(root, "RES.kbf")))) {
-							return KBState.from(zipdis);
+							return KBCodec.restoreState(zipdis);
 						}
 					});
 					this.buffer.putEdge(-1, -1, -1);

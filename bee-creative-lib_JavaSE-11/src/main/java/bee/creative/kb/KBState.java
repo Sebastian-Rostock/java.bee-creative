@@ -1,6 +1,5 @@
 package bee.creative.kb;
 
-import java.io.IOException;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Arrays;
 import java.util.Map.Entry;
@@ -21,7 +20,7 @@ import bee.creative.util.Iterators;
  * {@link #getTargetRefs() Zielreferenzen} aus effizient zugegriffen werden kann. Jedem Textwert ist eineindeutig eine {@link #getValueRef(FEMString)
  * Textreferenz} zugeordnet.
  * <p>
- * Eine Wissensstand kann in eine {@link #persist(ZIPDOS) Wissensabschrift} überführt werden.
+ * Eine Wissensstand kann in eine {@link KBCodec#persistState(KBState) Wissensabschrift} überführt werden.
  * <p>
  * Die über {@link #getIndexRef()}, {@link #getExternalRef()} und {@link #getInternalRef()} und bereitgestellten Referenzen haben Bedeutung für
  * {@link KBBuffer}.
@@ -33,15 +32,6 @@ public class KBState implements Emuable {
 
 	/** Dieses Feld speichert den leeren {@link KBState Wissensstand}. */
 	public static final KBState EMPTY = new KBState();
-
-	/** Diese Methode liefert einen neuen {@link KBState Wissensstand} zur gegebenen {@link #persist(ZIPDOS) Wissensabschrift}. */
-	public static KBState from(ZIPDIS source) throws IOException {
-		var result = new KBState();
-		result.restoreRefs(source);
-		result.restoreEdgeMaps(source);
-		result.restoreValueMaps(source);
-		return result;
-	}
 
 	/** Diese Methode liefert einen neuen {@link KBState Wissensstand} mit den gegebenen {@link KBEdge Kanten}. */
 	public static KBState from(KBEdge... edges) {
@@ -267,20 +257,6 @@ public class KBState implements Emuable {
 			+ this.valueStrMap.emu() + this.edges.emu() + this.values.emu();
 	}
 
-	public byte[] persist() throws IOException {
-		return ZIPDOS.deflate(this::persist);
-	}
-
-	/** Diese Methode fügt die Wissensabschrift dieses Wissensstandes an den gegebenen {@link ZIPDOS} an. */
-	public void persist(ZIPDOS target) throws IOException {
-		synchronized (this) {
-			this.persistRefs(target);
-			this.persistEdgeMaps(target);
-			this.persistValueMaps(target);
-			target.writeInt(0, 0);
-		}
-	}
-
 	@Override
 	public synchronized String toString() {
 		return Objects.toStringCall(true, true, this, "edges", this.edges, "values", this.values);
@@ -343,7 +319,7 @@ public class KBState implements Emuable {
 	 *
 	 * @param oldState alter Wissensstands.
 	 * @param newState neuer Wissensstands. */
-	static void selectInserts(KBState oldState, KBState newState, KBEdges.RUN edgesTask, KBValues.RUN valuesTask) {
+	static void selectInserts(KBState oldState, KBState newState, KBEdgesTask edgesTask, KBValuesTask valuesTask) {
 		if (oldState == newState) return;
 		var oldSourceMap = oldState.sourceMap;
 		var newSourceMap = newState.sourceMap;
@@ -442,7 +418,7 @@ public class KBState implements Emuable {
 		var oldValueStrMap = oldState.valueStrMap;
 		var newValueStrMap = newState.valueStrMap;
 		if (oldValueStrMap != newValueStrMap) {
-			newValueStrMap.fastForEach((KBValues.RUN)(valueRef, valueStr) -> {
+			newValueStrMap.fastForEach((KBValuesTask)(valueRef, valueStr) -> {
 				if (!valueStr.equals(oldValueStrMap.get(valueRef))) {
 					valuesTask.run(valueRef, valueStr);
 				}
@@ -520,7 +496,7 @@ public class KBState implements Emuable {
 		this.valueStrMap = that.valueStrMap;
 	}
 
-	final void forEachEdge(KBEdges.RUN task) {
+	final void forEachEdge(KBEdgesTask task) {
 		this.forEachEdge(null, null, null, null, null, null, task);
 	}
 
@@ -531,7 +507,7 @@ public class KBState implements Emuable {
 	// TODO forEachRelation auto forEachSourceRelation vs. forEachTargetRelation
 
 	final void forEachEdge(int[] acceptSourceRefset_or_null, int[] refuseSourceRefset_or_null, int[] acceptTargetRefset_or_null, int[] refuseTargetRefset_or_null,
-		int[] acceptRelationRefset_or_null, int[] refuseRelationRefset_or_null, KBEdges.RUN task) {
+		int[] acceptRelationRefset_or_null, int[] refuseRelationRefset_or_null, KBEdgesTask task) {
 		var sourceMap = this.sourceMap;
 		var targetMap = this.targetMap;
 		var allSources = (acceptSourceRefset_or_null == null) && (refuseSourceRefset_or_null == null);
@@ -604,15 +580,15 @@ public class KBState implements Emuable {
 		}
 	}
 
-	final void forEachValue(KBValues.RUN task) {
+	final void forEachValue(KBValuesTask task) {
 		this.forEachValue(null, null, task);
 	}
 
-	final void forEachValue(int[] acceptValueRefset_or_null, int[] refuseValueRefset_or_null, KBValues.RUN task) {
+	final void forEachValue(int[] acceptValueRefset_or_null, int[] refuseValueRefset_or_null, KBValuesTask task) {
 		if ((acceptValueRefset_or_null == null) && (refuseValueRefset_or_null == null)) {
 			this.valueStrMap.fastForEach(task);
 		} else {
-			this.valueStrMap.fastForEach((KBValues.RUN)(valueRef, valueStr) -> {
+			this.valueStrMap.fastForEach((KBValuesTask)(valueRef, valueStr) -> {
 				if (REFSET.isValid(valueRef, acceptValueRefset_or_null, refuseValueRefset_or_null)) {
 					task.run(valueRef, valueStr);
 				}
@@ -718,7 +694,7 @@ public class KBState implements Emuable {
 			return new ITER();
 		}
 
-		public void fastForEach(KBValues.RUN task) {
+		public void fastForEach(KBValuesTask task) {
 			for (var index = this.capacityImpl() - 1; 0 <= index; index--) {
 				var valueStr = this.customGetValue(index);
 				if (valueStr != null) {
@@ -778,22 +754,20 @@ public class KBState implements Emuable {
 
 	}
 
-	private static final int MAGIC = 0xCBFF2501;
-
 	final void insertEdgeNow(int sourceRef, int targetRef, int relationRef) {
-		this.insertEdgeNowIntoSourceMap(sourceRef, targetRef, relationRef);
-		this.insertEdgeNowIntoTargetMap(sourceRef, targetRef, relationRef);
+		this.insertEdgeIntoSourceMap(sourceRef, targetRef, relationRef);
+		this.insertEdgeIntoTargetMap(sourceRef, targetRef, relationRef);
 	}
 
-	final void insertEdgeNowIntoTargetMap(int sourceRef, int targetRef, int relationRef) {
-		this.targetMap = this.insertEdgeNowIntoMap(this.targetMap, targetRef, sourceRef, relationRef);
+	final void insertEdgeIntoTargetMap(int sourceRef, int targetRef, int relationRef) {
+		this.targetMap = KBState.insertEdgeIntoMapSRT(this.targetMap, targetRef, relationRef, sourceRef);
 	}
 
-	final void insertEdgeNowIntoSourceMap(int sourceRef, int targetRef, int relationRef) {
-		this.sourceMap = this.insertEdgeNowIntoMap(this.sourceMap, sourceRef, targetRef, relationRef);
+	final void insertEdgeIntoSourceMap(int sourceRef, int targetRef, int relationRef) {
+		this.sourceMap = KBState.insertEdgeIntoMapSRT(this.sourceMap, sourceRef, relationRef, targetRef);
 	}
 
-	final Object[] insertEdgeNowIntoMap(Object[] sourceMap, int sourceRef, int targetRef, int relationRef) {
+	static Object[] insertEdgeIntoMapSRT(Object[] sourceMap, int sourceRef, int relationRef, int targetRef) {
 
 		sourceMap = REFMAP.grow(sourceMap);
 
@@ -847,188 +821,6 @@ public class KBState implements Emuable {
 			this.valueStrMap.put(newValueRef, oldValueStr);
 			this.valueRefMap.remove(newValueStr);
 			throw new IllegalArgumentException();
-		}
-	}
-
-	/** Diese Methode persistiert die Kopfdaten in folgender Struktur: {@code (MAGIC: int, indexRef: int, internalRef: int, externalRef: int)} */
-	void persistRefs(ZIPDOS target) throws IOException {
-		target.writeInt(KBState.MAGIC, this.indexRef, this.internalRef, this.externalRef);
-	}
-
-	/** Diese Methode persistiert die Kanen in folgender Struktur:
-	 * {@code (count: int, sourceCount: int, (sourceRef: int, targetRefCount: int, targetSetCount: int, (targetRef: int, relationRef: int)[targetRefCount], (relationRef: int, targetCount: int, targetRef: int[targetCount])[targetSetCount])[sourceCount])} */
-	void persistEdgeMaps(ZIPDOS result) throws IOException {
-		var count = 1;
-		var sourceMap = this.sourceMap;
-		var sourceCount = 0;
-		for (var sourceIdx = sourceMap.length - 1; 0 < sourceIdx; sourceIdx--) {
-			var relationMap = KBState.asRefMap(sourceMap[sourceIdx]);
-			if (relationMap != null) {
-				var relationSize = 0;
-				for (var relationIdx = relationMap.length - 1; 0 < relationIdx; relationIdx--) {
-					var targetVal = KBState.asRefVal(relationMap[relationIdx]);
-					if (targetVal != null) {
-						if (KBState.isRef(targetVal)) {
-							relationSize += /*relationRef, targetRef*/ 2;
-						} else {
-							var targetCount = REFSET.size(targetVal);
-							if (targetCount == 1) {
-								relationSize += /*relationRef, targetRef*/ 2;
-							} else if (targetCount > 0) {
-								relationSize += /*relationRef, targetCount*/ 2 + /*targetRef*/ targetCount;
-							}
-						}
-					}
-				}
-				if (relationSize != 0) {
-					count += /*sourceRef, targetRefCount, targetRefSetCount*/ 3 + relationSize;
-					sourceCount++;
-				}
-			}
-		}
-		var index = 0;
-		var array = new int[count + 1];
-		array[index++] = count;
-		array[index++] = sourceCount;
-		for (var sourceIdx = sourceMap.length - 1; 0 < sourceIdx; sourceIdx--) {
-			var relationMap = KBState.asRefMap(sourceMap[sourceIdx]);
-			if (relationMap != null) {
-				var targetRefCount = 0;
-				var targetSetCount = 0;
-				for (var relationIdx = relationMap.length - 1; 0 < relationIdx; relationIdx--) {
-					var targetVal = KBState.asRefVal(relationMap[relationIdx]);
-					if (targetVal != null) {
-						if (KBState.isRef(targetVal)) {
-							targetRefCount++;
-						} else {
-							var targetCount = REFSET.size(targetVal);
-							if (targetCount == 1) {
-								targetRefCount++;
-							} else if (targetCount > 0) {
-								targetSetCount++;
-							}
-						}
-					}
-				}
-				if ((targetRefCount != 0) || (targetSetCount != 0)) {
-					array[index++] = REFSET.getRef(REFMAP.getKeys(sourceMap), sourceIdx);
-					array[index++] = targetRefCount;
-					array[index++] = targetSetCount;
-					if (targetRefCount != 0) {
-						for (var relationIdx = relationMap.length - 1; 0 < relationIdx; relationIdx--) {
-							var targetVal = KBState.asRefVal(relationMap[relationIdx]);
-							if ((targetVal != null) && (KBState.isRef(targetVal) || (REFSET.size(targetVal) == 1))) {
-								array[index++] = KBState.asRef(targetVal);
-								array[index++] = REFSET.getRef(REFMAP.getKeys(relationMap), relationIdx);
-							}
-						}
-					}
-					if (targetSetCount != 0) {
-						for (var relationIdx = relationMap.length - 1; 0 < relationIdx; relationIdx--) {
-							var targetVal = KBState.asRefVal(relationMap[relationIdx]);
-							if (targetVal != null) {
-								if (!KBState.isRef(targetVal)) {
-									var targetCount = REFSET.size(targetVal);
-									if (targetCount > 1) {
-										array[index++] = REFSET.getRef(REFMAP.getKeys(relationMap), relationIdx);
-										array[index++] = targetCount;
-										for (var targetIdx = targetVal.length - 1; 3 < targetIdx; targetIdx -= 3) {
-											var targetRef = targetVal[targetIdx];
-											if (targetRef != 0) {
-												array[index++] = targetRef;
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		result.writeInt(array);
-	}
-
-	/** Diese Methode persistiert die Textwete in folgender Struktur: (valueCount: int, valueRef: int[valueCount], valueHash: int[valueCount], valueSize:
-	 * int[valueCount], valueLength: int[valueCount], valueString: byte[valueSize][valueCount])</pre> */
-	void persistValueMaps(ZIPDOS result) throws IOException {
-		var valueMap = this.valueStrMap;
-		KBState.persistValueMap(result, valueMap);
-	}
-
-	static void persistValueMap(ZIPDOS result, ValueStrMap valueMap) throws IOException {
-		// TODO je 1024 werte blockweise
-		var valueCount = valueMap.size();
-		var refArray = new int[valueCount];
-		var strArray = new FEMString[valueCount];
-		var iter = valueMap.fastIterator();
-		for (var i = 0; iter.hasNext(); i++) {
-			var entry = iter.next();
-			refArray[i] = entry.getKey();
-			strArray[i] = entry.getValue();
-		}
-		result.writeInt(valueCount);
-		result.writeInt(refArray);
-		result.writeStrings(strArray);
-	}
-
-	final void restoreRefs(ZIPDIS source) throws IOException {
-		var header = source.readInt(4);
-		if (header[0] != KBState.MAGIC) throw new IOException();
-		this.indexRef = header[1];
-		this.internalRef = header[2];
-		this.externalRef = header[3];
-	}
-
-	final void restoreEdgeMaps(ZIPDIS source) throws IOException {
-		this.restoreEdgeMaps(source, this::insertEdgeNow);
-	}
-
-	final void restoreEdgeMaps(ZIPDIS source, KBEdges.RUN task) throws IOException {
-		var count = source.readInt(1)[0];
-		// TODO mehrere blöcke, count array lesen, je count aufrufen
-		this.restoreEdgeMaps(source, count, task);
-	}
-
-	final void restoreEdgeMaps(ZIPDIS source, int count, KBEdges.RUN task) throws IOException {
-		var index = 0;
-		var array = source.readInt(count);
-		var sourceRefCount = array[index++];
-		while (0 < sourceRefCount--) {
-			var sourceRef = array[index++];
-			var targetRefCount = array[index++];
-			var targetSetCount = array[index++];
-			while (0 < targetRefCount--) {
-				var targetRef = array[index++];
-				var relationRef = array[index++];
-				task.run(sourceRef, targetRef, relationRef);
-			}
-			while (0 < targetSetCount--) {
-				var relationRef = array[index++];
-				var targetCount = array[index++];
-				while (0 < targetCount--) {
-					var targetRef = array[index++];
-					task.run(sourceRef, targetRef, relationRef);
-				}
-			}
-		}
-	}
-
-	final void restoreValueMaps(ZIPDIS source) throws IOException {
-		var count = source.readInt(1)[0];
-		this.valueRefMap.allocate(count);
-		this.valueStrMap.allocate(count);
-		restoreValueMaps(source, count, (valueRef, valueStr) -> {
-			this.valueRefMap.put(valueStr, valueRef);
-			this.valueStrMap.put(valueRef, valueStr);
-		});
-	}
-
-	final void restoreValueMaps(ZIPDIS source, int count, KBValues.RUN task) throws IOException {
-		var refArray = source.readInt(count);
-		var strArray = source.readStrings(count);
-		for (var i = 0; i < count; i++) {
-			task.run(refArray[i], strArray[i]);
 		}
 	}
 

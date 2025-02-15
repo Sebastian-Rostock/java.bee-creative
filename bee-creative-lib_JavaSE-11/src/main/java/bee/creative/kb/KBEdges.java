@@ -69,8 +69,8 @@ public class KBEdges implements Iterable2<KBEdge>, Emuable, UseToString {
 				refuseRelationRefset));
 	}
 
-	/** Diese Methode übergibt die Referenzen der {@link KBEdge Kanten} an {@link RUN#run(int, int, int) task.run()}. */
-	public void forEach(RUN task) {
+	/** Diese Methode übergibt die Referenzen der {@link KBEdge Kanten} an {@link KBEdgesTask#run(int, int, int) task.run()}. */
+	public void forEach(KBEdgesTask task) {
 		this.owner.forEachEdge(this.acceptSourceRefset, this.refuseSourceRefset, this.acceptTargetRefset, this.refuseTargetRefset, this.acceptRelationRefset,
 			this.refuseRelationRefset, task);
 	}
@@ -95,15 +95,6 @@ public class KBEdges implements Iterable2<KBEdge>, Emuable, UseToString {
 	@Override
 	public String toString() {
 		return Objects.printIterable(true, 20, this);
-	}
-
-	/** Diese Schnittstelle definiert den Empfänger der Referenzen für {@link KBEdges#forEach(RUN)}. */
-	public interface RUN {
-
-		/** Diese Methode verarbeitet die gegebene Quellreferenz {@code sourceRef}, Zielreferenz {@code targetRef} und Beziehungsreferenz {@code relationRef} einer
-		 * {@link KBEdge Kante}. */
-		void run(int sourceRef, int targetRef, int relationRef);
-
 	}
 
 	KBEdges(KBState owner) {

@@ -35,8 +35,8 @@ public class KBValues implements Iterable2<Entry<Integer, FEMString>>, Emuable, 
 			acceptValueRefset -> new KBValues(this.owner, acceptValueRefset, null), refuseValueRefset -> new KBValues(this.owner, null, refuseValueRefset));
 	}
 
-	/** Diese Methode übergibt die Textwerte und deren Referenzen an {@link RUN#run(int, FEMString) task.run()}. */
-	public void forEach(RUN task) {
+	/** Diese Methode übergibt die Textwerte und deren Referenzen an {@link KBValuesTask#run(int, FEMString) task.run()}. */
+	public void forEach(KBValuesTask task) {
 		this.owner.forEachValue(this.acceptValueRefset, this.refuseValueRefset, task);
 	}
 
@@ -58,14 +58,6 @@ public class KBValues implements Iterable2<Entry<Integer, FEMString>>, Emuable, 
 	@Override
 	public String toString() {
 		return Objects.printIterable(true, 20, this);
-	}
-
-	/** Diese Schnittstelle definiert den Empfänger für {@link KBValues#forEach(RUN)}. */
-	public interface RUN {
-
-		/** Diese Methode verarbeitet den gegebenen Textwert {@code valueStr} mit der gegebenen Textreferenz {@code valueRef}. */
-		void run(int valueRef, FEMString valueStr);
-
 	}
 
 	KBValues(KBState owner) {
