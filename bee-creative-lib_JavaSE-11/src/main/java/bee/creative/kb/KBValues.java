@@ -1,20 +1,18 @@
 package bee.creative.kb;
 
-import java.util.Map.Entry;
 import java.util.function.Consumer;
 import bee.creative.emu.EMU;
 import bee.creative.emu.Emuable;
 import bee.creative.fem.FEMString;
 import bee.creative.lang.Objects;
 import bee.creative.lang.Objects.UseToString;
-import bee.creative.util.Entries;
 import bee.creative.util.Iterable2;
 import bee.creative.util.Iterator2;
 
 /** Diese Klasse implementiert das {@link Iterable2} der Textwerte eines {@link KBState Wissensstands}.
  *
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public class KBValues implements Iterable2<Entry<Integer, FEMString>>, Emuable, UseToString {
+public class KBValues implements Iterable2<KBValue>, Emuable, UseToString {
 
 	/** Diese Methode liefert den {@link KBState Wissensstand}, dessen {@link FEMString Texterte} iteriert werden. */
 	public KBState owner() {
@@ -41,12 +39,12 @@ public class KBValues implements Iterable2<Entry<Integer, FEMString>>, Emuable, 
 	}
 
 	@Override
-	public void forEach(Consumer<? super Entry<Integer, FEMString>> action) {
-		this.forEach((valueRef, valueStr) -> action.accept(Entries.from(valueRef, valueStr)));
+	public void forEach(Consumer<? super KBValue> action) {
+		this.forEach((valueRef, valueStr) -> action.accept(new KBValue(valueRef, valueStr)));
 	}
 
 	@Override
-	public Iterator2<Entry<Integer, FEMString>> iterator() {
+	public Iterator2<KBValue> iterator() {
 		return this.owner.valueIterator(this.acceptValueRefset, this.refuseValueRefset);
 	}
 

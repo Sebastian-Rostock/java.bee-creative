@@ -118,8 +118,7 @@ class KBCodec {
 	static void restoreState(ZIPDIS source, KBState target, KBEdgesTask edgeTask, KBValuesTask valueTask) throws IOException {
 		KBCodec.___restoreStateRefs(source, target);
 		KBCodec.restoreEdges(source, edgeTask);
-		source.readInt(1); // valueCount
-		KBCodec.restoreValues(source, valueTask);
+		KBCodec.___restoreValues(source, valueTask);
 	}
 
 	static void ___restoreStateRefs(ZIPDIS source, KBState target) throws IOException {
@@ -134,13 +133,13 @@ class KBCodec {
 	}
 
 	static void restoreStateValues(ZIPDIS source, KBState target) throws IOException {
-		var valueCount = source.readInt(1)[0];
-		target.valueRefMap.allocate(valueCount);
-		target.valueStrMap.allocate(valueCount);
-		KBCodec.restoreValues(source, (valueRef, valueStr) -> {
+		target.valueRefMap.allocate(65536);
+		target.valueStrMap.allocate(65536);
+		KBCodec.___restoreValues(source, (valueRef, valueStr) -> {
 			target.valueRefMap.put(valueStr, valueRef);
 			target.valueStrMap.put(valueRef, valueStr);
 		});
+		target.valueRefMap.pack();
 	}
 
 	static void restoreEdges(ZIPDIS source, KBEdgesTask task) throws IOException {
@@ -199,16 +198,19 @@ class KBCodec {
 		return true;
 	}
 
-	static void restoreValues(ZIPDIS source, KBValuesTask task) throws IOException {
-		// (partCount: int, partSize: int[partCount], (ref: int[partSize], str: BIN[partSize])[partCount])
+	static void ___restoreValues(ZIPDIS source, KBValuesTask task) throws IOException {
+		while (___restoreValuesPage(source, task)) {}
+	}
 
+	static boolean ___restoreValuesPage(ZIPDIS source, KBValuesTask task) throws IOException {
 		var count = source.readInt(1)[0];
-
+		if (count == 0) return false;
 		var refArray = source.readInt(count);
 		var strArray = source.readStrings(count);
 		for (var i = 0; i < count; i++) {
 			task.run(refArray[i], strArray[i]);
 		}
+		return true;
 	}
 
 	/** Diese Methode persistiert die Kanen in folgender Struktur:
@@ -392,4 +394,28 @@ class KBCodec {
 		result.writeStrings(strArray);
 	}
 
+	
+	/** Diese Methode persistiert die Textwete in folgender Struktur: (valueCount: int, valueRef: int[valueCount], valueHash: int[valueCount], valueSize:
+	 * int[valueCount], valueLength: int[valueCount], valueString: byte[valueSize][valueCount])</pre> */
+	static void persistValuesPage(ZIPDOS result, ValueStrMap valueMap) throws IOException {
+
+		var valueCount = valueMap.size();
+		result.writeInt(valueCount);
+
+		// TODO je 1024 werte blockweise
+
+		result.writeInt(valueCount);
+
+		var refArray = new int[valueCount];
+		var strArray = new FEMString[valueCount];
+		var iter = valueMap.fastIterator();
+		for (var i = 0; iter.hasNext(); i++) {
+			var entry = iter.next();
+			refArray[i] = entry.getKey();
+			strArray[i] = entry.getValue();
+		}
+		result.writeInt(refArray);
+		result.writeStrings(strArray);
+	}
+	
 }

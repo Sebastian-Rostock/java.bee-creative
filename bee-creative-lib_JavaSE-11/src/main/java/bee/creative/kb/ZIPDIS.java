@@ -23,13 +23,13 @@ import bee.creative.fem.FEMString.CompactStringUTF8;
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class ZIPDIS extends InflaterInputStream {
 
-	public static <T> T inflate(byte[] source, TASK<T> task) throws IOException {
+	public static <T> T inflate(byte[] source, RESTORE<T> task) throws IOException {
 		return ZIPDIS.inflate(source, ByteOrder.nativeOrder(), task);
 	}
 
-	public static <T> T inflate(byte[] source, ByteOrder order, TASK<T> task) throws IOException {
+	public static <T> T inflate(byte[] source, ByteOrder order, RESTORE<T> task) throws IOException {
 		try (var zipdis = new ZIPDIS(new ByteArrayInputStream(source), order)) {
-			return task.run(zipdis);
+			return task.restore(zipdis);
 		}
 	}
 
@@ -182,9 +182,9 @@ public class ZIPDIS extends InflaterInputStream {
 		return values;
 	}
 
-	public interface TASK<T> {
+	public interface RESTORE<T> {
 
-		T run(ZIPDIS source) throws IOException;
+		T restore(ZIPDIS source) throws IOException;
 
 	}
 

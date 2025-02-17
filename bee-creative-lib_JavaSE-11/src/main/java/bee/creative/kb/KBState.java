@@ -1,8 +1,6 @@
 package bee.creative.kb;
 
-import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Arrays;
-import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import bee.creative.emu.EMU;
 import bee.creative.emu.Emuable;
@@ -653,9 +651,9 @@ public class KBState implements Emuable {
 		}));
 	}
 
-	final Iterator2<Entry<Integer, FEMString>> valueIterator(int[] acceptValueRefset_or_null, int[] refuseValueRefset_or_null) {
+	final Iterator2<KBValue> valueIterator(int[] acceptValueRefset_or_null, int[] refuseValueRefset_or_null) {
 		return ((acceptValueRefset_or_null == null) && (refuseValueRefset_or_null == null) ? this.valueStrMap.fastIterator()
-			: this.valueStrMap.fastIterator().filter(entry -> REFSET.isValid(entry.getKey(), acceptValueRefset_or_null, refuseValueRefset_or_null)));
+			: this.valueStrMap.fastIterator().filter(entry -> REFSET.isValid(entry.valueRef(), acceptValueRefset_or_null, refuseValueRefset_or_null)));
 	}
 
 	static final class ValueStrMap extends HashMapIO<FEMString> {
@@ -686,11 +684,11 @@ public class KBState implements Emuable {
 			return result;
 		}
 
-		public Iterable2<Entry<Integer, FEMString>> fastEntries() {
+		public Iterable2<KBValue> fastEntries() {
 			return () -> this.fastIterator();
 		}
 
-		public Iterator2<Entry<Integer, FEMString>> fastIterator() {
+		public Iterator2<KBValue> fastIterator() {
 			return new ITER();
 		}
 
@@ -704,10 +702,10 @@ public class KBState implements Emuable {
 		}
 
 		@SuppressWarnings ("synthetic-access")
-		final class ITER implements Iterator2<Entry<Integer, FEMString>> {
+		final class ITER implements Iterator2<KBValue> {
 
 			@Override
-			public Entry<Integer, FEMString> next() {
+			public KBValue next() {
 				if (!this.hasNext()) throw new NoSuchElementException();
 				var result = this.next;
 				while (true) {
@@ -716,7 +714,7 @@ public class KBState implements Emuable {
 					var valueStr = ValueStrMap.this.customGetValue(this.index);
 					if (valueStr != null) {
 						var valueRef = ValueStrMap.this.customGetKey(this.index);
-						this.next = new SimpleImmutableEntry<>(valueRef, valueStr);
+						this.next = new KBValue(valueRef, valueStr);
 						return result;
 					}
 				}
@@ -732,7 +730,7 @@ public class KBState implements Emuable {
 				this.next();
 			}
 
-			private Entry<Integer, FEMString> next;
+			private KBValue next;
 
 			private int index;
 

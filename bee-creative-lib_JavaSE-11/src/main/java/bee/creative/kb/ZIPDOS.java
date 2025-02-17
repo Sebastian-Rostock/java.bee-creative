@@ -20,13 +20,13 @@ import bee.creative.fem.FEMString;
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class ZIPDOS extends DeflaterOutputStream {
 
-	/** Diese Methode ist eine Abkürzung für {@link #deflate(int, ByteOrder, TASK) deflate(Deflater.DEFAULT_COMPRESSION, ByteOrder.nativeOrder(), task)}. */
-	public static byte[] deflate(TASK task) throws IOException {
+	/** Diese Methode ist eine Abkürzung für {@link #deflate(int, ByteOrder, PERSIST) deflate(Deflater.DEFAULT_COMPRESSION, ByteOrder.nativeOrder(), task)}. */
+	public static byte[] deflate(PERSIST task) throws IOException {
 		return ZIPDOS.deflate(Deflater.DEFAULT_COMPRESSION, ByteOrder.nativeOrder(), task);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #deflate(int, ByteOrder, TASK) deflate(level, ByteOrder.nativeOrder(), task)}. */
-	public static byte[] deflate(int level, TASK task) throws IOException {
+	/** Diese Methode ist eine Abkürzung für {@link #deflate(int, ByteOrder, PERSIST) deflate(level, ByteOrder.nativeOrder(), task)}. */
+	public static byte[] deflate(int level, PERSIST task) throws IOException {
 		return ZIPDOS.deflate(level, ByteOrder.nativeOrder(), task);
 	}
 
@@ -34,12 +34,12 @@ public class ZIPDOS extends DeflaterOutputStream {
 	 * {@link Deflater#NO_COMPRESSION}..{@link Deflater#BEST_COMPRESSION}) und der gegebenen Bytereihenfolge mit {@code order} auf Basis eines
 	 * {@link ByteArrayOutputStream}, ruft damit die gegebene Funktion {@code task} auf und liefert schließlich die dadurch erzeugte Bytefolge.
 	 *
-	 * @see TASK#run(ZIPDOS)
+	 * @see PERSIST#persist(ZIPDOS)
 	 * @see ZIPDOS#ZIPDOS(OutputStream, int, ByteOrder)
 	 * @see ByteArrayOutputStream#toByteArray() */
-	public static byte[] deflate(int level, ByteOrder order, TASK task) throws IOException {
+	public static byte[] deflate(int level, ByteOrder order, PERSIST task) throws IOException {
 		try (var result = new ByteArrayOutputStream(ZIPDOS.BUFFER_SIZE); var target = new ZIPDOS(result, level, order)) {
-			task.run(target);
+			task.persist(target);
 			target.flush();
 			return result.toByteArray();
 		}
@@ -196,9 +196,9 @@ public class ZIPDOS extends DeflaterOutputStream {
 		}
 	}
 
-	public interface TASK {
+	public interface PERSIST {
 
-		void run(ZIPDOS target) throws IOException;
+		void persist(ZIPDOS target) throws IOException;
 
 	}
 
