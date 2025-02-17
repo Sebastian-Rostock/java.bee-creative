@@ -273,10 +273,12 @@ public class KBBuffer extends KBState {
 		this.reset();
 	}
 
- 
+	public void persist(ZIPDOS target) throws IOException {
+		KBCodec.persistBuffer(target, this);
+	}
 
-	public void restore(ZIPDIS source) throws IOException {
-		// TODO
+	public void restore(ZIPDIS source) throws IOException, IllegalStateException {
+		KBCodec.restoreBuffer(source, this);
 	}
 
 	/** Diese Methode füt diesem Wissenspuffer alle {@link #edges() Kanten} und {@link #values() Textwerte} des gegebenen {@link KBState Wissensstandes} hinzu und
@@ -311,7 +313,7 @@ public class KBBuffer extends KBState {
 		this.reset(KBState.from(state));
 	}
 
-	public synchronized boolean redo() {
+	public synchronized boolean redo() throws IllegalStateException {
 		if (this.backup != null) throw new IllegalStateException();
 		var redoItem = this.redoHistory.getFirstItem();
 		if (redoItem == null) return false;
@@ -341,7 +343,7 @@ public class KBBuffer extends KBState {
 		return true;
 	}
 
-	public synchronized boolean undo() {
+	public synchronized boolean undo() throws IllegalStateException {
 		if (this.backup != null) throw new IllegalStateException();
 		var undoItem = this.undoHistory.getFirstItem();
 		if (undoItem == null) return false;
@@ -462,7 +464,7 @@ public class KBBuffer extends KBState {
 	/** Dieses Feld speichert die umkehrbaren Änderungen und hat eine Potenz von zwei als Kapazität. */
 	final History undoHistory = new History(this);
 
-	  final History redoHistory = new History(this);
+	final History redoHistory = new History(this);
 
 	private void backup() {
 		if (this.backup != null) return;
@@ -930,21 +932,6 @@ public class KBBuffer extends KBState {
 
 		}
 
-		HistoryItem getItem(int index) {
-			return this.items[(this.first + index) & (this.items.length - 1)];
-		}
-
-		public void setAll(History that) {
-			this.size = that.size;
-			this.items = that.items.clone();
-			this.first = that.first;
-			this.limit = that.limit;
-		}
-
-		public void popAll() {
-			// TODO
-		}
-
 		@Override
 		public int size() {
 			synchronized (this.owner) {
@@ -955,6 +942,21 @@ public class KBBuffer extends KBState {
 		History(KBBuffer owner) {
 			this.owner = owner;
 			this.items = new HistoryItem[1];
+		}
+
+		void reset(History that, boolean clone) {
+			this.size = that.size;
+			this.items = clone? that.items.clone():that.items;
+			this.first = that.first;
+			this.limit = that.limit;
+		}
+
+		HistoryItem getItem(int index) {
+			return this.items[(this.first + index) & (this.items.length - 1)];
+		}
+
+		void popAll() {
+			// TODO
 		}
 
 		int getLimit() {
@@ -1014,7 +1016,7 @@ public class KBBuffer extends KBState {
 
 		private final KBBuffer owner;
 
-		int size;
+		private int size;
 
 		private int first;
 

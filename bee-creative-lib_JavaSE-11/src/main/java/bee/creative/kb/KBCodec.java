@@ -2,7 +2,7 @@ package bee.creative.kb;
 
 import java.io.IOException;
 import bee.creative.fem.FEMString;
-import bee.creative.kb.KBState.ValueStrMap;
+import bee.creative.kb.KBBuffer.History;
 
 class KBCodec {
 
@@ -13,37 +13,46 @@ class KBCodec {
 	public static void persistState(ZIPDOS target, KBState source) throws IOException {
 		synchronized (source) {
 			target.writeInt(KBCodec.STATE_MAGIC);
-			KBCodec.___persistStateRefs(target, source);
-			KBCodec.persistStateEdges(target, source);
-			KBCodec.persistStateValues(target, source);
+			KBCodec.persistRefs(target, source);
+			KBCodec.persistEdges(target, source);
+			KBCodec.persistValues(target, source);
 		}
 	}
 
-	public void persistBuffer(ZIPDOS target, KBBuffer source) throws IOException {
+	public static void persistBuffer(ZIPDOS target, KBBuffer source) throws IOException {
 		var that = new KBBuffer();
-		synchronized (this) {
+		synchronized (source) {
 			that.reset(source.getBackup());
-			that.undoHistory.setAll(source.undoHistory);
-			that.redoHistory.setAll(source.redoHistory);
+			that.undoHistory.reset(source.undoHistory, true);
+			that.redoHistory.reset(source.redoHistory, true);
 		}
 		target.writeInt(KBCodec.BUFFER_MAGIC);
-		KBCodec.___persistStateRefs(target, that);
-		KBCodec.persistStateEdges(target, that);
-		KBCodec.persistStateValues(target, that);
-		KBCodec.persistHistoryItems(target, that.undoHistory);
-		KBCodec.persistHistoryItems(target, that.redoHistory);
+		KBCodec.persistRefs(target, that);
+		KBCodec.persistEdges(target, that);
+		KBCodec.persistValues(target, that);
+		KBCodec.persistHistory(target, that.undoHistory);
+		KBCodec.persistHistory(target, that.redoHistory);
 	}
 
-	static void persistHistoryItems(ZIPDOS target, KBBuffer.History history) throws IOException {
-		var limit = history.getLimit();
-		target.writeInt(limit);
-		if (limit == 0) return;
-		var size = history.size;
-		target.writeInt(size);
-		for (var i = 0; i < size; i++) {
-			var item = history.getItem(i);
-			target.writeStrings(item.info);
-			target.writeBinaries(item.insertData, item.deleteData);
+	public static KBBuffer restoreBuffer(ZIPDIS source) throws IOException {
+		var header = source.readInt(1);
+		if (header[0] != KBCodec.BUFFER_MAGIC) throw new IOException();
+		var result = new KBBuffer();
+		KBCodec.restoreRefs(source, result);
+		KBCodec.restoreEdges(source, result);
+		KBCodec.restoreValues(source, result);
+		KBCodec.restoreHistory(source, result.undoHistory);
+		KBCodec.restoreHistory(source, result.redoHistory);
+		return result;
+	}
+
+	public static void restoreBuffer(ZIPDIS source, KBBuffer target) throws IOException {
+		var result = restoreBuffer(source);
+		synchronized (target) {
+			if (target.hasBackup()) throw new IllegalStateException();
+			target.reset(result);
+			target.undoHistory.reset(result.undoHistory, false);
+			target.redoHistory.reset(result.redoHistory, false);
 		}
 	}
 
@@ -56,45 +65,38 @@ class KBCodec {
 		var header = source.readInt(1);
 		if (header[0] != KBCodec.STATE_MAGIC) throw new IOException();
 		var result = new KBState();
-		KBCodec.___restoreStateRefs(source, result);
-		KBCodec.restoreStateEdges(source, result);
-		KBCodec.restoreStateValues(source, result);
+		KBCodec.restoreRefs(source, result);
+		KBCodec.restoreEdges(source, result);
+		KBCodec.restoreValues(source, result);
 		return result;
 	}
 
-	static final int STATE_MAGIC = 0xCBFF0501;
+	static void restoreState(ZIPDIS source, KBState target, KBEdgesTask edgeTask, KBValuesTask valueTask) throws IOException {
+		KBCodec.restoreRefs(source, target);
+		KBCodec.restoreEdges(source, edgeTask);
+		KBCodec.restoreValues(source, valueTask);
+	}
 
-	static final int BUFFER_MAGIC = 0xCBFF0B01;
+	private static final int STATE_MAGIC = 0xCBFF5001;
 
-	static final int MAGIC_EDGE_PAGE_SRT = 0xCBEF00E1;
+	private static final int BUFFER_MAGIC = 0xCBFFB001;
 
-	static final int MAGIC_EDGE_PAGE_STR = 0xCBEF00E2;
-
-	static final int MAGIC_EDGE_PAGE_RST = 0xCBEF00E3;
-
-	static final int MAGIC_EDGE_PAGE_RTS = 0xCBEF00E4;
-
-	static final int MAGIC_EDGE_PAGE_TRS = 0xCBEF00E5;
-
-	static final int MAGIC_EDGE_PAGE_TSR = 0xCBEF00E6;
-
-	/** Diese Methode persistiert die Referenzen des {@link KBState} in folgender Struktur: {@code (indexRef: int, internalRef: int, externalRef: int)} */
-	static void ___persistStateRefs(ZIPDOS target, KBState source) throws IOException {
+	private static void persistRefs(ZIPDOS target, KBState source) throws IOException {
 		target.writeInt(source.indexRef, source.internalRef, source.externalRef);
 	}
 
-	static void persistStateEdges(ZIPDOS target, KBState source) throws IOException {
-		var EDGE_LIMIT = 128 * 1024;
-		var cursor = new int[]{EDGE_LIMIT};
-		var buffer = new KBEdge[EDGE_LIMIT];
+	private static void persistEdges(ZIPDOS target, KBState source) throws IOException {
+		var LIMIT = 1024 * 1024;
+		var cursor = new int[]{LIMIT};
+		var sourceMap = new Object[][]{REFMAP.EMPTY};
 		try {
 			source.forEachEdge((sourceRef, targetRef, relationRef) -> {
 				try {
-					var edge = new KBEdge(sourceRef, targetRef, relationRef);
-					buffer[--cursor[0]] = edge;
-					if (cursor[0] != 0) return;
-					KBCodec.persistEdgesPage(target, buffer, cursor[0]);
-					cursor[0] = EDGE_LIMIT;
+					sourceMap[0] = KBState.insertEdgeIntoMapSRT(sourceMap[0], sourceRef, relationRef, targetRef);
+					if (--cursor[0] != 0) return;
+					KBCodec.persistEdgesBlock(target, sourceMap[0]);
+					cursor[0] = LIMIT;
+					sourceMap[0] = REFMAP.EMPTY;
 				} catch (IOException cause) {
 					throw new IllegalStateException(cause);
 				}
@@ -103,119 +105,16 @@ class KBCodec {
 			if (cause.getCause() instanceof IOException) throw (IOException)cause.getCause();
 			throw cause;
 		}
-		if (cursor[0] != EDGE_LIMIT) KBCodec.persistEdgesPage(target, buffer, cursor[0]);
-		KBCodec.persistEdgesPage(target, buffer, EDGE_LIMIT);
-	}
-
-	static void persistStateValues(ZIPDOS target, KBState source) throws IOException {
-		source.forEachValue((valueRef, valueStr) -> {
-
-		});
-
-		KBCodec.persistValueMap(target, source.valueStrMap);
-	}
-
-	static void restoreState(ZIPDIS source, KBState target, KBEdgesTask edgeTask, KBValuesTask valueTask) throws IOException {
-		KBCodec.___restoreStateRefs(source, target);
-		KBCodec.restoreEdges(source, edgeTask);
-		KBCodec.___restoreValues(source, valueTask);
-	}
-
-	static void ___restoreStateRefs(ZIPDIS source, KBState target) throws IOException {
-		var refs = source.readInt(3);
-		target.indexRef = refs[0];
-		target.internalRef = refs[1];
-		target.externalRef = refs[2];
-	}
-
-	static void restoreStateEdges(ZIPDIS source, KBState result) throws IOException {
-		KBCodec.restoreEdges(source, result::insertEdgeNow);
-	}
-
-	static void restoreStateValues(ZIPDIS source, KBState target) throws IOException {
-		target.valueRefMap.allocate(65536);
-		target.valueStrMap.allocate(65536);
-		KBCodec.___restoreValues(source, (valueRef, valueStr) -> {
-			target.valueRefMap.put(valueStr, valueRef);
-			target.valueStrMap.put(valueRef, valueStr);
-		});
-		target.valueRefMap.pack();
-	}
-
-	static void restoreEdges(ZIPDIS source, KBEdgesTask task) throws IOException {
-		while (true) {
-			var i = source.readInt(1)[0];
-			switch (i) {
-				case MAGIC_EDGE_PAGE_SRT:
-					if (!KBCodec.restoreEdgesMap(source, (sourceRef, targetRef, relationRef) -> task.run(sourceRef, targetRef, relationRef))) return;
-				break;
-				case MAGIC_EDGE_PAGE_STR:
-					if (!KBCodec.restoreEdgesMap(source, (sourceRef, targetRef, relationRef) -> task.run(sourceRef, relationRef, targetRef))) return;
-				break;
-				case MAGIC_EDGE_PAGE_RST:
-					if (!KBCodec.restoreEdgesMap(source, (sourceRef, targetRef, relationRef) -> task.run(relationRef, targetRef, sourceRef))) return;
-				break;
-				case MAGIC_EDGE_PAGE_RTS:
-					if (!KBCodec.restoreEdgesMap(source, (sourceRef, targetRef, relationRef) -> task.run(relationRef, sourceRef, targetRef))) return;
-				break;
-				case MAGIC_EDGE_PAGE_TRS:
-					if (!KBCodec.restoreEdgesMap(source, (sourceRef, targetRef, relationRef) -> task.run(targetRef, sourceRef, relationRef))) return;
-				break;
-				case MAGIC_EDGE_PAGE_TSR:
-					if (!KBCodec.restoreEdgesMap(source, (sourceRef, targetRef, relationRef) -> task.run(targetRef, relationRef, sourceRef))) return;
-				break;
-				default:
-					System.out.println(i);
-					throw new IOException();
-			}
+		if (KBCodec.persistEdgesBlock(target, sourceMap[0])) {
+			KBCodec.persistEdgesBlock(target, REFMAP.EMPTY);
 		}
-	}
-
-	static boolean restoreEdgesMap(ZIPDIS source, KBEdgesTask task) throws IOException {
-		var count = source.readInt(1)[0];
-		var index = 0;
-		var array = source.readInt(count);
-		var sourceRefCount = array[index++];
-		if (sourceRefCount == 0) return false;
-		while (0 < sourceRefCount--) {
-			var sourceRef = array[index++];
-			var targetRefCount = array[index++];
-			var targetSetCount = array[index++];
-			while (0 < targetRefCount--) {
-				var targetRef = array[index++];
-				var relationRef = array[index++];
-				task.run(sourceRef, targetRef, relationRef);
-			}
-			while (0 < targetSetCount--) {
-				var relationRef = array[index++];
-				var targetCount = array[index++];
-				while (0 < targetCount--) {
-					var targetRef = array[index++];
-					task.run(sourceRef, targetRef, relationRef);
-				}
-			}
-		}
-		return true;
-	}
-
-	static void ___restoreValues(ZIPDIS source, KBValuesTask task) throws IOException {
-		while (___restoreValuesPage(source, task)) {}
-	}
-
-	static boolean ___restoreValuesPage(ZIPDIS source, KBValuesTask task) throws IOException {
-		var count = source.readInt(1)[0];
-		if (count == 0) return false;
-		var refArray = source.readInt(count);
-		var strArray = source.readStrings(count);
-		for (var i = 0; i < count; i++) {
-			task.run(refArray[i], strArray[i]);
-		}
-		return true;
 	}
 
 	/** Diese Methode persistiert die Kanen in folgender Struktur:
-	 * {@code (count: int, sourceCount: int, (sourceRef: int, targetRefCount: int, targetSetCount: int, (targetRef: int, relationRef: int)[targetRefCount], (relationRef: int, targetCount: int, targetRef: int[targetCount])[targetSetCount])[sourceCount])} */
-	static void persistEdgesMap(ZIPDOS target, Object[] sourceMap) throws IOException {
+	 * {@code (count: int, sourceCount: int, (sourceRef: int, targetRefCount: int, targetSetCount: int, (targetRef: int, relationRef: int)[targetRefCount], (relationRef: int, targetCount: int, targetRef: int[targetCount])[targetSetCount])[sourceCount])}
+	 *
+	 * @return */
+	private static boolean persistEdgesBlock(ZIPDOS target, Object[] sourceMap) throws IOException {
 		var count = 1;
 		var sourceCount = 0;
 		for (var sourceIdx = sourceMap.length - 1; 0 < sourceIdx; sourceIdx--) {
@@ -304,118 +203,133 @@ class KBCodec {
 			}
 		}
 		target.writeInt(array);
+		return sourceCount != 0;
 	}
 
-	static void persistEdgesPage(ZIPDOS target, KBEdge[] source, int offset) throws IOException {
-		var length = source.length;
-		// Referenzen Zählen
-		var sourceSet = REFSET.EMPTY;
-		var targetSet = REFSET.EMPTY;
-		var relationSet = REFSET.EMPTY;
-		for (var index = offset; index < length; index++) {
-			var edge = source[index];
-			sourceSet = REFSET.growAndPutRef(sourceSet, edge.sourceRef);
-			targetSet = REFSET.growAndPutRef(targetSet, edge.targetRef);
-			relationSet = REFSET.growAndPutRef(relationSet, edge.relationRef);
+	private static void persistValues(ZIPDOS target, KBState source) throws IOException {
+		var LIMIT = 256;
+		var cursor = new int[]{LIMIT};
+		var buffer = new KBValue[LIMIT];
+		try {
+			source.forEachValue((valueRef, valueStr) -> {
+				try {
+					buffer[--cursor[0]] = new KBValue(valueRef, valueStr);
+					if (cursor[0] != 0) return;
+					KBCodec.persistValuesBlock(target, buffer, cursor[0]);
+					cursor[0] = LIMIT;
+				} catch (IOException cause) {
+					throw new IllegalStateException(cause);
+				}
+			});
+		} catch (IllegalStateException cause) {
+			if (cause.getCause() instanceof IOException) throw (IOException)cause.getCause();
+			throw cause;
 		}
-		var sourceCount = REFSET.size(sourceSet);
-		var targetCount = REFSET.size(targetSet);
-		var relationCount = REFSET.size(relationSet);
-		// Rollen der Referenzen tauschen
-		var resultMap = REFMAP.EMPTY;
-		if (relationCount <= sourceCount) { // * R * S *
-			if (relationCount <= targetCount) { // R * S *
-				if (sourceCount <= targetCount) { // RST
-					target.writeInt(KBCodec.MAGIC_EDGE_PAGE_RST);
-					for (var index = offset; index < length; index++) {
-						var edge = source[index];
-						resultMap = KBState.insertEdgeIntoMapSRT(resultMap, edge.relationRef, edge.sourceRef, edge.targetRef);
-					}
-				} else { // RTS
-					target.writeInt(KBCodec.MAGIC_EDGE_PAGE_RTS);
-					for (var index = offset; index < length; index++) {
-						var edge = source[index];
-						resultMap = KBState.insertEdgeIntoMapSRT(resultMap, edge.relationRef, edge.targetRef, edge.sourceRef);
-					}
-				}
-			} else { // TRS
-				target.writeInt(KBCodec.MAGIC_EDGE_PAGE_TRS);
-				for (var index = offset; index < length; index++) {
-					var edge = source[index];
-					resultMap = KBState.insertEdgeIntoMapSRT(resultMap, edge.targetRef, edge.relationRef, edge.sourceRef);
-				}
-			}
-		} else { // * S * R *
-			if (sourceCount <= targetCount) { // S * R *
-				if (relationCount <= targetCount) { // SRT
-					target.writeInt(KBCodec.MAGIC_EDGE_PAGE_SRT);
-					for (var index = offset; index < length; index++) {
-						var edge = source[index];
-						resultMap = KBState.insertEdgeIntoMapSRT(resultMap, edge.sourceRef, edge.relationRef, edge.targetRef);
-					}
-				} else { // STR
-					target.writeInt(KBCodec.MAGIC_EDGE_PAGE_STR);
-					for (var index = offset; index < length; index++) {
-						var edge = source[index];
-						resultMap = KBState.insertEdgeIntoMapSRT(resultMap, edge.sourceRef, edge.targetRef, edge.relationRef);
-					}
-				}
-			} else { // TSR
-				target.writeInt(KBCodec.MAGIC_EDGE_PAGE_TSR);
-				for (var index = offset; index < length; index++) {
-					var edge = source[index];
-					resultMap = KBState.insertEdgeIntoMapSRT(resultMap, edge.targetRef, edge.sourceRef, edge.relationRef);
-				}
-			}
+		if (KBCodec.persistValuesBlock(target, buffer, cursor[0])) {
+			KBCodec.persistValuesBlock(target, buffer, LIMIT);
 		}
-		KBCodec.persistEdgesMap(target, resultMap);
 	}
 
-	/** Diese Methode persistiert die Textwete in folgender Struktur: (valueCount: int, valueRef: int[valueCount], valueHash: int[valueCount], valueSize:
-	 * int[valueCount], valueLength: int[valueCount], valueString: byte[valueSize][valueCount])</pre> */
-	static void persistValueMap(ZIPDOS result, ValueStrMap valueMap) throws IOException {
-
-		var valueCount = valueMap.size();
-		result.writeInt(valueCount);
-
-		// TODO je 1024 werte blockweise
-
-		result.writeInt(valueCount);
-
-		var refArray = new int[valueCount];
-		var strArray = new FEMString[valueCount];
-		var iter = valueMap.fastIterator();
-		for (var i = 0; iter.hasNext(); i++) {
-			var entry = iter.next();
+	/** Diese Methode persistiert die Textwete ab der gegebenen Position bis zum Listenende und liefert nur dann {@code true}, wenn dies nicht {@code 0} sind. */
+	private static boolean persistValuesBlock(ZIPDOS result, KBValue[] source, int offset) throws IOException {
+		var count = source.length - offset;
+		result.writeInt(count);
+		if (count == 0) return false;
+		var refArray = new int[count];
+		var strArray = new FEMString[count];
+		for (var i = 0; i < count; i++) {
+			var entry = source[i + offset];
 			refArray[i] = entry.getKey();
 			strArray[i] = entry.getValue();
 		}
 		result.writeInt(refArray);
 		result.writeStrings(strArray);
+		return true;
 	}
 
-	
-	/** Diese Methode persistiert die Textwete in folgender Struktur: (valueCount: int, valueRef: int[valueCount], valueHash: int[valueCount], valueSize:
-	 * int[valueCount], valueLength: int[valueCount], valueString: byte[valueSize][valueCount])</pre> */
-	static void persistValuesPage(ZIPDOS result, ValueStrMap valueMap) throws IOException {
-
-		var valueCount = valueMap.size();
-		result.writeInt(valueCount);
-
-		// TODO je 1024 werte blockweise
-
-		result.writeInt(valueCount);
-
-		var refArray = new int[valueCount];
-		var strArray = new FEMString[valueCount];
-		var iter = valueMap.fastIterator();
-		for (var i = 0; iter.hasNext(); i++) {
-			var entry = iter.next();
-			refArray[i] = entry.getKey();
-			strArray[i] = entry.getValue();
+	static void persistHistory(ZIPDOS target, History source) throws IOException {
+		var limit = source.getLimit();
+		target.writeInt(limit);
+		if (limit == 0) return;
+		var size = source.size();
+		target.writeInt(size);
+		for (var i = 0; i < size; i++) {
+			var item = source.getItem(i);
+			target.writeStrings(item.info);
+			target.writeBinaries(item.insertData, item.deleteData);
 		}
-		result.writeInt(refArray);
-		result.writeStrings(strArray);
 	}
-	
+
+	private static void restoreRefs(ZIPDIS source, KBState target) throws IOException {
+		var refs = source.readInt(3);
+		target.indexRef = refs[0];
+		target.internalRef = refs[1];
+		target.externalRef = refs[2];
+	}
+
+	private static void restoreEdges(ZIPDIS source, KBState result) throws IOException {
+		KBCodec.restoreEdges(source, result::insertEdgeNow);
+	}
+
+	private static void restoreEdges(ZIPDIS source, KBEdgesTask task) throws IOException {
+		while (KBCodec.restoreEdgesBlock(source, task)) {}
+	}
+
+	private static boolean restoreEdgesBlock(ZIPDIS source, KBEdgesTask task) throws IOException {
+		var count = source.readInt(1)[0];
+		var index = 0;
+		var array = source.readInt(count);
+		var sourceRefCount = array[index++];
+		if (sourceRefCount == 0) return false;
+		while (0 < sourceRefCount--) {
+			var sourceRef = array[index++];
+			var targetRefCount = array[index++];
+			var targetSetCount = array[index++];
+			while (0 < targetRefCount--) {
+				var targetRef = array[index++];
+				var relationRef = array[index++];
+				task.run(sourceRef, targetRef, relationRef);
+			}
+			while (0 < targetSetCount--) {
+				var relationRef = array[index++];
+				var targetCount = array[index++];
+				while (0 < targetCount--) {
+					var targetRef = array[index++];
+					task.run(sourceRef, targetRef, relationRef);
+				}
+			}
+		}
+		return true;
+	}
+
+	private static void restoreValues(ZIPDIS source, KBState target) throws IOException {
+		target.valueRefMap.allocate(65536);
+		target.valueStrMap.allocate(65536);
+		KBCodec.restoreValues(source, (valueRef, valueStr) -> {
+			target.valueRefMap.put(valueStr, valueRef);
+			target.valueStrMap.put(valueRef, valueStr);
+		});
+		target.valueRefMap.pack();
+		target.valueStrMap.pack();
+	}
+
+	private static void restoreValues(ZIPDIS source, KBValuesTask task) throws IOException {
+		while (KBCodec.restoreValuesBlock(source, task)) {}
+	}
+
+	private static boolean restoreValuesBlock(ZIPDIS source, KBValuesTask task) throws IOException {
+		var count = source.readInt(1)[0];
+		if (count == 0) return false;
+		var refArray = source.readInt(count);
+		var strArray = source.readStrings(count);
+		for (var i = 0; i < count; i++) {
+			task.run(refArray[i], strArray[i]);
+		}
+		return true;
+	}
+
+	static void restoreHistory(ZIPDIS source, History target) throws IOException {
+		// TODO
+	}
+
 }

@@ -166,12 +166,14 @@ public class ZIPDOS extends DeflaterOutputStream {
 		this.writeStrings(values, 0, values.length);
 	}
 
+	/** Diese Methode persistiert die Zeichenketten im gegebenen Aschnitt in folgender Struktur:
+	 * {@code (valueHash: int[length], valueLength: int[length], (valueSize: int[length], valueBytes: byte[valueSize][length]))}. */
 	public void writeStrings(FEMString[] values, int offset, int length) throws IOException {
 		var hashArray = new int[length];
 		var lengthArray = new int[length];
 		var stringArray = new byte[length][];
 		for (var i = 0; i < length; i++) {
-			var value = values[offset+i];
+			var value = values[offset + i];
 			hashArray[i] = value.hashCode();
 			stringArray[i] = value.toBytes(true);
 			lengthArray[i] = value.length();
@@ -185,6 +187,8 @@ public class ZIPDOS extends DeflaterOutputStream {
 		this.writeBinaries(values, 0, values.length);
 	}
 
+	/** Diese Methode persistiert die Bytefolgen im gegebenen Aschnitt in folgender Struktur:
+	 * {@code (valueSize: int[length], valueBytes: byte[valueSize][length])}. */
 	public void writeBinaries(byte[][] values, int offset, int length) throws IOException {
 		var sizeArray = new int[length];
 		for (var i = 0; i < length; i++) {
