@@ -3,6 +3,7 @@ package bee.creative.app.ft;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
@@ -926,35 +927,47 @@ public class AppWindow {
 	FEMDatetime getDatetimeFromMP4(File sourceFile) {
 		if (!sourceFile.isFile()) return null;
 		try (var sourceStream = IO.inputStreamFrom(sourceFile)) {
-			var buf = new byte[4];
+			var buf = new byte[8];
 			{ // ftype
-				sourceStream.readNBytes(buf, 0, 4);
-				var boxSize = Bytes.getInt4BE(buf, 0);
-				sourceStream.readNBytes(buf, 0, 4);
-				var boxName = Bytes.getInt4BE(buf, 0);
+				var boxSize = readInt4(sourceStream, buf);
+				var boxName = readInt4(sourceStream, buf);
+				if (boxSize == 1) {
+					boxSize = readInt8(sourceStream, buf) - 8;
+				}
 				if (boxName != 1718909296) return null;
-				sourceStream.skip(boxSize);
+				sourceStream.skip(boxSize - 8);
 			}
 			while (true) {
-				sourceStream.readNBytes(buf, 0, 4);
-				var boxSize = Bytes.getInt4BE(buf, 0);
-				sourceStream.readNBytes(buf, 0, 4);
-				var boxName = Bytes.getInt4BE(buf, 0);
-				if (boxName == 1836476516) { // mvhd
-					sourceStream.readNBytes(buf, 0, 4);
-					var mvhdVersion = Bytes.getInt4BE(buf, 0);
-					if (mvhdVersion != 0) return null;
-					sourceStream.readNBytes(buf, 0, 4);
-					var mvhdCreated = Bytes.getInt4BE(buf, 0) & 0xFFFFFFFFL;
-					var move = MP4_BASE_DATETIME.move(0, 0, 0, 0, 0, mvhdCreated, 0);
-					//System.out.println(move);
-					return move;
+				var boxSize = readInt4(sourceStream, buf);
+				var boxName = readInt4(sourceStream, buf);
+				if (boxSize == 1) {
+					boxSize = readInt8(sourceStream, buf) - 8;
 				}
-				sourceStream.skip(boxSize);
+				if (boxName == 1836476516) { // mvhd
+					var mvhdVersion = readInt4(sourceStream, buf);
+					if (mvhdVersion != 0) return null;
+					var mvhdCreated = readInt4(sourceStream, buf);
+					var result = Mp4Test.MP4_BASE_DATETIME.move(0, 0, 0, 0, 0, mvhdCreated, 0);
+					return result;
+				}
+				if (boxName == 1836019574) { // moov
+					continue;
+				}
+				sourceStream.skip(boxSize - 8);
 			}
 		} catch (Exception e) {
 			return null;
 		}
+	}
+
+	static long readInt4(InputStream sourceStream, byte[] buf) throws IOException {
+		if (sourceStream.readNBytes(buf, 0, 4) != 4) throw new IOException();
+		return Bytes.getInt4BE(buf, 0) & 0xFFFFFFFFL;
+	}
+
+	static long readInt8(InputStream sourceStream, byte[] buf) throws IOException {
+		if (sourceStream.readNBytes(buf, 0, 8) != 8) throw new IOException();
+		return Bytes.getLong8BE(buf, 0);
 	}
 
 	public void runRefreshFiles_DONE() {
