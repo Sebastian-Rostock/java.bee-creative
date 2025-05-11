@@ -33,11 +33,14 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import bee.creative.fem.FEMDatetime;
+import bee.creative.io.IO;
+import bee.creative.lang.Bytes;
 import bee.creative.lang.Objects;
 import bee.creative.lang.Strings;
 import bee.creative.util.Comparators;
 import bee.creative.util.Consumer;
 import bee.creative.util.Filter;
+import bee.creative.util.Getter;
 import bee.creative.util.HashMap2;
 import bee.creative.util.HashSet2;
 import bee.creative.util.Iterables;
@@ -815,7 +818,8 @@ public class AppWindow {
 				Die Zielpfade haben das Format {EP}\\JJJJ-MM-TT hh.mm.ss{NE}, wobei {EP} für den \
 				Elternverzeichnispfad und {NE} für die kleingeschriebene Namenserweiterung der Quelldatei stehen.""") //
 			.useOption("Zeitkorrektur in Sekunden", this.settings.timenameOffset) //
-			.useButton("Zeitnamen ableiten", () -> this.runComputeTimenameImpl(false, false)) //
+			.useButton("Datei-Zeitnamen ableiten", () -> this.runComputeTimenameImpl("Datei-Zeitnamen ableiten", false, this::getDatetimeFromFile)) //
+			.useButton("MP4-Zeitnamen ableiten", () -> this.runComputeTimenameImpl("MP4-Zeitnamen ableiten", false, this::getDatetimeFromMP4)) //
 		;
 	}
 
@@ -828,7 +832,7 @@ public class AppWindow {
 				Die Zielpfade haben das Format {EP}\\JJJJ-MM-TT hh.mm.ss{NE}, wobei {EP} für den \
 				Elternverzeichnispfad und {NE} für die kleingeschriebene Namenserweiterung der Quelldatei stehen.""") //
 			.useOption("Zeitkorrektur in Sekunden", this.settings.timenameOffset) //
-			.useButton("Zeitnamen aktualisieren", () -> this.runComputeTimenameImpl(false, true)) //
+			.useButton("Zeitnamen aktualisieren", () -> this.runComputeTimenameImpl("Zeitnamen aktualisieren", false, this::getDatetimeFromName)) //
 		;
 	}
 
@@ -842,21 +846,20 @@ public class AppWindow {
 				Großelternverzeichnispfad, {EN} für den Elternverzeichnisnamen und {NE} für die kleingeschriebene \
 				Namenserweiterung der Quelldatei stehen.""") //
 			.useOption("Zeitkorrektur in Sekunden", this.settings.timenameOffset) //
-			.useButton("Zeitpfade aktualisieren", () -> this.runComputeTimenameImpl(true, true)) //
+			.useButton("Zeitpfade aktualisieren", () -> this.runComputeTimenameImpl("Zeitpfade aktualisieren", true, this::getDatetimeFromName)) //
 		;
 	}
 
-	private void runComputeTimenameImpl(boolean isPath, boolean isName) {
+	private void runComputeTimenameImpl(String title, boolean isPath, Getter<File, FEMDatetime> getDatetime) {
 		// isName = true, wenn Zeitpunkt aus Dateinamen abgeleitet werden soll
 		// isName = false, wenn Anderungszeitpunkt verwendet werden soll
 		long moveTime = this.settings.timenameOffset.getValue();
-		this.runTask(isName ? (isPath ? "Zeitpfade aktualisieren" : "Zeitnamen aktualisieren") : (isPath ? "Zeitpfade ableiten" : "Zeitnamen ableiten"), proc -> {
+		this.runTask(title, proc -> {
 			var result = AppEntry.list();
 			var pathSet = new HashSet2<String>(1000);
-			var namePattern = Pattern.compile("([0-9]{4})[^0-9]*([0-9]{2})[^0-9]*([0-9]{2})[^0-9]*([0-9]{2})[^0-9]*([0-9]{2})[^0-9]*([0-9]{2})[^0-9]*");
 			this.runItems(proc, this.getEntries_DONE(), line -> {
 				var sourceFile = line.source.fileOrNull();
-				if ((sourceFile == null) || (!isName && !sourceFile.isFile())) return;
+				if (sourceFile == null) return;
 				var parentFile = sourceFile.getParentFile();
 				if (parentFile == null) return;
 				var parentName = isPath ? parentFile.getName() : null;
@@ -866,31 +869,8 @@ public class AppWindow {
 				var index = sourceName.lastIndexOf('.');
 				if (index < 0) return;
 				var sourceType = sourceName.substring(index).toLowerCase();
-				var datetime = FEMDatetime.EMPTY;
-				if (isName) {
-					var nameMatcher = namePattern.matcher(sourceName);
-					if (!nameMatcher.find()) return;
-					var yearValue = nameMatcher.group(1);
-					var monthValue = nameMatcher.group(2);
-					var dateValue = nameMatcher.group(3);
-					var hourValue = nameMatcher.group(4);
-					var minuteValue = nameMatcher.group(5);
-					var secondValue = nameMatcher.group(6);
-					try {
-						datetime = FEMDatetime.from(yearValue + "-" + monthValue + "-" + dateValue + "T" + hourValue + ":" + minuteValue + ":" + secondValue);
-					} catch (RuntimeException ignore) {
-						try {
-							datetime = FEMDatetime.fromDate(Integer.parseInt(yearValue), 1, 1).withTime(0)
-								.move(0, 0, Integer.parseInt(dateValue) - 1, Integer.parseInt(hourValue), Integer.parseInt(minuteValue), Integer.parseInt(secondValue), 0)
-								.move(Integer.parseInt(monthValue) - 1, 0);
-						} catch (RuntimeException e) {
-							System.out.println(sourceName);
-							return;
-						}
-					}
-				} else {
-					datetime = FEMDatetime.from(sourceFile.lastModified());
-				}
+				var datetime = getDatetime.get(sourceFile);
+				if (datetime == null) return;
 				datetime = datetime.move(0, moveTime * 1000);
 				while (true) {
 					var targetName = String.format("%04d-%02d-%02d %02d.%02d.%02d%s", //
@@ -910,6 +890,71 @@ public class AppWindow {
 			}, null);
 			this.setEntries_DONE(result);
 		});
+	}
+
+	FEMDatetime getDatetimeFromFile(File sourceFile) {
+		if (!sourceFile.isFile()) return null;
+		return FEMDatetime.from(sourceFile.lastModified());
+	}
+
+	static final Pattern namePattern = Pattern.compile("([0-9]{4})[^0-9]*([0-9]{2})[^0-9]*([0-9]{2})[^0-9]*([0-9]{2})[^0-9]*([0-9]{2})[^0-9]*([0-9]{2})[^0-9]*");
+
+	FEMDatetime getDatetimeFromName(File sourceFile) {
+		var nameMatcher = namePattern.matcher(sourceFile.getName());
+		if (!nameMatcher.find()) return null;
+		var yearValue = nameMatcher.group(1);
+		var monthValue = nameMatcher.group(2);
+		var dateValue = nameMatcher.group(3);
+		var hourValue = nameMatcher.group(4);
+		var minuteValue = nameMatcher.group(5);
+		var secondValue = nameMatcher.group(6);
+		try {
+			return FEMDatetime.from(yearValue + "-" + monthValue + "-" + dateValue + "T" + hourValue + ":" + minuteValue + ":" + secondValue);
+		} catch (RuntimeException ignore) {
+			try {
+				return FEMDatetime.fromDate(Integer.parseInt(yearValue), 1, 1).withTime(0)
+					.move(0, 0, Integer.parseInt(dateValue) - 1, Integer.parseInt(hourValue), Integer.parseInt(minuteValue), Integer.parseInt(secondValue), 0)
+					.move(Integer.parseInt(monthValue) - 1, 0);
+			} catch (RuntimeException e) {
+				return null;
+			}
+		}
+	}
+
+	static final FEMDatetime MP4_BASE_DATETIME = FEMDatetime.from("1904-01-01T00:00:00Z");
+
+	FEMDatetime getDatetimeFromMP4(File sourceFile) {
+		if (!sourceFile.isFile()) return null;
+		try (var sourceStream = IO.inputStreamFrom(sourceFile)) {
+			var buf = new byte[4];
+			{ // ftype
+				sourceStream.readNBytes(buf, 0, 4);
+				var boxSize = Bytes.getInt4BE(buf, 0);
+				sourceStream.readNBytes(buf, 0, 4);
+				var boxName = Bytes.getInt4BE(buf, 0);
+				if (boxName != 1718909296) return null;
+				sourceStream.skip(boxSize);
+			}
+			while (true) {
+				sourceStream.readNBytes(buf, 0, 4);
+				var boxSize = Bytes.getInt4BE(buf, 0);
+				sourceStream.readNBytes(buf, 0, 4);
+				var boxName = Bytes.getInt4BE(buf, 0);
+				if (boxName == 1836476516) { // mvhd
+					sourceStream.readNBytes(buf, 0, 4);
+					var mvhdVersion = Bytes.getInt4BE(buf, 0);
+					if (mvhdVersion != 0) return null;
+					sourceStream.readNBytes(buf, 0, 4);
+					var mvhdCreated = Bytes.getInt4BE(buf, 0) & 0xFFFFFFFFL;
+					var move = MP4_BASE_DATETIME.move(0, 0, 0, 0, 0, mvhdCreated, 0);
+					//System.out.println(move);
+					return move;
+				}
+				sourceStream.skip(boxSize);
+			}
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	public void runRefreshFiles_DONE() {
