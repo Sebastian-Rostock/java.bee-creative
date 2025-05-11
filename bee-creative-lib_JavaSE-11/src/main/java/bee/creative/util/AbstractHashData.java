@@ -106,469 +106,61 @@ import bee.creative.lang.Objects;
  * @see HashSet
  * @see HashSet2
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GKey> Typ der Schlüssel.
- * @param <GValue> Typ der Werte. */
-public abstract class AbstractHashData<GKey, GValue> implements Emuable {
-
-	/** Diese Klasse implementiert das {@link Entry} für {@link AbstractHashData.HashIterator#nextEntry()}. */
-	protected static class HashEntry<GKey, GValue> implements Entry<GKey, GValue> {
-
-		protected final AbstractHashData<GKey, GValue> entryData;
-
-		protected final int entryIndex;
-
-		public HashEntry(AbstractHashData<GKey, GValue> entryData, int entryIndex) {
-			this.entryData = entryData;
-			this.entryIndex = entryIndex;
-		}
-
-		@Override
-		public GKey getKey() {
-			return this.entryData.customGetKey(this.entryIndex);
-		}
-
-		@Override
-		public GValue getValue() {
-			return this.entryData.customGetValue(this.entryIndex);
-		}
-
-		@Override
-		public GValue setValue(GValue value) {
-			return this.entryData.customSetValue(this.entryIndex, value);
-		}
-
-		@Override
-		public int hashCode() {
-			return this.entryData.customHashKey(this.entryIndex) ^ this.entryData.customHashValue(this.entryIndex);
-		}
-
-		@Override
-		public boolean equals(Object object) {
-			if (!(object instanceof Entry)) return false;
-			var that = (Entry<?, ?>)object;
-			return this.entryData.customEqualsKey(this.entryIndex, that.getKey()) && this.entryData.customEqualsValue(this.entryIndex, that.getValue());
-		}
-
-		@Override
-		public String toString() {
-			return this.getKey() + "=" + this.getValue();
-		}
-
-	}
-
-	/** Diese Klasse implementiert das unveränderliche {@link AbstractHashData.HashEntry}. */
-
-	protected static class HashEntry2<GKey, GValue> extends HashEntry<GKey, GValue> {
-
-		public HashEntry2(AbstractHashData<GKey, GValue> entryData, int entryIndex) {
-			super(entryData, entryIndex);
-		}
-
-		@Override
-		public GValue setValue(GValue value) {
-			throw new UnsupportedOperationException();
-		}
-
-	}
-
-	/** Diese Klasse implementiert den abstrakten {@link Iterator} über die Schlüssel, Werte und Einträge. */
-
-	protected static abstract class HashIterator<GKey, GValue, GItem> extends AbstractIterator<GItem> {
-
-		protected final AbstractHashData<GKey, GValue> entryData;
-
-		/** Dieses Feld speichert den Index des nächsten Eintrags in {@link AbstractHashData#customGetKey(int)}. */
-		protected int nextEntry;
-
-		/** Dieses Feld speichert den Index des aktuellen Eintrags in {@link AbstractHashData#table}. */
-		protected int nextTable = -1;
-
-		/** Dieses Feld speichert den Index des aktuellen Eintrags in {@link AbstractHashData#customGetKey(int)}. */
-		protected int prevEntry = -1;
-
-		protected int prevTable;
-
-		public HashIterator(AbstractHashData<GKey, GValue> entryData) {
-			this.entryData = entryData;
-			this.nextIndex2();
-		}
-
-		/** Diese Methode gibt den nächsten Schlüssel zurück. */
-		protected final GKey nextKey() {
-			return this.entryData.customGetKey(this.nextIndex());
-		}
-
-		/** Diese Methode gibt den nächsten Eintrag zurück. */
-		protected final Entry<GKey, GValue> nextEntry() {
-			return this.entryData.customGetEntry(this.nextIndex());
-		}
-
-		/** Diese Methode gibt den nächsten Wert zurück. */
-		protected final GValue nextValue() {
-			return this.entryData.customGetValue(this.nextIndex());
-		}
-
-		/** Diese Methode ermitteln den Index des nächsten Eintrags und gibt den des aktuellen zurück. */
-		protected final int nextIndex() {
-			var result = this.nextEntry;
-			this.prevEntry = result;
-			if (result < 0) throw new NoSuchElementException();
-			var nextEntry = this.entryData.nexts[result];
-			if (nextEntry >= 0) {
-				this.prevTable = this.nextTable;
-				this.nextEntry = nextEntry;
-			} else {
-				this.nextIndex2();
-			}
-			return result;
-		}
-
-		/** Diese Methode sucht den Index des nächsten Eintrags. */
-		final void nextIndex2() {
-			var table = this.entryData.table;
-			var length = table.length;
-			for (var nextTable = (this.prevTable = this.nextTable) + 1; nextTable < length; ++nextTable) {
-				var nextEntry = table[nextTable];
-				if (nextEntry >= 0) {
-					this.nextEntry = nextEntry;
-					this.nextTable = nextTable;
-					return;
-				}
-			}
-			this.nextEntry = -1;
-			this.nextTable = -1;
-		}
-
-		@Override
-		public boolean hasNext() {
-			return this.nextEntry >= 0;
-		}
-
-		@Override
-		public void remove() {
-			if (this.entryData.popEntryImpl(this.prevTable, this.prevEntry)) return;
-			this.prevEntry = -1;
-			throw new IllegalStateException();
-		}
-
-	}
-
-	/** Diese Klasse implementiert {@link AbstractHashData#newKeysImpl()}. */
-
-	protected static class Keys<GKey> extends AbstractSet2<GKey> {
-
-		protected final AbstractHashData<GKey, ?> entryData;
-
-		public Keys(AbstractHashData<GKey, ?> entryData) {
-			this.entryData = entryData;
-		}
-
-		@Override
-		public int size() {
-			return this.entryData.countImpl();
-		}
-
-		@Override
-		public void clear() {
-			this.entryData.clearImpl();
-		}
-
-		@Override
-		public Iterator2<GKey> iterator() {
-			return this.entryData.newKeysIteratorImpl();
-		}
-
-		@Override
-		public boolean contains(Object item) {
-			return this.entryData.hasKeyImpl(item);
-		}
-
-		@Override
-		public boolean remove(Object item) {
-			return this.entryData.popKeyImpl(item);
-		}
-
-		@Override
-		public int hashCode() {
-			var entryData = this.entryData;
-			var result = 0;
-			for (var iter = entryData.newKeysIteratorImpl(); iter.hasNext();) {
-				result += entryData.customHashKey(iter.nextIndex());
-			}
-			return result;
-		}
-
-		@Override
-		public boolean equals(final Object object) {
-			if (object == this) return true;
-			if (!(object instanceof Set)) return false;
-			var that = (Set<?>)object;
-			if (this.size() != that.size()) return false;
-			return this.containsAll(that);
-		}
-
-	}
-
-	/** Diese Klasse implementiert {@link AbstractHashData#newKeysIteratorImpl()}. */
-	protected static class KeysIterator<GKey, GValue> extends HashIterator<GKey, GValue, GKey> {
-
-		public KeysIterator(AbstractHashData<GKey, GValue> entryData) {
-			super(entryData);
-		}
-
-		@Override
-		public GKey next() {
-			return this.nextKey();
-		}
-
-	}
-
-	/** Diese Klasse implementiert {@link AbstractHashData#newValuesImpl()}. */
-	protected static class Values<GValue> extends AbstractCollection2<GValue> {
-
-		protected final AbstractHashData<?, GValue> entryData;
-
-		public Values(AbstractHashData<?, GValue> entryData) {
-			this.entryData = entryData;
-		}
-
-		@Override
-		public int size() {
-			return this.entryData.countImpl();
-		}
-
-		@Override
-		public void clear() {
-			this.entryData.clearImpl();
-		}
-
-		@Override
-		public Iterator2<GValue> iterator() {
-			return this.entryData.newValuesIteratorImpl();
-		}
-
-		@Override
-		public boolean contains(Object o) {
-			return this.entryData.hasValueImpl(o);
-		}
-
-		@Override
-		public boolean remove(Object o) {
-			return this.entryData.popValueImpl(o);
-		}
-
-	}
-
-	/** Diese Klasse implementiert {@link AbstractHashData#newValuesIteratorImpl()}. */
-
-	protected static class ValuesIterator<GKey, GValue> extends HashIterator<GKey, GValue, GValue> {
-
-		public ValuesIterator(AbstractHashData<GKey, GValue> entryData) {
-			super(entryData);
-		}
-
-		@Override
-		public GValue next() {
-			return this.nextValue();
-		}
-
-	}
-
-	/** Diese Klasse implementiert {@link AbstractHashData#newEntriesImpl()}. */
-
-	protected static class Entries<GKey, GValue> extends AbstractSet2<Entry<GKey, GValue>> {
-
-		protected final AbstractHashData<GKey, GValue> entryData;
-
-		public Entries(AbstractHashData<GKey, GValue> entryData) {
-			this.entryData = entryData;
-		}
-
-		@Override
-		public int size() {
-			return this.entryData.countImpl();
-		}
-
-		@Override
-		public void clear() {
-			this.entryData.clearImpl();
-		}
-
-		@Override
-		public Iterator2<Entry<GKey, GValue>> iterator() {
-			return this.entryData.newEntriesIteratorImpl();
-		}
-
-		@Override
-		public boolean remove(Object object) {
-			if (!(object instanceof Entry)) return false;
-			var entry = (Entry<?, ?>)object;
-			return this.entryData.popEntryImpl(entry.getKey(), entry.getValue());
-		}
-
-		@Override
-		public boolean contains(Object object) {
-			if (!(object instanceof Entry)) return false;
-			var entry = (Entry<?, ?>)object;
-			return this.entryData.hasEntryImpl(entry.getKey(), entry.getValue());
-		}
-
-	}
-
-	/** Diese Klasse implementiert {@link AbstractHashData#newEntriesIteratorImpl()}. */
-
-	protected static class EntriesIterator<GKey, GValue> extends HashIterator<GKey, GValue, Entry<GKey, GValue>> {
-
-		public EntriesIterator(AbstractHashData<GKey, GValue> entryData) {
-			super(entryData);
-		}
-
-		@Override
-		public Entry<GKey, GValue> next() {
-			return this.nextEntry();
-		}
-
-	}
-
-	/** Diese Klasse implementiert {@link AbstractHashData#newMappingImpl()}. */
-	protected static class Mapping<GKey, GValue> extends AbstractMap<GKey, GValue> implements Map3<GKey, GValue> {
-
-		protected final AbstractHashData<GKey, GValue> entryData;
-
-		public Mapping(AbstractHashData<GKey, GValue> entryData) {
-			this.entryData = entryData;
-		}
-
-		@Override
-		public int size() {
-			return this.entryData.countImpl();
-		}
-
-		@Override
-		public void clear() {
-			this.entryData.clearImpl();
-		}
-
-		@Override
-		public boolean isEmpty() {
-			return this.entryData.countImpl() == 0;
-		}
-
-		@Override
-		public boolean containsKey(Object key) {
-			return this.entryData.hasKeyImpl(key);
-		}
-
-		@Override
-		public boolean containsValue(Object value) {
-			return this.values().contains(value);
-		}
-
-		@Override
-		public GValue get(Object key) {
-			return this.entryData.getImpl(key);
-		}
-
-		@Override
-		public Keys<GKey> keySet() {
-			return this.entryData.newKeysImpl();
-		}
-
-		@Override
-		public GValue put(GKey key, GValue value) {
-			return this.entryData.putImpl(key, value);
-		}
-
-		@Override
-		public GValue remove(Object key) {
-			return this.entryData.popImpl(key);
-		}
-
-		@Override
-		public Values<GValue> values() {
-			return this.entryData.newValuesImpl();
-		}
-
-		@Override
-		public Entries<GKey, GValue> entrySet() {
-			return this.entryData.newEntriesImpl();
-		}
-
-	}
-
-	/** Diese Schnittstelle definiert den Allokator zur Reservierung und Aktualisierung der Schlüssel- und Wertlisten eines {@link AbstractHashData}. */
-	protected static interface HashAllocator {
-
-		/** Diese Methode kopiert Schlüssel und Wert des gegebenen Quelleintrags zum gegebenen Zieleintrag.
-		 *
-		 * @see AbstractHashData#allocateImpl(int)
-		 * @param sourceIndex Index des Quelleintrags.
-		 * @param targetIndex Index des Zieleintrags. */
-		void copy(int sourceIndex, int targetIndex);
-
-		/** Diese Methode überträgt die Schlüssel- und Wertlisten auf den Erzeuger dieses Allokators.
-		 *
-		 * @see AbstractHashData#allocateImpl(int) **/
-		void apply();
-
-	}
-
-	/** Dieses Feld speichert die maximale Kapazität. */
-	private static final int MAX_CAPACITY = Integer.MAX_VALUE - 8;
-
-	/** Dieses Feld speichert den initialwert für {@link #table}. */
-	private static final int[] EMPTY_TABLE = {-1};
-
-	/** Dieses Feld speichert den initialwert für eine leere Zahlenliste. */
-	protected static final long[] EMPTY_LONGS = {};
-
-	/** Dieses Feld speichert den initialwert für eine Objektliste. */
-	protected static final Object[] EMPTY_OBJECTS = {};
-
-	/** Dieses Feld speichert den initialwert für eine leere Zahlenliste. */
-	protected static final int[] EMPTY_INTEGERS = {};
-
-	private static void setupNextsImpl(int[] array) {
-		for (int i = 0, size = array.length; i < size; array[i] = ++i) {}
-	}
-
-	private static void setupTableImpl(int[] array) {
-		Arrays.fill(array, -1);
-	}
-
-	/** Dieses Feld bildet vom maskierten Streuwert eines Schlüssels auf den Index des Eintrags ab, dessen Schlüssel den gleichen maskierten Streuwert besitzt.
-	 * Die Länge dieser Liste entspricht stets einer Potenz von 2. Ungenutzte Elemente sind {@code -1}. */
-	transient int[] table;
-
-	/** Dieses Feld bildet vom Index eines Eintrags auf den Index des nächsten Eintrags ab. Für alle anderen Indizes bildet es auf den Index des nächsten
-	 * reservierten Speicherbereiches ab. Ungenutzte Elemente sind {@code -1}. */
-	transient int[] nexts;
-
-	/** Dieses Feld speichert die Anzahl der Einträge. */
-	transient int count;
-
-	/** Dieses Feld speichert den Index des nächsten freien Speicherbereiches in {@link #nexts}. Die ungenutzten Speicherbereiche bilden über {@link #nexts} eine
-	 * einfach verkettete Liste. */
-	transient int empty;
+ * @param <KEY> Typ der Schlüssel.
+ * @param <VALUE> Typ der Werte. */
+public abstract class AbstractHashData<KEY, VALUE> implements Emuable {
 
 	/** Dieser Konstruktor initialisiert das die {@link #capacityImpl() Kapazität} mit {@code 0}. */
 	public AbstractHashData() {
 		this.table = AbstractHashData.EMPTY_TABLE;
-		this.nexts = AbstractHashData.EMPTY_INTEGERS;
+		this.nexts = AbstractHashData.EMPTY_INTS;
 		this.customAllocator(0).apply();
+	}
+
+	@Override
+	public long emu() {
+		return EMU.fromObject(this) + EMU.fromArray(this.table) + EMU.fromArray(this.nexts);
+	}
+
+	/** Diese Methode liefert eine Abbildung, die jeder in diesem Objekt vorkommenden Anzahl von Streuwertkollissionen die Anzahl der betroffenen Datensätze
+	 * zuordnet.
+	 *
+	 * @param permille {@code true}, wenn die Datensatzanzahl relativ in aufgerundeten Promille angegeben werden soll; {@code false}, wenn die Datensatzanzahl
+	 *        absolut angegeben werden soll.
+	 * @return Abbildung von Kollissionsanzahl auf Datensatzanzahl. */
+	public Map<Integer, Integer> collisions(boolean permille) {
+		var result = new HashMapII();
+		var table = this.table;
+		var nexts = this.nexts;
+		var length = table.length;
+		for (var index = 0; index < length; ++index) {
+			var count = 0;
+			for (var entry = table[index]; entry >= 0; entry = nexts[entry]) {
+				result.add(++count, 1);
+			}
+		}
+		var count = this.count;
+		if (!permille || (count == 0)) return result;
+		var mod = 0;
+		for (var entry: result.entrySet()) {
+			var val = (entry.getValue() * 1000) + mod;
+			mod = val % count;
+			entry.setValue(val / count);
+		}
+		return result;
 	}
 
 	/** Diese Methode wird in {@link HashEntry#getKey()} sowie {@link HashIterator#nextKey()} genutzt und gibt den Schlüssel des gegebenen Eintrags zurück.
 	 *
 	 * @param entryIndex Index eines Eintrags.
 	 * @return Schlüssel oder {@code null}. */
-	protected abstract GKey customGetKey(int entryIndex);
+	protected abstract KEY customGetKey(int entryIndex);
 
 	/** Diese Methode wird in {@link HashIterator#nextEntry()} genutzt und gibt den Eintrag zum gegebenen Index zurück.
 	 *
 	 * @param entryIndex Index eines Eintrags.
 	 * @return Eintrag. */
-	protected Entry<GKey, GValue> customGetEntry(int entryIndex) {
+	protected Entry<KEY, VALUE> customGetEntry(int entryIndex) {
 		return new HashEntry<>(this, entryIndex);
 	}
 
@@ -577,20 +169,20 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 	 *
 	 * @param entryIndex Index eines Eintrags.
 	 * @return Wert oder {@code null}. */
-	protected abstract GValue customGetValue(int entryIndex);
+	protected abstract VALUE customGetValue(int entryIndex);
 
 	/** Diese Methode wird von {@link #customSetKey(int, Object)} genutzt und ersetzt den Wert des gegebenen Schlüssels.
 	 *
 	 * @param entryIndex Index eines Eintrags.
 	 * @param key neuer Schlüssel oder {@code null}. */
-	protected abstract void customSetKey(int entryIndex, GKey key);
+	protected abstract void customSetKey(int entryIndex, KEY key);
 
 	/** Diese Methode wird von {@link #putIndexImpl(Object)} genutzt und ersetzt den Wert des gegebenen Schlüssels.
 	 *
 	 * @param entryIndex Index eines Eintrags.
 	 * @param key neuer Schlüssel oder {@code null}.
 	 * @param keyHash Streuwert des Schlüssels. */
-	protected void customSetKey(int entryIndex, GKey key, int keyHash) {
+	protected void customSetKey(int entryIndex, KEY key, int keyHash) {
 		this.customSetKey(entryIndex, key);
 	}
 
@@ -600,7 +192,7 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 	 * @param entryIndex Index eines Eintrags.
 	 * @param value neuer Wert oder {@code null}.
 	 * @return alter Wert oder {@code null}. */
-	protected abstract GValue customSetValue(int entryIndex, GValue value);
+	protected abstract VALUE customSetValue(int entryIndex, VALUE value);
 
 	/** Diese Methode wird in {@link #getIndexImpl(Object)}, {@link #putIndexImpl(Object)}, {@link #popIndexImpl(Object)} sowie
 	 * {@link #popEntryImpl(Object, Object)} genutzt und gibt den {@link Object#hashCode() Streuwert} des gegebenen Schlüssels zurück.
@@ -685,7 +277,7 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 	 *
 	 * @param key Schlüssel zur Ermittlung des Eintrags.
 	 * @return Schlüssel des neuen Eintrags. */
-	protected GKey customInstallKey(GKey key) {
+	protected KEY customInstallKey(KEY key) {
 		return key;
 	}
 
@@ -695,7 +287,7 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 	 *
 	 * @param key Schlüssel des neuen Eintrags.
 	 * @return Wert des neuen Eintrags. */
-	protected GValue customInstallValue(GKey key) {
+	protected VALUE customInstallValue(KEY key) {
 		return null;
 	}
 
@@ -720,7 +312,7 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 	 *
 	 * @param key Schlüssel des Eintrags.
 	 * @return Index des gefundenen oder erzeugten Eintrags. */
-	protected final int installImpl(GKey key) {
+	protected final int installImpl(KEY key) {
 		var count = this.count;
 		var index = this.putIndexImpl(key);
 		if (count == this.count) {
@@ -738,23 +330,23 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 	 * <b>Achtung:</b> Innerhalb der Methoden {@code installKey} und {@code installValue} dürfen Einträge nicht {@link #putKeyImpl(Object) eingefügt},
 	 * {@link #popIndexImpl(Object) entfernt} oder {@link #allocateImpl(int) reserviert} werden.
 	 *
-	 * @param key2 Schlüssel des Eintrags.
+	 * @param key Schlüssel des Eintrags.
 	 * @param installKey Methode zur Überführung des gegebenen Schlüssels in den einzutragenden Schlüssel.
 	 * @param installValue Methode zur Überführung des einzutragenden Schlüssels in den einzutragenden Wert.
 	 * @return Index des gefundenen oder erzeugten Eintrags. */
-	protected final <KEY2 extends GKey> int installImpl(KEY2 key2, Getter<? super KEY2, ? extends KEY2> installKey,
-		Getter<? super KEY2, ? extends GValue> installValue) {
+	protected final <KEY2 extends KEY, KEY3 extends KEY> int installImpl(KEY3 key, Getter<? super KEY3, ? extends KEY2> installKey,
+		Getter<? super KEY2, ? extends VALUE> installValue) {
 		var count = this.count;
-		var index = this.putIndexImpl(key2);
+		var index = this.putIndexImpl(key);
 		if (count == this.count) return index;
-		key2 = installKey.get(key2);
+		var key2 = installKey.get(key);
 		this.customSetKey(index, key2);
 		var value = installValue.get(key2);
 		this.customSetValue(index, value);
 		return index;
 	}
 
-	protected final <KEY2 extends GKey> GValue updateImpl(KEY2 key2, Getter<? super KEY2, ? extends KEY2> installKey, Reducer<? super GKey, GValue> updateValue) {
+	protected final <KEY2 extends KEY> VALUE updateImpl(KEY2 key2, Getter<? super KEY2, ? extends KEY2> installKey, Reducer<? super KEY, VALUE> updateValue) {
 		var index = this.getIndexImpl(key2);
 		if (index < 0) {
 			key2 = installKey.get(key2);
@@ -803,7 +395,7 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 		if (capacity == 0) {
 			this.empty = 0;
 			this.table = AbstractHashData.EMPTY_TABLE;
-			this.nexts = AbstractHashData.EMPTY_INTEGERS;
+			this.nexts = AbstractHashData.EMPTY_INTS;
 		} else if (capacity <= AbstractHashData.MAX_CAPACITY) {
 			var newMask = Objects.mask(capacity);
 			var oldTable = this.table;
@@ -870,7 +462,7 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 	 * @see Map#get(Object)
 	 * @param key Schlüssel des Eintrags.
 	 * @return Wert des gefundenen Eintrags oder {@code null}. */
-	protected final GValue getImpl(Object key) {
+	protected final VALUE getImpl(Object key) {
 		var entryIndex = this.getIndexImpl(key);
 		return entryIndex < 0 ? null : this.customGetValue(entryIndex);
 	}
@@ -884,17 +476,6 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 		return this.getIndexImpl2(key, this.customHash(key));
 	}
 
-	private int getIndexImpl2(Object key, int keyHash) {
-		var table = this.table;
-		var nexts = this.nexts;
-		var index = keyHash & (table.length - 1);
-		var entry = table[index];
-		for (var result = entry; 0 <= result; result = nexts[result]) {
-			if (this.customEqualsKey(result, key, keyHash)) return result;
-		}
-		return -1;
-	}
-
 	/** Diese Methode sucht den Eintrag mit dem gegebenen Schlüssel, setzt dessen Wert und gibt seinen vorherigen Wert zurück. Wenn kein solcher Eintrag
 	 * existierte, wird {@code null} geliefert.
 	 *
@@ -902,7 +483,7 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 	 * @param key Schlüssel des Eintrags.
 	 * @param value neuer Wert des Eintrags.
 	 * @return alert Wert des gefundenen Eintrags oder {@code null}. */
-	protected final GValue putImpl(GKey key, GValue value) {
+	protected final VALUE putImpl(KEY key, VALUE value) {
 		var entryIndex = this.putIndexImpl(key);
 		return this.customSetValue(entryIndex, value);
 	}
@@ -913,7 +494,7 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 	 * @see Set#add(Object)
 	 * @param key Schlüssel des Eintrags.
 	 * @return {@code true}, wenn der Eintrag erzeugt wurde. */
-	protected final boolean putKeyImpl(GKey key) {
+	protected final boolean putKeyImpl(KEY key) {
 		var count = this.count;
 		this.putIndexImpl(key);
 		return count != this.count;
@@ -923,7 +504,7 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 	 *
 	 * @param key Schlüssel des Eintrags.
 	 * @return Index des gefundenen oder erzeugten Eintrags. */
-	protected final int putIndexImpl(GKey key) {
+	protected final int putIndexImpl(KEY key) {
 		var keyHash = this.customHash(key);
 		var result = this.getIndexImpl2(key, keyHash);
 		if (result >= 0) return result;
@@ -937,25 +518,13 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 		return this.putIndexImpl2(key, keyHash);
 	}
 
-	private int putIndexImpl2(GKey key, int keyHash) {
-		var table = this.table;
-		var nexts = this.nexts;
-		var index = keyHash & (table.length - 1);
-		var result = this.empty;
-		this.empty = nexts[result];
-		nexts[result] = table[index];
-		table[index] = result;
-		this.customSetKey(result, key, keyHash);
-		return result;
-	}
-
 	/** Diese Methode entfernt den Eintrag mit dem gegebenen Schlüssel und gibt den Wert des Eintrags zurück. Wenn kein solcher Eintrag existiert, wird
 	 * {@code null} geliefert.
 	 *
 	 * @see Map#remove(Object)
 	 * @param key Schlüssel.
 	 * @return Wert oder {@code null}. */
-	protected final GValue popImpl(Object key) {
+	protected final VALUE popImpl(Object key) {
 		var entryIndex = this.popIndexImpl(key);
 		if (entryIndex < 0) return null;
 		var result = this.customGetValue(entryIndex);
@@ -1070,6 +639,543 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 		return this.popIndexImpl2(key, this.customHash(key));
 	}
 
+	/** Diese Methode gibt das {@link Set} der Schlüssel zurück.
+	 *
+	 * @return Schlüssel. */
+	protected final Keys<KEY> newKeysImpl() {
+		return new Keys<>(this);
+	}
+
+	/** Diese Methode gibt den {@link Iterator} über die Schlüssel zurück.
+	 *
+	 * @return Interator für {@link #newKeysImpl()}. */
+	protected final KeysIterator<KEY, VALUE> newKeysIteratorImpl() {
+		return new KeysIterator<>(this);
+	}
+
+	/** Diese Methode gibt die {@link Collection} der Werte zurück.
+	 *
+	 * @return Werte. */
+	protected final Values<VALUE> newValuesImpl() {
+		return new Values<>(this);
+	}
+
+	/** Diese Methode gibt den {@link Iterator} über die Werte zurück.
+	 *
+	 * @return Interator für {@link #newValuesImpl()}. */
+	protected final ValuesIterator<KEY, VALUE> newValuesIteratorImpl() {
+		return new ValuesIterator<>(this);
+	}
+
+	/** Diese Methode gibt das {@link Set} der Einträge zurück.
+	 *
+	 * @return Einträge. */
+	protected final Entries<KEY, VALUE> newEntriesImpl() {
+		return new Entries<>(this);
+	}
+
+	/** Diese Methode gibt den {@link Iterator} über die Einträge zurück.
+	 *
+	 * @return Interator für {@link #newEntriesImpl()}. */
+	protected final EntriesIterator<KEY, VALUE> newEntriesIteratorImpl() {
+		return new EntriesIterator<>(this);
+	}
+
+	/** Diese Methode gibt die {@link Map} zu den Schlüsseln und Werten zurück.
+	 *
+	 * @return Abbildung. */
+	protected final Mapping<KEY, VALUE> newMappingImpl() {
+		return new Mapping<>(this);
+	}
+
+	/** Diese Methode entfernt alle Einträge. Hierbei werden die Anzahl der Einträge auf {@code 0} gesetzt und die Tabellen initialisiert. */
+	protected final void clearImpl() {
+		if (this.count == 0) return;
+		AbstractHashData.setupTableImpl(this.table);
+		AbstractHashData.setupNextsImpl(this.nexts);
+		this.empty = 0;
+		this.customClear();
+		this.count = 0;
+	}
+
+	@Override
+	protected AbstractHashData<KEY, VALUE> clone() {
+		try {
+			@SuppressWarnings ("unchecked")
+			var result = (AbstractHashData<KEY, VALUE>)super.clone();
+			if (this.capacityImpl() == 0) return result;
+			result.table = this.table.clone();
+			result.nexts = this.nexts.clone();
+			return result;
+		} catch (Exception cause) {
+			throw new IllegalStateException(cause);
+		}
+	}
+
+	/** Diese Klasse implementiert das {@link Entry} für {@link AbstractHashData.HashIterator#nextEntry()}. */
+	protected static class HashEntry<GKey, GValue> implements Entry<GKey, GValue> {
+
+		public HashEntry(AbstractHashData<GKey, GValue> entryData, int entryIndex) {
+			this.entryData = entryData;
+			this.entryIndex = entryIndex;
+		}
+
+		@Override
+		public GKey getKey() {
+			return this.entryData.customGetKey(this.entryIndex);
+		}
+
+		@Override
+		public GValue getValue() {
+			return this.entryData.customGetValue(this.entryIndex);
+		}
+
+		@Override
+		public GValue setValue(GValue value) {
+			return this.entryData.customSetValue(this.entryIndex, value);
+		}
+
+		@Override
+		public int hashCode() {
+			return this.entryData.customHashKey(this.entryIndex) ^ this.entryData.customHashValue(this.entryIndex);
+		}
+
+		@Override
+		public boolean equals(Object object) {
+			if (!(object instanceof Entry)) return false;
+			var that = (Entry<?, ?>)object;
+			return this.entryData.customEqualsKey(this.entryIndex, that.getKey()) && this.entryData.customEqualsValue(this.entryIndex, that.getValue());
+		}
+
+		@Override
+		public String toString() {
+			return this.getKey() + "=" + this.getValue();
+		}
+
+		protected final AbstractHashData<GKey, GValue> entryData;
+
+		protected final int entryIndex;
+
+	}
+
+	/** Diese Klasse implementiert das unveränderliche {@link AbstractHashData.HashEntry}. */
+
+	protected static class HashEntry2<GKey, GValue> extends HashEntry<GKey, GValue> {
+
+		public HashEntry2(AbstractHashData<GKey, GValue> entryData, int entryIndex) {
+			super(entryData, entryIndex);
+		}
+
+		@Override
+		public GValue setValue(GValue value) {
+			throw new UnsupportedOperationException();
+		}
+
+	}
+
+	/** Diese Klasse implementiert den abstrakten {@link Iterator} über die Schlüssel, Werte und Einträge. */
+
+	protected static abstract class HashIterator<GKey, GValue, GItem> extends AbstractIterator<GItem> {
+
+		@Override
+		public boolean hasNext() {
+			return this.nextEntry >= 0;
+		}
+
+		@Override
+		public void remove() {
+			if (this.entryData.popEntryImpl(this.prevTable, this.prevEntry)) return;
+			this.prevEntry = -1;
+			throw new IllegalStateException();
+		}
+
+		protected final AbstractHashData<GKey, GValue> entryData;
+
+		/** Dieses Feld speichert den Index des nächsten Eintrags in {@link AbstractHashData#customGetKey(int)}. */
+		protected int nextEntry;
+
+		/** Dieses Feld speichert den Index des aktuellen Eintrags in {@link AbstractHashData#table}. */
+		protected int nextTable = -1;
+
+		/** Dieses Feld speichert den Index des aktuellen Eintrags in {@link AbstractHashData#customGetKey(int)}. */
+		protected int prevEntry = -1;
+
+		protected int prevTable;
+
+		protected HashIterator(AbstractHashData<GKey, GValue> entryData) {
+			this.entryData = entryData;
+			this.nextIndex2();
+		}
+
+		/** Diese Methode gibt den nächsten Schlüssel zurück. */
+		protected final GKey nextKey() {
+			return this.entryData.customGetKey(this.nextIndex());
+		}
+
+		/** Diese Methode gibt den nächsten Eintrag zurück. */
+		protected final Entry<GKey, GValue> nextEntry() {
+			return this.entryData.customGetEntry(this.nextIndex());
+		}
+
+		/** Diese Methode gibt den nächsten Wert zurück. */
+		protected final GValue nextValue() {
+			return this.entryData.customGetValue(this.nextIndex());
+		}
+
+		/** Diese Methode ermitteln den Index des nächsten Eintrags und gibt den des aktuellen zurück. */
+		protected final int nextIndex() {
+			var result = this.nextEntry;
+			this.prevEntry = result;
+			if (result < 0) throw new NoSuchElementException();
+			var nextEntry = this.entryData.nexts[result];
+			if (nextEntry >= 0) {
+				this.prevTable = this.nextTable;
+				this.nextEntry = nextEntry;
+			} else {
+				this.nextIndex2();
+			}
+			return result;
+		}
+
+		/** Diese Methode sucht den Index des nächsten Eintrags. */
+		final void nextIndex2() {
+			var table = this.entryData.table;
+			var length = table.length;
+			for (var nextTable = (this.prevTable = this.nextTable) + 1; nextTable < length; ++nextTable) {
+				var nextEntry = table[nextTable];
+				if (nextEntry >= 0) {
+					this.nextEntry = nextEntry;
+					this.nextTable = nextTable;
+					return;
+				}
+			}
+			this.nextEntry = -1;
+			this.nextTable = -1;
+		}
+
+	}
+
+	/** Diese Schnittstelle definiert den Allokator zur Reservierung und Aktualisierung der Schlüssel- und Wertlisten eines {@link AbstractHashData}. */
+	protected static interface HashAllocator {
+	
+		/** Diese Methode kopiert Schlüssel und Wert des gegebenen Quelleintrags zum gegebenen Zieleintrag.
+		 *
+		 * @see AbstractHashData#allocateImpl(int)
+		 * @param sourceIndex Index des Quelleintrags.
+		 * @param targetIndex Index des Zieleintrags. */
+		void copy(int sourceIndex, int targetIndex);
+	
+		/** Diese Methode überträgt die Schlüssel- und Wertlisten auf den Erzeuger dieses Allokators.
+		 *
+		 * @see AbstractHashData#allocateImpl(int) **/
+		void apply();
+	
+	}
+
+	/** Diese Klasse implementiert {@link AbstractHashData#newKeysImpl()}. */
+
+	protected static class Keys<GKey> extends AbstractSet2<GKey> {
+
+		public Keys(AbstractHashData<GKey, ?> entryData) {
+			this.entryData = entryData;
+		}
+
+		@Override
+		public int size() {
+			return this.entryData.countImpl();
+		}
+
+		@Override
+		public void clear() {
+			this.entryData.clearImpl();
+		}
+
+		@Override
+		public Iterator2<GKey> iterator() {
+			return this.entryData.newKeysIteratorImpl();
+		}
+
+		@Override
+		public boolean contains(Object item) {
+			return this.entryData.hasKeyImpl(item);
+		}
+
+		@Override
+		public boolean remove(Object item) {
+			return this.entryData.popKeyImpl(item);
+		}
+
+		@Override
+		public int hashCode() {
+			var entryData = this.entryData;
+			var result = 0;
+			for (var iter = entryData.newKeysIteratorImpl(); iter.hasNext();) {
+				result += entryData.customHashKey(iter.nextIndex());
+			}
+			return result;
+		}
+
+		@Override
+		public boolean equals(final Object object) {
+			if (object == this) return true;
+			if (!(object instanceof Set)) return false;
+			var that = (Set<?>)object;
+			if (this.size() != that.size()) return false;
+			return this.containsAll(that);
+		}
+
+		protected final AbstractHashData<GKey, ?> entryData;
+
+	}
+
+	/** Diese Klasse implementiert {@link AbstractHashData#newKeysIteratorImpl()}. */
+	protected static class KeysIterator<GKey, GValue> extends HashIterator<GKey, GValue, GKey> {
+
+		public KeysIterator(AbstractHashData<GKey, GValue> entryData) {
+			super(entryData);
+		}
+
+		@Override
+		public GKey next() {
+			return this.nextKey();
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link AbstractHashData#newValuesImpl()}. */
+	protected static class Values<GValue> extends AbstractCollection2<GValue> {
+
+		public Values(AbstractHashData<?, GValue> entryData) {
+			this.entryData = entryData;
+		}
+
+		@Override
+		public int size() {
+			return this.entryData.countImpl();
+		}
+
+		@Override
+		public void clear() {
+			this.entryData.clearImpl();
+		}
+
+		@Override
+		public Iterator2<GValue> iterator() {
+			return this.entryData.newValuesIteratorImpl();
+		}
+
+		@Override
+		public boolean contains(Object o) {
+			return this.entryData.hasValueImpl(o);
+		}
+
+		@Override
+		public boolean remove(Object o) {
+			return this.entryData.popValueImpl(o);
+		}
+
+		protected final AbstractHashData<?, GValue> entryData;
+
+	}
+
+	/** Diese Klasse implementiert {@link AbstractHashData#newValuesIteratorImpl()}. */
+
+	protected static class ValuesIterator<GKey, GValue> extends HashIterator<GKey, GValue, GValue> {
+
+		public ValuesIterator(AbstractHashData<GKey, GValue> entryData) {
+			super(entryData);
+		}
+
+		@Override
+		public GValue next() {
+			return this.nextValue();
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link AbstractHashData#newEntriesImpl()}. */
+
+	protected static class Entries<GKey, GValue> extends AbstractSet2<Entry<GKey, GValue>> {
+
+		public Entries(AbstractHashData<GKey, GValue> entryData) {
+			this.entryData = entryData;
+		}
+
+		@Override
+		public int size() {
+			return this.entryData.countImpl();
+		}
+
+		@Override
+		public void clear() {
+			this.entryData.clearImpl();
+		}
+
+		@Override
+		public Iterator2<Entry<GKey, GValue>> iterator() {
+			return this.entryData.newEntriesIteratorImpl();
+		}
+
+		@Override
+		public boolean remove(Object object) {
+			if (!(object instanceof Entry)) return false;
+			var entry = (Entry<?, ?>)object;
+			return this.entryData.popEntryImpl(entry.getKey(), entry.getValue());
+		}
+
+		@Override
+		public boolean contains(Object object) {
+			if (!(object instanceof Entry)) return false;
+			var entry = (Entry<?, ?>)object;
+			return this.entryData.hasEntryImpl(entry.getKey(), entry.getValue());
+		}
+
+		protected final AbstractHashData<GKey, GValue> entryData;
+
+	}
+
+	/** Diese Klasse implementiert {@link AbstractHashData#newEntriesIteratorImpl()}. */
+
+	protected static class EntriesIterator<GKey, GValue> extends HashIterator<GKey, GValue, Entry<GKey, GValue>> {
+
+		public EntriesIterator(AbstractHashData<GKey, GValue> entryData) {
+			super(entryData);
+		}
+
+		@Override
+		public Entry<GKey, GValue> next() {
+			return this.nextEntry();
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link AbstractHashData#newMappingImpl()}. */
+	protected static class Mapping<GKey, GValue> extends AbstractMap<GKey, GValue> implements Map3<GKey, GValue> {
+
+		public Mapping(AbstractHashData<GKey, GValue> entryData) {
+			this.entryData = entryData;
+		}
+
+		@Override
+		public int size() {
+			return this.entryData.countImpl();
+		}
+
+		@Override
+		public void clear() {
+			this.entryData.clearImpl();
+		}
+
+		@Override
+		public boolean isEmpty() {
+			return this.entryData.countImpl() == 0;
+		}
+
+		@Override
+		public boolean containsKey(Object key) {
+			return this.entryData.hasKeyImpl(key);
+		}
+
+		@Override
+		public boolean containsValue(Object value) {
+			return this.values().contains(value);
+		}
+
+		@Override
+		public GValue get(Object key) {
+			return this.entryData.getImpl(key);
+		}
+
+		@Override
+		public Keys<GKey> keySet() {
+			return this.entryData.newKeysImpl();
+		}
+
+		@Override
+		public GValue put(GKey key, GValue value) {
+			return this.entryData.putImpl(key, value);
+		}
+
+		@Override
+		public GValue remove(Object key) {
+			return this.entryData.popImpl(key);
+		}
+
+		@Override
+		public Values<GValue> values() {
+			return this.entryData.newValuesImpl();
+		}
+
+		@Override
+		public Entries<GKey, GValue> entrySet() {
+			return this.entryData.newEntriesImpl();
+		}
+
+		protected final AbstractHashData<GKey, GValue> entryData;
+
+	}
+
+	/** Dieses Feld bildet vom maskierten Streuwert eines Schlüssels auf den Index des Eintrags ab, dessen Schlüssel den gleichen maskierten Streuwert besitzt.
+	 * Die Länge dieser Liste entspricht stets einer Potenz von 2. Ungenutzte Elemente sind {@code -1}. */
+	transient int[] table;
+
+	/** Dieses Feld bildet vom Index eines Eintrags auf den Index des nächsten Eintrags ab. Für alle anderen Indizes bildet es auf den Index des nächsten
+	 * reservierten Speicherbereiches ab. Ungenutzte Elemente sind {@code -1}. */
+	transient int[] nexts;
+
+	/** Dieses Feld speichert die Anzahl der Einträge. */
+	transient int count;
+
+	/** Dieses Feld speichert den Index des nächsten freien Speicherbereiches in {@link #nexts}. Die ungenutzten Speicherbereiche bilden über {@link #nexts} eine
+	 * einfach verkettete Liste. */
+	transient int empty;
+
+	/** Dieses Feld speichert den initialwert für eine leere Zahlenliste. */
+	protected static final int[] EMPTY_INTS = {};
+
+	/** Dieses Feld speichert den initialwert für eine leere Zahlenliste. */
+	protected static final long[] EMPTY_LONGS = {};
+
+	/** Dieses Feld speichert den initialwert für eine Objektliste. */
+	protected static final Object[] EMPTY_OBJECTS = {};
+
+	/** Dieses Feld speichert den initialwert für {@link #table}. */
+	private static final int[] EMPTY_TABLE = {-1};
+
+	/** Dieses Feld speichert die maximale Kapazität. */
+	private static final int MAX_CAPACITY = Integer.MAX_VALUE - 8;
+
+	private static void setupNextsImpl(int[] array) {
+		for (int i = 0, size = array.length; i < size; array[i] = ++i) {}
+	}
+
+	private static void setupTableImpl(int[] array) {
+		Arrays.fill(array, -1);
+	}
+
+	private int getIndexImpl2(Object key, int keyHash) {
+		var table = this.table;
+		var nexts = this.nexts;
+		var index = keyHash & (table.length - 1);
+		var entry = table[index];
+		for (var result = entry; 0 <= result; result = nexts[result]) {
+			if (this.customEqualsKey(result, key, keyHash)) return result;
+		}
+		return -1;
+	}
+
+	private int putIndexImpl2(KEY key, int keyHash) {
+		var table = this.table;
+		var nexts = this.nexts;
+		var index = keyHash & (table.length - 1);
+		var result = this.empty;
+		this.empty = nexts[result];
+		nexts[result] = table[index];
+		table[index] = result;
+		this.customSetKey(result, key, keyHash);
+		return result;
+	}
+
 	private int popIndexImpl2(Object key, int keyHash) {
 		var table = this.table;
 		var nexts = this.nexts;
@@ -1093,115 +1199,8 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 				this.count--;
 				return nextIndex;
 			}
-		}
-
+		}	
 		return -1;
-	}
-
-	/** Diese Methode gibt das {@link Set} der Schlüssel zurück.
-	 *
-	 * @return Schlüssel. */
-	protected final Keys<GKey> newKeysImpl() {
-		return new Keys<>(this);
-	}
-
-	/** Diese Methode gibt den {@link Iterator} über die Schlüssel zurück.
-	 *
-	 * @return Interator für {@link #newKeysImpl()}. */
-	protected final KeysIterator<GKey, GValue> newKeysIteratorImpl() {
-		return new KeysIterator<>(this);
-	}
-
-	/** Diese Methode gibt die {@link Collection} der Werte zurück.
-	 *
-	 * @return Werte. */
-	protected final Values<GValue> newValuesImpl() {
-		return new Values<>(this);
-	}
-
-	/** Diese Methode gibt den {@link Iterator} über die Werte zurück.
-	 *
-	 * @return Interator für {@link #newValuesImpl()}. */
-	protected final ValuesIterator<GKey, GValue> newValuesIteratorImpl() {
-		return new ValuesIterator<>(this);
-	}
-
-	/** Diese Methode gibt das {@link Set} der Einträge zurück.
-	 *
-	 * @return Einträge. */
-	protected final Entries<GKey, GValue> newEntriesImpl() {
-		return new Entries<>(this);
-	}
-
-	/** Diese Methode gibt den {@link Iterator} über die Einträge zurück.
-	 *
-	 * @return Interator für {@link #newEntriesImpl()}. */
-	protected final EntriesIterator<GKey, GValue> newEntriesIteratorImpl() {
-		return new EntriesIterator<>(this);
-	}
-
-	/** Diese Methode gibt die {@link Map} zu den Schlüsseln und Werten zurück.
-	 *
-	 * @return Abbildung. */
-	protected final Mapping<GKey, GValue> newMappingImpl() {
-		return new Mapping<>(this);
-	}
-
-	/** Diese Methode entfernt alle Einträge. Hierbei werden die Anzahl der Einträge auf {@code 0} gesetzt und die Tabellen initialisiert. */
-	protected final void clearImpl() {
-		if (this.count == 0) return;
-		AbstractHashData.setupTableImpl(this.table);
-		AbstractHashData.setupNextsImpl(this.nexts);
-		this.empty = 0;
-		this.customClear();
-		this.count = 0;
-	}
-
-	@Override
-	protected AbstractHashData<GKey, GValue> clone() {
-		try {
-			@SuppressWarnings ("unchecked")
-			var result = (AbstractHashData<GKey, GValue>)super.clone();
-			if (this.capacityImpl() == 0) return result;
-			result.table = this.table.clone();
-			result.nexts = this.nexts.clone();
-			return result;
-		} catch (Exception cause) {
-			throw new IllegalStateException(cause);
-		}
-	}
-
-	@Override
-	public long emu() {
-		return EMU.fromObject(this) + EMU.fromArray(this.table) + EMU.fromArray(this.nexts);
-	}
-
-	/** Diese Methode liefert eine Abbildung, die jeder in diesem Objekt vorkommenden Anzahl von Streuwertkollissionen die Anzahl der betroffenen Datensätze
-	 * zuordnet.
-	 *
-	 * @param permille {@code true}, wenn die Datensatzanzahl relativ in aufgerundeten Promille angegeben werden soll; {@code false}, wenn die Datensatzanzahl
-	 *        absolut angegeben werden soll.
-	 * @return Abbildung von Kollissionsanzahl auf Datensatzanzahl. */
-	public Map<Integer, Integer> collisions(boolean permille) {
-		var result = new HashMapII();
-		var table = this.table;
-		var nexts = this.nexts;
-		var length = table.length;
-		for (var index = 0; index < length; ++index) {
-			var count = 0;
-			for (var entry = table[index]; entry >= 0; entry = nexts[entry]) {
-				result.add(++count, 1);
-			}
-		}
-		var count = this.count;
-		if (!permille || (count == 0)) return result;
-		var mod = 0;
-		for (var entry: result.entrySet()) {
-			var val = (entry.getValue() * 1000) + mod;
-			mod = val % count;
-			entry.setValue(val / count);
-		}
-		return result;
 	}
 
 }

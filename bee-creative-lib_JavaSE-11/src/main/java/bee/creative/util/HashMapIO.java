@@ -104,7 +104,7 @@ public class HashMapIO<GValue> extends AbstractHashMap<Integer, GValue> implemen
 
 	@Override
 	protected HashAllocator customAllocator(int capacity) {
-		var keys2 = capacity == 0 ? AbstractHashData.EMPTY_INTEGERS : new int[capacity];
+		var keys2 = capacity == 0 ? AbstractHashData.EMPTY_INTS : new int[capacity];
 		var values2 = capacity == 0 ? AbstractHashData.EMPTY_OBJECTS : new Object[capacity];
 		return new HashAllocator() {
 
@@ -124,7 +124,7 @@ public class HashMapIO<GValue> extends AbstractHashMap<Integer, GValue> implemen
 	}
 
 	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Schlüssel ab. */
-	transient int[] keys = AbstractHashData.EMPTY_INTEGERS;
+	transient int[] keys = AbstractHashData.EMPTY_INTS;
 
 	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Wert ab oder ist {@code null}. Für alle anderen Indizes bildet es auf {@code null} ab. */
 	transient Object[] values = AbstractHashData.EMPTY_OBJECTS;

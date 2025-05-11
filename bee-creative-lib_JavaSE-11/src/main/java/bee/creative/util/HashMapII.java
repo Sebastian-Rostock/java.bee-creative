@@ -18,10 +18,10 @@ public class HashMapII extends AbstractHashMap<Integer, Integer> implements Seri
 	private static final long serialVersionUID = -5580543670395051911L;
 
 	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Schlüssel ab. */
-	transient int[] keys = AbstractHashData.EMPTY_INTEGERS;
+	transient int[] keys = AbstractHashData.EMPTY_INTS;
 
 	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Wert ab. */
-	transient int[] values = AbstractHashData.EMPTY_INTEGERS;
+	transient int[] values = AbstractHashData.EMPTY_INTS;
 
 	/** Dieser Konstruktor initialisiert die Kapazität mit {@code 0}. */
 	public HashMapII() {
@@ -117,8 +117,8 @@ public class HashMapII extends AbstractHashMap<Integer, Integer> implements Seri
 		final int[] keys2;
 		final int[] values2;
 		if (capacity == 0) {
-			keys2 = AbstractHashData.EMPTY_INTEGERS;
-			values2 = AbstractHashData.EMPTY_INTEGERS;
+			keys2 = AbstractHashData.EMPTY_INTS;
+			values2 = AbstractHashData.EMPTY_INTS;
 		} else {
 			keys2 = new int[capacity];
 			values2 = new int[capacity];

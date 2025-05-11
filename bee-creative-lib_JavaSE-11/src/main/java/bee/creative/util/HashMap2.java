@@ -77,7 +77,7 @@ public class HashMap2<GKey, GValue> extends HashMap<GKey, GValue> {
 	}
 
 	/** Dieses Feld bildet vom Index eines Eintrags auf den Streuwert seines Schlüssels ab. */
-	transient int[] hashes = AbstractHashData.EMPTY_INTEGERS;
+	transient int[] hashes = AbstractHashData.EMPTY_INTS;
 
 	/** Dieser Konstruktor initialisiert die Kapazität mit {@code 0}. */
 	public HashMap2() {
@@ -122,7 +122,7 @@ public class HashMap2<GKey, GValue> extends HashMap<GKey, GValue> {
 		if (capacity == 0) {
 			keys2 = AbstractHashData.EMPTY_OBJECTS;
 			values2 = AbstractHashData.EMPTY_OBJECTS;
-			hashes2 = AbstractHashData.EMPTY_INTEGERS;
+			hashes2 = AbstractHashData.EMPTY_INTS;
 		} else {
 			keys2 = new Object[capacity];
 			values2 = new Object[capacity];

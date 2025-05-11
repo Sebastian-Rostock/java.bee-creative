@@ -62,7 +62,7 @@ public class HashSet2<GItem> extends HashSet<GItem> {
 	}
 
 	/** Dieses Feld bildet vom Index eines Eintrags auf den Streuwert seines Schlüssels ab. */
-	transient int[] hashes = AbstractHashData.EMPTY_INTEGERS;
+	transient int[] hashes = AbstractHashData.EMPTY_INTS;
 
 	/** Dieser Konstruktor initialisiert die Kapazität mit {@code 0}. */
 	public HashSet2() {
@@ -112,7 +112,7 @@ public class HashSet2<GItem> extends HashSet<GItem> {
 		final int[] hashes2;
 		if (capacity == 0) {
 			items2 = AbstractHashData.EMPTY_OBJECTS;
-			hashes2 = AbstractHashData.EMPTY_INTEGERS;
+			hashes2 = AbstractHashData.EMPTY_INTS;
 		} else {
 			items2 = new Object[capacity];
 			hashes2 = new int[capacity];

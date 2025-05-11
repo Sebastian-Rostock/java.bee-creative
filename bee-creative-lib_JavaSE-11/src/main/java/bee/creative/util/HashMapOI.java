@@ -48,7 +48,7 @@ public class HashMapOI<GKey> extends AbstractHashMap<GKey, Integer> implements S
 	transient Object[] keys = AbstractHashData.EMPTY_OBJECTS;
 
 	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Wert ab. */
-	transient int[] values = AbstractHashData.EMPTY_INTEGERS;
+	transient int[] values = AbstractHashData.EMPTY_INTS;
 
 	/** Dieser Konstruktor initialisiert die Kapazität mit {@code 0}. */
 	public HashMapOI() {
@@ -133,7 +133,7 @@ public class HashMapOI<GKey> extends AbstractHashMap<GKey, Integer> implements S
 		final int[] values2;
 		if (capacity == 0) {
 			keys2 = AbstractHashData.EMPTY_OBJECTS;
-			values2 = AbstractHashData.EMPTY_INTEGERS;
+			values2 = AbstractHashData.EMPTY_INTS;
 		} else {
 			keys2 = new Object[capacity];
 			values2 = new int[capacity];

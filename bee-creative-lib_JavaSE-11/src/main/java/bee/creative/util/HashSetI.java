@@ -18,7 +18,7 @@ public class HashSetI extends AbstractHashSet<Integer> implements Serializable, 
 	private static final long serialVersionUID = 6862948924620051022L;
 
 	/** Dieses Feld bildet vom Index eines Elements auf dessen Wert ab. */
-	transient int[] items = AbstractHashData.EMPTY_INTEGERS;
+	transient int[] items = AbstractHashData.EMPTY_INTS;
 
 	/** Dieser Konstruktor initialisiert die Kapazität mit {@code 0}. */
 	public HashSetI() {
@@ -80,7 +80,7 @@ public class HashSetI extends AbstractHashSet<Integer> implements Serializable, 
 	protected HashAllocator customAllocator(final int capacity) {
 		final int[] items2;
 		if (capacity == 0) {
-			items2 = AbstractHashData.EMPTY_INTEGERS;
+			items2 = AbstractHashData.EMPTY_INTS;
 		} else {
 			items2 = new int[capacity];
 		}
