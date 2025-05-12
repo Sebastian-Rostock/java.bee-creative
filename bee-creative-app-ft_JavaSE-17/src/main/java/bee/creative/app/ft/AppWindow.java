@@ -3,7 +3,6 @@ package bee.creative.app.ft;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
@@ -33,9 +32,13 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import com.drew.imaging.jpeg.JpegMetadataReader;
+import com.drew.imaging.mp4.Mp4MetadataReader;
+import com.drew.metadata.exif.ExifDirectoryBase;
+import com.drew.metadata.exif.ExifIFD0Directory;
+import com.drew.metadata.mp4.Mp4Directory;
 import bee.creative.fem.FEMDatetime;
 import bee.creative.io.IO;
-import bee.creative.lang.Bytes;
 import bee.creative.lang.Objects;
 import bee.creative.lang.Strings;
 import bee.creative.util.Comparators;
@@ -821,6 +824,7 @@ public class AppWindow {
 			.useOption("Zeitkorrektur in Sekunden", this.settings.timenameOffset) //
 			.useButton("Datei-Zeitnamen ableiten", () -> this.runComputeTimenameImpl("Datei-Zeitnamen ableiten", false, this::getDatetimeFromFile)) //
 			.useButton("MP4-Zeitnamen ableiten", () -> this.runComputeTimenameImpl("MP4-Zeitnamen ableiten", false, this::getDatetimeFromMP4)) //
+			.useButton("JPEG-Zeitnamen ableiten", () -> this.runComputeTimenameImpl("JPEG-Zeitnamen ableiten", false, this::getDatetimeFromJPEG)) //
 		;
 	}
 
@@ -922,53 +926,74 @@ public class AppWindow {
 		}
 	}
 
-	static final FEMDatetime MP4_BASE_DATETIME = FEMDatetime.from("1904-01-01T00:00:00Z");
-
-	FEMDatetime getDatetimeFromMP4(File sourceFile) {
+	FEMDatetime getDatetimeFromJPEG(File sourceFile) {
 		if (!sourceFile.isFile()) return null;
 		try (var sourceStream = IO.inputStreamFrom(sourceFile)) {
-			var buf = new byte[8];
-			{ // ftype
-				var boxSize = readInt4(sourceStream, buf);
-				var boxName = readInt4(sourceStream, buf);
-				if (boxSize == 1) {
-					boxSize = readInt8(sourceStream, buf) - 8;
-				}
-				if (boxName != 1718909296) return null;
-				sourceStream.skip(boxSize - 8);
-			}
-			while (true) {
-				var boxSize = readInt4(sourceStream, buf);
-				var boxName = readInt4(sourceStream, buf);
-				if (boxSize == 1) {
-					boxSize = readInt8(sourceStream, buf) - 8;
-				}
-				if (boxName == 1836476516) { // mvhd
-					var mvhdVersion = readInt4(sourceStream, buf);
-					if (mvhdVersion != 0) return null;
-					var mvhdCreated = readInt4(sourceStream, buf);
-					var result = Mp4Test.MP4_BASE_DATETIME.move(0, 0, 0, 0, 0, mvhdCreated, 0);
-					return result;
-				}
-				if (boxName == 1836019574) { // moov
-					continue;
-				}
-				sourceStream.skip(boxSize - 8);
-			}
+			var directory = JpegMetadataReader.readMetadata(sourceStream).getFirstDirectoryOfType(ExifIFD0Directory.class);
+			var result = FEMDatetime.from(directory.getDate(ExifDirectoryBase.TAG_DATETIME).getTime());
+			System.out.println(result);
+			return result;
 		} catch (Exception e) {
 			return null;
 		}
 	}
 
-	static long readInt4(InputStream sourceStream, byte[] buf) throws IOException {
-		if (sourceStream.readNBytes(buf, 0, 4) != 4) throw new IOException();
-		return Bytes.getInt4BE(buf, 0) & 0xFFFFFFFFL;
+	// static final FEMDatetime MP4_BASE_DATETIME = FEMDatetime.from("1904-01-01T00:00:00Z");
+
+	FEMDatetime getDatetimeFromMP4(File sourceFile) {
+		if (!sourceFile.isFile()) return null;
+		try (var sourceStream = IO.inputStreamFrom(sourceFile)) {
+			var directory = Mp4MetadataReader.readMetadata(sourceStream).getFirstDirectoryOfType(Mp4Directory.class);
+			var result = FEMDatetime.from(directory.getDate(Mp4Directory.TAG_CREATION_TIME).getTime());
+			System.out.println(result);
+			return result;
+		} catch (Exception e) {
+			return null;
+		}
+		// if (!sourceFile.isFile()) return null;
+		// try (var sourceStream = IO.inputStreamFrom(sourceFile)) {
+		// var buf = new byte[8];
+		// { // ftype
+		// var boxSize = readInt4(sourceStream, buf);
+		// var boxName = readInt4(sourceStream, buf);
+		// if (boxSize == 1) {
+		// boxSize = readInt8(sourceStream, buf) - 8;
+		// }
+		// if (boxName != 1718909296) return null;
+		// sourceStream.skip(boxSize - 8);
+		// }
+		// while (true) {
+		// var boxSize = readInt4(sourceStream, buf);
+		// var boxName = readInt4(sourceStream, buf);
+		// if (boxSize == 1) {
+		// boxSize = readInt8(sourceStream, buf) - 8;
+		// }
+		// if (boxName == 1836476516) { // mvhd
+		// var mvhdVersion = readInt4(sourceStream, buf);
+		// if (mvhdVersion != 0) return null;
+		// var mvhdCreated = readInt4(sourceStream, buf);
+		// var result = Mp4Test.MP4_BASE_DATETIME.move(0, 0, 0, 0, 0, mvhdCreated, 0);
+		// return result;
+		// }
+		// if (boxName == 1836019574) { // moov
+		// continue;
+		// }
+		// sourceStream.skip(boxSize - 8);
+		// }
+		// } catch (Exception e) {
+		// return null;
+		// }
 	}
 
-	static long readInt8(InputStream sourceStream, byte[] buf) throws IOException {
-		if (sourceStream.readNBytes(buf, 0, 8) != 8) throw new IOException();
-		return Bytes.getLong8BE(buf, 0);
-	}
+	// static long readInt4(InputStream sourceStream, byte[] buf) throws IOException {
+	// if (sourceStream.readNBytes(buf, 0, 4) != 4) throw new IOException();
+	// return Bytes.getInt4BE(buf, 0) & 0xFFFFFFFFL;
+	// }
+
+	// static long readInt8(InputStream sourceStream, byte[] buf) throws IOException {
+	// if (sourceStream.readNBytes(buf, 0, 8) != 8) throw new IOException();
+	// return Bytes.getLong8BE(buf, 0);
+	// }
 
 	public void runRefreshFiles_DONE() {
 		this.runDialog_DONE()//
