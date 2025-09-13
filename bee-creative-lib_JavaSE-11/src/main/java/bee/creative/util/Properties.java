@@ -325,7 +325,7 @@ public class Properties {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ValueProperty new ValueProperty<>(value)}. */
-	public static <GValue> Property2<GValue> fromValue(final GValue value) {
+	public static <GValue> Property2<GValue> propertyFromValue(final GValue value) {
 		return new ValueProperty<>(value);
 	}
 

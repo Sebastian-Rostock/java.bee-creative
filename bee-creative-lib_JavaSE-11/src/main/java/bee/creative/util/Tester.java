@@ -2,6 +2,8 @@ package bee.creative.util;
 
 import static bee.creative.util.Comparators.compare;
 import static bee.creative.util.Iterables.iterableFromArray;
+import static bee.creative.util.Properties.propertyFromValue;
+import static java.lang.Long.MAX_VALUE;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Runtime.getRuntime;
@@ -40,7 +42,7 @@ public class Tester {
 	 *
 	 * @param task Testmethode. */
 	public static <T> T testCall(Callable2<T> task) {
-		var res = Properties.<T>fromValue(null);
+		var res = propertyFromValue((T)null);
 		testRun(() -> res.set(task.call()));
 		return res.get();
 	}
@@ -50,8 +52,8 @@ public class Tester {
 	 * @param testers {@link Tester}, deren arithmetisches Mittel ermitttelt wird.
 	 * @return {@code avg}-{@link Tester}.
 	 * @throws NullPointerException Wenn {@code testers} {@code null} ist oder enthält. */
-	public static Tester testerAvg(Tester... testers) throws NullPointerException {
-		return testerAvg(iterableFromArray(testers));
+	public static Tester avgTester(Tester... testers) throws NullPointerException {
+		return avgTester(iterableFromArray(testers));
 	}
 
 	/** Diese Methode liefert den {@link Tester} zum arithmetischen Mittel ({@link #usedTime} und {@link #usedMemory}) der gegebenen Tester.
@@ -59,7 +61,7 @@ public class Tester {
 	 * @param testers {@link Tester}, deren arithmetisches Mittel ermitttelt wird.
 	 * @return {@code avg}-{@link Tester}.
 	 * @throws NullPointerException Wenn {@code testers} {@code null} ist oder enthält. */
-	public static Tester testerAvg(Iterable<? extends Tester> testers) throws NullPointerException {
+	public static Tester avgTester(Iterable<? extends Tester> testers) throws NullPointerException {
 		var count = 0L;
 		var usedTime = 0L;
 		var usedMemory = 0L;
@@ -77,8 +79,8 @@ public class Tester {
 	 * @param testers {@link Tester}, deren Minimum ermitttelt wird.
 	 * @return {@code min}-{@link Tester}.
 	 * @throws NullPointerException Wenn {@code testers} {@code null} ist oder enthält. */
-	public static Tester fromMin(Tester... testers) throws NullPointerException {
-		return fromMin(iterableFromArray(testers));
+	public static Tester minTester(Tester... testers) throws NullPointerException {
+		return minTester(iterableFromArray(testers));
 	}
 
 	/** Diese Methode liefert den {@link Tester} zum Minimum ({@link #usedTime} und {@link #usedMemory}) der gegebenen.
@@ -86,9 +88,9 @@ public class Tester {
 	 * @param testers {@link Tester}, deren Minimum ermitttelt wird.
 	 * @return {@code min}-{@link Tester}.
 	 * @throws NullPointerException Wenn {@code testers} {@code null} ist oder enthält. */
-	public static Tester fromMin(Iterable<? extends Tester> testers) throws NullPointerException {
-		var usedTime = Long.MAX_VALUE;
-		var usedMemory = Long.MAX_VALUE;
+	public static Tester minTester(Iterable<? extends Tester> testers) throws NullPointerException {
+		var usedTime = MAX_VALUE;
+		var usedMemory = MAX_VALUE;
 		for (var tester: testers) {
 			usedTime = min(usedTime, tester.usedTime);
 			usedMemory = min(usedMemory, tester.usedMemory);
