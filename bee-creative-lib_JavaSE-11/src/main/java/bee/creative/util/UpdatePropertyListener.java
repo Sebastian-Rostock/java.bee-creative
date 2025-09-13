@@ -8,6 +8,6 @@ public interface UpdatePropertyListener {
 	/** Diese Methode wird bei Aktualisierung des Werts eiens {@link ObservableProperty} aufgerufen.
 	 *
 	 * @param event Ereignisnachricht. */
-	public void onUpdateProperty(UpdatePropertyEvent event);
+	void onUpdateProperty(UpdatePropertyEvent event);
 
 }

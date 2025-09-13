@@ -5,7 +5,7 @@ class UpdateFieldObservables extends Observables<UpdateFieldEvent, UpdateFieldLi
 	public static final UpdateFieldObservables INSTANCE = new UpdateFieldObservables();
 
 	@Override
-	protected void customFire(final Object sender, final UpdateFieldEvent message, final UpdateFieldListener observer) {
+	protected void customFire(Object sender, UpdateFieldEvent message, UpdateFieldListener observer) {
 		observer.onUpdateField(message);
 	}
 

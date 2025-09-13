@@ -17,15 +17,10 @@ public class UpdatePropertyEvent {
 	public final Object newValue;
 
 	/** Dieser Konstruktor initialisiert die Eigenschafte des Ereignisses. */
-	public <GValue> UpdatePropertyEvent(final ObservableProperty<GValue> sender, final GValue oldValue, final GValue newValue) {
+	public <VALUE> UpdatePropertyEvent(ObservableProperty<VALUE> sender, VALUE oldValue, VALUE newValue) {
 		this.sender = sender;
 		this.oldValue = oldValue;
 		this.newValue = newValue;
-	}
-
-	@SuppressWarnings ({"unchecked", "rawtypes"})
-	private void setValue(final Object value) {
-		((ObservableProperty)this.sender).set(value);
 	}
 
 	/** Diese Methode setzt den Wert der {@link #sender Eigenschaft} auf den {@link #oldValue alten Wert}. */
@@ -41,6 +36,11 @@ public class UpdatePropertyEvent {
 	@Override
 	public String toString() {
 		return Objects.toInvokeString(this, this.sender, this.oldValue, this.newValue);
+	}
+
+	@SuppressWarnings ({"unchecked", "rawtypes"})
+	private void setValue(Object value) {
+		((ObservableProperty)this.sender).set(value);
 	}
 
 }

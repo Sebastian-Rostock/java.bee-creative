@@ -19,16 +19,11 @@ public class UpdateFieldEvent {
 	public final Object newValue;
 
 	/** Dieser Konstruktor initialisiert die Eigenschafte des Ereignisses. */
-	public <GItem, GValue> UpdateFieldEvent(final ObservableField<? super GItem, GValue> sender, final GItem item, final GValue oldValue, final GValue newValue) {
+	public <ITEM, VALUE> UpdateFieldEvent(ObservableField<? super ITEM, VALUE> sender, ITEM item, VALUE oldValue, VALUE newValue) {
 		this.sender = sender;
 		this.item = item;
 		this.oldValue = oldValue;
 		this.newValue = newValue;
-	}
-
-	@SuppressWarnings ({"unchecked", "rawtypes"})
-	private void setValue(final Object value) {
-		((ObservableField)this.sender).set(this.item, value);
 	}
 
 	/** Diese Methode setzt den Wert des {@link #sender Datenfeldes} der {@link #item Einagbe} auf den {@link #oldValue alten Wert}. */
@@ -44,6 +39,11 @@ public class UpdateFieldEvent {
 	@Override
 	public String toString() {
 		return Objects.toInvokeString(this, this.sender, this.item, this.oldValue, this.newValue);
+	}
+
+	@SuppressWarnings ({"unchecked", "rawtypes"})
+	private void setValue(Object value) {
+		((ObservableField)this.sender).set(this.item, value);
 	}
 
 }

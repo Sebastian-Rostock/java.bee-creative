@@ -8,6 +8,6 @@ public interface UpdateFieldListener {
 	/** Diese Methode wird bei Aktualisierung des Werts eiens {@link ObservableField} aufgerufen.
 	 *
 	 * @param event Ereignisnachricht. */
-	public void onUpdateField(UpdateFieldEvent event);
+	void onUpdateField(UpdateFieldEvent event);
 
 }

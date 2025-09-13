@@ -5,7 +5,7 @@ class UpdatePropertyObservables extends Observables<UpdatePropertyEvent, UpdateP
 	public static final UpdatePropertyObservables INSTANCE = new UpdatePropertyObservables();
 
 	@Override
-	protected void customFire(final Object sender, final UpdatePropertyEvent message, final UpdatePropertyListener observer) {
+	protected void customFire(Object sender, UpdatePropertyEvent message, UpdatePropertyListener observer) {
 		observer.onUpdateProperty(message);
 	}
 
