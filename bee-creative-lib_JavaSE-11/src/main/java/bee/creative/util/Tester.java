@@ -1,9 +1,13 @@
 package bee.creative.util;
 
-import java.util.Arrays;
+import static bee.creative.util.Comparators.compare;
+import static bee.creative.util.Iterables.iterableFromArray;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+import static java.lang.Runtime.getRuntime;
+import static java.lang.System.nanoTime;
 import java.util.Comparator;
-import java.util.List;
-import bee.creative.lang.Gettable2;
+import bee.creative.lang.Callable2;
 import bee.creative.lang.Objects;
 import bee.creative.lang.Runnable2;
 
@@ -15,48 +19,56 @@ import bee.creative.lang.Runnable2;
 public class Tester {
 
 	/** Dieses Feld speichert den {@link Comparator} zu {@link #usedTime}. */
-	public static final Comparator2<Tester> USED_TIME_ORDER = (tester1, tester2) -> Comparators.compare(tester1.usedTime, tester2.usedTime);
+	public static final Comparator2<Tester> USED_TIME_ORDER = (tester1, tester2) -> compare(tester1.usedTime, tester2.usedTime);
 
 	/** Dieses Feld speichert den {@link Comparator} zu {@link #usedMemory}. */
-	public static final Comparator2<Tester> USED_MEMORY_ORDER = (tester1, tester2) -> Comparators.compare(tester1.usedMemory, tester2.usedMemory);
+	public static final Comparator2<Tester> USED_MEMORY_ORDER = (tester1, tester2) -> compare(tester1.usedMemory, tester2.usedMemory);
 
-	public static <T> T get(Gettable2<T> task) {
-		var res = Properties.<T>fromValue(null);
-		Tester.run(() -> res.set(task.get()));
-		return res.get();
-	}
-
-	public static void run(Runnable2 task) {
+	/** Diese Methode erzeugt den {@link Tester} zu {@code task.run()} und gibt ihn über {@link System#err} aus. Wenn sein {@link #cause} nicht {@code null} ist,
+	 * wird diese ebenfalls darüber ausgegeben.
+	 *
+	 * @param task Testmethode. */
+	public static void testRun(Runnable2 task) {
 		var run = new Tester(task);
 		System.err.println(run);
 		if (run.cause == null) return;
 		run.cause.printStackTrace();
 	}
 
-	/** Diese Methode ist eine Abkürzung für liefert den {@link Tester} zum arithmetischen Mittel ({@link #usedTime} und {@link #usedMemory}) der gegebenen
-	 * Tester.
+	/** Diese Methode erzeugt den {@link Tester} zu {@code task.call()}, gibt ihn über {@link System#err} aus und lifert das Ergebnis von {@code task.call()}.
+	 * Wenn sein {@link #cause} nicht {@code null} ist, wird diese ebenfalls darüber ausgegeben und {@code null} geliefert.
 	 *
-	 * @param testers {@link Tester}, deren arithmetisches Mittel ermitttelt wird.
-	 * @return {@code svg}-{@link Tester}.
-	 * @throws NullPointerException Wenn {@code testers} {@code null} ist oder enthält. */
-	public static Tester fromAvg(Tester... testers) throws NullPointerException {
-		return Tester.fromAvg(Arrays.asList(testers));
+	 * @param task Testmethode. */
+	public static <T> T testCall(Callable2<T> task) {
+		var res = Properties.<T>fromValue(null);
+		testRun(() -> res.set(task.call()));
+		return res.get();
 	}
 
 	/** Diese Methode liefert den {@link Tester} zum arithmetischen Mittel ({@link #usedTime} und {@link #usedMemory}) der gegebenen Tester.
 	 *
 	 * @param testers {@link Tester}, deren arithmetisches Mittel ermitttelt wird.
-	 * @return {@code svg}-{@link Tester}.
+	 * @return {@code avg}-{@link Tester}.
 	 * @throws NullPointerException Wenn {@code testers} {@code null} ist oder enthält. */
-	public static Tester fromAvg(List<Tester> testers) throws NullPointerException {
-		var count = testers.size();
-		if (count == 0) return new Tester(0, 0);
+	public static Tester testerAvg(Tester... testers) throws NullPointerException {
+		return testerAvg(iterableFromArray(testers));
+	}
+
+	/** Diese Methode liefert den {@link Tester} zum arithmetischen Mittel ({@link #usedTime} und {@link #usedMemory}) der gegebenen Tester.
+	 *
+	 * @param testers {@link Tester}, deren arithmetisches Mittel ermitttelt wird.
+	 * @return {@code avg}-{@link Tester}.
+	 * @throws NullPointerException Wenn {@code testers} {@code null} ist oder enthält. */
+	public static Tester testerAvg(Iterable<? extends Tester> testers) throws NullPointerException {
+		var count = 0L;
 		var usedTime = 0L;
 		var usedMemory = 0L;
 		for (var tester: testers) {
+			count++;
 			usedTime += tester.usedTime;
 			usedMemory += tester.usedMemory;
 		}
+		if (count == 0) return new Tester(0, 0);
 		return new Tester(usedTime / count, usedMemory / count);
 	}
 
@@ -66,7 +78,7 @@ public class Tester {
 	 * @return {@code min}-{@link Tester}.
 	 * @throws NullPointerException Wenn {@code testers} {@code null} ist oder enthält. */
 	public static Tester fromMin(Tester... testers) throws NullPointerException {
-		return Tester.fromMin(Arrays.asList(testers));
+		return fromMin(iterableFromArray(testers));
 	}
 
 	/** Diese Methode liefert den {@link Tester} zum Minimum ({@link #usedTime} und {@link #usedMemory}) der gegebenen.
@@ -74,12 +86,12 @@ public class Tester {
 	 * @param testers {@link Tester}, deren Minimum ermitttelt wird.
 	 * @return {@code min}-{@link Tester}.
 	 * @throws NullPointerException Wenn {@code testers} {@code null} ist oder enthält. */
-	public static Tester fromMin(List<Tester> testers) throws NullPointerException {
+	public static Tester fromMin(Iterable<? extends Tester> testers) throws NullPointerException {
 		var usedTime = Long.MAX_VALUE;
 		var usedMemory = Long.MAX_VALUE;
 		for (var tester: testers) {
-			usedTime = Math.min(usedTime, tester.usedTime);
-			usedMemory = Math.min(usedMemory, tester.usedMemory);
+			usedTime = min(usedTime, tester.usedTime);
+			usedMemory = min(usedMemory, tester.usedMemory);
 		}
 		return new Tester(usedTime, usedMemory);
 	}
@@ -138,39 +150,39 @@ public class Tester {
 	 * @throws NullPointerException Wenn {@code method} {@code null} ist. */
 	public Tester(int mode, Runnable2 task) throws NullPointerException {
 		Objects.notNull(task);
-		var runtime = Runtime.getRuntime();
+		var runtime = getRuntime();
 		Throwable cause = null;
 		if (mode > 0) {
 			var sampler = new Sampler(mode);
 			runtime.gc();
 			sampler.activate();
 			this.enterMemory = runtime.totalMemory() - runtime.freeMemory();
-			this.enterTime = System.nanoTime();
+			this.enterTime = nanoTime();
 			try {
 				task.run();
 			} catch (Throwable cause2) {
 				cause = cause2;
 			} finally {
-				this.leaveTime = System.nanoTime();
+				this.leaveTime = nanoTime();
 				sampler.deactivate();
 			}
 			runtime.gc();
 			this.leaveMemory = runtime.totalMemory() - runtime.freeMemory();
 			this.usedTime = this.leaveTime - this.enterTime - sampler.usedTime;
-			this.usedMemory = Math.max(sampler.usedMemory, this.leaveMemory) - this.enterMemory;
+			this.usedMemory = max(sampler.usedMemory, this.leaveMemory) - this.enterMemory;
 		} else {
 			if (mode < 0) {
 				runtime.gc();
 				Thread.yield();
 			}
 			this.enterMemory = runtime.totalMemory() - runtime.freeMemory();
-			this.enterTime = System.nanoTime();
+			this.enterTime = nanoTime();
 			try {
 				task.run();
 			} catch (Throwable cause2) {
 				cause = cause2;
 			}
-			this.leaveTime = System.nanoTime();
+			this.leaveTime = nanoTime();
 			if (mode < 0) {
 				runtime.gc();
 				Thread.yield();
@@ -224,21 +236,21 @@ public class Tester {
 			super("Tester-Thread");
 			if (millis <= 0) throw new IllegalArgumentException();
 			this.millis = millis;
-			this.setPriority(Math.min(Thread.currentThread().getPriority() + 1, Thread.MAX_PRIORITY));
+			this.setPriority(min(currentThread().getPriority() + 1, Thread.MAX_PRIORITY));
 		}
 
 		@Override
 		public void run() {
-			var runtime = Runtime.getRuntime();
+			var runtime = getRuntime();
 			var enterTime = 0L;
 			var leaveTime = 0L;
 			while (true) {
-				var enterTime2 = System.nanoTime();
+				var enterTime2 = nanoTime();
 				this.usedTime += leaveTime - enterTime;
 				runtime.gc();
-				this.usedMemory = Math.max(runtime.totalMemory() - runtime.freeMemory(), this.usedMemory);
+				this.usedMemory = max(runtime.totalMemory() - runtime.freeMemory(), this.usedMemory);
 				enterTime = enterTime2;
-				leaveTime = System.nanoTime();
+				leaveTime = nanoTime();
 				synchronized (this) {
 					if (this.millis <= 0) {
 						break;

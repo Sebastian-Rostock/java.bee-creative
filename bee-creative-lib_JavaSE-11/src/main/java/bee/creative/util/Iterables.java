@@ -25,18 +25,12 @@ public class Iterables {
 
 	}
 
-	/** Diese Klasse implementiert einen {@link Iterable2}, der die Elemente eines Abschnitts eines gegebenen {@link Array} liefert.
+	/** Diese Klasse implementiert einen {@link Iterable2}, der die Elemente eines Abschnitts eines gegebenen Array liefert.
 	 *
 	 * @param <GItem> Typ der Elemente. */
 	public static class ArrayIterable<GItem> extends AbstractIterable<GItem> {
 
-		public final Array<? extends GItem> items;
-
-		public final int fromIndex;
-
-		public final int toIndex;
-
-		public ArrayIterable(Array<? extends GItem> items, int fromIndex, int toIndex) throws NullPointerException, IllegalArgumentException {
+		public ArrayIterable(GItem[] items, int fromIndex, int toIndex) throws NullPointerException, IllegalArgumentException {
 			Comparables.check(fromIndex, toIndex);
 			this.items = Objects.notNull(items);
 			this.fromIndex = fromIndex;
@@ -52,6 +46,12 @@ public class Iterables {
 		public String toString() {
 			return Objects.toInvokeString(this, this.items, this.fromIndex, this.toIndex);
 		}
+
+		private final GItem[] items;
+
+		private final int fromIndex;
+
+		private final int toIndex;
 
 	}
 
@@ -367,30 +367,19 @@ public class Iterables {
 		return new UniformIterable<>(item, count);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(Iterable) Iterables.from(Arrays.asList(items))}.
-	 *
-	 * @see Arrays#asList(Object...) */
+	/** Diese Methode ist eine Abkürzung für {@link #iterableFromArray(Object[], int, int) iterableFromArray(items, 0, items.length)}. */
 	@SafeVarargs
-	public static <GItem> Iterable2<GItem> fromArray(GItem... items) throws NullPointerException {
-		return Iterables.from(Arrays.asList(items));
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link #from(Iterable) Iterables.from(Arrays.asList(items).subList(fromIndex, toIndex))}.
-	 *
-	 * @see List#subList(int, int)
-	 * @see Arrays#asList(Object...) */
-	public static <GItem> Iterable2<GItem> fromArray(GItem[] items, int fromIndex, int toIndex) throws NullPointerException, IllegalArgumentException {
-		return Iterables.from(Arrays.asList(items).subList(fromIndex, toIndex));
+	public static <GItem> Iterable2<GItem> iterableFromArray(GItem... items) throws NullPointerException {
+		return iterableFromArray(items, 0, items.length);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ArrayIterable new ArrayIterable<>(items, fromIndex, toIndex)}. */
-	public static <GItem> Iterable2<GItem> fromArray(Array<? extends GItem> items, int fromIndex, int toIndex)
-		throws NullPointerException, IllegalArgumentException {
+	public static <GItem> Iterable2<GItem> iterableFromArray(GItem[] items, int fromIndex, int toIndex) throws NullPointerException, IllegalArgumentException {
 		return new ArrayIterable<>(items, fromIndex, toIndex);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link CountIterable new CountIterable<>(count)}. */
-	public static Iterable2<Integer> fromCount(int count) throws IllegalArgumentException {
+	public static Iterable2<Integer> iterableFromCount(int count) throws IllegalArgumentException {
 		return new CountIterable(count);
 	}
 

@@ -1,14 +1,15 @@
 package bee.creative.kb;
 
+import static bee.creative.kb.KBCodec.persistState;
+import static bee.creative.kb.KBCodec.restoreState;
+import static bee.creative.util.Tester.testCall;
 import java.io.IOException;
 import java.util.Random;
-import bee.creative.emu.EMU;
 import bee.creative.fem.FEMString;
 import bee.creative.lang.Integers;
 import bee.creative.lang.Objects;
 import bee.creative.log.LOGBuilder;
 import bee.creative.util.HashMapOI;
-import bee.creative.util.Tester;
 
 class TEST {
 
@@ -19,10 +20,9 @@ class TEST {
 		log.pushEntry("CC\nDD\nEE\n");
 		log.pushEntry("54646546546.");
 		log.leaveScope("close");
-		
+
 		System.out.println(log);
-		
-		
+
 		{
 			System.out.println("Value Test");
 			var buf = new KBBuffer();
@@ -33,8 +33,8 @@ class TEST {
 			System.out.println(buf);
 			System.out.println(buf.values().exceptValueRefs(-2));
 
-			var persisted = KBCodec.persistState(buf);
-			var restored = KBCodec.restoreState(persisted);
+			var persisted = persistState(buf);
+			var restored = restoreState(persisted);
 			System.out.println(restored);
 		}
 		new TEST();
@@ -105,33 +105,33 @@ class TEST {
 
 			}
 		}
-		buffer.commit();
-//		System.out //
-//		.append(": EDGES=").append(this.edgeCount + "") //
-//		.append(": EMU=").append(Integers.printSize(this.buffer.emu())) //
-//		.append(" BYTES=").append(Integers.printSize(EMU.from(ZIPDOS.deflate(this.buffer::persist)))) //
-//		;
+		this.buffer.commit();
+		// System.out //
+		// .append(": EDGES=").append(this.edgeCount + "") //
+		// .append(": EMU=").append(Integers.printSize(this.buffer.emu())) //
+		// .append(" BYTES=").append(Integers.printSize(EMU.from(ZIPDOS.deflate(this.buffer::persist)))) //
+		// ;
 		System.out.println();
 
 		System.out.println(Objects.toStringCall(true, true, this, "linkMap", this.linkMap, "typeMap", this.typeMap, "buffer", this.buffer));
 
 		System.out.println("PERSIST");
-		var persisted = Tester.get(() -> KBCodec.persistState(this.buffer));
+		var persisted = testCall(() -> persistState(this.buffer));
 		System.out.println(Integers.printSize(persisted.length));
 
 		System.out.println("RESTORE");
-		var restored = Tester.get(() -> KBCodec.restoreState(persisted));
+		var restored = testCall(() -> restoreState(persisted));
 		System.out.println(Integers.printSize(restored.emu()));
 
-//		System.out.println("INSERTS");
-//		var ins = Tester.get(() -> KBState.from(this.buffer, restored));
-//		System.out.println(ins);
-		
-//		System.out.println("DELETES");
-//		var del = Tester.get(() -> KBState.from(restored, this.buffer));
-//		System.out.println(del);
-		
-//		System.out.println(restored);
+		// System.out.println("INSERTS");
+		// var ins = Tester.get(() -> KBState.from(this.buffer, restored));
+		// System.out.println(ins);
+
+		// System.out.println("DELETES");
+		// var del = Tester.get(() -> KBState.from(restored, this.buffer));
+		// System.out.println(del);
+
+		// System.out.println(restored);
 	}
 
 	int putItem() {

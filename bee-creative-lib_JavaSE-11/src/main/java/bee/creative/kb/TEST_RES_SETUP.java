@@ -1,5 +1,7 @@
 package bee.creative.kb;
 
+import static bee.creative.util.Tester.testCall;
+import static bee.creative.util.Tester.testRun;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -8,7 +10,6 @@ import bee.creative.csv.CSVWriter;
 import bee.creative.fem.FEMString;
 import bee.creative.lang.Integers;
 import bee.creative.util.HashMapOI;
-import bee.creative.util.Tester;
 
 public class TEST_RES_SETUP {
 
@@ -37,13 +38,13 @@ public class TEST_RES_SETUP {
 					}
 					this.printState(this.buffer);
 					System.err.print("persist: ");
-					Tester.run(() -> {
+					testRun(() -> {
 						try (var zipdos = new ZIPDOS(new FileOutputStream(new File(root, "RES.kbf")))) {
 							KBCodec.persistState(zipdos,buffer);
 						}
 					});
 					System.err.print("restore: ");
-					var r = Tester.get(() -> {
+					var r = testCall(() -> {
 						try (var zipdis = new ZIPDIS(new FileInputStream(new File(root, "RES.kbf")))) {
 							return KBCodec.restoreState(zipdis);
 						}

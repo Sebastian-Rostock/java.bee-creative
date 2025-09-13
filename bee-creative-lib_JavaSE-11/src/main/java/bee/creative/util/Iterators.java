@@ -603,16 +603,16 @@ public class Iterators {
 		return new UniformIterator<>(item, count);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Iterables#fromArray(Object...) Iterables.fromArray(items).iterator()}. */
+	/** Diese Methode ist eine Abkürzung für {@link Iterables#iterableFromArray(Object...) Iterables.fromArray(items).iterator()}. */
 	@SafeVarargs
 	public static <GItem> Iterator2<GItem> fromArray(final GItem... items) throws NullPointerException {
-		return Iterables.fromArray(items).iterator();
+		return Iterables.iterableFromArray(items).iterator();
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Iterables#fromArray(Object[], int, int) Iterables.fromArray(items, fromIndex, toIndex).iterator()}. */
+	/** Diese Methode ist eine Abkürzung für {@link Iterables#iterableFromArray(Object[], int, int) Iterables.fromArray(items, fromIndex, toIndex).iterator()}. */
 	public static <GItem> Iterator2<GItem> fromArray(final GItem[] items, final int fromIndex, final int toIndex)
 		throws NullPointerException, IllegalArgumentException {
-		return Iterables.fromArray(items, fromIndex, toIndex).iterator();
+		return Iterables.iterableFromArray(items, fromIndex, toIndex).iterator();
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ArrayIterator new ArrayIterator<>(items, fromIndex, toIndex)}. */

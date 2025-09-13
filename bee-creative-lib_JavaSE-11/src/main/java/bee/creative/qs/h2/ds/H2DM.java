@@ -1,5 +1,7 @@
 package bee.creative.qs.h2.ds;
 
+import static bee.creative.qs.ds.DL.Handling.handlingTrans;
+import static bee.creative.qs.ds.DL.Multiplicity.multiplicityTrans;
 import bee.creative.qs.QN;
 import bee.creative.qs.ds.DE;
 import bee.creative.qs.ds.DH;
@@ -164,11 +166,11 @@ public class H2DM implements DM {
 		this.installTargets(DL.IDENT_IsLinkWithIdent, link).asValueSet().add(ident);
 		this.installTargets(DL.IDENT_IsLinkWithLabel, link).asValue().set(label);
 		this.installTargets(DL.IDENT_IsLinkWithSourceType, link).asNode().translate(this.typeTrans()).set(this.installType(sourceTypeIdent));
-		this.installTargets(DL.IDENT_IsLinkWithSourceHandling, link).asValue().set(Handling.trans.toSource(sourceHandling));
-		this.installTargets(DL.IDENT_IsLinkWithSourceMultiplicity, link).asValue().set(Multiplicity.trans.toSource(sourceMultiplicity));
+		this.installTargets(DL.IDENT_IsLinkWithSourceHandling, link).asValue().set(handlingTrans().toSource(sourceHandling));
+		this.installTargets(DL.IDENT_IsLinkWithSourceMultiplicity, link).asValue().set(multiplicityTrans().toSource(sourceMultiplicity));
 		this.installTargets(DL.IDENT_IsLinkWithTargetType, link).asNode().translate(this.typeTrans()).set(this.installType(targetTypeIdent));
-		this.installTargets(DL.IDENT_IsLinkWithTargetHandling, link).asValue().set(Handling.trans.toSource(targetHandling));
-		this.installTargets(DL.IDENT_IsLinkWithTargetMultiplicity, link).asValue().set(Multiplicity.trans.toSource(targetMultiplicity));
+		this.installTargets(DL.IDENT_IsLinkWithTargetHandling, link).asValue().set(handlingTrans().toSource(targetHandling));
+		this.installTargets(DL.IDENT_IsLinkWithTargetMultiplicity, link).asValue().set(multiplicityTrans().toSource(targetMultiplicity));
 		this.installSources(DT.IDENT_IsTypeWithInstance, link).asNode().translate(this.typeTrans()).set(this.installType(DL.IDENT_IsLink));
 		return link;
 	}

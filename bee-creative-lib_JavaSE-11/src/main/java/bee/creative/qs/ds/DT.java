@@ -4,7 +4,7 @@ import bee.creative.qs.QN;
 import bee.creative.util.Property2;
 import bee.creative.util.Set2;
 
-/** Diese Schnittstelle definiert einen Datentyp (Domain-type) als {@link #labelAsNode() beschriftete} und {@link #identsAsNodes() erkennbare} {@link #instancesAsNodes()
+/** Diese Schnittstelle definiert einen Datentyp (Domain-Type) als {@link #labelAsNode() beschriftete} und {@link #identsAsNodes() erkennbare} {@link #instancesAsNodes()
  * Instanzmenge}.
  *
  * @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */

@@ -1,5 +1,7 @@
 package bee.creative.qs.ds;
 
+import static bee.creative.qs.ds.DL.Handling.handlingTrans;
+import static bee.creative.util.Translators.fromEnum;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -12,12 +14,11 @@ import bee.creative.util.Properties;
 import bee.creative.util.Property2;
 import bee.creative.util.Set2;
 import bee.creative.util.Translator2;
-import bee.creative.util.Translators;
 import bee.creative.util.Translators.EnumTranslator;
 import bee.creative.util.Translators.OptionalizedTranslator;
 
-/** Diese Schnittstelle definiert ein Datenfeld (Domain-Link) als {@link #labelAsNode() beschriftete} und {@link #identsAsNodes() erkennbarer} {@link #node() Prädikatknoten}
- * mit Festlegungen zur Vielzahl, Handhabung und Typisierung der damit verbundenen Objekt- und Subjektknoten.
+/** Diese Schnittstelle definiert ein Datenfeld (Domain-Link) als {@link #labelAsNode() beschriftete} und {@link #identsAsNodes() erkennbarer} {@link #node()
+ * Prädikatknoten} mit Festlegungen zur Vielzahl, Handhabung und Typisierung der damit verbundenen Objekt- und Subjektknoten.
  *
  * @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public interface DL extends DE {
@@ -103,10 +104,10 @@ public interface DL extends DE {
 	 *
 	 * @see DL#sourceHandlingAsNode()
 	 * @see QS#valueTrans()
-	 * @see Handling#trans
+	 * @see Handling#handlingTrans()
 	 * @return Subjekthandhabung. */
 	default Property2<Handling> sourceHandling() {
-		return this.sourceHandlingAsNode().translate(this.owner().valueTrans()).translate(Handling.trans);
+		return this.sourceHandlingAsNode().translate(this.owner().valueTrans()).translate(handlingTrans());
 	}
 
 	/** Diese Methode erlaubt Zugriff auf den {@link DT#node() Hyperknoten} der {@link Handling Handhabung} von {@link QE#subject() Subjektknoten} beim Entfernen
@@ -122,7 +123,7 @@ public interface DL extends DE {
 	 *
 	 * @see DL#sourceMultiplicityAsNode()
 	 * @see QS#valueTrans()
-	 * @see Multiplicity#trans
+	 * @see Multiplicity#multiplicityTrans()
 	 * @return Subjektvielzahl. */
 	default Property2<Multiplicity> sourceMultiplicity() {
 		return this.sourceMultiplicityAsNode().translate(this.owner().valueTrans()).translate(Multiplicity.trans);
@@ -152,9 +153,9 @@ public interface DL extends DE {
 	}
 
 	default Property2<Handling> targetHandling() {
-		return this.targetHandlingAsNode().translate(this.owner().valueTrans()).translate(Handling.trans);
+		return this.targetHandlingAsNode().translate(this.owner().valueTrans()).translate(handlingTrans());
 	}
-	
+
 	default Property2<QN> targetHandlingAsNode() {
 		return this.parent().getLink(DL.IDENT_IsLinkWithTargetHandling).asTargetProperty(this.node());
 	}
@@ -162,7 +163,7 @@ public interface DL extends DE {
 	default Property2<Multiplicity> targetMultiplicity() {
 		return this.targetMultiplicityAsNode().translate(this.owner().valueTrans()).translate(Multiplicity.trans);
 	}
-	
+
 	default Property2<QN> targetMultiplicityAsNode() {
 		return this.parent().getLink(DL.IDENT_IsLinkWithTargetMultiplicity).asTargetProperty(this.node());
 	}
@@ -374,7 +375,7 @@ public interface DL extends DE {
 	enum Handling {
 
 		/** Beim Entfernen des referenzierenden {@link QN Hyperknoten} sollen die {@link QE Hyperkanten} zu den referenzierten Hyperknoten ebenfalls entfernt
-		 * werden. Beim Duplizieren sollen die Hyperkanten nicht dupliziert werden. */
+		 * werden. Beim Duplizieren sollen die Hyperkanten ignoriert werden. */
 		Association,
 
 		/** Beim Entfernen bzw. Duplizieren des referenzierenden {@link QN Hyperknoten} sollen die {@link QE Hyperkanten} zu den referenzierten Hyperknoten
@@ -382,11 +383,15 @@ public interface DL extends DE {
 		Aggregation,
 
 		/** Beim Entfernen bzw. Duplizieren des referenzierenden {@link QN Hyperknoten} sollen sowohl die {@link QE Hyperkanten} zu den referenzierten Hyperknoten
-		 * als auch die referenzierten Hyperknoten ebenfalls entfernt bzw. dupliziert werden. */
+		 * als auch die referenzierten Hyperknoten entfernt bzw. dupliziert werden. */
 		Composition;
 
-		/** Dieses Feld speichert den {@link OptionalizedTranslator optionalisierten} {@link Handling}-{@link EnumTranslator}. */
-		public static final Translator2<String, Handling> trans = Translators.fromEnum(Handling.class).optionalize();
+		/** Diese Methode liefert den {@link OptionalizedTranslator optionalisierten} {@link Handling}-{@link EnumTranslator}. */
+		public static final Translator2<String, Handling> handlingTrans() {
+			return trans == null ? trans = fromEnum(Handling::name, Handling.class.getEnumConstants()).optionalize() : trans;
+		}
+
+		private static Translator2<String, Handling> trans;
 
 	}
 
@@ -405,8 +410,12 @@ public interface DL extends DE {
 		/** Einem referenzierenden {@link QN Hyperknoten} soll mindestens ein referenzierter Hyperknoten zugeordnet werden können. */
 		Multiplicity1N;
 
-		/** Dieses Feld speichert den {@link OptionalizedTranslator optionalisierten} {@link Multiplicity}-{@link EnumTranslator}. */
-		public static final Translator2<String, Multiplicity> trans = Translators.fromEnum(Multiplicity.class).optionalize();
+		/** Diese Methode liefert den {@link OptionalizedTranslator optionalisierten} {@link Multiplicity}-{@link EnumTranslator}. */
+		public static final Translator2<String, Multiplicity> multiplicityTrans() {
+			return trans == null ? trans = fromEnum(Multiplicity::name, Multiplicity.class.getEnumConstants()).optionalize() : trans;
+		}
+
+		private static Translator2<String, Multiplicity> trans;
 
 	}
 

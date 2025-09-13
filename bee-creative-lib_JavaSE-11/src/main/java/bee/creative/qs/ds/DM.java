@@ -27,7 +27,7 @@ public interface DM extends QO {
 		return this.owner().edges().havingContext(this.context());
 	}
 
-	/** Diese Methode liefet das dieses Domänenmodelle verwaltenden Domänenspeicher.
+	/** Diese Methode liefet den dieses Domänenmodell verwaltenden Domänenspeicher.
 	 *
 	 * @return Domänenspeicher. */
 	DS parent();
