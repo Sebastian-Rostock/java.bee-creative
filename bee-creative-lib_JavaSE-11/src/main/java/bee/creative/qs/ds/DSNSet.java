@@ -25,7 +25,7 @@ public interface DSNSet extends QNSet {
 	 * @param node Hyperknoten oder {@code null}.
 	 * @return {@code true}, wenn die Menge verändert wurde. {@code false} sonst. */
 	default boolean setNode(QN node) throws IllegalArgumentException {
-		return this.setNodes(node != null ? Iterables.fromItem(node) : Iterables.empty());
+		return this.setNodes(node != null ? Iterables.fromItem(node) : Iterables.emptyIterable());
 	}
 
 	/** Diese Methode ersetzt alle Elemente dieser Menge mit den gegebenen {@link QN Hyperknoten}.
@@ -96,7 +96,7 @@ public interface DSNSet extends QNSet {
 
 			@Override
 			public void clear() {
-				DSNSet.this.setNodes(Iterables.empty());
+				DSNSet.this.setNodes(Iterables.emptyIterable());
 			}
 
 			@Override

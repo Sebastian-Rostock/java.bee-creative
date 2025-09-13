@@ -194,7 +194,7 @@ public interface QS {
 	/** Diese Methode liefert den {@link OptionalizedTranslator optionalisierten} {@link QN#value() Textwert}-{@link #newNode(Object)
 	 * Hyperknoten}-{@link Translator}. */
 	default Translator2<QN, String> valueTrans() {
-		return Translators.from(QN.class, String.class, QN::value, this::newNode).optionalize();
+		return Translators.translatorFrom(QN.class, String.class, QN::value, this::newNode).optionalize();
 	}
 
 }

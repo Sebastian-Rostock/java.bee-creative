@@ -21,7 +21,7 @@ import bee.creative.util.Translators;
 public class DQ {
 
 	public static final Translator2<String, FEMDatetime> datetimeTrans =
-		Translators.from(String.class, FEMDatetime.class, FEMDatetime::from, FEMDatetime::toString).optionalize();
+		Translators.translatorFrom(String.class, FEMDatetime.class, FEMDatetime::from, FEMDatetime::toString).optionalize();
 
 	public static List<QN> getObjectSet(QN context, QN predicate, QN subject) throws NullPointerException, IllegalArgumentException {
 		return DQ.getEdgesHavingContextAndPredicate(context, predicate).withSubject(subject).objects().toList();

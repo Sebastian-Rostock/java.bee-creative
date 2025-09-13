@@ -182,7 +182,7 @@ public class Filters {
 
 		@Override
 		public Filter2<GItem> negate() {
-			return Filters.from(this.that);
+			return Filters.filterFrom(this.that);
 		}
 
 		@Override
@@ -393,7 +393,7 @@ public class Filters {
 
 	/** Diese Methode liefert den gegebenen {@link Filter} als {@link Filter2}. Wenn er {@code null} ist, wird der {@link EmptyFilter} geliefert. */
 	@SuppressWarnings ("unchecked")
-	public static <GItem> Filter2<GItem> from(final Filter<? super GItem> that) {
+	public static <GItem> Filter2<GItem> filterFrom(final Filter<? super GItem> that) {
 		if (that == null) return Filters.empty();
 		if (that instanceof Filter2) return (Filter2<GItem>)that;
 		return Filters.translate(that, Getters.<GItem>neutral());

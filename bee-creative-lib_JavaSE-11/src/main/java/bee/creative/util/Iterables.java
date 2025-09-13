@@ -344,17 +344,16 @@ public class Iterables {
 
 	/** Diese Methode liefert {@link EmptyIterable EmptyIterable.INSTANCE}. */
 	@SuppressWarnings ("unchecked")
-	public static <GItem> Iterable2<GItem> empty() {
+	public static <GItem> Iterable2<GItem> emptyIterable() {
 		return (Iterable2<GItem>)EmptyIterable.INSTANCE;
 	}
 
-	/** Diese Methode liefert den gegebenen {@link Iterable} als {@link Iterable2}. Wenn er {@code null} ist, wird {@link #empty() Iterables.empty()}
-	 * geliefert. */
+	/** Diese Methode liefert den gegebenen {@link Iterable} als {@link Iterable2}. Wenn er {@code null} ist, wird {@link #emptyIterable()} geliefert. */
 	@SuppressWarnings ("unchecked")
 	public static <GItem> Iterable2<GItem> from(Iterable<? extends GItem> that) {
-		if (that == null) return Iterables.empty();
+		if (that == null) return emptyIterable();
 		if (that instanceof Iterable2<?>) return (Iterable2<GItem>)that;
-		return Iterables.translate(that, Getters.<GItem>neutral());
+		return translate(that, Getters.<GItem>neutral());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #fromItem(Object, int) Iterables.fromItem(item, 1)}. */

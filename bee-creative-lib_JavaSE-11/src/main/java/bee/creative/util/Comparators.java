@@ -516,8 +516,8 @@ public class Comparators {
 	public static <GItem> int compare(final Iterable<? extends GItem> item1, final Iterable<? extends GItem> item2, final Comparator<? super GItem> order)
 		throws NullPointerException {
 		Objects.notNull(order);
-		final Iterator<? extends GItem> iter1 = Objects.notNull(item1, Iterables.<GItem>empty()).iterator();
-		final Iterator<? extends GItem> iter2 = Objects.notNull(item2, Iterables.<GItem>empty()).iterator();
+		final Iterator<? extends GItem> iter1 = Objects.notNull(item1, Iterables.<GItem>emptyIterable()).iterator();
+		final Iterator<? extends GItem> iter2 = Objects.notNull(item2, Iterables.<GItem>emptyIterable()).iterator();
 		while (true) {
 			if (!iter1.hasNext()) return (iter2.hasNext() ? -1 : 0);
 			if (!iter2.hasNext()) return 1;

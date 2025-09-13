@@ -1,7 +1,7 @@
 package bee.creative.qs.ds;
 
 import static bee.creative.qs.ds.DL.Handling.handlingTrans;
-import static bee.creative.util.Translators.fromEnum;
+import static bee.creative.util.Translators.translatorFromEnum;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -388,7 +388,7 @@ public interface DL extends DE {
 
 		/** Diese Methode liefert den {@link OptionalizedTranslator optionalisierten} {@link Handling}-{@link EnumTranslator}. */
 		public static final Translator2<String, Handling> handlingTrans() {
-			return trans == null ? trans = fromEnum(Handling::name, Handling.class.getEnumConstants()).optionalize() : trans;
+			return trans == null ? trans = translatorFromEnum(Handling.class).optionalize() : trans;
 		}
 
 		private static Translator2<String, Handling> trans;
@@ -412,7 +412,7 @@ public interface DL extends DE {
 
 		/** Diese Methode liefert den {@link OptionalizedTranslator optionalisierten} {@link Multiplicity}-{@link EnumTranslator}. */
 		public static final Translator2<String, Multiplicity> multiplicityTrans() {
-			return trans == null ? trans = fromEnum(Multiplicity::name, Multiplicity.class.getEnumConstants()).optionalize() : trans;
+			return trans == null ? trans = translatorFromEnum(Multiplicity.class).optionalize() : trans;
 		}
 
 		private static Translator2<String, Multiplicity> trans;
