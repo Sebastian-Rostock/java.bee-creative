@@ -17,18 +17,18 @@ public class HashMap2<GKey, GValue> extends HashMap<GKey, GValue> {
 
 	/** Diese Methode ist eine Abkürzung für {@link #from(Hasher, Getter, Getter, Setter) HashMap2.from(hasher, Getters.neutral(), Getters.empty(), null)}. */
 	public static <GKey, GValue> HashMap2<GKey, GValue> from(Hasher hasher) throws NullPointerException {
-		return HashMap2.from(hasher, Getters.neutral(), Getters.empty(), null);
+		return HashMap2.from(hasher, Getters.neutralGetter(), Getters.empty(), null);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #from(Hasher, Getter, Getter, Setter) HashMap2.from(hasher, Getters.neutral(), installValue, null)}. */
 	public static <GKey, GValue> HashMap2<GKey, GValue> from(Hasher hasher, Getter<? super GKey, ? extends GValue> installValue) throws NullPointerException {
-		return HashMap2.from(hasher, Getters.neutral(), installValue, null);
+		return HashMap2.from(hasher, Getters.neutralGetter(), installValue, null);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #from(Hasher, Getter, Getter, Setter) HashMap2.from(hasher, Getters.neutral(), installAndReuseValue,
 	 * installAndReuseValue)}. */
 	public static <GKey, GValue> HashMap2<GKey, GValue> from(Hasher hasher, Field<? super GKey, GValue> installAndReuseValue) throws NullPointerException {
-		return HashMap2.from(hasher, Getters.neutral(), installAndReuseValue, installAndReuseValue);
+		return HashMap2.from(hasher, Getters.neutralGetter(), installAndReuseValue, installAndReuseValue);
 	}
 
 	/** Diese Methode liefert eine neue {@link HashMap2}, welche Streuwert, Äquivalenz, Installation und Wiederverwendung von Schlüsseln, Werten bzw. Einträgen an

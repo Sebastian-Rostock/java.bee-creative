@@ -576,7 +576,7 @@ public class Comparables {
 	public static <GItem> Comparable2<GItem> from(final Comparable<? super GItem> that) {
 		if (that == null) return Comparables.empty();
 		if (that instanceof Comparable2<?>) return (Comparable2<GItem>)that;
-		return Comparables.translate(that, Getters.<GItem>neutral());
+		return Comparables.translate(that, Getters.<GItem>neutralGetter());
 	}
 
 	/** Diese Methode gibt einen {@link Comparable} zurück, der den gegebenen {@link Comparator} sowie die gegebene Eingabe zur Berechnung des Navigationswert

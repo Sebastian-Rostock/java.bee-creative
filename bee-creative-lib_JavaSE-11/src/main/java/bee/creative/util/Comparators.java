@@ -543,7 +543,7 @@ public class Comparators {
 	public static <GItem> Comparator2<GItem> from(final Comparator<? super GItem> that) {
 		if (that == null) return Comparators.neutral();
 		if (that instanceof Comparator2<?>) return (Comparator2<GItem>)that;
-		return Comparators.translate(that, Getters.<GItem>neutral());
+		return Comparators.translate(that, Getters.<GItem>neutralGetter());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ConcatComparator new ConcatComparator<>(that1, that2)}. */

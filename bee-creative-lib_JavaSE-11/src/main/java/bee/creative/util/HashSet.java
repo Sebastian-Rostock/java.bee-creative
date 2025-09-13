@@ -22,7 +22,7 @@ public class HashSet<GItem> extends AbstractHashSet<GItem> implements Serializab
 
 	/** Diese Methode ist eine Abkürzung für {@link #from(Hasher, Getter, Consumer) HashSet.from(hasher, Getters.neutral(), null)}. */
 	public static <GItem> HashSet<GItem> from(final Hasher hasher) throws NullPointerException {
-		return HashSet.from(hasher, Getters.<GItem>neutral(), null);
+		return HashSet.from(hasher, Getters.<GItem>neutralGetter(), null);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #from(Hasher, Getter, Consumer) HashSet.from(hasher, installItem, null)}. */

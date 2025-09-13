@@ -15,7 +15,7 @@ public class HashSet2<GItem> extends HashSet<GItem> {
 
 	/** Diese Methode ist eine Abkürzung für {@link #from(Hasher, Getter, Consumer) HashSet2.from(hasher, Getters.neutral(), null)}. */
 	public static <GItem> HashSet2<GItem> from(final Hasher hasher) throws NullPointerException {
-		return HashSet2.from(hasher, Getters.<GItem>neutral(), null);
+		return HashSet2.from(hasher, Getters.<GItem>neutralGetter(), null);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #from(Hasher, Getter, Consumer) HashSet2.from(hasher, installItem, null)}. */

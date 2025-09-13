@@ -353,7 +353,7 @@ public class Iterables {
 	public static <GItem> Iterable2<GItem> from(Iterable<? extends GItem> that) {
 		if (that == null) return emptyIterable();
 		if (that instanceof Iterable2<?>) return (Iterable2<GItem>)that;
-		return translate(that, Getters.<GItem>neutral());
+		return translate(that, Getters.<GItem>neutralGetter());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #fromItem(Object, int) Iterables.fromItem(item, 1)}. */

@@ -53,7 +53,7 @@ public abstract class AbstractHashSet<GItem> extends AbstractHashData<GItem, GIt
 	 * @param installItem Methode zur Überführung des gegebenen Elements in das einzutragende Element.
 	 * @return enthaltenes und ggf. eingefügtes Element. */
 	public GItem install(GItem item, Getter<? super GItem, ? extends GItem> installItem) {
-		return this.customGetKey(this.installImpl(item, installItem, Getters.<GItem>neutral()));
+		return this.customGetKey(this.installImpl(item, installItem, Getters.<GItem>neutralGetter()));
 	}
 
 	@Override

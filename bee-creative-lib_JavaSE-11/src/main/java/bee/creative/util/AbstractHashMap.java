@@ -46,7 +46,7 @@ public abstract class AbstractHashMap<GKey, GValue> extends AbstractHashData<GKe
 	}
 
 	public GValue install(GKey key, Producer<? extends GValue> installValue) {
-		return this.install(key, Getters.<GKey>neutral(), value -> installValue.get());
+		return this.install(key, Getters.<GKey>neutralGetter(), value -> installValue.get());
 	}
 
 	/** Diese Methode liefert den zum gegebenen Schlüssel hinterlegten Wert, analog zu {@link #get(Object)}. Wenn zu diesem Schlüssel noch kein Wert hinterlegt
@@ -56,7 +56,7 @@ public abstract class AbstractHashMap<GKey, GValue> extends AbstractHashData<GKe
 	 * @param installValue Methode zur Überführung des einzutragenden Schlüssels in den einzutragenden Wert.
 	 * @return enthaltener und ggf. erzeugter Wert. */
 	public GValue install(GKey key, Getter<? super GKey, ? extends GValue> installValue) {
-		return this.install(key, Getters.<GKey>neutral(), installValue);
+		return this.install(key, Getters.<GKey>neutralGetter(), installValue);
 	}
 
 	/** Diese Methode liefert den zum gegebenen Schlüssel hinterlegten Wert, analog zu {@link #get(Object)}. Wenn zu diesem Schlüssel noch kein Wert hinterlegt
@@ -77,7 +77,7 @@ public abstract class AbstractHashMap<GKey, GValue> extends AbstractHashData<GKe
 	}
 
 	public GValue update(GKey key, Reducer<? super GKey, GValue> updateValue) {
-		return this.update(key, Getters.<GKey>neutral(), updateValue);
+		return this.update(key, Getters.<GKey>neutralGetter(), updateValue);
 	}
 
 	public GValue update(GKey key, Getter<? super GKey, ? extends GKey> installKey, Reducer<? super GKey, GValue> updateValue) {

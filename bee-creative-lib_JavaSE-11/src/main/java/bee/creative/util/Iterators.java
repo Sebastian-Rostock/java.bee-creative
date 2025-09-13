@@ -589,7 +589,7 @@ public class Iterators {
 	public static <GItem> Iterator2<GItem> from(final Iterator<? extends GItem> that) {
 		if (that == null) return Iterators.empty();
 		if (that instanceof Iterator2<?>) return (Iterator2<GItem>)that;
-		return Iterators.translate(that, Getters.<GItem>neutral());
+		return Iterators.translate(that, Getters.<GItem>neutralGetter());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #fromItem(Object, int) Iterators.fromItem(item, 1)}. */

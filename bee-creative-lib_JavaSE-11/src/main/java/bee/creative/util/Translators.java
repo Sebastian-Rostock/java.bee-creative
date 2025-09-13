@@ -57,7 +57,7 @@ public class Translators {
 	/** Diese Methode liefert einen neutralen {@link Translator2} und ist eine Abkürzung für {@link Translators#translatorFrom(Class, Class, Getter, Getter)
 	 * Translators.from(valueClass, valueClass, Getters.neutral(), Getters.neutral())}. */
 	public static <GValue> Translator2<GValue, GValue> neutralTranslator(Class<GValue> valueClass) throws NullPointerException {
-		return Translators.translatorFrom(valueClass, valueClass, Getters.<GValue>neutral(), Getters.<GValue>neutral());
+		return Translators.translatorFrom(valueClass, valueClass, Getters.<GValue>neutralGetter(), Getters.<GValue>neutralGetter());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ConcatTranslator new ConcatTranslator<>(that, trans)}. */

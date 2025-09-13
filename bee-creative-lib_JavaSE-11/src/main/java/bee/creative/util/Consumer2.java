@@ -16,9 +16,9 @@ public interface Consumer2<GValue> extends Consumer<GValue> {
 		return Consumers.synchronize(this, mutex);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Setters#from(Consumer) Setter.from(this)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Setters#setterFrom(Consumer) Setter.from(this)}. */
 	default Setter3<Object, GValue> toSetter() {
-		return Setters.from(this);
+		return Setters.setterFrom(this);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Properties#from(Producer, Consumer) Properties.from(get, this)}. */

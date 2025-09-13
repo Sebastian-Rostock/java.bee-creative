@@ -321,7 +321,7 @@ public class Properties {
 	public static <GValue> Property2<GValue> from(final Property<GValue> that) {
 		if (that == null) return Properties.empty();
 		if (that instanceof Property2<?>) return (Property2<GValue>)that;
-		return Properties.translate(that, Getters.<GValue>neutral(), Getters.<GValue>neutral());
+		return Properties.translate(that, Getters.<GValue>neutralGetter(), Getters.<GValue>neutralGetter());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ValueProperty new ValueProperty<>(value)}. */

@@ -492,7 +492,7 @@ public class Getters {
 
 	/** Diese Methode liefert den {@link NeutralGetter}. */
 	@SuppressWarnings ("unchecked")
-	public static <GItem> Getter3<GItem, GItem> neutral() {
+	public static <GItem> Getter3<GItem, GItem> neutralGetter() {
 		return (Getter3<GItem, GItem>)NeutralGetter.INSTANCE;
 	}
 
@@ -501,7 +501,7 @@ public class Getters {
 	public static <GItem, GValue> Getter3<GItem, GValue> getterFrom(final Getter<? super GItem, ? extends GValue> that) {
 		if (that == null) return Getters.empty();
 		if (that instanceof Getter3) return (Getter3<GItem, GValue>)that;
-		return Getters.concat(that, Getters.<GValue>neutral());
+		return Getters.concat(that, Getters.<GValue>neutralGetter());
 	}
 
 	/** Diese Methode liefert einen {@link Getter3} zu {@link Producer#get()} des gegebenen {@link Producer}. */
@@ -623,7 +623,7 @@ public class Getters {
 	/** Diese Methode ist eine Abkürzung für {@link #aggregate(Getter, Getter) Getters.aggregate(that, Getters.neutral())}. */
 	public static <GItem, GValue> Getter3<Iterable<? extends GItem>, GValue> aggregate(final Getter<? super GItem, ? extends GValue> that)
 		throws NullPointerException {
-		return Getters.aggregate(that, Getters.<GValue>neutral());
+		return Getters.aggregate(that, Getters.<GValue>neutralGetter());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #aggregate(Getter, Getter, Getter, Getter) Getters.aggregate(that, trans, Getters.empty(),

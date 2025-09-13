@@ -191,7 +191,7 @@ public class Producers {
 	public static <GValue> Producer3<GValue> from(final Producer<? extends GValue> that) {
 		if (that == null) return Producers.empty();
 		if (that instanceof Producer3<?>) return (Producer3<GValue>)that;
-		return Producers.translate(that, Getters.<GValue>neutral());
+		return Producers.translate(that, Getters.<GValue>neutralGetter());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #from(Getter, Object) Producers.from(that, null)}. */

@@ -149,7 +149,7 @@ public class Consumers {
 	public static <GValue> Consumer3<GValue> from(final Consumer<? super GValue> target) {
 		if (target == null) return Consumers.empty();
 		if (target instanceof Consumer3<?>) return (Consumer3<GValue>)target;
-		return Consumers.translate(target, Getters.<GValue>neutral());
+		return Consumers.translate(target, Getters.<GValue>neutralGetter());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #from(Setter, Object) Consumers.from(that, null)}. */

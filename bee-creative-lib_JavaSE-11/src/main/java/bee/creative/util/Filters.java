@@ -396,7 +396,7 @@ public class Filters {
 	public static <GItem> Filter2<GItem> filterFrom(final Filter<? super GItem> that) {
 		if (that == null) return Filters.empty();
 		if (that instanceof Filter2) return (Filter2<GItem>)that;
-		return Filters.translate(that, Getters.<GItem>neutral());
+		return Filters.translate(that, Getters.<GItem>neutralGetter());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code value ? Filters.accept() : Filters.reject()}.
