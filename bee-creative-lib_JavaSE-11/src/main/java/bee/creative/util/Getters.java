@@ -4,10 +4,6 @@ import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.Iterator;
 import bee.creative.lang.Natives;
 import bee.creative.lang.Objects;
@@ -16,6 +12,114 @@ import bee.creative.lang.Objects;
  *
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Getters {
+
+	/** Diese Methode liefert den {@link EmptyGetter}. */
+	@SuppressWarnings ("unchecked")
+	public static <GItem, GValue> Getter3<GItem, GValue> empty() {
+		return (Getter3<GItem, GValue>)EmptyGetter.INSTANCE;
+	}
+
+	/** Diese Methode liefert den {@link NeutralGetter}. */
+	@SuppressWarnings ("unchecked")
+	public static <GItem> Getter3<GItem, GItem> neutralGetter() {
+		return (Getter3<GItem, GItem>)NeutralGetter.INSTANCE;
+	}
+
+	/** Diese Methode liefert den gegebenen {@link Getter} als {@link Getter3}. Wenn er {@code null} ist, wird dern {@link EmptyGetter} geliefert. */
+	@SuppressWarnings ("unchecked")
+	public static <GItem, GValue> Getter3<GItem, GValue> getterFrom(final Getter<? super GItem, ? extends GValue> that) {
+		if (that == null) return Getters.empty();
+		if (that instanceof Getter3) return (Getter3<GItem, GValue>)that;
+		return Getters.concat(that, Getters.<GValue>neutralGetter());
+	}
+
+	/** Diese Methode liefert einen {@link Getter3} zu {@link Producer#get()} des gegebenen {@link Producer}. */
+	public static <GValue> Getter3<Object, GValue> from(final Producer<? extends GValue> that) throws NullPointerException {
+		return that == Producers.empty() ? Getters.<Object, GValue>empty() : new ProducerGetter<>(that);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #getterFrom(Getter) Getters.from(Producers.fromValue(that).toGetter())}.
+	 *
+	 * @see Producers#fromValue(Object) */
+	public static <GValue> Getter3<Object, GValue> fromValue(final GValue that) {
+		return Getters.getterFrom(Producers.fromValue(that).toGetter());
+	}
+
+	/** Diese Methode liefert einen {@link Getter3} zu {@link Filter#accept(Object)} des gegebenen {@link Filter}. Für einen Datenstz {@code item} liefert er
+	 * {@code Boolean.valueOf(that.accept(item))}. */
+	public static <GItem> Getter3<GItem, Boolean> fromFilter(final Filter<? super GItem> that) throws NullPointerException {
+		return new FilterGetter<>(that);
+	}
+
+	/** Diese Methode gibt einen {@link Getter3} zu {@link Translator#toSource(Object)} des gegebenen {@link Translator} zurück. Für einen Datensatz {@code item}
+	 * liefert er den Wert {@code that.toSource(item)}. */
+	public static <GValue, GItem> Getter3<GItem, GValue> fromSource(final Translator<? extends GValue, ? super GItem> that) throws NullPointerException {
+		return new SourceGetter<>(that);
+	}
+
+	/** Diese Methode gibt einen {@link Getter3} zu {@link Translator#toTarget(Object)} des gegebenen {@link Translator} zurück. Für einen Datensatz {@code item}
+	 * liefert er den Wert {@code that.toTarget(item)}. */
+	public static <GSource, GTarget> Getter3<GSource, GTarget> fromTarget(final Translator<? super GSource, ? extends GTarget> that) throws NullPointerException {
+		return new TargetGetter<>(that);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link ConcatGetter new ConcatGetter<>(that, trans)}. */
+	public static <GItem, GValue2, GValue> Getter3<GItem, GValue> concat(final Getter<? super GItem, ? extends GValue2> that,
+		final Getter<? super GValue2, ? extends GValue> trans) throws NullPointerException {
+		return new ConcatGetter<>(that, trans);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #buffer(Getter, int, Hasher) Getters.buffer(that, References.SOFT, Hashers.natural())}. */
+	public static <GItem, GValue> Getter3<GItem, GValue> buffer(final Getter<? super GItem, ? extends GValue> that) throws NullPointerException {
+		return Getters.buffer(that, BufferedGetter.SOFT, Hashers.natural());
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link BufferedGetter new BufferedGetter<>(that, mode, hasher)}. */
+	public static <GItem, GValue> Getter3<GItem, GValue> buffer(final Getter<? super GItem, ? extends GValue> that, final int mode, final Hasher hasher)
+		throws NullPointerException, IllegalArgumentException {
+		return new BufferedGetter<>(that, mode, hasher);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #aggregate(Getter, Getter) Getters.aggregate(that, Getters.neutral())}. */
+	public static <GItem, GValue> Getter3<Iterable<? extends GItem>, GValue> aggregate(final Getter<? super GItem, ? extends GValue> that)
+		throws NullPointerException {
+		return Getters.aggregate(that, Getters.<GValue>neutralGetter());
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #aggregate(Getter, Getter, Getter, Getter) Getters.aggregate(that, trans, Getters.empty(),
+	 * Getters.empty())}. */
+	public static <GItem, GValue, GValue2> Getter3<Iterable<? extends GItem>, GValue> aggregate(final Getter<? super GItem, ? extends GValue2> that,
+		final Getter<? super GValue2, ? extends GValue> trans) throws NullPointerException {
+		return Getters.aggregate(that, trans, Getters.<Object, GValue>empty(), Getters.<Object, GValue>empty());
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link AggregatedGetter new AggregatedGetter<>(that, trans, empty, mixed)}. */
+	public static <GItem extends Iterable<? extends GItem2>, GValue, GItem2, GValue2> Getter3<GItem, GValue> aggregate(
+		final Getter<? super GItem2, ? extends GValue2> that, final Getter<? super GValue2, ? extends GValue> trans,
+		final Getter<? super GItem, ? extends GValue> empty, final Getter<? super GItem, ? extends GValue> mixed) throws NullPointerException {
+		return new AggregatedGetter<>(that, trans, empty, mixed);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #optionalize(Getter, Object) Getters.optionalize(that, null)}. **/
+	public static <GItem, GValue> Getter3<GItem, GValue> optionalize(final Getter<? super GItem, GValue> that) throws NullPointerException {
+		return Getters.optionalize(that, null);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link OptionalizedGetter new OptionalizedGetter<>(that, value)}. */
+	public static <GItem, GValue> Getter3<GItem, GValue> optionalize(final Getter<? super GItem, GValue> that, final GValue value) throws NullPointerException {
+		return new OptionalizedGetter<>(that, value);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #synchronize(Getter, Object) Getters.synchronize(that, that)}. */
+	public static <GItem, GValue> Getter3<GItem, GValue> synchronize(final Getter<? super GItem, ? extends GValue> that) throws NullPointerException {
+		return Getters.synchronize(that, that);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link SynchronizedGetter new SynchronizedGetter<>(that, mutex)}. */
+	public static <GItem, GValue> Getter3<GItem, GValue> synchronize(final Getter<? super GItem, ? extends GValue> that, final Object mutex)
+		throws NullPointerException {
+		return new SynchronizedGetter<>(that, mutex);
+	}
 
 	/** Diese Klasse implementiert den leeren {@link Getter3}, der beim {@link #get(Object) Lesen} stets {@code null} liefert. */
 	public static class EmptyGetter extends AbstractGetter<Object, Object> {
@@ -32,82 +136,6 @@ public class Getters {
 		@Override
 		public Object get(final Object item) {
 			return item;
-		}
-
-	}
-
-	/** Diese Klasse implementiert einen {@link Getter3}, der das {@link #get(Object) Lesen} an eine gegebene {@link Method nativen Methode} delegiert. Bei einer
-	 * Klassenmethode liefert er für einen Datensatz {@code item} {@link Method#invoke(Object, Object...) this.that.invoke(null, item)}, bei einer Objektmethode
-	 * dagegen {@link Method#invoke(Object, Object...) this.that.invoke(item)}.
-	 *
-	 * @param <GItem> Typ des Datensatzes.
-	 * @param <GValue> Typ des Werts. */
-	public static class MethodGetter<GItem, GValue> extends AbstractGetter<GItem, GValue> {
-
-		public final Method that;
-
-		public final boolean forceAccessible;
-
-		public MethodGetter(final Method that, final boolean forceAccessible) throws NullPointerException, IllegalArgumentException {
-			this.forceAccessible = forceAccessible;
-			if (that.getParameterTypes().length != (Modifier.isStatic(that.getModifiers()) ? 1 : 0)) throw new IllegalArgumentException();
-			this.that = forceAccessible ? Natives.forceAccessible(that) : Objects.notNull(that);
-		}
-
-		@Override
-		@SuppressWarnings ("unchecked")
-		public GValue get(final GItem item) {
-			try {
-				final GValue result;
-				if (Modifier.isStatic(this.that.getModifiers())) {
-					result = (GValue)this.that.invoke(null, item);
-				} else {
-					result = (GValue)this.that.invoke(item);
-				}
-				return result;
-			} catch (final IllegalAccessException | InvocationTargetException cause) {
-				throw new IllegalArgumentException(cause);
-			}
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.that, this.forceAccessible);
-		}
-
-	}
-
-	/** Diese Klasse implementiert einen {@link Getter3}, der das {@link #get(Object) Lesen} an einen gegebenen {@link Constructor nativen Kontruktor} delegiert.
-	 * Für einen Datensatz {@code item} liefert er {@link Constructor#newInstance(Object...) this.that.newInstance(item)}.
-	 *
-	 * @param <GItem> Typ des Datensatzes.
-	 * @param <GValue> Typ des Werts. */
-	public static class ConstructorGetter<GItem, GValue> extends AbstractGetter<GItem, GValue> {
-
-		public final Constructor<?> that;
-
-		public final boolean forceAccessible;
-
-		public ConstructorGetter(final Constructor<?> that, final boolean forceAccessible) throws NullPointerException, IllegalArgumentException {
-			this.forceAccessible = forceAccessible;
-			if (!Modifier.isStatic(that.getModifiers()) || (that.getParameterTypes().length != 1)) throw new IllegalArgumentException();
-			this.that = forceAccessible ? Natives.forceAccessible(that) : Objects.notNull(that);
-		}
-
-		@Override
-		public GValue get(final GItem item) {
-			try {
-				@SuppressWarnings ("unchecked")
-				final GValue result = (GValue)this.that.newInstance(item);
-				return result;
-			} catch (final IllegalAccessException | InstantiationException | InvocationTargetException cause) {
-				throw new IllegalArgumentException(cause);
-			}
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.that, this.forceAccessible);
 		}
 
 	}
@@ -482,183 +510,6 @@ public class Getters {
 			return Objects.toInvokeString(this, this.that);
 		}
 
-	}
-
-	/** Diese Methode liefert den {@link EmptyGetter}. */
-	@SuppressWarnings ("unchecked")
-	public static <GItem, GValue> Getter3<GItem, GValue> empty() {
-		return (Getter3<GItem, GValue>)EmptyGetter.INSTANCE;
-	}
-
-	/** Diese Methode liefert den {@link NeutralGetter}. */
-	@SuppressWarnings ("unchecked")
-	public static <GItem> Getter3<GItem, GItem> neutralGetter() {
-		return (Getter3<GItem, GItem>)NeutralGetter.INSTANCE;
-	}
-
-	/** Diese Methode liefert den gegebenen {@link Getter} als {@link Getter3}. Wenn er {@code null} ist, wird dern {@link EmptyGetter} geliefert. */
-	@SuppressWarnings ("unchecked")
-	public static <GItem, GValue> Getter3<GItem, GValue> getterFrom(final Getter<? super GItem, ? extends GValue> that) {
-		if (that == null) return Getters.empty();
-		if (that instanceof Getter3) return (Getter3<GItem, GValue>)that;
-		return Getters.concat(that, Getters.<GValue>neutralGetter());
-	}
-
-	/** Diese Methode liefert einen {@link Getter3} zu {@link Producer#get()} des gegebenen {@link Producer}. */
-	public static <GValue> Getter3<Object, GValue> from(final Producer<? extends GValue> that) throws NullPointerException {
-		return that == Producers.empty() ? Getters.<Object, GValue>empty() : new ProducerGetter<>(that);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link #fromNative(String, boolean) Getters.fromNative(memberText, true)}. */
-	public static <GItem, GValue> Getter3<GItem, GValue> fromNative(final String memberText) throws NullPointerException, IllegalArgumentException {
-		return Getters.fromNative(memberText, true);
-	}
-
-	/** Diese Methode ist effektiv eine Abkürzung für {@code Getters.fromNative(Natives.parse(memberText), forceAccessible)}.
-	 *
-	 * @see Natives#parseNative(String)
-	 * @see Getters#fromNative(java.lang.reflect.Field, boolean)
-	 * @see Getters#fromNative(Method, boolean)
-	 * @see Getters#fromNative(Constructor, boolean) */
-	public static <GItem, GValue> Getter3<GItem, GValue> fromNative(final String memberText, final boolean forceAccessible)
-		throws NullPointerException, IllegalArgumentException {
-		final Object object = Natives.parseNative(memberText);
-		if (object instanceof java.lang.reflect.Field) return Getters.fromNative((java.lang.reflect.Field)object, forceAccessible);
-		if (object instanceof Method) return Getters.fromNative((Method)object, forceAccessible);
-		if (object instanceof Constructor<?>) return Getters.fromNative((Constructor<?>)object, forceAccessible);
-		throw new IllegalArgumentException();
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link #fromNative(java.lang.reflect.Field, boolean) Getters.fromNative(field, true)}. */
-	public static <GItem, GValue> Getter3<GItem, GValue> fromNative(final java.lang.reflect.Field that) throws NullPointerException, IllegalArgumentException {
-		return Getters.fromNative(that, true);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link #getterFrom(Getter) Getters.from(Fields.fromNative(that, forceAccessible))}.
-	 *
-	 * @see Fields#fieldFromNative(java.lang.reflect.Field, boolean) */
-	public static <GItem, GValue> Getter3<GItem, GValue> fromNative(final java.lang.reflect.Field that, final boolean forceAccessible)
-		throws NullPointerException, IllegalArgumentException {
-		return Getters.getterFrom(Fields.<GItem, GValue>fieldFromNative(that, forceAccessible));
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link #fromNative(Method, boolean) Getters.fromNative(that, true)}. */
-	public static <GItem, GOutput> Getter3<GItem, GOutput> fromNative(final Method that) throws NullPointerException, IllegalArgumentException {
-		return Getters.fromNative(that, true);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link MethodGetter new MethodGetter<>(that, forceAccessible)}. */
-	public static <GItem, GValue> Getter3<GItem, GValue> fromNative(final Method that, final boolean forceAccessible)
-		throws NullPointerException, IllegalArgumentException {
-		return new MethodGetter<>(that, forceAccessible);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link #fromNative(Constructor, boolean) Getters.fromNative(that, true)}. */
-	public static <GItem, GOutput> Getter3<GItem, GOutput> fromNative(final Constructor<?> that) throws NullPointerException, IllegalArgumentException {
-		return Getters.fromNative(that, true);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link ConstructorGetter new ConstructorGetter<>(that, forceAccessible)}. */
-	public static <GItem, GValue> Getter3<GItem, GValue> fromNative(final Constructor<?> that, final boolean forceAccessible)
-		throws NullPointerException, IllegalArgumentException {
-		return new ConstructorGetter<>(that, forceAccessible);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link #fromNative(Class, String, boolean) Getters.fromNative(fieldOwner, fieldName, true)}. */
-	public static <GItem, GValue> Getter3<GItem, GValue> fromNative(final Class<? extends GItem> fieldOwner, final String fieldName)
-		throws NullPointerException, IllegalArgumentException {
-		return Getters.fromNative(fieldOwner, fieldName, true);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link #getterFrom(Getter) Getters.from(Fields.fromNative(fieldOwner, fieldName, forceAccessible))}.
-	 *
-	 * @see Fields#fieldFromNative(Class, String, boolean) */
-	public static <GItem, GValue> Getter3<GItem, GValue> fromNative(final Class<? extends GItem> fieldOwner, final String fieldName,
-		final boolean forceAccessible) throws NullPointerException, IllegalArgumentException {
-		return Getters.getterFrom(Fields.<GItem, GValue>fieldFromNative(fieldOwner, fieldName, forceAccessible));
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link #getterFrom(Getter) Getters.from(Producers.fromValue(that).toGetter())}.
-	 *
-	 * @see Producers#fromValue(Object) */
-	public static <GValue> Getter3<Object, GValue> fromValue(final GValue that) {
-		return Getters.getterFrom(Producers.fromValue(that).toGetter());
-	}
-
-	/** Diese Methode liefert einen {@link Getter3} zu {@link Filter#accept(Object)} des gegebenen {@link Filter}. Für einen Datenstz {@code item} liefert er
-	 * {@code Boolean.valueOf(that.accept(item))}. */
-	public static <GItem> Getter3<GItem, Boolean> fromFilter(final Filter<? super GItem> that) throws NullPointerException {
-		return new FilterGetter<>(that);
-	}
-
-	/** Diese Methode gibt einen {@link Getter3} zu {@link Translator#toSource(Object)} des gegebenen {@link Translator} zurück. Für einen Datensatz {@code item}
-	 * liefert er den Wert {@code that.toSource(item)}. */
-	public static <GValue, GItem> Getter3<GItem, GValue> fromSource(final Translator<? extends GValue, ? super GItem> that) throws NullPointerException {
-		return new SourceGetter<>(that);
-	}
-
-	/** Diese Methode gibt einen {@link Getter3} zu {@link Translator#toTarget(Object)} des gegebenen {@link Translator} zurück. Für einen Datensatz {@code item}
-	 * liefert er den Wert {@code that.toTarget(item)}. */
-	public static <GSource, GTarget> Getter3<GSource, GTarget> fromTarget(final Translator<? super GSource, ? extends GTarget> that) throws NullPointerException {
-		return new TargetGetter<>(that);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link ConcatGetter new ConcatGetter<>(that, trans)}. */
-	public static <GItem, GValue2, GValue> Getter3<GItem, GValue> concat(final Getter<? super GItem, ? extends GValue2> that,
-		final Getter<? super GValue2, ? extends GValue> trans) throws NullPointerException {
-		return new ConcatGetter<>(that, trans);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link #buffer(Getter, int, Hasher) Getters.buffer(that, References.SOFT, Hashers.natural())}. */
-	public static <GItem, GValue> Getter3<GItem, GValue> buffer(final Getter<? super GItem, ? extends GValue> that) throws NullPointerException {
-		return Getters.buffer(that, BufferedGetter.SOFT, Hashers.natural());
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link BufferedGetter new BufferedGetter<>(that, mode, hasher)}. */
-	public static <GItem, GValue> Getter3<GItem, GValue> buffer(final Getter<? super GItem, ? extends GValue> that, final int mode, final Hasher hasher)
-		throws NullPointerException, IllegalArgumentException {
-		return new BufferedGetter<>(that, mode, hasher);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link #aggregate(Getter, Getter) Getters.aggregate(that, Getters.neutral())}. */
-	public static <GItem, GValue> Getter3<Iterable<? extends GItem>, GValue> aggregate(final Getter<? super GItem, ? extends GValue> that)
-		throws NullPointerException {
-		return Getters.aggregate(that, Getters.<GValue>neutralGetter());
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link #aggregate(Getter, Getter, Getter, Getter) Getters.aggregate(that, trans, Getters.empty(),
-	 * Getters.empty())}. */
-	public static <GItem, GValue, GValue2> Getter3<Iterable<? extends GItem>, GValue> aggregate(final Getter<? super GItem, ? extends GValue2> that,
-		final Getter<? super GValue2, ? extends GValue> trans) throws NullPointerException {
-		return Getters.aggregate(that, trans, Getters.<Object, GValue>empty(), Getters.<Object, GValue>empty());
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link AggregatedGetter new AggregatedGetter<>(that, trans, empty, mixed)}. */
-	public static <GItem extends Iterable<? extends GItem2>, GValue, GItem2, GValue2> Getter3<GItem, GValue> aggregate(
-		final Getter<? super GItem2, ? extends GValue2> that, final Getter<? super GValue2, ? extends GValue> trans,
-		final Getter<? super GItem, ? extends GValue> empty, final Getter<? super GItem, ? extends GValue> mixed) throws NullPointerException {
-		return new AggregatedGetter<>(that, trans, empty, mixed);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link #optionalize(Getter, Object) Getters.optionalize(that, null)}. **/
-	public static <GItem, GValue> Getter3<GItem, GValue> optionalize(final Getter<? super GItem, GValue> that) throws NullPointerException {
-		return Getters.optionalize(that, null);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link OptionalizedGetter new OptionalizedGetter<>(that, value)}. */
-	public static <GItem, GValue> Getter3<GItem, GValue> optionalize(final Getter<? super GItem, GValue> that, final GValue value) throws NullPointerException {
-		return new OptionalizedGetter<>(that, value);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link #synchronize(Getter, Object) Getters.synchronize(that, that)}. */
-	public static <GItem, GValue> Getter3<GItem, GValue> synchronize(final Getter<? super GItem, ? extends GValue> that) throws NullPointerException {
-		return Getters.synchronize(that, that);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link SynchronizedGetter new SynchronizedGetter<>(that, mutex)}. */
-	public static <GItem, GValue> Getter3<GItem, GValue> synchronize(final Getter<? super GItem, ? extends GValue> that, final Object mutex)
-		throws NullPointerException {
-		return new SynchronizedGetter<>(that, mutex);
 	}
 
 }

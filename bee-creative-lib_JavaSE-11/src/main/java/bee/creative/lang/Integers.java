@@ -11,7 +11,7 @@ public class Integers {
 	 *
 	 * @param value positive Dezimalzahl.
 	 * @return Zeichenanzahl. */
-	public static int getSize(final int value) {
+	public static int getSize(int value) {
 		return (value > 99999 //
 			? (value > 9999999 //
 				? (value > 999999999//
@@ -31,9 +31,11 @@ public class Integers {
 	 *
 	 * @param value positive Dezimalzahl.
 	 * @return Zeichenanzahl. */
-	public static int getSize(final long value) {
-		final long div = value / 1000000000, mod = value % 1000000000;
-		return div != 0 ? Integers.getSize(div) + 9 : Integers.getSize((int)mod);
+	public static int getSize(long value) {
+		var div = value / 1000000000;
+		if (div != 0) return getSize(div) + 9;
+		var mod = value % 1000000000;
+		return getSize((int)mod);
 	}
 
 	/** Diese Methode gibt die Anzahl der Dezimalziffern ab der gegebenen Position des gegebenen Puffers zurück.
@@ -44,11 +46,11 @@ public class Integers {
 	 * @param offset Position des ersten untersuchten Zeichens.
 	 * @param length Anzahl der zu untersuchenden Zeichen.
 	 * @return Anzahl der Dezimalziffern. */
-	public static int getSize(final char[] buffer, final int offset, final int length) {
-		final int limit = offset + length;
-		int index = offset;
+	public static int getSize(char[] buffer, int offset, int length) {
+		var limit = offset + length;
+		var index = offset;
 		while (index < limit) {
-			final char digit = buffer[index];
+			var digit = buffer[index];
 			if ((digit < '0') || (digit > '9')) return index - offset;
 			index++;
 		}
@@ -63,11 +65,11 @@ public class Integers {
 	 * @param offset Position des ersten untersuchten Zeichens.
 	 * @param length Anzahl der zu untersuchenden Zeichen.
 	 * @return Anzahl der Dezimalziffern. */
-	public static int getSize(final String buffer, final int offset, final int length) {
-		final int limit = offset + length;
-		int index = offset;
+	public static int getSize(String buffer, int offset, int length) {
+		var limit = offset + length;
+		var index = offset;
 		while (index < limit) {
-			final char digit = buffer.charAt(index);
+			var digit = buffer.charAt(index);
 			if ((digit < '0') || (digit > '9')) return index - offset;
 			index++;
 		}
@@ -82,9 +84,9 @@ public class Integers {
 	 * @param offset Position der ersten Dezimalziffer.
 	 * @param length Anzahl der einzulesenden Dezimalziffern.
 	 * @return positiven Dezimalzahl. */
-	public static int parseInt(final char[] buffer, int offset, int length) {
+	public static int parseInt(char[] buffer, int offset, int length) {
 		if (length == 0) return 0;
-		int result = 0;
+		var result = 0;
 		length += offset;
 		while (true) {
 			result += buffer[offset] - '0';
@@ -102,9 +104,9 @@ public class Integers {
 	 * @param offset Position der ersten Dezimalziffer.
 	 * @param length Anzahl der einzulesenden Dezimalziffern.
 	 * @return positiven Dezimalzahl. */
-	public static int parseInt(final String buffer, int offset, int length) {
+	public static int parseInt(String buffer, int offset, int length) {
 		if (length == 0) return 0;
-		int result = 0;
+		var result = 0;
 		length += offset;
 		while (true) {
 			result += buffer.charAt(offset) - '0';
@@ -122,9 +124,9 @@ public class Integers {
 	 * @param offset Position der ersten Dezimalziffer.
 	 * @param length Anzahl der einzulesenden Dezimalziffern.
 	 * @return positiven Dezimalzahl. */
-	public static long parseLong(final char[] buffer, final int offset, final int length) {
-		if (length < 10) return Integers.parseInt(buffer, offset, length);
-		return (Integers.parseLong(buffer, offset, length - 9) * 1000000000) + Integers.parseLong(buffer, (offset + length) - 9, 9);
+	public static long parseLong(char[] buffer, int offset, int length) {
+		if (length < 10) return parseInt(buffer, offset, length);
+		return (parseLong(buffer, offset, length - 9) * 1000000000) + parseLong(buffer, (offset + length) - 9, 9);
 	}
 
 	/** Diese Methode liest die positiven Dezimalzahl aus dem gegebenen Bereich der gegebenen Zeichenkette und gibt sie zurück.
@@ -135,9 +137,9 @@ public class Integers {
 	 * @param offset Position der ersten Dezimalziffer.
 	 * @param length Anzahl der einzulesenden Dezimalziffern.
 	 * @return positiven Dezimalzahl. */
-	public static long parseLong(final String buffer, final int offset, final int length) {
-		if (length < 10) return Integers.parseInt(buffer, offset, length);
-		return (Integers.parseLong(buffer, offset, length - 9) * 1000000000) + Integers.parseLong(buffer, (offset + length) - 9, 9);
+	public static long parseLong(String buffer, int offset, int length) {
+		if (length < 10) return parseInt(buffer, offset, length);
+		return (parseLong(buffer, offset, length - 9) * 1000000000) + parseLong(buffer, (offset + length) - 9, 9);
 	}
 
 	/** Diese Methode schreibt die Zeichenkette der gegebene positiven Dezimalzahl vor der gegebenen Position in den gegebenen Puffer.
@@ -147,19 +149,18 @@ public class Integers {
 	 * @param value positiven Dezimalzahl.
 	 * @param buffer Puffer für die Zeichenkette.
 	 * @param offset Position des ersten Zeichens hinter der geschriebenen Dezimalzahl. */
-	public static void printInt(int value, final char[] buffer, int offset) {
-		int div, mod;
+	public static void printInt(int value, char[] buffer, int offset) {
 		while (true) {
-			div = value / 100;
-			mod = value % 100;
+			var div = value / 100;
+			var mod = value % 100;
 			if (div != 0) {
-				buffer[--offset] = (char)Integers.digitOneArray[mod];
-				buffer[--offset] = (char)Integers.digitTenArray[mod];
+				buffer[--offset] = (char)digitOneArray[mod];
+				buffer[--offset] = (char)digitTenArray[mod];
 				value = div;
 			} else {
-				buffer[--offset] = (char)Integers.digitOneArray[mod];
+				buffer[--offset] = (char)digitOneArray[mod];
 				if (mod < 10) return;
-				buffer[--offset] = (char)Integers.digitTenArray[mod];
+				buffer[--offset] = (char)digitTenArray[mod];
 				return;
 			}
 		}
@@ -174,12 +175,12 @@ public class Integers {
 	 * @param buffer Puffer für die Zeichenkette.
 	 * @param offset Position des ersten zu schreibenden Zeichens.
 	 * @param length Anzahl der zu schreibenden Zeichen, welche mindestend der für die gegebene Dezimalzahl neötigten Anzahl an Zeichen entsprechen muss. */
-	public static void printInt(final int value, final char[] buffer, final int offset, final int length) {
-		int fill = length - Integers.getSize(value);
+	public static void printInt(int value, char[] buffer, int offset, int length) {
+		var fill = length - getSize(value);
 		while (--fill >= 0) {
 			buffer[offset + fill] = '0';
 		}
-		Integers.printInt(value, buffer, offset + length);
+		printInt(value, buffer, offset + length);
 	}
 
 	/** Diese Methode schreibt die Zeichenkette der gegebene positiven Dezimalzahl vor der gegebenen Position in den gegebenen Puffer.
@@ -189,17 +190,16 @@ public class Integers {
 	 * @param value positiven Dezimalzahl.
 	 * @param buffer Puffer für die Zeichenkette.
 	 * @param offset Position des ersten Zeichens hinter der geschriebenen Dezimalzahl. */
-	public static void printLong(long value, final char[] buffer, int offset) {
-		long div, mod;
+	public static void printLong(long value, char[] buffer, int offset) {
 		while (true) {
-			div = value / 1000000000;
-			mod = value % 1000000000;
+			var div = value / 1000000000;
+			var mod = value % 1000000000;
 			if (div != 0) {
 				offset -= 9;
-				Integers.printInt((int)mod, buffer, offset, 9);
+				printInt((int)mod, buffer, offset, 9);
 				value = div;
 			} else {
-				Integers.printInt((int)mod, buffer, offset);
+				printInt((int)mod, buffer, offset);
 				return;
 			}
 		}
@@ -214,12 +214,12 @@ public class Integers {
 	 * @param buffer Puffer für die Zeichenkette.
 	 * @param offset Position des ersten zu schreibenden Zeichens.
 	 * @param length Anzahl der zu schreibenden Zeichen, welche mindestend der für die gegebene Dezimalzahl neötigten Anzahl an Zeichen entsprechen muss. */
-	public static void printLong(final long value, final char[] buffer, final int offset, final int length) {
-		int fill = length - Integers.getSize(value);
+	public static void printLong(long value, char[] buffer, int offset, int length) {
+		var fill = length - getSize(value);
 		while (--fill >= 0) {
 			buffer[offset + fill] = '0';
 		}
-		Integers.printLong(value, buffer, offset + length);
+		printLong(value, buffer, offset + length);
 	}
 
 	/** Diese Methode gibt die gegebene Speichergröße als Zeichenkette mit Maßeinheit {@code B}, {@code KB}, {@code MB}, {@code GB}, {@code TB}, {@code PB} bzw.
@@ -227,9 +227,9 @@ public class Integers {
 	 *
 	 * @param value Speichergröße in Byte.
 	 * @return formatierte Speichergröße. */
-	public static String printSize(final long value) {
-		final StringBuilder res = new StringBuilder();
-		Integers.printSize(res, value);
+	public static String printSize(long value) {
+		var res = new StringBuilder();
+		printSize(res, value);
 		return res.toString();
 	}
 
@@ -237,11 +237,11 @@ public class Integers {
 	 *
 	 * @param res Speichergröße in Byte.
 	 * @param value Puffer. */
-	public static void printSize(final StringBuilder res, final long value) {
+	public static void printSize(StringBuilder res, long value) {
 		if (value < 0) {
-			Integers.appendSizeImpl(res.append('-'), value < -1024 ? ~value : -value);
+			printSize0(res.append('-'), value < -1024 ? ~value : -value);
 		} else {
-			Integers.appendSizeImpl(res, value);
+			printSize0(res, value);
 		}
 	}
 
@@ -250,9 +250,9 @@ public class Integers {
 	 *
 	 * @param value Zeitspanne in Nanosekunden.
 	 * @return formatierte Zeitspanne. */
-	public static String printTime(final long value) {
-		final StringBuilder res = new StringBuilder();
-		Integers.printTime(res, value);
+	public static String printTime(long value) {
+		var res = new StringBuilder();
+		printTime(res, value);
 		return res.toString();
 	}
 
@@ -260,11 +260,11 @@ public class Integers {
 	 *
 	 * @param res Zeitspanne in Nanosekunden.
 	 * @param value Puffer. */
-	public static void printTime(final StringBuilder res, final long value) {
+	public static void printTime(StringBuilder res, long value) {
 		if (value < 0) {
-			Integers.appendTimeImpl(res.append('-'), value < -1000 ? ~value : -value);
+			printTime0(res.append('-'), value < -1000 ? ~value : -value);
 		} else {
-			Integers.appendTimeImpl(res, value);
+			printTime0(res, value);
 		}
 	}
 
@@ -273,22 +273,22 @@ public class Integers {
 	 * @param int16H MSB 16-Bit-Wert.
 	 * @param int16L LSB 16-Bit-Wert.
 	 * @return 32-Bit-Wert */
-	public static int toInt(final int int16H, final int int16L) {
+	public static int toInt(int int16H, int int16L) {
 		return (int16H << 16) | (int16L & 0xFFFF);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #toInt(int, int) toInt(toShort(byte3, byte2), toShort(byte1, byte0))}.
 	 *
 	 * @see #toShort(int, int) */
-	public static int toInt(final int byte3, final int byte2, final int byte1, final int byte0) {
-		return Integers.toInt(Integers.toShort(byte3, byte2), Integers.toShort(byte1, byte0));
+	public static int toInt(int byte3, int byte2, int byte1, int byte0) {
+		return toInt(toShort(byte3, byte2), toShort(byte1, byte0));
 	}
 
 	/** Diese Methode gibt den LSB 32-Bit-Wert des gegebenen 64-Bit-Werts zurück.
 	 *
 	 * @param int64 64-Bit-Wert.
 	 * @return LSB 32-Bit-Wert. */
-	public static int toIntL(final long int64) {
+	public static int toIntL(long int64) {
 		return (int)int64;
 	}
 
@@ -296,15 +296,15 @@ public class Integers {
 	 *
 	 * @param int64 64-Bit-Wert.
 	 * @return MSB 32-Bit-Wert. */
-	public static int toIntH(final long int64) {
-		return Integers.toIntL(int64 >> 32);
+	public static int toIntH(long int64) {
+		return toIntL(int64 >> 32);
 	}
 
 	/** Diese Methode gibt den LSB 8-Bit-Wert des gegebenen 16-Bit-Werts zurück.
 	 *
 	 * @param int16 16-Bit-Wert.
 	 * @return LSB 8-Bit-Wert. */
-	public static int toByteL(final int int16) {
+	public static int toByteL(int int16) {
 		return int16 & 0xFF;
 	}
 
@@ -312,8 +312,8 @@ public class Integers {
 	 *
 	 * @param int16 16-Bit-Wert.
 	 * @return MSB 8-Bit-Wert. */
-	public static int toByteH(final int int16) {
-		return Integers.toByteL(int16 >> 8);
+	public static int toByteH(int int16) {
+		return toByteL(int16 >> 8);
 	}
 
 	/** Diese Methode gibt die gegebennen 8-Bit-Werte als 16-Bit-Wert zurück.
@@ -321,7 +321,7 @@ public class Integers {
 	 * @param int8H MSB 8-Bit-Wert.
 	 * @param int8L LSB 8-Bit-Wert.
 	 * @return 16-Bit-Wert */
-	public static int toShort(final int int8H, final int int8L) {
+	public static int toShort(int int8H, int int8L) {
 		return (int8H << 8) | (int8L & 0xFF);
 	}
 
@@ -329,7 +329,7 @@ public class Integers {
 	 *
 	 * @param int32 32-Bit-Wert.
 	 * @return LSB 16-Bit-Wert. */
-	public static int toShortL(final int int32) {
+	public static int toShortL(int int32) {
 		return int32 & 0xFFFF;
 	}
 
@@ -337,8 +337,8 @@ public class Integers {
 	 *
 	 * @param int32 32-Bit-Wert.
 	 * @return MSB 16-Bit-Wert. */
-	public static int toShortH(final int int32) {
-		return Integers.toShortL(int32 >> 16);
+	public static int toShortH(int int32) {
+		return toShortL(int32 >> 16);
 	}
 
 	/** Diese Methode gibt die gegebennen 32-Bit-Werte als 64-Bit-Wert zurück.
@@ -346,27 +346,27 @@ public class Integers {
 	 * @param int32H MSB 32-Bit-Wert.
 	 * @param int32L LSB 32-Bit-Wert.
 	 * @return 64-Bit-Wert */
-	public static long toLong(final int int32H, final int int32L) {
+	public static long toLong(int int32H, int int32L) {
 		return ((long)int32H << 32) | (int32L & 0xFFFFFFFFL);
 	}
 
-	final static byte[] digitTenArray = {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '2', '2', '2', '2',
-	'2', '2', '2', '2', '2', '2', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '4', '4', '4', '4', '4', '4', '4', '4', '4', '4', '5', '5', '5', '5', '5',
-	'5', '5', '5', '5', '5', '6', '6', '6', '6', '6', '6', '6', '6', '6', '6', '7', '7', '7', '7', '7', '7', '7', '7', '7', '7', '8', '8', '8', '8', '8', '8',
-	'8', '8', '8', '8', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9'};
+	private static final byte[] digitTenArray = {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '2', '2',
+		'2', '2', '2', '2', '2', '2', '2', '2', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '4', '4', '4', '4', '4', '4', '4', '4', '4', '4', '5', '5', '5',
+		'5', '5', '5', '5', '5', '5', '5', '6', '6', '6', '6', '6', '6', '6', '6', '6', '6', '7', '7', '7', '7', '7', '7', '7', '7', '7', '7', '8', '8', '8', '8',
+		'8', '8', '8', '8', '8', '8', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9'};
 
-	final static byte[] digitOneArray = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3',
-	'4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4',
-	'5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5',
-	'6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+	private static final byte[] digitOneArray = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1',
+		'2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2',
+		'3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3',
+		'4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
 
-	final static String[] sizeUnitArray = {" B", " KB", " MB", " GB", " TB", " PB", " EB"};
+	private static final String[] sizeUnitArray = {" B", " KB", " MB", " GB", " TB", " PB", " EB"};
 
-	final static String[] timeUnitArray = {" ns", " µs", " ms", " s", " ks", " MS", " GS"};
+	private static final String[] timeUnitArray = {" ns", " µs", " ms", " s", " ks", " MS", " GS"};
 
-	static StringBuilder appendSizeImpl(final StringBuilder res, long value) {
-		if (value < 1024) return res.append((int)value).append(Integers.sizeUnitArray[0]);
-		int unit = 1;
+	private static StringBuilder printSize0(StringBuilder res, long value) {
+		if (value < 1024) return res.append((int)value).append(sizeUnitArray[0]);
+		var unit = 1;
 		if (value < 102400) {
 			value = (value * 100) / 1024;
 		} else {
@@ -376,27 +376,28 @@ public class Integers {
 			unit++;
 			value /= 1024;
 		}
-		return Integers.appendPercentImpl(res, (int)value).append(Integers.sizeUnitArray[unit]);
+		return printValue0(res, (int)value).append(sizeUnitArray[unit]);
 	}
 
-	static StringBuilder appendTimeImpl(final StringBuilder res, long value) {
-		if (value < 1000) return res.append((int)value).append(Integers.timeUnitArray[0]);
+	private static StringBuilder printTime0(StringBuilder res, long value) {
+		if (value < 1000) return res.append((int)value).append(timeUnitArray[0]);
 		value /= 10;
-		int unit = 1;
+		var unit = 1;
 		while (value >= 100000) {
 			unit++;
 			value /= 1000;
 		}
-		return Integers.appendPercentImpl(res, (int)value).append(Integers.timeUnitArray[unit]);
+		return printValue0(res, (int)value).append(timeUnitArray[unit]);
 	}
 
-	static StringBuilder appendPercentImpl(final StringBuilder res, final int value) {
-		final int div = value / 100, mod = value % 100;
+	private static StringBuilder printValue0(StringBuilder res, int value) {
+		var div = value / 100;
+		var mod = value % 100;
 		res.append(div);
 		if ((div >= 100) || (mod == 0) || ((div >= 10) && (mod < 10))) return res;
-		res.append('.').append((char)Integers.digitTenArray[mod]);
+		res.append('.').append((char)digitTenArray[mod]);
 		if ((div >= 10) || ((mod % 10) == 0)) return res;
-		return res.append((char)Integers.digitOneArray[mod]);
+		return res.append((char)digitOneArray[mod]);
 	}
 
 }

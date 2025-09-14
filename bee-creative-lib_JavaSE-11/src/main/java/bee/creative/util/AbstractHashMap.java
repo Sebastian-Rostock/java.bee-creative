@@ -1,6 +1,7 @@
 package bee.creative.util;
 
 import java.util.Map;
+import java.util.function.BiFunction;
 
 /** Diese Klasse implementiert eine auf {@link AbstractHashData} aufbauende {@link Map} mit geringem {@link AbstractHashData Speicherverbrauch}.
  * <p>
@@ -45,6 +46,11 @@ public abstract class AbstractHashMap<GKey, GValue> extends AbstractHashData<GKe
 		return this.customGetValue(this.installImpl(key));
 	}
 
+	@Override
+	public GValue compute(GKey key, BiFunction<? super GKey, ? super GValue, ? extends GValue> remappingFunction) {
+		return Map3.super.compute(key, remappingFunction);
+	}
+	
 	public GValue install(GKey key, Producer<? extends GValue> installValue) {
 		return this.install(key, Getters.<GKey>neutralGetter(), value -> installValue.get());
 	}

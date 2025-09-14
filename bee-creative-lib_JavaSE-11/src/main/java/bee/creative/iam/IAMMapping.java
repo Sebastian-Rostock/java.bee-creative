@@ -88,7 +88,7 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 			final int rangeMask;
 			final int[] rangeOffset;
 			if (that.mode()) {
-				rangeMask = Objects.mask(entryCount);
+				rangeMask = Objects.hashMask(entryCount);
 				final int rangeCount = rangeMask + 2;
 				final int[] bucketIndex = new int[entryCount];
 				rangeOffset = new int[rangeCount];
@@ -479,7 +479,7 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 
 		if (this.mode()) {
 
-			rangeMask = Objects.mask(entryCount);
+			rangeMask = Objects.hashMask(entryCount);
 			rangeCount = rangeMask + 2;
 			rangeData = new int[rangeCount];
 			rangeDataType = SizeStats.computeSizeType(entryCount);

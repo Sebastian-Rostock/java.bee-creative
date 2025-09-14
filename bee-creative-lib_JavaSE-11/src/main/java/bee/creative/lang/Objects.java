@@ -1,5 +1,9 @@
 package bee.creative.lang;
 
+import static bee.creative.lang.Natives.printClass;
+import static bee.creative.lang.Natives.printConstructor;
+import static bee.creative.lang.Natives.printField;
+import static bee.creative.lang.Natives.printMethod;
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Map;
@@ -11,57 +15,25 @@ import java.util.Map.Entry;
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Objects {
 
-	/** Diese Schnittstelle definiert eine Markierung für die Methode {@link Objects#toString(boolean, Object)}. Sie ist nur sinnvoll für eigene Implementationen
-	 * von {@link Map}, {@link Iterable} und {@link CharSequence}, für welche nicht die in {@link Objects#toString(boolean, Object)} realisierten, gesonderten
-	 * Textdarstellungen verwendet werden sollen.
+	/** Diese Methode gibt das gegebene Objekt zurück, wenn dieses nicht {@code null} ist.
 	 *
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public static interface UseToString {
-
+	 * @param <VALUE> Typ des Objekts.
+	 * @param result Objekt oder {@code null}.
+	 * @return Objekt.
+	 * @throws NullPointerException Wenn {@code object} {@code null} ist. */
+	public static <VALUE> VALUE notNull(VALUE result) throws NullPointerException {
+		if (result != null) return result;
+		throw new NullPointerException();
 	}
 
-	/** Diese Klasse implementiert ein Objekt, dessen {@link #toString() Textdarsellung} über {@link Objects#toInvokeString(Object, Object...)
-	 * Objects.toInvokeString(this)} ermittelt wird. Sie kann als Basis von Klassen mit nur einer Instanz eingesetzt werden. */
-	public static class BaseObject {
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this);
-		}
-
-	}
-
-	private static final class PrintFuture {
-
-		final Object object;
-
-		final boolean format;
-
-		PrintFuture(final Object object, final boolean format) {
-			this.object = object;
-			this.format = format;
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toString(this.format, this.object);
-		}
-
-	}
-
-	private static final class StringFuture {
-
-		final Object object;
-
-		StringFuture(final Object object) {
-			this.object = Objects.notNull(object);
-		}
-
-		@Override
-		public String toString() {
-			return this.object.toString();
-		}
-
+	/** Diese Methode gibt das erste gegebene Objekt zurück, wenn dieses nicht {@code null} ist. Andernfalls wird das zweite geliefert.
+	 *
+	 * @param <VALUE> Typ der Objekte.
+	 * @param result Objekt oder {@code null}.
+	 * @param result2 Objekt oder {@code null}.
+	 * @return Objekt. */
+	public static <VALUE> VALUE notNull(VALUE result, VALUE result2) {
+		return result != null ? result : result2;
 	}
 
 	/** Diese Methode gibt das gegebene {@link Map} als {@link Object#toString() Textdarstelung} zurück. Für eine bessere Lesbarkeit der Zeichenkette kann deren
@@ -70,14 +42,14 @@ public class Objects {
 	 * @param format Aktivierung der hierarchische Formatierung.
 	 * @param object {@link Map} oder {@code null}.
 	 * @return {@link Object#toString() Textdarstelung}. */
-	public static String printMap(final boolean format, final Map<?, ?> object) {
+	public static String printMap(boolean format, Map<?, ?> object) {
 		if (object == null) return "null";
 		if (object.isEmpty()) return "{}";
 		var space = (format ? "{\n  " : "{");
-		final var comma = (format ? ",\n  " : ", ");
-		final var result = new StringBuilder();
-		for (final Entry<?, ?> entry: object.entrySet()) {
-			result.append(space).append(Objects.toString(format, format, entry.getKey())).append(" = ").append(Objects.toString(format, format, entry.getValue()));
+		var comma = (format ? ",\n  " : ", ");
+		var result = new StringBuilder();
+		for (var entry: object.entrySet()) {
+			result.append(space).append(toString(format, format, entry.getKey())).append(" = ").append(toString(format, format, entry.getValue()));
 			space = comma;
 		}
 		return result.append((format ? "\n}" : "}")).toString();
@@ -87,9 +59,9 @@ public class Objects {
 	 *
 	 * @param object {@link Character} oder {@code null}.
 	 * @return {@link Object#toString() Textdarstelung}. */
-	public static String printChar(final Character object) {
+	public static String printChar(Character object) {
 		if (object == null) return "null";
-		final var result = new StringBuilder(4).append('\'');
+		var result = new StringBuilder(4).append('\'');
 		switch (object) {
 			case '\'':
 				result.append("\\\'");
@@ -116,15 +88,15 @@ public class Objects {
 	 * @param format Aktivierung der hierarchische Formatierung.
 	 * @return {@link Object#toString() Textdarstelung}.
 	 * @throws IllegalArgumentException Wenn das gegebene Objekt kein Array ist. */
-	public static String printArray(final boolean format, final Object object) throws IllegalArgumentException {
+	public static String printArray(boolean format, Object object) throws IllegalArgumentException {
 		if (object == null) return "null";
-		final var size = Array.getLength(object);
+		var size = Array.getLength(object);
 		if (size == 0) return "[]";
 		var space = (format ? "[\n  " : "[");
-		final var comma = (format ? ",\n  " : ", ");
-		final var result = new StringBuilder();
+		var comma = (format ? ",\n  " : ", ");
+		var result = new StringBuilder();
 		for (var i = 0; i < size; i++) {
-			result.append(space).append(Objects.toString(format, format, Array.get(object, i)));
+			result.append(space).append(toString(format, format, Array.get(object, i)));
 			space = comma;
 		}
 		return result.append((format ? "\n]" : "]")).toString();
@@ -136,12 +108,12 @@ public class Objects {
 	 * @param object {@link String} oder {@code null}.
 	 * @param format Aktivierung der hierarchische Formatierung.
 	 * @return {@link Object#toString() Textdarstelung}. */
-	public static String printString(final boolean format, final CharSequence object) {
+	public static String printString(boolean format, CharSequence object) {
 		if (object == null) return "null";
-		final var space = (format ? "\\n\"+\n\"" : "\\n");
-		final var result = new StringBuilder("\"");
+		var space = (format ? "\\n\"+\n\"" : "\\n");
+		var result = new StringBuilder("\"");
 		int last = -1, next = 0;
-		final var size = object.length();
+		var size = object.length();
 		while (next < size) {
 			switch (object.charAt(next)) {
 				case '\"':
@@ -169,7 +141,7 @@ public class Objects {
 	 * @param object {@link Iterable} oder {@code null}.
 	 * @return {@link Object#toString() Textdarstelung}. */
 	public static String printIterable(boolean format, Iterable<?> object) {
-		return Objects.printIterable(format, Integer.MAX_VALUE, object);
+		return printIterable(format, Integer.MAX_VALUE, object);
 	}
 
 	public static String printIterable(boolean format, int limit, Iterable<?> object) {
@@ -178,11 +150,11 @@ public class Objects {
 		if (!iter.hasNext()) return "[]";
 		var result = new StringBuilder();
 		var next = iter.next();
-		if (!iter.hasNext()) return result.append("[").append(Objects.toString(format, format, next)).append("]").toString();
-		result.append(format ? "[\n  " : "[").append(Objects.toString(format, format, next));
+		if (!iter.hasNext()) return result.append("[").append(toString(format, format, next)).append("]").toString();
+		result.append(format ? "[\n  " : "[").append(toString(format, format, next));
 		while (iter.hasNext() && (0 < limit--)) {
 			next = iter.next();
-			result.append(format ? ",\n  " : ", ").append(Objects.toString(format, format, next));
+			result.append(format ? ",\n  " : ", ").append(toString(format, format, next));
 		}
 		if (iter.hasNext()) {
 			result.append(format ? ",\n  " : ", ").append("…");
@@ -197,51 +169,15 @@ public class Objects {
 	 * @param format Aktivierung der hierarchische Formatierung.
 	 * @param object Objekt oder {@code null}.
 	 * @return {@link Objects#toString(boolean, Object)}-Objekt. */
-	public static Object printFuture(final boolean format, final Object object) {
+	public static Object printFuture(boolean format, Object object) {
 		return new PrintFuture(object, format);
-	}
-
-	/** Diese Methode gibt die gegebenen Zeichenkette mit erhöhtem Einzug zurück. Dazu wird jedes Vorkommen von {@code "\n"} durch {@code "\n  "} ersetzt.
-	 *
-	 * @param value Zeichenkette.
-	 * @return Zeichenkette mit erhöhtem Einzug. */
-	public static String indent(final String value) {
-		if (value == null) return "null";
-		final var result = new StringBuilder();
-		int last = -1, next = 0;
-		final var size = value.length();
-		while ((next = value.indexOf('\n', next)) >= 0) {
-			result.append(value.substring(last + 1, last = next)).append("\n  ");
-			next++;
-		}
-		return result.append(value.substring(last + 1, size)).toString();
-	}
-
-	/** Diese Methode gibt die Bitmaske zurück, die der Umrechnung des {@link Object#hashCode() Streuwerts} eines gesuchten Schlüssels in den Index des einzigen
-	 * Schlüsselbereichs dient, in dem ein gesuchter Schlüssel enthalten sein kann. Die Bitmaske ist eine um {@code 1} verringerte Potenz von {@code 2}. Ein
-	 * Algorithmus zur Ermittlung der Bitmaske ist:<pre>
-	 * int result = 2;
-	 * while (result < entryCount) result = result << 1;
-	 * return (result – 1) & 536870911;</pre>
-	 *
-	 * @param entryCount Anzahl der Einträge der Abbildung.
-	 * @return Bitmaske. */
-	public static int mask(int entryCount) {
-		if (entryCount <= 0) return 0;
-		--entryCount;
-		entryCount |= (entryCount >> 1);
-		entryCount |= (entryCount >> 2);
-		entryCount |= (entryCount >> 4);
-		entryCount |= (entryCount >> 8);
-		entryCount |= (entryCount >> 16);
-		return entryCount & 536870911;
 	}
 
 	/** Diese Methode gibt den Streuwert des gegebenen Zahl zurück.
 	 *
 	 * @param value Zahl.
 	 * @return {@link Object#hashCode() Streuwert}. */
-	public static int hash(final long value) {
+	public static int hash(long value) {
 		return Integers.toIntH(value) ^ Integers.toIntL(value);
 	}
 
@@ -249,7 +185,7 @@ public class Objects {
 	 *
 	 * @param object Objekt oder {@code null}.
 	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}. */
-	public static int hash(final Object object) {
+	public static int hash(Object object) {
 		return object == null ? 0 : object.hashCode();
 	}
 
@@ -261,9 +197,9 @@ public class Objects {
 	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}. */
 	public static int hash(final Object... objects) {
 		if (objects == null) return 0;
-		var result = Objects.hashInit();
+		var result = hashInit();
 		for (final Object object: objects) {
-			result = Objects.hashPush(result, Objects.hash(object));
+			result = hashPush(result, hash(object));
 		}
 		return result;
 	}
@@ -275,8 +211,8 @@ public class Objects {
 	 * @param object1 Objekt oder {@code null}.
 	 * @param object2 Objekt oder {@code null}.
 	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}. */
-	public static int hash(final Object object1, final Object object2) {
-		return Objects.hashPush(Objects.hashPush(Objects.hashInit(), Objects.hash(object1)), Objects.hash(object2));
+	public static int hash(Object object1, Object object2) {
+		return hashPush(hashPush(hashInit(), hash(object1)), hash(object2));
 	}
 
 	/** Diese Methode gibt den {@link Object#hashCode() Streuwert} der gegebenen Objekte oder {@code 0} zurück.
@@ -287,8 +223,8 @@ public class Objects {
 	 * @param object2 Objekt oder {@code null}.
 	 * @param object3 Objekt oder {@code null}.
 	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}. */
-	public static int hash(final Object object1, final Object object2, final Object object3) {
-		return Objects.hashPush(Objects.hash(object1, object2), Objects.hash(object3));
+	public static int hash(Object object1, Object object2, Object object3) {
+		return hashPush(hash(object1, object2), hash(object3));
 	}
 
 	/** Diese Methode gibt den Startwert für die Streuwertberechnung in {@link #hash(Object...)} zurück.
@@ -309,8 +245,28 @@ public class Objects {
 	 * @param prev vorheriger Streuwert.
 	 * @param next nächater Streuwert.
 	 * @return kombinierter Streuwert. */
-	public static int hashPush(final int prev, final int next) {
+	public static int hashPush(int prev, int next) {
 		return (prev * 0x01000193) ^ next;
+	}
+
+	/** Diese Methode gibt die Bitmaske zurück, die der Umrechnung des {@link Object#hashCode() Streuwerts} eines gesuchten Schlüssels in den Index des einzigen
+	 * Schlüsselbereichs dient, in dem ein gesuchter Schlüssel enthalten sein kann. Die Bitmaske ist eine um {@code 1} verringerte Potenz von {@code 2}. Ein
+	 * Algorithmus zur Ermittlung der Bitmaske ist:<pre>
+	 * int result = 2;
+	 * while (result < entryCount) result = result << 1;
+	 * return (result – 1) & 536870911;</pre>
+	 *
+	 * @param entryCount Anzahl der Einträge der Abbildung.
+	 * @return Bitmaske. */
+	public static int hashMask(int entryCount) {
+		if (entryCount <= 0) return 0;
+		--entryCount;
+		entryCount |= (entryCount >> 1);
+		entryCount |= (entryCount >> 2);
+		entryCount |= (entryCount >> 4);
+		entryCount |= (entryCount >> 8);
+		entryCount |= (entryCount >> 16);
+		return entryCount & 536870911;
 	}
 
 	/** Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte zurück und tolleriert dabei {@code null}-Eingaben. Der Rückgabewert
@@ -338,7 +294,7 @@ public class Objects {
 		final var length = objects1.length;
 		if (length != objects2.length) return false;
 		for (var i = 0; i < length; i++) {
-			if (!Objects.equals(objects1[i], objects2[i])) return false;
+			if (!equals(objects1[i], objects2[i])) return false;
 		}
 		return true;
 	}
@@ -368,7 +324,7 @@ public class Objects {
 		if (clazz == float[].class) return Arrays.hashCode((float[])object);
 		if (clazz == double[].class) return Arrays.hashCode((double[])object);
 		if (clazz == boolean[].class) return Arrays.hashCode((boolean[])object);
-		return Objects.deepHash((Object[])object);
+		return deepHash((Object[])object);
 	}
 
 	/** Diese Methode gibt den {@link Object#hashCode() Streuwert} des gegebenen Arrays oder {@code 0} zurück. Der {@link Object#hashCode() Streuwert} der
@@ -378,9 +334,9 @@ public class Objects {
 	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}. */
 	public static int deepHash(final Object... objects) {
 		if (objects == null) return 0;
-		var result = Objects.hashInit();
+		var result = hashInit();
 		for (final Object object: objects) {
-			result = Objects.hashPush(result, Objects.deepHash(object));
+			result = hashPush(result, deepHash(object));
 		}
 		return result;
 	}
@@ -394,7 +350,7 @@ public class Objects {
 	 * @param object2 Objekt oder {@code null}.
 	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}. */
 	public static int deepHash(final Object object1, final Object object2) {
-		return Objects.hashPush(Objects.hashPush(Objects.hashInit(), Objects.deepHash(object1)), Objects.deepHash(object2));
+		return hashPush(hashPush(hashInit(), deepHash(object1)), deepHash(object2));
 	}
 
 	/** Diese Methode gibt den {@link Object#hashCode() Streuwert} der gegebenen Objekte oder {@code 0} zurück. Für Arrays werden die entsprechenden Hilfsmethoden
@@ -407,7 +363,7 @@ public class Objects {
 	 * @param object3 Objekt oder {@code null}.
 	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}. */
 	public static int deepHash(final Object object1, final Object object2, final Object object3) {
-		return Objects.hashPush(Objects.deepHash(object1, object2), Objects.deepHash(object3));
+		return hashPush(deepHash(object1, object2), deepHash(object3));
 	}
 
 	/** Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte zurück und tolleriert dabei {@code null}-Eingaben und Arrays. Für
@@ -441,7 +397,7 @@ public class Objects {
 		if (c1 == float[].class) return (c2 == float[].class) && Arrays.equals((float[])object1, (float[])object2);
 		if (c1 == double[].class) return (c2 == double[].class) && Arrays.equals((double[])object1, (double[])object2);
 		if (c1 == boolean[].class) return (c2 == boolean[].class) && Arrays.equals((boolean[])object1, (boolean[])object2);
-		return Objects.deepEquals((Object[])object1, (Object[])object2);
+		return deepEquals((Object[])object1, (Object[])object2);
 	}
 
 	/** Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen Arrays zurück und tolleriert dabei {@code null}-Eingaben. Die
@@ -457,7 +413,7 @@ public class Objects {
 		final var length = objects1.length;
 		if (length != objects2.length) return false;
 		for (var i = 0; i < length; i++) {
-			if (!Objects.deepEquals(objects1[i], objects2[i])) return false;
+			if (!deepEquals(objects1[i], objects2[i])) return false;
 		}
 		return true;
 	}
@@ -500,24 +456,24 @@ public class Objects {
 	}
 
 	/** Diese Methode gibt das gegebene Objekt als {@link Object#toString() Textdarstelung} zurück. Der Rückgabewert entspricht {@link #toString(boolean, Object)
-	 * Objects.toString(false, object)}.
+	 * toString(false, object)}.
 	 *
-	 * @see Objects#toString(boolean, Object)
+	 * @see #toString(boolean, Object)
 	 * @param object Objekt oder {@code null}.
 	 * @return {@link Object#toString() Textdarstelung}. */
-	public static String toString(final Object object) {
-		return Objects.toString(false, object);
+	public static String toString(Object object) {
+		return toString(false, object);
 	}
 
 	/** Diese Methode gibt das gegebene Objekt als {@link Object#toString() Textdarstelung} zurück. Der Rückgabewert entspricht
-	 * {@link #toString(boolean, boolean, Object) Objects.toString(format, false, object)}.
+	 * {@link #toString(boolean, boolean, Object) toString(format, false, object)}.
 	 *
-	 * @see Objects#toString(boolean, boolean, Object)
+	 * @see #toString(boolean, boolean, Object)
 	 * @param format Aktivierung der hierarchische Formatierung.
 	 * @param object Objekt oder {@code null}.
 	 * @return {@link Object#toString() Textdarstelung}. */
-	public static String toString(final boolean format, final Object object) {
-		return Objects.toString(format, false, object);
+	public static String toString(boolean format, Object object) {
+		return toString(format, false, object);
 	}
 
 	/** Diese Methode gibt das gegebene Objekt als {@link Object#toString() Textdarstelung} zurück. Für eine bessere Lesbarkeit der Zeichenkette können deren
@@ -537,33 +493,33 @@ public class Objects {
 	 * @param format Aktivierung der hierarchische Formatierung.
 	 * @param indent Aktivierung der Erhöhung des Einzugs.
 	 * @return {@link Object#toString() Textdarstelung}. */
-	public static String toString(final boolean format, final boolean indent, final Object object) {
+	public static String toString(boolean format, boolean indent, Object object) {
 		if (object == null) return "null";
-		final String result;
+		String result;
 		if (object.getClass().isArray()) {
-			result = Objects.printArray(format, object);
+			result = printArray(format, object);
 		} else if (object instanceof Class<?>) {
-			result = Natives.printClass((Class<?>)object);
+			result = printClass((Class<?>)object);
 		} else if (object instanceof java.lang.reflect.Field) {
-			result = Natives.printField((java.lang.reflect.Field)object);
+			result = printField((java.lang.reflect.Field)object);
 		} else if (object instanceof java.lang.reflect.Method) {
-			result = Natives.printMethod((java.lang.reflect.Method)object);
+			result = printMethod((java.lang.reflect.Method)object);
 		} else if (object instanceof java.lang.reflect.Constructor<?>) {
-			result = Natives.printConstructor((java.lang.reflect.Constructor<?>)object);
+			result = printConstructor((java.lang.reflect.Constructor<?>)object);
 		} else if (object instanceof Character) {
-			result = Objects.printChar((Character)object);
+			result = printChar((Character)object);
 		} else if (object instanceof UseToString) {
 			result = object.toString();
 		} else if (object instanceof CharSequence) {
-			result = Objects.printString(format, (CharSequence)object);
+			result = printString(format, (CharSequence)object);
 		} else if (object instanceof Map<?, ?>) {
-			result = Objects.printMap(format, (Map<?, ?>)object);
+			result = printMap(format, (Map<?, ?>)object);
 		} else if (object instanceof Iterable<?>) {
-			result = Objects.printIterable(format, (Iterable<?>)object);
+			result = printIterable(format, (Iterable<?>)object);
 		} else {
 			result = String.valueOf(object);
 		}
-		return (indent ? Objects.indent(result) : result);
+		return (indent ? Strings.indent(result) : result);
 	}
 
 	/** Diese Methode gibt einen Funktionsaufruf als {@link Object#toString() Textdarstelung} zurück. Für eine bessere Lesbarkeit der Zeichenkette kann deren
@@ -585,12 +541,12 @@ public class Objects {
 			final var comma = (format ? ",\n  " : ", ");
 			if (label) {
 				for (int i = 0, size = args.length - 1; i < size; i += 2) {
-					result.append(join).append(Objects.toString(format, format, args[i])).append(": ").append(Objects.toString(format, format, args[i + 1]));
+					result.append(join).append(toString(format, format, args[i])).append(": ").append(toString(format, format, args[i + 1]));
 					join = comma;
 				}
 			} else {
 				for (Object arg: args) {
-					result.append(join).append(Objects.toString(format, format, arg));
+					result.append(join).append(toString(format, format, arg));
 					join = comma;
 				}
 			}
@@ -611,7 +567,7 @@ public class Objects {
 	 * @return {@link Object#toString() Textdarstelung}.
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist. */
 	public static String toStringCall(final boolean format, final boolean label, final Object object, final Object... args) throws NullPointerException {
-		return Objects.toStringCall(format, label, Strings.substringAfterLast(object.getClass().getName(), '.'), args);
+		return toStringCall(format, label, Strings.substringAfterLast(object.getClass().getName(), '.'), args);
 	}
 
 	/** Diese Methode gibt ein Objekt zurück, dessen {@link Object#toString() Textdarstelung} der des gegebenen Objekts entspricht.
@@ -623,7 +579,7 @@ public class Objects {
 	}
 
 	/** Diese Methode gibt einen Funktionsaufruf als {@link Object#toString() Textdarstelung} zurück. Der Rückgabewert entspricht
-	 * {@code Objects.toStringCall(false, false, name, args)}.
+	 * {@code toStringCall(false, false, name, args)}.
 	 *
 	 * @see Objects#toStringCall(boolean, boolean, String, Object...)
 	 * @param name Funktionsname.
@@ -631,11 +587,11 @@ public class Objects {
 	 * @return {@link Object#toString() Textdarstelung}.
 	 * @throws NullPointerException Wenn {@code name} bzw. {@code args} {@code null} ist. */
 	public static String toInvokeString(final String name, final Object... args) throws NullPointerException {
-		return Objects.toStringCall(false, false, name, args);
+		return toStringCall(false, false, name, args);
 	}
 
 	/** Diese Methode gibt einen Funktionsaufruf als {@link Object#toString() Textdarstelung} zurück. Der Rückgabewert entspricht
-	 * {@code Objects.toStringCall(false, false, object, args)}.
+	 * {@code toStringCall(false, false, object, args)}.
 	 *
 	 * @see #toStringCall(boolean, boolean, Object, Object...)
 	 * @param object {@link Object}.
@@ -643,28 +599,60 @@ public class Objects {
 	 * @return {@link Object#toString() Textdarstelung}.
 	 * @throws NullPointerException Wenn {@code object} bzw. {@code args} {@code null} ist. */
 	public static String toInvokeString(final Object object, final Object... args) throws NullPointerException {
-		return Objects.toStringCall(false, false, object, args);
+		return toStringCall(false, false, object, args);
 	}
 
-	/** Diese Methode gibt das gegebene Objekt zurück, wenn dieses nicht {@code null} ist.
+	/** Diese Schnittstelle definiert eine Markierung für die Methode {@link Objects#toString(boolean, Object)}. Sie ist nur sinnvoll für eigene Implementationen
+	 * von {@link Map}, {@link Iterable} und {@link CharSequence}, für welche nicht die in {@link Objects#toString(boolean, Object)} realisierten, gesonderten
+	 * Textdarstellungen verwendet werden sollen.
 	 *
-	 * @param <GResult> Typ des Objekts.
-	 * @param result Objekt oder {@code null}.
-	 * @return Objekt.
-	 * @throws NullPointerException Wenn {@code object} {@code null} ist. */
-	public static <GResult> GResult notNull(final GResult result) throws NullPointerException {
-		if (result != null) return result;
-		throw new NullPointerException();
+	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
+	public static interface UseToString {
+
 	}
 
-	/** Diese Methode gibt das erste gegebene Objekt zurück, wenn dieses nicht {@code null} ist. Andernfalls wird das zweite geliefert.
-	 *
-	 * @param <GResult> Typ der Objekte.
-	 * @param result Objekt oder {@code null}.
-	 * @param result2 Objekt oder {@code null}.
-	 * @return Objekt. */
-	public static <GResult> GResult notNull(final GResult result, final GResult result2) {
-		return result != null ? result : result2;
+	/** Diese Klasse implementiert ein Objekt, dessen {@link #toString() Textdarsellung} über {@link Objects#toInvokeString(Object, Object...)
+	 * toInvokeString(this)} ermittelt wird. Sie kann als Basis von Klassen mit nur einer Instanz eingesetzt werden. */
+	public static class BaseObject {
+
+		@Override
+		public String toString() {
+			return toInvokeString(this);
+		}
+
+	}
+
+	private static final class PrintFuture {
+
+		final Object object;
+
+		final boolean format;
+
+		PrintFuture(final Object object, final boolean format) {
+			this.object = object;
+			this.format = format;
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toString(this.format, this.object);
+		}
+
+	}
+
+	private static final class StringFuture {
+
+		final Object object;
+
+		StringFuture(final Object object) {
+			this.object = notNull(object);
+		}
+
+		@Override
+		public String toString() {
+			return this.object.toString();
+		}
+
 	}
 
 }

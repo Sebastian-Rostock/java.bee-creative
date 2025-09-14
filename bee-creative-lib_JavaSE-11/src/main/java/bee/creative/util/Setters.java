@@ -1,14 +1,7 @@
 package bee.creative.util;
 
-import static bee.creative.lang.Natives.forceAccessible;
-import static bee.creative.lang.Natives.parseNative;
 import static bee.creative.lang.Objects.notNull;
-import static bee.creative.util.Fields.fieldFromNative;
 import static bee.creative.util.Getters.neutralGetter;
-import static java.lang.reflect.Modifier.isStatic;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import bee.creative.lang.Natives;
 import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert grundlegende {@link Setter}.
@@ -34,62 +27,6 @@ public class Setters {
 		if (that == null) return Setters.emptySetter();
 		if (that instanceof Setter3) return (Setter3<ITEM, VALUE>)that;
 		return concatSetter(neutralGetter(), that);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link #setterFromNative(String, boolean) setterFromNative(memberPath, true)}. */
-	public static <ITEM, VALUE> Setter3<ITEM, VALUE> setterFromNative(String memberPath) throws NullPointerException, IllegalArgumentException {
-		return setterFromNative(memberPath, true);
-	}
-
-	/** Diese Methode ist effektiv eine Abkürzung für {@code setterFromNative(parseNative(memberPath), forceAccessible)}.
-	 *
-	 * @see Natives#parseNative(String)
-	 * @see #setterFromNative(java.lang.reflect.Field, boolean)
-	 * @see #setterFromNative(Method, boolean) */
-	public static <ITEM, VALUE> Setter3<ITEM, VALUE> setterFromNative(String memberPath, boolean forceAccessible)
-		throws NullPointerException, IllegalArgumentException {
-		var object = parseNative(memberPath);
-		if (object instanceof java.lang.reflect.Field) return setterFromNative((java.lang.reflect.Field)object, forceAccessible);
-		if (object instanceof Method) return setterFromNative((Method)object, forceAccessible);
-		throw new IllegalArgumentException();
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link #setterFromNative(java.lang.reflect.Field) setterFromNative(that, true)}. */
-	public static <ITEM, VALUE> Setter3<ITEM, VALUE> setterFromNative(java.lang.reflect.Field that) throws NullPointerException, IllegalArgumentException {
-		return setterFromNative(that, true);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link #setterFrom(Setter) setterFrom(fieldFromNative(that, forceAccessible))}.
-	 *
-	 * @see Fields#fieldFromNative(java.lang.reflect.Field, boolean) */
-	public static <ITEM, VALUE> Setter3<ITEM, VALUE> setterFromNative(java.lang.reflect.Field that, boolean forceAccessible)
-		throws NullPointerException, IllegalArgumentException {
-		return setterFrom(fieldFromNative(that, forceAccessible));
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link #setterFromNative(Method, boolean) setterFromNative(that, true)}. */
-	public static <ITEM, VALUE> Setter3<ITEM, VALUE> setterFromNative(Method that) throws NullPointerException, IllegalArgumentException {
-		return setterFromNative(that, true);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link MethodSetter new MethodSetter<>(that, forceAccessible)}. */
-	public static <ITEM, VALUE> Setter3<ITEM, VALUE> setterFromNative(Method that, boolean forceAccessible)
-		throws NullPointerException, IllegalArgumentException {
-		return new MethodSetter<>(that, forceAccessible);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link #setterFromNative(Class, String, boolean) setterFromNative(fieldOwner, fieldName, true)}. */
-	public static <ITEM, VALUE> Setter3<ITEM, VALUE> setterFromNative(Class<? extends ITEM> fieldOwner, String fieldName)
-		throws NullPointerException, IllegalArgumentException {
-		return setterFromNative(fieldOwner, fieldName, true);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link #setterFrom(Setter) setterFromNative(fieldFromNative(fieldOwner, fieldName, forceAccessible))}.
-	 *
-	 * @see Fields#fieldFromNative(Class, String, boolean) */
-	public static <ITEM, VALUE> Setter3<ITEM, VALUE> setterFromNative(Class<? extends ITEM> fieldOwner, String fieldName, boolean forceAccessible)
-		throws NullPointerException, IllegalArgumentException {
-		return Setters.setterFrom(fieldFromNative(fieldOwner, fieldName, forceAccessible));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ConcatSetter new ConcatSetter<>(that, trans)}. */
@@ -134,45 +71,6 @@ public class Setters {
 	public static class EmptySetter extends AbstractSetter<Object, Object> {
 
 		public static final Setter3<?, ?> INSTANCE = new EmptySetter();
-
-	}
-
-	/** Diese Klasse implementiert einen {@link Setter3}, der das {@link #set(Object, Object) Schreiben} an eine gegebene {@link Method nativen Methode}
-	 * delegiert. Bei einer Klassenmethode erfolgt das Schreiben des Werts {@code value} der Eigenschaft eines Datensatzes {@code item} über
-	 * {@link Method#invoke(Object, Object...) this.that.invoke(null, item, value)}, bei einer Objektmethode hingegen über {@link Method#invoke(Object, Object...)
-	 * this.that.invoke(item, value)}.
-	 *
-	 * @param <ITEM> Typ des Datensatzes.
-	 * @param <VALUE> Typ des Werts der Eigenschaft. */
-	public static class MethodSetter<ITEM, VALUE> extends AbstractSetter<ITEM, VALUE> {
-
-		public MethodSetter(Method method, boolean forceAccessible) throws NullPointerException, IllegalArgumentException {
-			this.forceAccessible = forceAccessible;
-			if (method.getParameterTypes().length != (isStatic(method.getModifiers()) ? 2 : 1)) throw new IllegalArgumentException();
-			this.method = forceAccessible ? forceAccessible(method) : notNull(method);
-		}
-
-		@Override
-		public void set(ITEM item, VALUE value) {
-			try {
-				if (isStatic(this.method.getModifiers())) {
-					this.method.invoke(null, item, value);
-				} else {
-					this.method.invoke(item, value);
-				}
-			} catch (IllegalAccessException | InvocationTargetException cause) {
-				throw new IllegalArgumentException(cause);
-			}
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.method, this.forceAccessible);
-		}
-
-		private final Method method;
-
-		private final boolean forceAccessible;
 
 	}
 

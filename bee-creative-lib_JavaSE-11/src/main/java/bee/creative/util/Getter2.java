@@ -20,14 +20,14 @@ public interface Getter2<GItem, GValue> extends Getter<GItem, GValue> {
 		return Comparators.translate(target, this);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Fields#translate(Getter, Field) Fields.translate(this, target)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Fields#concalField(Getter, Field) Fields.translate(this, target)}. */
 	default <GValue2> Field2<GItem, GValue2> concat(Field<? super GValue, GValue2> target) {
-		return Fields.translate(this, target);
+		return Fields.concalField(this, target);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Filters#translate(Filter, Getter) Filters.translate(target, this)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Filters#translateFilter(Filter, Getter) Filters.translate(target, this)}. */
 	default Filter2<GItem> concat(Filter<? super GValue> target) {
-		return Filters.translate(target, this);
+		return Filters.translateFilter(target, this);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Getters#concat(Getter, Getter) Getters.concat(this, target)}. */

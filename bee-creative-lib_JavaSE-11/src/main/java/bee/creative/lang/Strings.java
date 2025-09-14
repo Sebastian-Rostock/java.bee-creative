@@ -16,6 +16,22 @@ import bee.creative.util.Setter;
  * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Strings {
 
+	/** Diese Methode gibt die gegebenen Zeichenkette mit erhöhtem Einzug zurück. Dazu wird jedes Vorkommen von {@code "\n"} durch {@code "\n  "} ersetzt.
+	 *
+	 * @param value Zeichenkette.
+	 * @return Zeichenkette mit erhöhtem Einzug. */
+	public static String indent(final String value) {
+		if (value == null) return "null";
+		final var result = new StringBuilder();
+		int last = -1, next = 0;
+		final var size = value.length();
+		while ((next = value.indexOf('\n', next)) >= 0) {
+			result.append(value.substring(last + 1, last = next)).append("\n  ");
+			next++;
+		}
+		return result.append(value.substring(last + 1, size)).toString();
+	}
+
 	private static final class FormatFuture {
 
 		final String format;

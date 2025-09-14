@@ -848,7 +848,7 @@ public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable<FE
 
 		CompactArray3(FEMValue[] items) throws IllegalArgumentException {
 			super(items);
-			final int length = this.length, mask = Objects.mask(length), count = mask + 2;
+			final int length = this.length, mask = Objects.hashMask(length), count = mask + 2;
 			final int[] table = new int[count + length], hashes = new int[length];
 			for (var i = 0; i < length; i++) {
 				final var hash = (items[i].hashCode() & mask) + 1;

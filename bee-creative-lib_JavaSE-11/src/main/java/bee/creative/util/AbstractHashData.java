@@ -112,8 +112,8 @@ public abstract class AbstractHashData<KEY, VALUE> implements Emuable {
 
 	/** Dieser Konstruktor initialisiert das die {@link #capacityImpl() Kapazität} mit {@code 0}. */
 	public AbstractHashData() {
-		this.table = AbstractHashData.EMPTY_TABLE;
-		this.nexts = AbstractHashData.EMPTY_INTS;
+		this.table = EMPTY_TABLE;
+		this.nexts = EMPTY_INTS;
 		this.customAllocator(0).apply();
 	}
 
@@ -397,7 +397,7 @@ public abstract class AbstractHashData<KEY, VALUE> implements Emuable {
 			this.table = AbstractHashData.EMPTY_TABLE;
 			this.nexts = AbstractHashData.EMPTY_INTS;
 		} else if (capacity <= AbstractHashData.MAX_CAPACITY) {
-			var newMask = Objects.mask(capacity);
+			var newMask = Objects.hashMask(capacity);
 			var oldTable = this.table;
 			var newTable = new int[newMask + 1];
 			var newNexts = new int[capacity];
@@ -857,19 +857,19 @@ public abstract class AbstractHashData<KEY, VALUE> implements Emuable {
 
 	/** Diese Schnittstelle definiert den Allokator zur Reservierung und Aktualisierung der Schlüssel- und Wertlisten eines {@link AbstractHashData}. */
 	protected static interface HashAllocator {
-	
+
 		/** Diese Methode kopiert Schlüssel und Wert des gegebenen Quelleintrags zum gegebenen Zieleintrag.
 		 *
 		 * @see AbstractHashData#allocateImpl(int)
 		 * @param sourceIndex Index des Quelleintrags.
 		 * @param targetIndex Index des Zieleintrags. */
 		void copy(int sourceIndex, int targetIndex);
-	
+
 		/** Diese Methode überträgt die Schlüssel- und Wertlisten auf den Erzeuger dieses Allokators.
 		 *
 		 * @see AbstractHashData#allocateImpl(int) **/
 		void apply();
-	
+
 	}
 
 	/** Diese Klasse implementiert {@link AbstractHashData#newKeysImpl()}. */
@@ -1199,7 +1199,7 @@ public abstract class AbstractHashData<KEY, VALUE> implements Emuable {
 				this.count--;
 				return nextIndex;
 			}
-		}	
+		}
 		return -1;
 	}
 

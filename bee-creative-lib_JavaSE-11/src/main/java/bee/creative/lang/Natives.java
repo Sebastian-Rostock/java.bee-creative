@@ -1,27 +1,35 @@
 package bee.creative.lang;
 
+import static bee.creative.lang.Objects.notNull;
+import static java.lang.reflect.Modifier.isStatic;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
+import bee.creative.util.AbstractField;
+import bee.creative.util.AbstractGetter;
+import bee.creative.util.AbstractSetter;
 import bee.creative.util.Builders.MapBuilder;
+import bee.creative.util.Field2;
+import bee.creative.util.Fields;
 import bee.creative.util.Getter;
+import bee.creative.util.Getter3;
+import bee.creative.util.Getters;
 import bee.creative.util.HashMap;
 import bee.creative.util.Iterables;
+import bee.creative.util.Setter;
+import bee.creative.util.Setter3;
+import bee.creative.util.Setters;
 
 /** Diese Klasse implementiert Methoden zum Parsen von {@link Class Klassen}, {@link Field Datenfeldern}, {@link Method Methoden} und {@link Constructor
  * Konstruktoren} aus deren Textdarstellung sowie zur Erzeugung dieser Textdarstellungen.
  *
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Natives {
-
-	/** Dieses Feld bildet von den Namen der primitiven Datentypen auf deren Klassen ab. */
-	static final HashMap<Object, Class<?>> parseClass = MapBuilder.<Object, Class<?>>forHashMap(false).putAllValues(Class::getName, byte.class, short.class, int.class, long.class, float.class, double.class, char.class, boolean.class, void.class).get();
-
-	/** Dieses Feld speichert den {@link Getter} zu {@link #printClass(Class)}. */
-	static final Getter<Class<?>, Object> printClass = Natives::printClass;
 
 	/** Diese Methode gibt das native Objekt zur gegebenen Pfadangabe zurück. Die Pfadangabe kodiert hierbei eine Klasse, eine Methode, einen Konstruktor oder ein
 	 * Datenfeld. Die folgenden Pfadangaben werden unterstützt:
@@ -276,10 +284,6 @@ public class Natives {
 		return Natives.printMethod(constructor.getDeclaringClass(), "new", constructor.getParameterTypes());
 	}
 
-	static String printMethod(final Class<?> methodOwner, final String methodName, final Class<?>... methodParams) throws NullPointerException {
-		return Natives.printClass(methodOwner) + "." + methodName + Natives.printParams(methodParams);
-	}
-
 	/** Diese Methode erzwingt die {@link AccessibleObject#setAccessible(boolean) Zugreifbarkeit} des gegebenen Objekts und gibt es zurück.
 	 *
 	 * @param result Objekt mit Zugreifbarkeit.
@@ -293,6 +297,341 @@ public class Natives {
 		} catch (final SecurityException cause) {
 			throw new IllegalArgumentException(cause);
 		}
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #nativeSetter(String, boolean) nativeSetter(memberPath, true)}. */
+	public static <ITEM, VALUE> Setter3<ITEM, VALUE> nativeSetter(String memberPath) throws NullPointerException, IllegalArgumentException {
+		return nativeSetter(memberPath, true);
+	}
+
+	/** Diese Methode ist effektiv eine Abkürzung für {@code setterFromNative(parseNative(memberPath), forceAccessible)}.
+	 *
+	 * @see #parseNative
+	 * @see #nativeSetter(java.lang.reflect.Field, boolean)
+	 * @see #nativeSetter(Method, boolean) */
+	public static <ITEM, VALUE> Setter3<ITEM, VALUE> nativeSetter(String memberPath, boolean forceAccessible)
+		throws NullPointerException, IllegalArgumentException {
+		var object = parseNative(memberPath);
+		if (object instanceof java.lang.reflect.Field) return nativeSetter((java.lang.reflect.Field)object, forceAccessible);
+		if (object instanceof Method) return nativeSetter((Method)object, forceAccessible);
+		throw new IllegalArgumentException();
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #nativeSetter(java.lang.reflect.Field) setterFromNative(that, true)}. */
+	public static <ITEM, VALUE> Setter3<ITEM, VALUE> nativeSetter(java.lang.reflect.Field that) throws NullPointerException, IllegalArgumentException {
+		return nativeSetter(that, true);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link Setters#setterFrom(Setter) setterFrom(fieldFromNative(that, forceAccessible))}.
+	 *
+	 * @see Natives#nativeField(java.lang.reflect.Field, boolean) */
+	public static <ITEM, VALUE> Setter3<ITEM, VALUE> nativeSetter(java.lang.reflect.Field that, boolean forceAccessible)
+		throws NullPointerException, IllegalArgumentException {
+		return Setters.setterFrom(Natives.nativeField(that, forceAccessible));
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #nativeSetter(Method, boolean) setterFromNative(that, true)}. */
+	public static <ITEM, VALUE> Setter3<ITEM, VALUE> nativeSetter(Method that) throws NullPointerException, IllegalArgumentException {
+		return nativeSetter(that, true);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link MethodSetter new MethodSetter<>(that, forceAccessible)}. */
+	public static <ITEM, VALUE> Setter3<ITEM, VALUE> nativeSetter(Method that, boolean forceAccessible) throws NullPointerException, IllegalArgumentException {
+		return new MethodSetter<>(that, forceAccessible);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #nativeSetter(Class, String, boolean) setterFromNative(fieldOwner, fieldName, true)}. */
+	public static <ITEM, VALUE> Setter3<ITEM, VALUE> nativeSetter(Class<? extends ITEM> fieldOwner, String fieldName)
+		throws NullPointerException, IllegalArgumentException {
+		return nativeSetter(fieldOwner, fieldName, true);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link Setters#setterFrom(Setter) setterFromNative(fieldFromNative(fieldOwner, fieldName, forceAccessible))}.
+	 *
+	 * @see Natives#nativeField(Class, String, boolean) */
+	public static <ITEM, VALUE> Setter3<ITEM, VALUE> nativeSetter(Class<? extends ITEM> fieldOwner, String fieldName, boolean forceAccessible)
+		throws NullPointerException, IllegalArgumentException {
+		return Setters.setterFrom(Natives.nativeField(fieldOwner, fieldName, forceAccessible));
+	}
+
+	/** Dieses Feld bildet von den Namen der primitiven Datentypen auf deren Klassen ab. */
+	static final HashMap<Object, Class<?>> parseClass = MapBuilder.<Object, Class<?>>forHashMap(false)
+		.putAllValues(Class::getName, byte.class, short.class, int.class, long.class, float.class, double.class, char.class, boolean.class, void.class).get();
+
+	/** Dieses Feld speichert den {@link Getter} zu {@link #printClass(Class)}. */
+	static final Getter<Class<?>, Object> printClass = Natives::printClass;
+
+	static String printMethod(final Class<?> methodOwner, final String methodName, final Class<?>... methodParams) throws NullPointerException {
+		return Natives.printClass(methodOwner) + "." + methodName + Natives.printParams(methodParams);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link Natives#nativeField(java.lang.reflect.Field, boolean) Fields.fromNative(that, true)}. */
+	public static <GItem, GValue> Field2<GItem, GValue> nativeField(final java.lang.reflect.Field that) throws NullPointerException, IllegalArgumentException {
+		return Natives.nativeField(that, true);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link NativeField new NativeField<>(that, forceAccessible)}. */
+	public static <GItem, GValue> Field2<GItem, GValue> nativeField(final java.lang.reflect.Field that, final boolean forceAccessible)
+		throws NullPointerException, IllegalArgumentException {
+		return new NativeField<>(that, forceAccessible);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link Natives#nativeField(Method, Method, boolean) Fields.fromNative(getMethod, setMethod, true)}. */
+	public static <GItem, GValue> Field2<GItem, GValue> nativeField(final Method get, final Method set) throws NullPointerException, IllegalArgumentException {
+		return Natives.nativeField(get, set, true);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link Fields#fieldFrom(Getter, Setter) Fields.from(Getters.fromNative(get, forceAccessible), Setters.fromNative(set,
+	 * forceAccessible))}.
+	 *
+	 * @see Natives#fromNative(Method, boolean)
+	 * @see #nativeSetter */
+	public static <GItem, GValue> Field2<GItem, GValue> nativeField(final Method get, final Method set, final boolean forceAccessible)
+		throws NullPointerException, IllegalArgumentException {
+		return Fields.fieldFrom(Natives.<GItem, GValue>fromNative(get, forceAccessible), nativeSetter(set, forceAccessible));
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link Natives#nativeField(Class, String, boolean) Fields.fromNative(fieldOwner, fieldName, true)}. */
+	public static <GItem, GValue> Field2<GItem, GValue> nativeField(final Class<? extends GItem> fieldOwner, final String fieldName)
+		throws NullPointerException, IllegalArgumentException {
+		return Natives.nativeField(fieldOwner, fieldName, true);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #nativeField(java.lang.reflect.Field, boolean) Fields.fromNative(Natives.parseField(fieldOwner, fieldName),
+	 * forceAccessible)}.
+	 *
+	 * @see #parseField */
+	public static <GItem, GValue> Field2<GItem, GValue> nativeField(final Class<? extends GItem> fieldOwner, final String fieldName,
+		final boolean forceAccessible) throws NullPointerException, IllegalArgumentException {
+		return Natives.nativeField(parseField(fieldOwner, fieldName), forceAccessible);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #fromNative(String, boolean) Getters.fromNative(memberText, true)}. */
+	public static <GItem, GValue> Getter3<GItem, GValue> fromNative(final String memberText) throws NullPointerException, IllegalArgumentException {
+		return Natives.fromNative(memberText, true);
+	}
+
+	/** Diese Methode ist effektiv eine Abkürzung für {@code Getters.fromNative(Natives.parse(memberText), forceAccessible)}.
+	 *
+	 * @see #parseNative
+	 * @see Natives#fromNative(java.lang.reflect.Field, boolean)
+	 * @see Natives#fromNative(Method, boolean)
+	 * @see Natives#fromNative(Constructor, boolean) */
+	public static <GItem, GValue> Getter3<GItem, GValue> fromNative(final String memberText, final boolean forceAccessible)
+		throws NullPointerException, IllegalArgumentException {
+		final Object object = parseNative(memberText);
+		if (object instanceof java.lang.reflect.Field) return Natives.fromNative((java.lang.reflect.Field)object, forceAccessible);
+		if (object instanceof Method) return Natives.fromNative((Method)object, forceAccessible);
+		if (object instanceof Constructor<?>) return Natives.fromNative((Constructor<?>)object, forceAccessible);
+		throw new IllegalArgumentException();
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #fromNative(java.lang.reflect.Field, boolean) Getters.fromNative(field, true)}. */
+	public static <GItem, GValue> Getter3<GItem, GValue> fromNative(final java.lang.reflect.Field that) throws NullPointerException, IllegalArgumentException {
+		return Natives.fromNative(that, true);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link Getters#getterFrom(Getter) Getters.from(Fields.fromNative(that, forceAccessible))}.
+	 *
+	 * @see #nativeField */
+	public static <GItem, GValue> Getter3<GItem, GValue> fromNative(final java.lang.reflect.Field that, final boolean forceAccessible)
+		throws NullPointerException, IllegalArgumentException {
+		return Getters.getterFrom( nativeField(that, forceAccessible));
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #fromNative(Method, boolean) Getters.fromNative(that, true)}. */
+	public static <GItem, GOutput> Getter3<GItem, GOutput> fromNative(final Method that) throws NullPointerException, IllegalArgumentException {
+		return Natives.fromNative(that, true);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link MethodGetter new MethodGetter<>(that, forceAccessible)}. */
+	public static <GItem, GValue> Getter3<GItem, GValue> fromNative(final Method that, final boolean forceAccessible)
+		throws NullPointerException, IllegalArgumentException {
+		return new MethodGetter<>(that, forceAccessible);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #fromNative(Constructor, boolean) Getters.fromNative(that, true)}. */
+	public static <GItem, GOutput> Getter3<GItem, GOutput> fromNative(final Constructor<?> that) throws NullPointerException, IllegalArgumentException {
+		return Natives.fromNative(that, true);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link ConstructorGetter new ConstructorGetter<>(that, forceAccessible)}. */
+	public static <GItem, GValue> Getter3<GItem, GValue> fromNative(final Constructor<?> that, final boolean forceAccessible)
+		throws NullPointerException, IllegalArgumentException {
+		return new ConstructorGetter<>(that, forceAccessible);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #fromNative(Class, String, boolean) Getters.fromNative(fieldOwner, fieldName, true)}. */
+	public static <GItem, GValue> Getter3<GItem, GValue> fromNative(final Class<? extends GItem> fieldOwner, final String fieldName)
+		throws NullPointerException, IllegalArgumentException {
+		return Natives.fromNative(fieldOwner, fieldName, true);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link Getters#getterFrom(Getter) Getters.from(Fields.fromNative(fieldOwner, fieldName, forceAccessible))}.
+	 *
+	 * @see #nativeField */
+	public static <GItem, GValue> Getter3<GItem, GValue> fromNative(final Class<? extends GItem> fieldOwner, final String fieldName,
+		final boolean forceAccessible) throws NullPointerException, IllegalArgumentException {
+		return Getters.getterFrom(nativeField(fieldOwner, fieldName, forceAccessible));
+	}
+
+	/** Diese Klasse implementiert einen {@link Setter3}, der das {@link #set(Object, Object) Schreiben} an eine gegebene {@link Method nativen Methode}
+	 * delegiert. Bei einer Klassenmethode erfolgt das Schreiben des Werts {@code value} der Eigenschaft eines Datensatzes {@code item} über
+	 * {@link Method#invoke(Object, Object...) this.that.invoke(null, item, value)}, bei einer Objektmethode hingegen über {@link Method#invoke(Object, Object...)
+	 * this.that.invoke(item, value)}.
+	 *
+	 * @param <ITEM> Typ des Datensatzes.
+	 * @param <VALUE> Typ des Werts der Eigenschaft. */
+	public static class MethodSetter<ITEM, VALUE> extends AbstractSetter<ITEM, VALUE> {
+
+		public MethodSetter(Method method, boolean forceAccessible) throws NullPointerException, IllegalArgumentException {
+			this.forceAccessible = forceAccessible;
+			if (method.getParameterTypes().length != (isStatic(method.getModifiers()) ? 2 : 1)) throw new IllegalArgumentException();
+			this.method = forceAccessible ? forceAccessible(method) : notNull(method);
+		}
+
+		@Override
+		public void set(ITEM item, VALUE value) {
+			try {
+				if (isStatic(this.method.getModifiers())) {
+					this.method.invoke(null, item, value);
+				} else {
+					this.method.invoke(item, value);
+				}
+			} catch (IllegalAccessException | InvocationTargetException cause) {
+				throw new IllegalArgumentException(cause);
+			}
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.method, this.forceAccessible);
+		}
+
+		private final Method method;
+
+		private final boolean forceAccessible;
+
+	}
+
+	/** Diese Klasse implementiert {@link Field2}, das das {@link #get(Object) Lesen} und {@link #set(Object, Object) Schreiben} an ein gegebenes
+	 * {@link java.lang.reflect.Field natives Datenfeld} delegiert. Bei einem statischen nativen Datenfeld wird der Datensatz ignoriert.
+	 *
+	 * @see java.lang.reflect.Field#get(Object)
+	 * @see java.lang.reflect.Field#set(Object, Object)
+	 * @param <GItem> Typ des Datensatzes.
+	 * @param <GValue> Typ des Werts der Eigenschaft. */
+	public static class NativeField<GItem, GValue> extends AbstractField<GItem, GValue> {
+
+		public final java.lang.reflect.Field that;
+
+		public final boolean forceAccessible;
+
+		public NativeField(final java.lang.reflect.Field target, final boolean forceAccessible) throws NullPointerException, IllegalArgumentException {
+			this.forceAccessible = forceAccessible;
+			this.that = forceAccessible ? forceAccessible(target) : Objects.notNull(target);
+		}
+
+		@Override
+		@SuppressWarnings ("unchecked")
+		public GValue get(final GItem item) {
+			try {
+				return (GValue)this.that.get(item);
+			} catch (final IllegalAccessException cause) {
+				throw new IllegalArgumentException(cause);
+			}
+		}
+
+		@Override
+		public void set(final GItem item, final GValue value) {
+			try {
+				this.that.set(item, value);
+			} catch (final IllegalAccessException cause) {
+				throw new IllegalArgumentException(cause);
+			}
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.that, this.forceAccessible);
+		}
+
+	}
+
+	/** Diese Klasse implementiert einen {@link Getter3}, der das {@link #get(Object) Lesen} an eine gegebene {@link Method nativen Methode} delegiert. Bei einer
+	 * Klassenmethode liefert er für einen Datensatz {@code item} {@link Method#invoke(Object, Object...) this.that.invoke(null, item)}, bei einer Objektmethode
+	 * dagegen {@link Method#invoke(Object, Object...) this.that.invoke(item)}.
+	 *
+	 * @param <GItem> Typ des Datensatzes.
+	 * @param <GValue> Typ des Werts. */
+	public static class MethodGetter<GItem, GValue> extends AbstractGetter<GItem, GValue> {
+	
+		public final Method that;
+	
+		public final boolean forceAccessible;
+	
+		public MethodGetter(final Method that, final boolean forceAccessible) throws NullPointerException, IllegalArgumentException {
+			this.forceAccessible = forceAccessible;
+			if (that.getParameterTypes().length != (Modifier.isStatic(that.getModifiers()) ? 1 : 0)) throw new IllegalArgumentException();
+			this.that = forceAccessible ? forceAccessible(that) : Objects.notNull(that);
+		}
+	
+		@Override
+		@SuppressWarnings ("unchecked")
+		public GValue get(final GItem item) {
+			try {
+				final GValue result;
+				if (Modifier.isStatic(this.that.getModifiers())) {
+					result = (GValue)this.that.invoke(null, item);
+				} else {
+					result = (GValue)this.that.invoke(item);
+				}
+				return result;
+			} catch (final IllegalAccessException | InvocationTargetException cause) {
+				throw new IllegalArgumentException(cause);
+			}
+		}
+	
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.that, this.forceAccessible);
+		}
+	
+	}
+
+	/** Diese Klasse implementiert einen {@link Getter3}, der das {@link #get(Object) Lesen} an einen gegebenen {@link Constructor nativen Kontruktor} delegiert.
+	 * Für einen Datensatz {@code item} liefert er {@link Constructor#newInstance(Object...) this.that.newInstance(item)}.
+	 *
+	 * @param <GItem> Typ des Datensatzes.
+	 * @param <GValue> Typ des Werts. */
+	public static class ConstructorGetter<GItem, GValue> extends AbstractGetter<GItem, GValue> {
+	
+		public final Constructor<?> that;
+	
+		public final boolean forceAccessible;
+	
+		public ConstructorGetter(final Constructor<?> that, final boolean forceAccessible) throws NullPointerException, IllegalArgumentException {
+			this.forceAccessible = forceAccessible;
+			if (!Modifier.isStatic(that.getModifiers()) || (that.getParameterTypes().length != 1)) throw new IllegalArgumentException();
+			this.that = forceAccessible ? forceAccessible(that) : Objects.notNull(that);
+		}
+	
+		@Override
+		public GValue get(final GItem item) {
+			try {
+				@SuppressWarnings ("unchecked")
+				final GValue result = (GValue)this.that.newInstance(item);
+				return result;
+			} catch (final IllegalAccessException | InstantiationException | InvocationTargetException cause) {
+				throw new IllegalArgumentException(cause);
+			}
+		}
+	
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.that, this.forceAccessible);
+		}
+	
 	}
 
 }

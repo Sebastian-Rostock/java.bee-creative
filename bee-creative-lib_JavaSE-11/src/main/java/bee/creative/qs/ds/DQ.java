@@ -212,7 +212,7 @@ public class DQ {
 		return owner.newEdges(Iterables.translate(objectSubjectMap.entrySet(), entry -> {
 			var subject = entry.getValue();
 			return subject != null ? owner.newEdge(context, predicate, subject, entry.getKey()) : null;
-		}).filter(Filters.empty()));
+		}).filter(Filters.emptyFilter()));
 	}
 
 	static QESet newObjectSubjectSetMapEdges(QN context, QN predicate, Map<? extends QN, ? extends Iterable<? extends QN>> objectSubjectSetMap) {
@@ -228,7 +228,7 @@ public class DQ {
 		return owner.newEdges(Iterables.translate(subjectObjectMap.entrySet(), entry -> {
 			var object = entry.getValue();
 			return object != null ? owner.newEdge(context, predicate, entry.getKey(), object) : null;
-		}).filter(Filters.empty()));
+		}).filter(Filters.emptyFilter()));
 	}
 
 	static QESet newSubjectObjectSetMapEdges(QN context, QN predicate, Map<? extends QN, ? extends Iterable<? extends QN>> subjectObjectSetMap) {
@@ -507,7 +507,7 @@ public class DQ {
 			return edge.withObject(targetObject).withSubject(targetSubject);
 		});
 
-		return qs.newEdges(edgesHavingObjectsToCloneIterable.concat(edgesHavingSubjectsToCloneIterable).filter(Filters.empty()));
+		return qs.newEdges(edgesHavingObjectsToCloneIterable.concat(edgesHavingSubjectsToCloneIterable).filter(Filters.emptyFilter()));
 	}
 
 	/** Diese Methode ermittelt zu jedem der gegebenen {@link QE#predicate() Prädikatknoten}, ob beim {@link #getCloneEdges(Map, QN, Iterable) Klonen} von

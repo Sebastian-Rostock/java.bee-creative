@@ -157,7 +157,7 @@ public class Iterators {
 		public UniqueIterator(final Iterator<? extends GItem> that, final Collection<? super GItem> buffer) throws NullPointerException {
 			this.that = Objects.notNull(that);
 			this.buffer = Objects.notNull(buffer);
-			this.helper = Iterators.filter(that, Filters.negate(Filters.fromItems(buffer)));
+			this.helper = Iterators.filter(that, Filters.negateFilter(Filters.fromItems(buffer)));
 		}
 
 		@Override
