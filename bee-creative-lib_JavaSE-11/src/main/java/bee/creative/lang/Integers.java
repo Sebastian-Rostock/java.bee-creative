@@ -11,7 +11,7 @@ public class Integers {
 	 *
 	 * @param value positive Dezimalzahl.
 	 * @return Zeichenanzahl. */
-	public static int getSize(int value) {
+	public static int integerLength(int value) {
 		return (value > 99999 //
 			? (value > 9999999 //
 				? (value > 999999999//
@@ -31,11 +31,11 @@ public class Integers {
 	 *
 	 * @param value positive Dezimalzahl.
 	 * @return Zeichenanzahl. */
-	public static int getSize(long value) {
+	public static int integerLength(long value) {
 		var div = value / 1000000000;
-		if (div != 0) return getSize(div) + 9;
+		if (div != 0) return integerLength(div) + 9;
 		var mod = value % 1000000000;
-		return getSize((int)mod);
+		return integerLength((int)mod);
 	}
 
 	/** Diese Methode gibt die Anzahl der Dezimalziffern ab der gegebenen Position des gegebenen Puffers zurück.
@@ -46,7 +46,7 @@ public class Integers {
 	 * @param offset Position des ersten untersuchten Zeichens.
 	 * @param length Anzahl der zu untersuchenden Zeichen.
 	 * @return Anzahl der Dezimalziffern. */
-	public static int getSize(char[] buffer, int offset, int length) {
+	public static int integerLength(char[] buffer, int offset, int length) {
 		var limit = offset + length;
 		var index = offset;
 		while (index < limit) {
@@ -65,7 +65,7 @@ public class Integers {
 	 * @param offset Position des ersten untersuchten Zeichens.
 	 * @param length Anzahl der zu untersuchenden Zeichen.
 	 * @return Anzahl der Dezimalziffern. */
-	public static int getSize(String buffer, int offset, int length) {
+	public static int integerLength(CharSequence buffer, int offset, int length) {
 		var limit = offset + length;
 		var index = offset;
 		while (index < limit) {
@@ -104,7 +104,7 @@ public class Integers {
 	 * @param offset Position der ersten Dezimalziffer.
 	 * @param length Anzahl der einzulesenden Dezimalziffern.
 	 * @return positiven Dezimalzahl. */
-	public static int parseInt(String buffer, int offset, int length) {
+	public static int parseInt(CharSequence buffer, int offset, int length) {
 		if (length == 0) return 0;
 		var result = 0;
 		length += offset;
@@ -137,7 +137,7 @@ public class Integers {
 	 * @param offset Position der ersten Dezimalziffer.
 	 * @param length Anzahl der einzulesenden Dezimalziffern.
 	 * @return positiven Dezimalzahl. */
-	public static long parseLong(String buffer, int offset, int length) {
+	public static long parseLong(CharSequence buffer, int offset, int length) {
 		if (length < 10) return parseInt(buffer, offset, length);
 		return (parseLong(buffer, offset, length - 9) * 1000000000) + parseLong(buffer, (offset + length) - 9, 9);
 	}
@@ -176,7 +176,7 @@ public class Integers {
 	 * @param offset Position des ersten zu schreibenden Zeichens.
 	 * @param length Anzahl der zu schreibenden Zeichen, welche mindestend der für die gegebene Dezimalzahl neötigten Anzahl an Zeichen entsprechen muss. */
 	public static void printInt(int value, char[] buffer, int offset, int length) {
-		var fill = length - getSize(value);
+		var fill = length - integerLength(value);
 		while (--fill >= 0) {
 			buffer[offset + fill] = '0';
 		}
@@ -215,7 +215,7 @@ public class Integers {
 	 * @param offset Position des ersten zu schreibenden Zeichens.
 	 * @param length Anzahl der zu schreibenden Zeichen, welche mindestend der für die gegebene Dezimalzahl neötigten Anzahl an Zeichen entsprechen muss. */
 	public static void printLong(long value, char[] buffer, int offset, int length) {
-		var fill = length - getSize(value);
+		var fill = length - integerLength(value);
 		while (--fill >= 0) {
 			buffer[offset + fill] = '0';
 		}

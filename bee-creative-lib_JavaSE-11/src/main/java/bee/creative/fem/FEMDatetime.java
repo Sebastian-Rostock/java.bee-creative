@@ -180,7 +180,7 @@ public final class FEMDatetime implements FEMValue, Comparable<FEMDatetime> {
 	}
 
 	static int fromI2(final char[] buffer, final int offset) {
-		if (Integers.getSize(buffer, offset, 2) != 2) throw new IllegalArgumentException();
+		if (Integers.integerLength(buffer, offset, 2) != 2) throw new IllegalArgumentException();
 		return Integers.parseInt(buffer, offset, 2);
 	}
 
@@ -204,7 +204,7 @@ public final class FEMDatetime implements FEMValue, Comparable<FEMDatetime> {
 	}
 
 	static FEMDatetime fromT12(final FEMDatetime result, final char[] buffer, final int offset) {
-		if ((buffer[offset + 2] != ':') || (buffer[offset + 5] != ':') || (buffer[offset + 8] != '.') || (Integers.getSize(buffer, offset + 9, 3) != 3))
+		if ((buffer[offset + 2] != ':') || (buffer[offset + 5] != ':') || (buffer[offset + 8] != '.') || (Integers.integerLength(buffer, offset + 9, 3) != 3))
 			throw new IllegalArgumentException();
 		final int hour = FEMDatetime.fromI2(buffer, offset + 0), minute = FEMDatetime.fromI2(buffer, offset + 3), second = FEMDatetime.fromI2(buffer, offset + 6),
 			millisecond = Integers.parseInt(buffer, offset + 9, 3);
@@ -212,7 +212,7 @@ public final class FEMDatetime implements FEMValue, Comparable<FEMDatetime> {
 	}
 
 	static FEMDatetime fromD10(final FEMDatetime result, final char[] buffer, final int offset) {
-		if ((buffer[offset + 4] != '-') || (buffer[offset + 7] != '-') || (Integers.getSize(buffer, offset, 4) != 4)) throw new IllegalArgumentException();
+		if ((buffer[offset + 4] != '-') || (buffer[offset + 7] != '-') || (Integers.integerLength(buffer, offset, 4) != 4)) throw new IllegalArgumentException();
 		final int year = Integers.parseInt(buffer, offset, 4), month = FEMDatetime.fromI2(buffer, offset + 5), date = FEMDatetime.fromI2(buffer, offset + 8);
 		return result.withDate(year, month, date);
 	}

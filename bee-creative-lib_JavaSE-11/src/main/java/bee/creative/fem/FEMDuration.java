@@ -70,7 +70,7 @@ public final class FEMDuration implements FEMValue, Comparable<FEMDuration> {
 
 		{
 			if (symbol != 'P') throw new IllegalArgumentException();
-			size = Integers.getSize(buffer, offset, length - offset);
+			size = Integers.integerLength(buffer, offset, length - offset);
 			offset += size;
 			symbol = buffer[offset];
 			offset += 1;
@@ -83,7 +83,7 @@ public final class FEMDuration implements FEMValue, Comparable<FEMDuration> {
 			if (offset > length) return negate //
 				? FEMDuration.from(-years, 0, 0, 0, 0, 0, 0) //
 				: FEMDuration.from(years, 0, 0, 0, 0, 0, 0);
-			size = Integers.getSize(buffer, offset, length - offset);
+			size = Integers.integerLength(buffer, offset, length - offset);
 			offset += size;
 			symbol = buffer[offset];
 			offset += 1;
@@ -98,7 +98,7 @@ public final class FEMDuration implements FEMValue, Comparable<FEMDuration> {
 			if (offset > length) return negate //
 				? FEMDuration.from(-years, -months, 0, 0, 0, 0, 0) //
 				: FEMDuration.from(years, months, 0, 0, 0, 0, 0);
-			size = Integers.getSize(buffer, offset, length - offset);
+			size = Integers.integerLength(buffer, offset, length - offset);
 			offset += size;
 			symbol = buffer[offset];
 			offset += 1;
@@ -122,7 +122,7 @@ public final class FEMDuration implements FEMValue, Comparable<FEMDuration> {
 
 		{
 			if ((symbol != 'T') || (size != 0) || (offset > length)) throw new IllegalArgumentException();
-			size = Integers.getSize(buffer, offset, length - offset);
+			size = Integers.integerLength(buffer, offset, length - offset);
 			offset += size;
 			symbol = buffer[offset];
 			offset += 1;
@@ -135,7 +135,7 @@ public final class FEMDuration implements FEMValue, Comparable<FEMDuration> {
 			if (offset > length) return negate //
 				? FEMDuration.from(-years, -months, -days, -hours, 0, 0, 0) //
 				: FEMDuration.from(years, months, days, hours, 0, 0, 0);
-			size = Integers.getSize(buffer, offset, length - offset);
+			size = Integers.integerLength(buffer, offset, length - offset);
 			offset += size;
 			symbol = buffer[offset];
 			offset += 1;
@@ -150,7 +150,7 @@ public final class FEMDuration implements FEMValue, Comparable<FEMDuration> {
 			if (offset > length) return negate //
 				? FEMDuration.from(-years, -months, -days, -hours, -minutes, 0, 0) //
 				: FEMDuration.from(years, months, days, hours, minutes, 0, 0);
-			size = Integers.getSize(buffer, offset, length - offset);
+			size = Integers.integerLength(buffer, offset, length - offset);
 			offset += size;
 			symbol = buffer[offset];
 			offset += 1;
@@ -166,7 +166,7 @@ public final class FEMDuration implements FEMValue, Comparable<FEMDuration> {
 
 		final int milliseconds;
 		if (symbol == '.') {
-			size = Integers.getSize(buffer, offset, length - offset);
+			size = Integers.integerLength(buffer, offset, length - offset);
 			if (size != 3) throw new IllegalArgumentException();
 			milliseconds = Integers.parseInt(buffer, offset, 3);
 			symbol = buffer[offset + 3];
@@ -662,21 +662,21 @@ public final class FEMDuration implements FEMValue, Comparable<FEMDuration> {
 		offset += 1;
 		final var years = this.yearsValue();
 		if (years != 0) {
-			offset += Integers.getSize(years);
+			offset += Integers.integerLength(years);
 			Integers.printInt(years, buffer, offset);
 			buffer[offset] = 'Y';
 			offset += 1;
 		}
 		final var months = this.monthsValue();
 		if (months != 0) {
-			offset += Integers.getSize(months);
+			offset += Integers.integerLength(months);
 			Integers.printInt(months, buffer, offset);
 			buffer[offset] = 'M';
 			offset += 1;
 		}
 		final var days = this.daysValue();
 		if (days != 0) {
-			offset += Integers.getSize(days);
+			offset += Integers.integerLength(days);
 			Integers.printInt(days, buffer, offset);
 			buffer[offset] = 'D';
 			offset += 1;
@@ -687,19 +687,19 @@ public final class FEMDuration implements FEMValue, Comparable<FEMDuration> {
 			offset += 1;
 		}
 		if (hours != 0) {
-			offset += Integers.getSize(hours);
+			offset += Integers.integerLength(hours);
 			Integers.printInt(hours, buffer, offset);
 			buffer[offset] = 'H';
 			offset += 1;
 		}
 		if (minutes != 0) {
-			offset += Integers.getSize(minutes);
+			offset += Integers.integerLength(minutes);
 			Integers.printInt(minutes, buffer, offset);
 			buffer[offset] = 'M';
 			offset += 1;
 		}
 		if (milliseconds != 0) {
-			offset += Integers.getSize(seconds);
+			offset += Integers.integerLength(seconds);
 			Integers.printInt(seconds, buffer, offset);
 			offset += 4;
 			Integers.printInt(milliseconds + 1000, buffer, offset);
@@ -707,7 +707,7 @@ public final class FEMDuration implements FEMValue, Comparable<FEMDuration> {
 			buffer[offset] = 'S';
 			offset += 1;
 		} else if (seconds != 0) {
-			offset += Integers.getSize(seconds);
+			offset += Integers.integerLength(seconds);
 			Integers.printInt(seconds, buffer, offset);
 			buffer[offset] = 'S';
 			offset += 1;
