@@ -305,13 +305,13 @@ public final class Fields {
 		return (Field2<GItem, GValue>)EmptyField.INSTANCE;
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(Getter, Setter) Fields.from(Getters.concat(trans, that), Setters.translate(trans, that))}.
+	/** Diese Methode ist eine Abkürzung für {@link #fieldFrom(Getter, Setter) Fields.from(Getters.concat(trans, that), Setters.translate(trans, that))}.
 	 *
 	 * @see Getters#concat(Getter, Getter)
 	 * @see Setters#concatSetter(Getter, Setter) */
 	public static <GSource, GTarget, GValue> Field2<GSource, GValue> translate(final Getter<? super GSource, ? extends GTarget> trans,
 		final Field<? super GTarget, GValue> that) throws NullPointerException {
-		return Fields.from(Getters.concat(trans, that), Setters.concatSetter(trans, that));
+		return Fields.fieldFrom(Getters.concat(trans, that), Setters.concatSetter(trans, that));
 	}
 
 	/** Diese Methode liefert einen {@link Field2} zu {@link Property#get()} und {@link Property#set(Object)} des gegebenen {@link Property}. */
@@ -319,22 +319,22 @@ public final class Fields {
 		return new PropertyField<>(target);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(Getter, Setter) Fields.from(Fields.empty(), that)}.
+	/** Diese Methode ist eine Abkürzung für {@link #fieldFrom(Getter, Setter) Fields.from(Fields.empty(), that)}.
 	 *
 	 * @see #empty() */
-	public static <GItem, GValue> Field2<GItem, GValue> from(final Setter<? super GItem, ? super GValue> that) throws NullPointerException {
-		return Fields.from(Fields.<GItem, GValue>empty(), that);
+	public static <GItem, GValue> Field2<GItem, GValue> fieldFrom(final Setter<? super GItem, ? super GValue> that) throws NullPointerException {
+		return Fields.fieldFrom(Fields.<GItem, GValue>empty(), that);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(Getter, Setter) Fields.from(that, Fields.empty())}.
+	/** Diese Methode ist eine Abkürzung für {@link #fieldFrom(Getter, Setter) Fields.from(that, Fields.empty())}.
 	 *
 	 * @see #empty() */
 	public static <GItem, GValue> Field2<GItem, GValue> from(final Getter<? super GItem, ? extends GValue> that) throws NullPointerException {
-		return Fields.from(that, Fields.<GItem, GValue>empty());
+		return Fields.fieldFrom(that, Fields.<GItem, GValue>empty());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link CompositeField new CompositeField<>(get, set)}. */
-	public static <GItem, GValue> Field2<GItem, GValue> from(final Getter<? super GItem, ? extends GValue> get, final Setter<? super GItem, ? super GValue> set)
+	public static <GItem, GValue> Field2<GItem, GValue> fieldFrom(final Getter<? super GItem, ? extends GValue> get, final Setter<? super GItem, ? super GValue> set)
 		throws NullPointerException {
 		return new CompositeField<>(get, set);
 	}
@@ -360,14 +360,14 @@ public final class Fields {
 		return Fields.fromNative(get, set, true);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(Getter, Setter) Fields.from(Getters.fromNative(get, forceAccessible), Setters.fromNative(set,
+	/** Diese Methode ist eine Abkürzung für {@link #fieldFrom(Getter, Setter) Fields.from(Getters.fromNative(get, forceAccessible), Setters.fromNative(set,
 	 * forceAccessible))}.
 	 *
 	 * @see Getters#fromNative(Method, boolean)
 	 * @see Setters#setterFromNative(Method, boolean) */
 	public static <GItem, GValue> Field2<GItem, GValue> fromNative(final Method get, final Method set, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
-		return Fields.from(Getters.<GItem, GValue>fromNative(get, forceAccessible), Setters.<GItem, GValue>setterFromNative(set, forceAccessible));
+		return Fields.fieldFrom(Getters.<GItem, GValue>fromNative(get, forceAccessible), Setters.<GItem, GValue>setterFromNative(set, forceAccessible));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Fields#fieldFromNative(Class, String, boolean) Fields.fromNative(fieldOwner, fieldName, true)}. */
@@ -396,13 +396,13 @@ public final class Fields {
 		return new ObservableField<>(that);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(Getter, Setter) Fields.from(Getters.concat(that, getTrans), Setters.translate(that, setTrans))}.
+	/** Diese Methode ist eine Abkürzung für {@link #fieldFrom(Getter, Setter) Fields.from(Getters.concat(that, getTrans), Setters.translate(that, setTrans))}.
 	 *
 	 * @see Getters#concat(Getter, Getter)
 	 * @see Setters#translateSetter(Setter, Getter) */
 	public static <GItem, GSource, GTarget> Field2<GItem, GTarget> translate(final Field<? super GItem, GSource> that,
 		final Getter<? super GSource, ? extends GTarget> getTrans, final Getter<? super GTarget, ? extends GSource> setTrans) throws NullPointerException {
-		return Fields.from(Getters.concat(that, getTrans), Setters.translateSetter(that, setTrans));
+		return Fields.fieldFrom(Getters.concat(that, getTrans), Setters.translateSetter(that, setTrans));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #translate(Field, Getter, Getter) Fields.translate(that, Getters.fromTarget(trans),
@@ -415,24 +415,24 @@ public final class Fields {
 		return Fields.translate(that, Getters.fromTarget(trans), Getters.fromSource(trans));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(Getter, Setter) Fields.from(Getters.aggregate(that), Setters.aggregate(that))}.
+	/** Diese Methode ist eine Abkürzung für {@link #fieldFrom(Getter, Setter) Fields.from(Getters.aggregate(that), Setters.aggregate(that))}.
 	 *
 	 * @see Getters#aggregate(Getter)
 	 * @see Setters#aggregateSetter(Setter) */
 	public static <GItem, GValue> Field2<Iterable<? extends GItem>, GValue> aggregate(final Field<? super GItem, GValue> that) throws NullPointerException {
-		return Fields.<Iterable<? extends GItem>, GValue>from(Getters.aggregate(that), Setters.aggregateSetter(that));
+		return Fields.<Iterable<? extends GItem>, GValue>fieldFrom(Getters.aggregate(that), Setters.aggregateSetter(that));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(Getter, Setter) Fields.from(Getters.aggregate(that, getTrans), Setters.aggregate(that, setTrans))}.
+	/** Diese Methode ist eine Abkürzung für {@link #fieldFrom(Getter, Setter) Fields.from(Getters.aggregate(that, getTrans), Setters.aggregate(that, setTrans))}.
 	 *
 	 * @see Getters#aggregate(Getter, Getter)
 	 * @see Setters#aggregateSetter(Setter, Getter) */
 	public static <GEntry, GSource, GTarget> Field2<Iterable<? extends GEntry>, GTarget> aggregate(final Field<? super GEntry, GSource> that,
 		final Getter<? super GSource, ? extends GTarget> getTrans, final Getter<? super GTarget, ? extends GSource> setTrans) throws NullPointerException {
-		return Fields.<Iterable<? extends GEntry>, GTarget>from(Getters.aggregate(that, getTrans), Setters.aggregateSetter(that, setTrans));
+		return Fields.<Iterable<? extends GEntry>, GTarget>fieldFrom(Getters.aggregate(that, getTrans), Setters.aggregateSetter(that, setTrans));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(Getter, Setter) Fields.from(Getters.aggregate(that, getTrans, empty, mixed), Setters.aggregate(that,
+	/** Diese Methode ist eine Abkürzung für {@link #fieldFrom(Getter, Setter) Fields.from(Getters.aggregate(that, getTrans, empty, mixed), Setters.aggregate(that,
 	 * setTrans))}.
 	 *
 	 * @see Getters#aggregate(Getter, Getter, Getter, Getter)
@@ -440,23 +440,23 @@ public final class Fields {
 	public static <GItem extends Iterable<? extends GItem2>, GValue, GItem2, GValue2> Field2<GItem, GValue> aggregate(final Field<? super GItem2, GValue2> that,
 		final Getter<? super GValue2, ? extends GValue> getTrans, final Getter<? super GValue, ? extends GValue2> setTrans,
 		final Getter<? super GItem, ? extends GValue> empty, final Getter<? super GItem, ? extends GValue> mixed) throws NullPointerException {
-		return Fields.from(Getters.<GItem, GValue, GItem2, GValue2>aggregate(that, getTrans, empty, mixed), Setters.aggregateSetter(that, setTrans));
+		return Fields.fieldFrom(Getters.<GItem, GValue, GItem2, GValue2>aggregate(that, getTrans, empty, mixed), Setters.aggregateSetter(that, setTrans));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(Getter, Setter) Fields.from(Getters.optionalize(that), Setters.optionalize(that))}.
+	/** Diese Methode ist eine Abkürzung für {@link #fieldFrom(Getter, Setter) Fields.from(Getters.optionalize(that), Setters.optionalize(that))}.
 	 *
 	 * @see Getters#optionalize(Getter)
 	 * @see Setters#optionalizeSetter(Setter) */
 	public static <GItem, GValue> Field2<GItem, GValue> optionalize(final Field<? super GItem, GValue> that) throws NullPointerException {
-		return Fields.from(Getters.optionalize(that), Setters.optionalizeSetter(that));
+		return Fields.fieldFrom(Getters.optionalize(that), Setters.optionalizeSetter(that));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(Getter, Setter) Fields.from(Getters.optionalize(that, value), Setters.optionalize(that))}.
+	/** Diese Methode ist eine Abkürzung für {@link #fieldFrom(Getter, Setter) Fields.from(Getters.optionalize(that, value), Setters.optionalize(that))}.
 	 *
 	 * @see Getters#optionalize(Getter, Object)
 	 * @see Setters#optionalizeSetter(Setter) */
 	public static <GItem, GValue> Field2<GItem, GValue> optionalize(final Field<? super GItem, GValue> that, final GValue value) throws NullPointerException {
-		return Fields.from(Getters.optionalize(that, value), Setters.optionalizeSetter(that));
+		return Fields.fieldFrom(Getters.optionalize(that, value), Setters.optionalizeSetter(that));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #synchronize(Field, Object) Fields.synchronize(that, that)}. */

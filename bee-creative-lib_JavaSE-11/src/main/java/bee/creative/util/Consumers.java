@@ -152,15 +152,15 @@ public class Consumers {
 		return Consumers.translate(target, Getters.<GValue>neutralGetter());
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(Setter, Object) Consumers.from(that, null)}. */
-	public static <GItem, GValue> Consumer3<GValue> from(final Setter<? super GItem, ? super GValue> that) throws NullPointerException {
-		return Consumers.from(that, null);
+	/** Diese Methode ist eine Abkürzung für {@link #consumerFrom(Setter, Object) Consumers.from(that, null)}. */
+	public static <GItem, GValue> Consumer3<GValue> consumerFrom(final Setter<? super GItem, ? super GValue> that) throws NullPointerException {
+		return Consumers.consumerFrom(that, null);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #from(Producer, Setter) Consumers.from(Producers.fromValue(item), that)}.
 	 *
 	 * @see Producers#fromValue(Object) */
-	public static <GItem, GValue> Consumer3<GValue> from(final Setter<? super GItem, ? super GValue> that, final GItem item) throws NullPointerException {
+	public static <GItem, GValue> Consumer3<GValue> consumerFrom(final Setter<? super GItem, ? super GValue> that, final GItem item) throws NullPointerException {
 		return Consumers.from(Producers.fromValue(item), that);
 	}
 

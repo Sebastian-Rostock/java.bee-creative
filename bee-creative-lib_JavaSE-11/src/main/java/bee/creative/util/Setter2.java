@@ -1,44 +1,51 @@
 package bee.creative.util;
 
+import static bee.creative.util.Consumers.consumerFrom;
+import static bee.creative.util.Fields.fieldFrom;
+import static bee.creative.util.Setters.aggregateSetter;
+import static bee.creative.util.Setters.optionalizeSetter;
+import static bee.creative.util.Setters.synchronizeSetter;
+
 /** Diese Schnittstelle ergänzt einen {@link Setter} insb. um eine Anbindung an Methoden von {@link Setters}.
  *
  * @author [cc-by] 2021 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GItem> Typ des Datensatzes.
- * @param <GValue> Typ des Werts der Eigenschaft. */
-public interface Setter2<GItem, GValue> extends Setter<GItem, GValue> {
+ * @param <ITEM> Typ des Datensatzes.
+ * @param <VALUE> Typ des Werts der Eigenschaft. */
+public interface Setter2<ITEM, VALUE> extends Setter<ITEM, VALUE> {
 
-	/** Diese Methode ist eine Abkürzung für {@link Setters#aggregateSetter(Setter) Setters.aggregate(this)}. */
-	default Setter2<Iterable<? extends GItem>, GValue> aggregate() {
-		return Setters.aggregateSetter(this);
+	/** Diese Methode ist eine Abkürzung für {@link Setters#aggregateSetter(Setter) aggregateSetter(this)}. */
+	default Setter2<Iterable<? extends ITEM>, VALUE> aggregate() {
+		return aggregateSetter(this);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Setters#optionalizeSetter(Setter) Setters.optionalize(this)}. */
-	default Setter2<GItem, GValue> optionalize() {
-		return Setters.optionalizeSetter(this);
+	/** Diese Methode ist eine Abkürzung für {@link Setters#optionalizeSetter(Setter) optionalizeSetter(this)}. */
+	default Setter2<ITEM, VALUE> optionalize() {
+		return optionalizeSetter(this);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Setters#synchronizeSetter(Setter) Setters.synchronize(this)}. */
-	default Setter2<GItem, GValue> synchronize() {
-		return Setters.synchronizeSetter(this);
+	/** Diese Methode ist eine Abkürzung für {@link Setters#synchronizeSetter(Setter) synchronizeSetter(this)}. */
+	default Setter2<ITEM, VALUE> synchronize() {
+		return synchronizeSetter(this);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Setters#synchronizeSetter(Setter, Object) Setters.synchronize(this)}. */
-	default Setter2<GItem, GValue> synchronize(final Object mutex) {
-		return Setters.synchronizeSetter(this, mutex);
+	/** Diese Methode ist eine Abkürzung für {@link Setters#synchronizeSetter(Setter, Object) synchronizeSetter(this)}. */
+	default Setter2<ITEM, VALUE> synchronize(Object mutex) {
+		return synchronizeSetter(this, mutex);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Fields#from(Getter, Setter) Fields.from(get, this)}. */
-	default Field2<GItem, GValue> toField(final Getter<? super GItem, ? extends GValue> get) {
-		return Fields.from(get, this);
+	/** Diese Methode ist eine Abkürzung für {@link Fields#fieldFrom(Getter, Setter) fieldFrom(get, this)}. */
+	default Field2<ITEM, VALUE> toField(Getter<? super ITEM, ? extends VALUE> get) {
+		return fieldFrom(get, this);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Consumers#from(Setter) Consumer.from(this)}. */
-	default Consumer3<GValue> toConsumer() {
-		return Consumers.from(this);
+	/** Diese Methode ist eine Abkürzung für {@link Consumers#consumerFrom(Setter) consumerFrom(this)}. */
+	default Consumer3<VALUE> toConsumer() {
+		return consumerFrom(this);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Consumers#from(Setter, Object) Consumer.from(this, item)}. */
-	default Consumer3<GValue> toConsumer(final GItem item) {
-		return Consumers.from(this, item);
+	/** Diese Methode ist eine Abkürzung für {@link Consumers#consumerFrom(Setter, Object) consumerFrom(this, item)}. */
+	default Consumer3<VALUE> toConsumer(ITEM item) {
+		return consumerFrom(this, item);
 	}
+
 }

@@ -85,9 +85,9 @@ public interface Getter2<GItem, GValue> extends Getter<GItem, GValue> {
 		return Getters.synchronize(this, mutex);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Fields#from(Getter, Setter) Fields.from(this, set)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Fields#fieldFrom(Getter, Setter) Fields.from(this, set)}. */
 	default Field2<GItem, GValue> toField(Setter<? super GItem, ? super GValue> set) {
-		return Fields.from(this, set);
+		return Fields.fieldFrom(this, set);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Producers#from(Getter) Producers.from(this)}. */
