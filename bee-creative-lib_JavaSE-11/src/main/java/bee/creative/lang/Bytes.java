@@ -1,5 +1,10 @@
 package bee.creative.lang;
 
+import static bee.creative.lang.Integers.toIntH;
+import static bee.creative.lang.Integers.toIntL;
+import static bee.creative.lang.Integers.toLong;
+import static java.nio.ByteOrder.BIG_ENDIAN;
+import static java.nio.ByteOrder.LITTLE_ENDIAN;
 import java.nio.ByteOrder;
 
 /** Diese Klasse implementiert Methoden zur Interpretation von Bytefolgen als Dezimalzahlen in {@link ByteOrder#BIG_ENDIAN} sowie
@@ -11,8 +16,8 @@ public interface Bytes {
 	/** Dieses Feld speichert das Ergebnis von {@link ByteOrder#nativeOrder()}. */
 	ByteOrder NATIVE_ORDER = ByteOrder.nativeOrder();
 
-	/** Dieses Feld speichert das Ergebnis von {@link Bytes#reverseOrder(ByteOrder) Bytes.reverseOrder(Bytes.NATIVE_ORDER)}. */
-	ByteOrder REVERSE_ORDER = Bytes.reverseOrder(Bytes.NATIVE_ORDER);
+	/** Dieses Feld speichert das Ergebnis von {@link Bytes#reverseOrder(ByteOrder) reverseOrder(NATIVE_ORDER)}. */
+	ByteOrder REVERSE_ORDER = reverseOrder(NATIVE_ORDER);
 
 	/** Diese Methode ließt {@code 1 byte} aus der gegebenen Bytefolge und gib diese als {@code int} interpretiert zurück.
 	 *
@@ -115,13 +120,13 @@ public interface Bytes {
 			case 0:
 				return 0;
 			case 1:
-				return Bytes.getInt1(byteArray, byteOffset);
+				return getInt1(byteArray, byteOffset);
 			case 2:
-				return Bytes.getInt2BE(byteArray, byteOffset);
+				return getInt2BE(byteArray, byteOffset);
 			case 3:
-				return Bytes.getInt3BE(byteArray, byteOffset);
+				return getInt3BE(byteArray, byteOffset);
 			case 4:
-				return Bytes.getInt4BE(byteArray, byteOffset);
+				return getInt4BE(byteArray, byteOffset);
 			default:
 				throw new IllegalArgumentException();
 		}
@@ -140,13 +145,13 @@ public interface Bytes {
 			case 0:
 				return 0;
 			case 1:
-				return Bytes.getInt1(byteArray, byteOffset);
+				return getInt1(byteArray, byteOffset);
 			case 2:
-				return Bytes.getInt2LE(byteArray, byteOffset);
+				return getInt2LE(byteArray, byteOffset);
 			case 3:
-				return Bytes.getInt3LE(byteArray, byteOffset);
+				return getInt3LE(byteArray, byteOffset);
 			case 4:
-				return Bytes.getInt4LE(byteArray, byteOffset);
+				return getInt4LE(byteArray, byteOffset);
 			default:
 				throw new IllegalArgumentException();
 		}
@@ -159,9 +164,7 @@ public interface Bytes {
 	 * @param byteOffset Position des ersten Byte.
 	 * @return {@code 5 byte}-Wert als {@code long}. */
 	static long getLong5BE(byte[] byteArray, int byteOffset) {
-		return 0 //
-			| ((long)Bytes.getInt1(byteArray, byteOffset + 0) << 32) //
-			| (Bytes.getInt4BE(byteArray, byteOffset + 1) & 0xFFFFFFFFL);
+		return toLong(getInt1(byteArray, byteOffset + 0), getInt4BE(byteArray, byteOffset + 1));
 	}
 
 	/** Diese Methode ließt {@code 5 byte} aus der gegebenen Bytefolge und gib diese als {@link ByteOrder#LITTLE_ENDIAN} {@code long} interpretiert zurück.
@@ -171,9 +174,7 @@ public interface Bytes {
 	 * @param byteOffset Position des ersten Byte.
 	 * @return {@code 5 byte}-Wert als {@code long}. */
 	static long getLong5LE(byte[] byteArray, int byteOffset) {
-		return 0 //
-			| ((long)Bytes.getInt1(byteArray, byteOffset + 4) << 32) //
-			| (Bytes.getInt4LE(byteArray, byteOffset + 0) & 0xFFFFFFFFL);
+		return toLong(getInt1(byteArray, byteOffset + 4), getInt4LE(byteArray, byteOffset + 0));
 	}
 
 	/** Diese Methode ließt {@code 6 byte} aus der gegebenen Bytefolge und gib diese als {@link ByteOrder#BIG_ENDIAN} {@code long} interpretiert zurück.
@@ -183,9 +184,7 @@ public interface Bytes {
 	 * @param byteOffset Position des ersten Byte.
 	 * @return {@code 6 byte}-Wert als {@code long}. */
 	static long getLong6BE(byte[] byteArray, int byteOffset) {
-		return 0 //
-			| ((long)Bytes.getInt2BE(byteArray, byteOffset + 0) << 32) //
-			| (Bytes.getInt4BE(byteArray, byteOffset + 2) & 0xFFFFFFFFL);
+		return toLong(getInt2BE(byteArray, byteOffset + 0), getInt4BE(byteArray, byteOffset + 2));
 	}
 
 	/** Diese Methode ließt {@code 6 byte} aus der gegebenen Bytefolge und gib diese als {@link ByteOrder#LITTLE_ENDIAN} {@code long} interpretiert zurück.
@@ -195,9 +194,7 @@ public interface Bytes {
 	 * @param byteOffset Position des ersten Byte.
 	 * @return {@code 6 byte}-Wert als {@code long}. */
 	static long getLong6LE(byte[] byteArray, int byteOffset) {
-		return 0 //
-			| ((long)Bytes.getInt2LE(byteArray, byteOffset + 4) << 32) //
-			| (Bytes.getInt4LE(byteArray, byteOffset + 0) & 0xFFFFFFFFL);
+		return toLong(getInt2LE(byteArray, byteOffset + 4), getInt4LE(byteArray, byteOffset + 0));
 	}
 
 	/** Diese Methode ließt {@code 7 byte} aus der gegebenen Bytefolge und gib diese als {@link ByteOrder#BIG_ENDIAN} {@code long} interpretiert zurück.
@@ -207,9 +204,7 @@ public interface Bytes {
 	 * @param byteOffset Position des ersten Byte.
 	 * @return {@code 7 byte}-Wert als {@code long}. */
 	static long getLong7BE(byte[] byteArray, int byteOffset) {
-		return 0 //
-			| ((long)Bytes.getInt3BE(byteArray, byteOffset + 0) << 32) //
-			| (Bytes.getInt4BE(byteArray, byteOffset + 3) & 0xFFFFFFFFL);
+		return toLong(getInt3BE(byteArray, byteOffset + 0), getInt4BE(byteArray, byteOffset + 3));
 	}
 
 	/** Diese Methode ließt {@code 7 byte} aus der gegebenen Bytefolge und gib diese als {@link ByteOrder#LITTLE_ENDIAN} {@code long} interpretiert zurück.
@@ -219,9 +214,7 @@ public interface Bytes {
 	 * @param byteOffset Position des ersten Byte.
 	 * @return {@code 7 byte}-Wert als {@code long}. */
 	static long getLong7LE(byte[] byteArray, int byteOffset) {
-		return 0 //
-			| ((long)Bytes.getInt3LE(byteArray, byteOffset + 4) << 32) //
-			| (Bytes.getInt4LE(byteArray, byteOffset + 0) & 0xFFFFFFFFL);
+		return toLong(getInt3LE(byteArray, byteOffset + 4), getInt4LE(byteArray, byteOffset + 0));
 	}
 
 	/** Diese Methode ließt {@code 8 byte} aus der gegebenen Bytefolge und gib diese als {@link ByteOrder#BIG_ENDIAN} {@code long} interpretiert zurück.
@@ -231,9 +224,7 @@ public interface Bytes {
 	 * @param byteOffset Position des ersten Byte.
 	 * @return {@code 8 byte}-Wert als {@code long}. */
 	static long getLong8BE(byte[] byteArray, int byteOffset) {
-		return 0 //
-			| ((long)Bytes.getInt4BE(byteArray, byteOffset + 0) << 32) //
-			| (Bytes.getInt4BE(byteArray, byteOffset + 4) & 0xFFFFFFFFL);
+		return toLong(getInt4BE(byteArray, byteOffset + 0), getInt4BE(byteArray, byteOffset + 4));
 	}
 
 	/** Diese Methode ließt {@code 8 byte} aus der gegebenen Bytefolge und gib diese als {@link ByteOrder#LITTLE_ENDIAN} {@code long} interpretiert zurück.
@@ -243,9 +234,7 @@ public interface Bytes {
 	 * @param byteOffset Position des ersten Byte.
 	 * @return {@code 8 byte}-Wert als {@code long}. */
 	static long getLong8LE(byte[] byteArray, int byteOffset) {
-		return 0 //
-			| ((long)Bytes.getInt4LE(byteArray, byteOffset + 4) << 32) //
-			| (Bytes.getInt4LE(byteArray, byteOffset + 0) & 0xFFFFFFFFL);
+		return toLong(getInt4LE(byteArray, byteOffset + 4), getInt4LE(byteArray, byteOffset + 0));
 	}
 
 	/** Diese Methode ließt die gegebene Anzahl an Byte aus der gegebenen Bytefolge und gib diese als {@link ByteOrder#BIG_ENDIAN} {@code long} interpretiert
@@ -261,21 +250,21 @@ public interface Bytes {
 			case 0:
 				return 0;
 			case 1:
-				return Bytes.getInt1(byteArray, byteOffset);
+				return getInt1(byteArray, byteOffset);
 			case 2:
-				return Bytes.getInt2BE(byteArray, byteOffset);
+				return getInt2BE(byteArray, byteOffset);
 			case 3:
-				return Bytes.getInt3BE(byteArray, byteOffset);
+				return getInt3BE(byteArray, byteOffset);
 			case 4:
-				return Bytes.getInt4BE(byteArray, byteOffset);
+				return getInt4BE(byteArray, byteOffset);
 			case 5:
-				return Bytes.getLong5BE(byteArray, byteOffset);
+				return getLong5BE(byteArray, byteOffset);
 			case 6:
-				return Bytes.getLong6BE(byteArray, byteOffset);
+				return getLong6BE(byteArray, byteOffset);
 			case 7:
-				return Bytes.getLong7BE(byteArray, byteOffset);
+				return getLong7BE(byteArray, byteOffset);
 			case 8:
-				return Bytes.getLong8BE(byteArray, byteOffset);
+				return getLong8BE(byteArray, byteOffset);
 			default:
 				throw new IllegalArgumentException();
 		}
@@ -294,21 +283,21 @@ public interface Bytes {
 			case 0:
 				return 0;
 			case 1:
-				return Bytes.getInt1(byteArray, byteOffset);
+				return getInt1(byteArray, byteOffset);
 			case 2:
-				return Bytes.getInt2LE(byteArray, byteOffset);
+				return getInt2LE(byteArray, byteOffset);
 			case 3:
-				return Bytes.getInt3LE(byteArray, byteOffset);
+				return getInt3LE(byteArray, byteOffset);
 			case 4:
-				return Bytes.getInt4LE(byteArray, byteOffset);
+				return getInt4LE(byteArray, byteOffset);
 			case 5:
-				return Bytes.getLong5LE(byteArray, byteOffset);
+				return getLong5LE(byteArray, byteOffset);
 			case 6:
-				return Bytes.getLong6LE(byteArray, byteOffset);
+				return getLong6LE(byteArray, byteOffset);
 			case 7:
-				return Bytes.getLong7LE(byteArray, byteOffset);
+				return getLong7LE(byteArray, byteOffset);
 			case 8:
-				return Bytes.getLong8LE(byteArray, byteOffset);
+				return getLong8LE(byteArray, byteOffset);
 			default:
 				throw new IllegalArgumentException();
 		}
@@ -408,16 +397,16 @@ public interface Bytes {
 			case 0:
 				return;
 			case 1:
-				Bytes.setInt1(byteArray, byteOffset, value);
+				setInt1(byteArray, byteOffset, value);
 			break;
 			case 2:
-				Bytes.setInt2BE(byteArray, byteOffset, value);
+				setInt2BE(byteArray, byteOffset, value);
 			break;
 			case 3:
-				Bytes.setInt3BE(byteArray, byteOffset, value);
+				setInt3BE(byteArray, byteOffset, value);
 			break;
 			case 4:
-				Bytes.setInt4BE(byteArray, byteOffset, value);
+				setInt4BE(byteArray, byteOffset, value);
 			break;
 			default:
 				throw new IllegalArgumentException();
@@ -436,16 +425,16 @@ public interface Bytes {
 			case 0:
 				return;
 			case 1:
-				Bytes.setInt1(byteArray, byteOffset, value);
+				setInt1(byteArray, byteOffset, value);
 			break;
 			case 2:
-				Bytes.setInt2LE(byteArray, byteOffset, value);
+				setInt2LE(byteArray, byteOffset, value);
 			break;
 			case 3:
-				Bytes.setInt3LE(byteArray, byteOffset, value);
+				setInt3LE(byteArray, byteOffset, value);
 			break;
 			case 4:
-				Bytes.setInt4LE(byteArray, byteOffset, value);
+				setInt4LE(byteArray, byteOffset, value);
 			break;
 			default:
 				throw new IllegalArgumentException();
@@ -459,8 +448,8 @@ public interface Bytes {
 	 * @param byteOffset Position des ersten Byte.
 	 * @param value {@code long} mit {@code 5 byte}-Wert. */
 	static void setLong5BE(byte[] byteArray, int byteOffset, long value) {
-		Bytes.setInt1(byteArray, byteOffset + 0, (int)(value >>> 32));
-		Bytes.setInt4BE(byteArray, byteOffset + 1, (int)(value >>> 0));
+		setInt1(byteArray, byteOffset + 0, toIntH(value));
+		setInt4BE(byteArray, byteOffset + 1, toIntL(value));
 	}
 
 	/** Diese Methode schreibt {@code 5 byte} des gegebenen {@link ByteOrder#LITTLE_ENDIAN} {@code long} in die gegebene Bytefolge.
@@ -470,8 +459,8 @@ public interface Bytes {
 	 * @param byteOffset Position des ersten Byte.
 	 * @param value {@code long} mit {@code 5 byte}-Wert. */
 	static void setLong5LE(byte[] byteArray, int byteOffset, long value) {
-		Bytes.setInt1(byteArray, byteOffset + 4, (int)(value >>> 32));
-		Bytes.setInt4LE(byteArray, byteOffset + 0, (int)(value >>> 0));
+		setInt1(byteArray, byteOffset + 4, toIntH(value));
+		setInt4LE(byteArray, byteOffset + 0, toIntL(value));
 	}
 
 	/** Diese Methode schreibt {@code 6 byte} des gegebenen {@link ByteOrder#BIG_ENDIAN} {@code long} in die gegebene Bytefolge.
@@ -481,8 +470,8 @@ public interface Bytes {
 	 * @param byteOffset Position des ersten Byte.
 	 * @param value {@code long} mit {@code 6 byte}-Wert. */
 	static void setLong6BE(byte[] byteArray, int byteOffset, long value) {
-		Bytes.setInt2BE(byteArray, byteOffset + 0, (int)(value >>> 32));
-		Bytes.setInt4BE(byteArray, byteOffset + 2, (int)(value >>> 0));
+		setInt2BE(byteArray, byteOffset + 0, toIntH(value));
+		setInt4BE(byteArray, byteOffset + 2, toIntL(value));
 	}
 
 	/** Diese Methode schreibt {@code 6 byte} des gegebenen {@link ByteOrder#LITTLE_ENDIAN} {@code long} in die gegebene Bytefolge.
@@ -492,8 +481,8 @@ public interface Bytes {
 	 * @param byteOffset Position des ersten Byte.
 	 * @param value {@code long} mit {@code 6 byte}-Wert. */
 	static void setLong6LE(byte[] byteArray, int byteOffset, long value) {
-		Bytes.setInt2LE(byteArray, byteOffset + 4, (int)(value >>> 32));
-		Bytes.setInt4LE(byteArray, byteOffset + 0, (int)(value >>> 0));
+		setInt2LE(byteArray, byteOffset + 4, toIntH(value));
+		setInt4LE(byteArray, byteOffset + 0, toIntL(value));
 	}
 
 	/** Diese Methode schreibt {@code 7 byte} des gegebenen {@link ByteOrder#BIG_ENDIAN} {@code long} in die gegebene Bytefolge.
@@ -503,8 +492,8 @@ public interface Bytes {
 	 * @param byteOffset Position des ersten Byte.
 	 * @param value {@code long} mit {@code 7 byte}-Wert. */
 	static void setLong7BE(byte[] byteArray, int byteOffset, long value) {
-		Bytes.setInt3BE(byteArray, byteOffset + 0, (int)(value >>> 32));
-		Bytes.setInt4BE(byteArray, byteOffset + 3, (int)(value >>> 0));
+		setInt3BE(byteArray, byteOffset + 0, toIntH(value));
+		setInt4BE(byteArray, byteOffset + 3, toIntL(value));
 	}
 
 	/** Diese Methode schreibt {@code 7 byte} des gegebenen {@link ByteOrder#LITTLE_ENDIAN} {@code long} in die gegebene Bytefolge.
@@ -514,8 +503,8 @@ public interface Bytes {
 	 * @param byteOffset Position des ersten Byte.
 	 * @param value {@code long} mit {@code 7 byte}-Wert. */
 	static void setLong7LE(byte[] byteArray, int byteOffset, long value) {
-		Bytes.setInt3LE(byteArray, byteOffset + 4, (int)(value >>> 32));
-		Bytes.setInt4LE(byteArray, byteOffset + 0, (int)(value >>> 0));
+		setInt3LE(byteArray, byteOffset + 4, toIntH(value));
+		setInt4LE(byteArray, byteOffset + 0, toIntL(value));
 	}
 
 	/** Diese Methode schreibt {@code 8 byte} des gegebenen {@link ByteOrder#BIG_ENDIAN} {@code long} in die gegebene Bytefolge.
@@ -525,8 +514,8 @@ public interface Bytes {
 	 * @param byteOffset Position des ersten Byte.
 	 * @param value {@code long} mit {@code 8 byte}-Wert. */
 	static void setLong8BE(byte[] byteArray, int byteOffset, long value) {
-		Bytes.setInt4BE(byteArray, byteOffset + 0, (int)(value >>> 32));
-		Bytes.setInt4BE(byteArray, byteOffset + 4, (int)(value >>> 0));
+		setInt4BE(byteArray, byteOffset + 0, toIntH(value));
+		setInt4BE(byteArray, byteOffset + 4, toIntL(value));
 	}
 
 	/** Diese Methode schreibt {@code 8 byte} des gegebenen {@link ByteOrder#LITTLE_ENDIAN} {@code long} in die gegebene Bytefolge.
@@ -536,8 +525,8 @@ public interface Bytes {
 	 * @param byteOffset Position des ersten Byte.
 	 * @param value {@code long} mit {@code 8 byte}-Wert. */
 	static void setLong8LE(byte[] byteArray, int byteOffset, long value) {
-		Bytes.setInt4LE(byteArray, byteOffset + 4, (int)(value >>> 32));
-		Bytes.setInt4LE(byteArray, byteOffset + 0, (int)(value >>> 0));
+		setInt4LE(byteArray, byteOffset + 4, toIntH(value));
+		setInt4LE(byteArray, byteOffset + 0, toIntL(value));
 	}
 
 	/** Diese Methode schreibt die gegebene Anzahl an Byte des gegebenen {@link ByteOrder#BIG_ENDIAN} {@code long} in die gegebene Bytefolge.
@@ -552,28 +541,28 @@ public interface Bytes {
 			case 0:
 				return;
 			case 1:
-				Bytes.setInt1(byteArray, byteOffset, (int)value);
+				setInt1(byteArray, byteOffset, toIntL(value));
 			break;
 			case 2:
-				Bytes.setInt2BE(byteArray, byteOffset, (int)value);
+				setInt2BE(byteArray, byteOffset, toIntL(value));
 			break;
 			case 3:
-				Bytes.setInt3BE(byteArray, byteOffset, (int)value);
+				setInt3BE(byteArray, byteOffset, toIntL(value));
 			break;
 			case 4:
-				Bytes.setInt4BE(byteArray, byteOffset, (int)value);
+				setInt4BE(byteArray, byteOffset, toIntL(value));
 			break;
 			case 5:
-				Bytes.setLong5BE(byteArray, byteOffset, value);
+				setLong5BE(byteArray, byteOffset, value);
 			break;
 			case 6:
-				Bytes.setLong6BE(byteArray, byteOffset, value);
+				setLong6BE(byteArray, byteOffset, value);
 			break;
 			case 7:
-				Bytes.setLong7BE(byteArray, byteOffset, value);
+				setLong7BE(byteArray, byteOffset, value);
 			break;
 			case 8:
-				Bytes.setLong8BE(byteArray, byteOffset, value);
+				setLong8BE(byteArray, byteOffset, value);
 			break;
 			default:
 				throw new IllegalArgumentException();
@@ -592,28 +581,28 @@ public interface Bytes {
 			case 0:
 				return;
 			case 1:
-				Bytes.setInt1(byteArray, byteOffset, (int)value);
+				setInt1(byteArray, byteOffset, toIntL(value));
 			break;
 			case 2:
-				Bytes.setInt2LE(byteArray, byteOffset, (int)value);
+				setInt2LE(byteArray, byteOffset, toIntL(value));
 			break;
 			case 3:
-				Bytes.setInt3LE(byteArray, byteOffset, (int)value);
+				setInt3LE(byteArray, byteOffset, toIntL(value));
 			break;
 			case 4:
-				Bytes.setInt4LE(byteArray, byteOffset, (int)value);
+				setInt4LE(byteArray, byteOffset, toIntL(value));
 			break;
 			case 5:
-				Bytes.setLong5LE(byteArray, byteOffset, value);
+				setLong5LE(byteArray, byteOffset, value);
 			break;
 			case 6:
-				Bytes.setLong6LE(byteArray, byteOffset, value);
+				setLong6LE(byteArray, byteOffset, value);
 			break;
 			case 7:
-				Bytes.setLong7LE(byteArray, byteOffset, value);
+				setLong7LE(byteArray, byteOffset, value);
 			break;
 			case 8:
-				Bytes.setLong8LE(byteArray, byteOffset, value);
+				setLong8LE(byteArray, byteOffset, value);
 			break;
 			default:
 				throw new IllegalArgumentException();
@@ -633,7 +622,7 @@ public interface Bytes {
 	 * @param value positiver Wert.
 	 * @return Länge (0..8). */
 	static int lengthOf(long value) {
-		return value > 0xFFFFFFFFL ? Bytes.lengthOf((int)(value >> 32)) + 4 : Bytes.lengthOf((int)value);
+		return value > 0xFFFFFFFFL ? lengthOf(toIntH(value)) + 4 : lengthOf(toIntL(value));
 	}
 
 	/** Diese Methode gibt nur dann {@link #NATIVE_ORDER} zurück, wenn die gegebene Bytereihenfolge {@code true} ist. Andernfalls wird {@link #REVERSE_ORDER}
@@ -642,7 +631,7 @@ public interface Bytes {
 	 * @param isNative {@code true} bei nativer Bytereihenfolge.
 	 * @return Bytereihenfolge. */
 	static ByteOrder nativeOrder(boolean isNative) {
-		return isNative ? Bytes.NATIVE_ORDER : Bytes.REVERSE_ORDER;
+		return isNative ? NATIVE_ORDER : REVERSE_ORDER;
 	}
 
 	/** Diese Methode gibt nur dann {@link ByteOrder#LITTLE_ENDIAN} zurück, wenn die gegebene Bytereihenfolge {@link ByteOrder#LITTLE_ENDIAN} ist. Andernfalls
@@ -651,7 +640,7 @@ public interface Bytes {
 	 * @param order Bytereihenfolge oder {@code null}.
 	 * @return Bytereihenfolge. */
 	static ByteOrder directOrder(ByteOrder order) {
-		return order == ByteOrder.LITTLE_ENDIAN ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN;
+		return order == LITTLE_ENDIAN ? LITTLE_ENDIAN : BIG_ENDIAN;
 	}
 
 	/** Diese Methode gibt nur dann {@link ByteOrder#BIG_ENDIAN} zurück, wenn die gegebene Bytereihenfolge {@link ByteOrder#LITTLE_ENDIAN} ist. Andernfalls wird
@@ -660,7 +649,7 @@ public interface Bytes {
 	 * @param order Bytereihenfolge oder {@code null}.
 	 * @return Bytereihenfolge. */
 	static ByteOrder reverseOrder(ByteOrder order) {
-		return order != ByteOrder.LITTLE_ENDIAN ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN;
+		return order != LITTLE_ENDIAN ? LITTLE_ENDIAN : BIG_ENDIAN;
 	}
 
 }

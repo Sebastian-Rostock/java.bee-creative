@@ -32,169 +32,6 @@ public class Strings {
 		return result.append(value.substring(last + 1, size)).toString();
 	}
 
-	private static final class FormatFuture {
-
-		final String format;
-
-		final Object[] args;
-
-		FormatFuture(final String format, final Object[] args) {
-			this.format = Objects.notNull(format);
-			this.args = args;
-		}
-
-		@Override
-		public String toString() {
-			return String.format(this.format, this.args);
-		}
-
-	}
-
-	private static class PatternCompiler implements Getter<String, Pattern> {
-
-		final int flags;
-
-		PatternCompiler(final int flags) {
-			this.flags = flags;
-		}
-
-		@Override
-		public Pattern get(final String input) {
-			return Pattern.compile(input, this.flags);
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.flags);
-		}
-
-	}
-
-	/** Dieses Feld speichert einen synchronisierten, gepufferten {@link #patternCompiler(int)} mit Flag {@code 0}. Dieser wird von den Methoden in
-	 * {@link #Strings()} genutzt, die einen regulärer Ausdruck kompilieren müssen. */
-	public static final Getter<String, Pattern> PATTERN_COMPILER = Getters.synchronize(Getters.buffer(Strings.patternCompiler(0)));
-
-	/** Diese Methode wendet den gegebenen regulären Ausdruck auf die gegebene Zeichenkette an und gibt eine Liste von Zeichenketten zurück. Mit den beiden
-	 * Schaltern kann dazu entschieden werden, ob die von der {@code index} -ten Gruppen des regulären Ausdrucks getroffenen bzw. nicht getroffenen Zeichenkette
-	 * in diese Liste eingetragen werden sollen.
-	 *
-	 * @param regex regulärer Ausdruck.
-	 * @param string Zeichenkette.
-	 * @param index Index.
-	 * @param split {@code true}, wenn die nicht getroffenen Zeichenkette eingetragen werden sollen.
-	 * @param match {@code true}, wenn die getroffen getroffenen Zeichenkette eingetragen werden sollen.
-	 * @return Liste der Zeichenketten.
-	 * @throws NullPointerException Wenn {@code regex} bzw. {@code string} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@code index < 0} ist. */
-	static List<String> apply(final String regex, final CharSequence string, final int index, final boolean split, final boolean match)
-		throws NullPointerException, IllegalArgumentException {
-		if (index < 0) throw new IllegalArgumentException("index < 0");
-		return Strings.apply(Strings.PATTERN_COMPILER.get(regex), string, index, split, match);
-	}
-
-	/** Diese Methode wendet den gegebenen kompilierten regulären Ausdruck auf die gegebene Zeichenkette an und gibt eine Liste von Zeichenketten zurück. Mit den
-	 * beiden Schaltern kann dazu entschieden werden, ob die von der {@code index} -ten Gruppen des regulären Ausdrucks getroffenen bzw. nicht getroffenen
-	 * Zeichenkette in diese Liste eingetragen werden sollen.
-	 *
-	 * @param pattern kompilierter regulärer Ausdruck.
-	 * @param string Zeichenkette.
-	 * @param index Index.
-	 * @param split {@code true}, wenn die nicht getroffenen Zeichenkette eingetragen werden sollen.
-	 * @param match {@code true}, wenn die getroffen getroffenen Zeichenkette eingetragen werden sollen.
-	 * @return Liste der Zeichenketten.
-	 * @throws NullPointerException Wenn {@code pattern} bzw. {@code string} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@code index < 0} ist. */
-	static List<String> apply(final Pattern pattern, final CharSequence string, final int index, final boolean split, final boolean match)
-		throws NullPointerException, IllegalArgumentException {
-		if (index < 0) throw new IllegalArgumentException("index < 0");
-		final Matcher matcher = pattern.matcher(string);
-		if (index > matcher.groupCount()) throw new IllegalArgumentException();
-		final List<String> result = new ArrayList<>();
-		int cursor = 0;
-		while (matcher.find()) {
-			final int from = matcher.start(index);
-			if (from >= 0) {
-				final int last = matcher.end(index);
-				if (split) {
-					result.add(string.subSequence(cursor, from).toString());
-					cursor = last;
-				}
-				if (match) {
-					result.add(string.subSequence(from, last).toString());
-				}
-			}
-		}
-		if (split) {
-			result.add(string.subSequence(cursor, string.length()).toString());
-		}
-		return result;
-	}
-
-	/** Diese Methode wendet den gegebenen regulären Ausdruck auf die gegebene Zeichenkette an und gibt eine Liste von Listen von Zeichenketten zurück. Mit den
-	 * beiden Schaltern kann dazu entschieden werden, ob die Listen der von den Gruppen des regulären Ausdrucks getroffenen bzw. der nicht getroffenen
-	 * Zeichenketten in die Ergebnisliste eingetragen werden sollen.
-	 *
-	 * @param regex regulärer Ausdruck.
-	 * @param string Zeichenkette.
-	 * @param split {@code true}, wenn die nicht getroffenen Zeichenkette eingetragen werden sollen.
-	 * @param match {@code true}, wenn die getroffen getroffenen Zeichenkette eingetragen werden sollen.
-	 * @return Liste der Listen der Zeichenketten.
-	 * @throws NullPointerException Wenn {@code regex} bzw. {@code string} {@code null} ist. */
-	static List<List<String>> applyAll(final String regex, final CharSequence string, final boolean split, final boolean match) throws NullPointerException {
-		return Strings.applyAll(Strings.PATTERN_COMPILER.get(regex), string, split, match);
-	}
-
-	/** Diese Methode wendet den gegebenen kompilierten regulären Ausdruck auf die gegebene Zeichenkette an und gibt eine Liste von Listen von Zeichenketten
-	 * zurück. Mit den beiden Schaltern kann dazu entschieden werden, ob die Listen der von den Gruppen des regulären Ausdrucks getroffenen bzw. nicht getroffenen
-	 * Zeichenketten in die Ergebnisliste eingetragen werden sollen.
-	 *
-	 * @param pattern kompilierter regulärer Ausdruck.
-	 * @param string Zeichenkette.
-	 * @param split {@code true}, wenn die nicht getroffenen Zeichenkette eingetragen werden sollen.
-	 * @param match {@code true}, wenn die getroffen getroffenen Zeichenkette eingetragen werden sollen.
-	 * @return Liste der Listen der Zeichenketten.
-	 * @throws NullPointerException Wenn {@code pattern} bzw. {@code string} {@code null} ist. */
-	static List<List<String>> applyAll(final Pattern pattern, final CharSequence string, final boolean split, final boolean match) throws NullPointerException {
-		final Matcher matcher = pattern.matcher(string);
-		final int count = matcher.groupCount() + 1;
-		final List<List<String>> result = new ArrayList<>();
-		final int[] cursorList = new int[count];
-		while (matcher.find()) {
-			final List<String> spliList = (split ? new ArrayList<>() : null);
-			final List<String> matchList = (match ? new ArrayList<>() : null);
-			for (int i = 0; i < count; i++) {
-				final int from = matcher.start(i);
-				if (from >= 0) {
-					final int last = matcher.end(i);
-					if (split) {
-						spliList.add(string.subSequence(cursorList[i], from).toString());
-						cursorList[i] = last;
-					}
-					if (match) {
-						matchList.add(string.subSequence(from, last).toString());
-					}
-				} else if (match) {
-					matchList.add(null);
-				}
-			}
-			if (split) {
-				result.add(spliList);
-			}
-			if (match) {
-				result.add(matchList);
-			}
-		}
-		if (split) {
-			final List<String> splitList = new ArrayList<>();
-			final int last = string.length();
-			for (int i = 0; i < count; i++) {
-				splitList.add(string.subSequence(cursorList[i], last).toString());
-			}
-			result.add(splitList);
-		}
-		return result;
-	}
-
 	/** Diese Methode gibt die Verkettung der {@link Object#toString() Textdarstelungen} der gegebenen Objekte zurück. Der Rückgabewert entspricht
 	 * {@code Strings.join("", items)}.
 	 *
@@ -680,6 +517,169 @@ public class Strings {
 	 * args)} ermittelt wird. */
 	public static Object formatFuture(final String format, final Object... args) {
 		return new FormatFuture(format, args);
+	}
+
+	private static final class FormatFuture {
+
+		final String format;
+
+		final Object[] args;
+
+		FormatFuture(final String format, final Object[] args) {
+			this.format = Objects.notNull(format);
+			this.args = args;
+		}
+
+		@Override
+		public String toString() {
+			return String.format(this.format, this.args);
+		}
+
+	}
+
+	private static class PatternCompiler implements Getter<String, Pattern> {
+
+		final int flags;
+
+		PatternCompiler(final int flags) {
+			this.flags = flags;
+		}
+
+		@Override
+		public Pattern get(final String input) {
+			return Pattern.compile(input, this.flags);
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.flags);
+		}
+
+	}
+
+	/** Dieses Feld speichert einen synchronisierten, gepufferten {@link #patternCompiler(int)} mit Flag {@code 0}. Dieser wird von den Methoden in
+	 * {@link #Strings()} genutzt, die einen regulärer Ausdruck kompilieren müssen. */
+	public static final Getter<String, Pattern> PATTERN_COMPILER = Getters.synchronize(Getters.buffer(Strings.patternCompiler(0)));
+
+	/** Diese Methode wendet den gegebenen regulären Ausdruck auf die gegebene Zeichenkette an und gibt eine Liste von Zeichenketten zurück. Mit den beiden
+	 * Schaltern kann dazu entschieden werden, ob die von der {@code index} -ten Gruppen des regulären Ausdrucks getroffenen bzw. nicht getroffenen Zeichenkette
+	 * in diese Liste eingetragen werden sollen.
+	 *
+	 * @param regex regulärer Ausdruck.
+	 * @param string Zeichenkette.
+	 * @param index Index.
+	 * @param split {@code true}, wenn die nicht getroffenen Zeichenkette eingetragen werden sollen.
+	 * @param match {@code true}, wenn die getroffen getroffenen Zeichenkette eingetragen werden sollen.
+	 * @return Liste der Zeichenketten.
+	 * @throws NullPointerException Wenn {@code regex} bzw. {@code string} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn {@code index < 0} ist. */
+	static List<String> apply(final String regex, final CharSequence string, final int index, final boolean split, final boolean match)
+		throws NullPointerException, IllegalArgumentException {
+		if (index < 0) throw new IllegalArgumentException("index < 0");
+		return Strings.apply(Strings.PATTERN_COMPILER.get(regex), string, index, split, match);
+	}
+
+	/** Diese Methode wendet den gegebenen kompilierten regulären Ausdruck auf die gegebene Zeichenkette an und gibt eine Liste von Zeichenketten zurück. Mit den
+	 * beiden Schaltern kann dazu entschieden werden, ob die von der {@code index} -ten Gruppen des regulären Ausdrucks getroffenen bzw. nicht getroffenen
+	 * Zeichenkette in diese Liste eingetragen werden sollen.
+	 *
+	 * @param pattern kompilierter regulärer Ausdruck.
+	 * @param string Zeichenkette.
+	 * @param index Index.
+	 * @param split {@code true}, wenn die nicht getroffenen Zeichenkette eingetragen werden sollen.
+	 * @param match {@code true}, wenn die getroffen getroffenen Zeichenkette eingetragen werden sollen.
+	 * @return Liste der Zeichenketten.
+	 * @throws NullPointerException Wenn {@code pattern} bzw. {@code string} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn {@code index < 0} ist. */
+	static List<String> apply(final Pattern pattern, final CharSequence string, final int index, final boolean split, final boolean match)
+		throws NullPointerException, IllegalArgumentException {
+		if (index < 0) throw new IllegalArgumentException("index < 0");
+		final Matcher matcher = pattern.matcher(string);
+		if (index > matcher.groupCount()) throw new IllegalArgumentException();
+		final List<String> result = new ArrayList<>();
+		int cursor = 0;
+		while (matcher.find()) {
+			final int from = matcher.start(index);
+			if (from >= 0) {
+				final int last = matcher.end(index);
+				if (split) {
+					result.add(string.subSequence(cursor, from).toString());
+					cursor = last;
+				}
+				if (match) {
+					result.add(string.subSequence(from, last).toString());
+				}
+			}
+		}
+		if (split) {
+			result.add(string.subSequence(cursor, string.length()).toString());
+		}
+		return result;
+	}
+
+	/** Diese Methode wendet den gegebenen regulären Ausdruck auf die gegebene Zeichenkette an und gibt eine Liste von Listen von Zeichenketten zurück. Mit den
+	 * beiden Schaltern kann dazu entschieden werden, ob die Listen der von den Gruppen des regulären Ausdrucks getroffenen bzw. der nicht getroffenen
+	 * Zeichenketten in die Ergebnisliste eingetragen werden sollen.
+	 *
+	 * @param regex regulärer Ausdruck.
+	 * @param string Zeichenkette.
+	 * @param split {@code true}, wenn die nicht getroffenen Zeichenkette eingetragen werden sollen.
+	 * @param match {@code true}, wenn die getroffen getroffenen Zeichenkette eingetragen werden sollen.
+	 * @return Liste der Listen der Zeichenketten.
+	 * @throws NullPointerException Wenn {@code regex} bzw. {@code string} {@code null} ist. */
+	static List<List<String>> applyAll(final String regex, final CharSequence string, final boolean split, final boolean match) throws NullPointerException {
+		return Strings.applyAll(Strings.PATTERN_COMPILER.get(regex), string, split, match);
+	}
+
+	/** Diese Methode wendet den gegebenen kompilierten regulären Ausdruck auf die gegebene Zeichenkette an und gibt eine Liste von Listen von Zeichenketten
+	 * zurück. Mit den beiden Schaltern kann dazu entschieden werden, ob die Listen der von den Gruppen des regulären Ausdrucks getroffenen bzw. nicht getroffenen
+	 * Zeichenketten in die Ergebnisliste eingetragen werden sollen.
+	 *
+	 * @param pattern kompilierter regulärer Ausdruck.
+	 * @param string Zeichenkette.
+	 * @param split {@code true}, wenn die nicht getroffenen Zeichenkette eingetragen werden sollen.
+	 * @param match {@code true}, wenn die getroffen getroffenen Zeichenkette eingetragen werden sollen.
+	 * @return Liste der Listen der Zeichenketten.
+	 * @throws NullPointerException Wenn {@code pattern} bzw. {@code string} {@code null} ist. */
+	static List<List<String>> applyAll(final Pattern pattern, final CharSequence string, final boolean split, final boolean match) throws NullPointerException {
+		final Matcher matcher = pattern.matcher(string);
+		final int count = matcher.groupCount() + 1;
+		final List<List<String>> result = new ArrayList<>();
+		final int[] cursorList = new int[count];
+		while (matcher.find()) {
+			final List<String> spliList = (split ? new ArrayList<>() : null);
+			final List<String> matchList = (match ? new ArrayList<>() : null);
+			for (int i = 0; i < count; i++) {
+				final int from = matcher.start(i);
+				if (from >= 0) {
+					final int last = matcher.end(i);
+					if (split) {
+						spliList.add(string.subSequence(cursorList[i], from).toString());
+						cursorList[i] = last;
+					}
+					if (match) {
+						matchList.add(string.subSequence(from, last).toString());
+					}
+				} else if (match) {
+					matchList.add(null);
+				}
+			}
+			if (split) {
+				result.add(spliList);
+			}
+			if (match) {
+				result.add(matchList);
+			}
+		}
+		if (split) {
+			final List<String> splitList = new ArrayList<>();
+			final int last = string.length();
+			for (int i = 0; i < count; i++) {
+				splitList.add(string.subSequence(cursorList[i], last).toString());
+			}
+			result.add(splitList);
+		}
+		return result;
 	}
 
 }

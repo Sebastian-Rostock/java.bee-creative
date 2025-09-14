@@ -1,8 +1,8 @@
 package bee.creative.lang;
 
+import static bee.creative.lang.Strings.formatFuture;
 import static bee.creative.util.Iterators.iteratorFrom;
 import static bee.creative.util.Iterators.iteratorFromArray;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.IllegalFormatException;
 import java.util.LinkedList;
@@ -23,7 +23,7 @@ public class Exception2 extends RuntimeException implements Iterable<String> {
 	 *
 	 * @param cause Ausnahme.
 	 * @return {@link Exception2}. */
-	public static Exception2 from(Throwable cause) {
+	public static Exception2 exceptionFrom(Throwable cause) {
 		if (cause instanceof Exception2) return (Exception2)cause;
 		return new Exception2().useCause(cause);
 	}
@@ -101,7 +101,7 @@ public class Exception2 extends RuntimeException implements Iterable<String> {
 	 * @throws NullPointerException Wenn {@link String#format(String, Object...)} eine entsprechende Ausnahme auslöst.
 	 * @throws IllegalFormatException Wenn {@link String#format(String, Object...)} eine entsprechende Ausnahme auslöst. */
 	public Exception2 push(String format, Object... args) throws NullPointerException, IllegalFormatException {
-		return format != null ? this.push(Strings.formatFuture(format, args)) : this;
+		return format != null ? this.push(formatFuture(format, args)) : this;
 	}
 
 	/** Diese Methode fügt die gegebenen Nachrichten in der gegebenen Reihenfolge {@link #push(Object) hinzu} gibt {@code this} zurück. Wenn die Nachrichten

@@ -1,7 +1,6 @@
 package bee.creative.lang;
 
-/** Diese Klasse implementiert eine abstrakte {@link Runnable Berechnung}, die als leichtgewichtiger Thread über einen {@link ThreadPool} ausgeführt wird. Das
- * Starten dieses leichtgewichtigen Thread benötigt ca. 100.000 Prozessortakte weniger, als ein nativer {@link java.lang.Thread} dafür benötigt.
+/** Diese Klasse implementiert eine abstrakte {@link Runnable Berechnung}, die als leichtgewichtiger Thread über einen {@link ThreadPool} ausgeführt wird.
  *
  * @author [cc-by] 2019 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public interface Thread extends Runnable {
@@ -19,7 +18,7 @@ public interface Thread extends Runnable {
 	 * @param timeout Wartezeit in Millisekungen oder {@code 0}.
 	 * @throws IllegalThreadStateException Wenn {@link ThreadPool#join(long, Runnable)} diese auslöst.
 	 * @throws InterruptedException Wenn {@link ThreadPool#join(long, Runnable)} diese auslöst. */
-	default void join(final long timeout) throws IllegalArgumentException, InterruptedException {
+	default void join(long timeout) throws IllegalArgumentException, InterruptedException {
 		this.getThreadPool().join(timeout, this);
 	}
 
