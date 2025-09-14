@@ -141,7 +141,7 @@ public abstract class AbstractProxyList<GItem, GData extends List<GItem>> extend
 
 	@Override
 	public Iterator2<GItem> iterator() {
-		return Iterators.from(this.listIterator(0));
+		return Iterators.iteratorFrom(this.listIterator(0));
 	}
 
 	@Override

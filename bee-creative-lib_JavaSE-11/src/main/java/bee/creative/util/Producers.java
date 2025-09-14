@@ -218,7 +218,7 @@ public class Producers {
 
 	/** Diese Methode ist effektiv eine Abkürzung für {@code Producers.fromNative(Natives.parse(memberPath), forceAccessible)}.
 	 *
-	 * @see Natives#parse(String)
+	 * @see Natives#parseNative(String)
 	 * @see #fromNative(Class, boolean)
 	 * @see #fromNative(java.lang.reflect.Field, boolean)
 	 * @see #fromNative(Method, boolean)
@@ -226,7 +226,7 @@ public class Producers {
 	@SuppressWarnings ("unchecked")
 	public static <GValue> Producer3<GValue> fromNative(final String memberPath, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
-		final Object object = Natives.parse(memberPath);
+		final Object object = Natives.parseNative(memberPath);
 		if (object instanceof Class<?>) return Producers.fromNative((Class<GValue>)object, forceAccessible);
 		if (object instanceof java.lang.reflect.Field) return Producers.fromNative((java.lang.reflect.Field)object, forceAccessible);
 		if (object instanceof Method) return Producers.fromNative((Method)object, forceAccessible);

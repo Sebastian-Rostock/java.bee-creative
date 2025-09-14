@@ -516,13 +516,13 @@ public class Getters {
 
 	/** Diese Methode ist effektiv eine Abkürzung für {@code Getters.fromNative(Natives.parse(memberText), forceAccessible)}.
 	 *
-	 * @see Natives#parse(String)
+	 * @see Natives#parseNative(String)
 	 * @see Getters#fromNative(java.lang.reflect.Field, boolean)
 	 * @see Getters#fromNative(Method, boolean)
 	 * @see Getters#fromNative(Constructor, boolean) */
 	public static <GItem, GValue> Getter3<GItem, GValue> fromNative(final String memberText, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
-		final Object object = Natives.parse(memberText);
+		final Object object = Natives.parseNative(memberText);
 		if (object instanceof java.lang.reflect.Field) return Getters.fromNative((java.lang.reflect.Field)object, forceAccessible);
 		if (object instanceof Method) return Getters.fromNative((Method)object, forceAccessible);
 		if (object instanceof Constructor<?>) return Getters.fromNative((Constructor<?>)object, forceAccessible);
@@ -536,10 +536,10 @@ public class Getters {
 
 	/** Diese Methode ist eine Abkürzung für {@link #getterFrom(Getter) Getters.from(Fields.fromNative(that, forceAccessible))}.
 	 *
-	 * @see Fields#fromNative(java.lang.reflect.Field, boolean) */
+	 * @see Fields#fieldFromNative(java.lang.reflect.Field, boolean) */
 	public static <GItem, GValue> Getter3<GItem, GValue> fromNative(final java.lang.reflect.Field that, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
-		return Getters.getterFrom(Fields.<GItem, GValue>fromNative(that, forceAccessible));
+		return Getters.getterFrom(Fields.<GItem, GValue>fieldFromNative(that, forceAccessible));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #fromNative(Method, boolean) Getters.fromNative(that, true)}. */
@@ -572,10 +572,10 @@ public class Getters {
 
 	/** Diese Methode ist eine Abkürzung für {@link #getterFrom(Getter) Getters.from(Fields.fromNative(fieldOwner, fieldName, forceAccessible))}.
 	 *
-	 * @see Fields#fromNative(Class, String, boolean) */
+	 * @see Fields#fieldFromNative(Class, String, boolean) */
 	public static <GItem, GValue> Getter3<GItem, GValue> fromNative(final Class<? extends GItem> fieldOwner, final String fieldName,
 		final boolean forceAccessible) throws NullPointerException, IllegalArgumentException {
-		return Getters.getterFrom(Fields.<GItem, GValue>fromNative(fieldOwner, fieldName, forceAccessible));
+		return Getters.getterFrom(Fields.<GItem, GValue>fieldFromNative(fieldOwner, fieldName, forceAccessible));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #getterFrom(Getter) Getters.from(Producers.fromValue(that).toGetter())}.

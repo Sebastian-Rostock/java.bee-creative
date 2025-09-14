@@ -7,34 +7,34 @@ package bee.creative.util;
  * @param <GValue> Typ des Werts der Eigenschaft. */
 public interface Setter3<GItem, GValue> extends Setter2<GItem, GValue> {
 
-	/** Diese Methode ist eine Abkürzung für {@link Setters#translate(Setter, Getter) Setters.translate(this, trans)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Setters#translateSetter(Setter, Getter) Setters.translate(this, trans)}. */
 	default <GValue2> Setter3<GItem, GValue2> translate(final Getter<? super GValue2, ? extends GValue> trans) {
-		return Setters.translate(this, trans);
+		return Setters.translateSetter(this, trans);
 	}
 
 	@Override
 	default Setter3<Iterable<? extends GItem>, GValue> aggregate() {
-		return Setters.aggregate(this);
+		return Setters.aggregateSetter(this);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Setters#aggregate(Setter, Getter) Setters.aggregate(this, trans)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Setters#aggregateSetter(Setter, Getter) Setters.aggregate(this, trans)}. */
 	default <GValue2> Setter3<Iterable<? extends GItem>, GValue2> aggregate(final Getter<? super GValue2, ? extends GValue> trans) {
-		return Setters.aggregate(this, trans);
+		return Setters.aggregateSetter(this, trans);
 	}
 
 	@Override
 	default Setter3<GItem, GValue> optionalize() {
-		return Setters.optionalize(this);
+		return Setters.optionalizeSetter(this);
 	}
 
 	@Override
 	default Setter3<GItem, GValue> synchronize() {
-		return Setters.synchronize(this);
+		return Setters.synchronizeSetter(this);
 	}
 
 	@Override
 	default Setter3<GItem, GValue> synchronize(final Object mutex) {
-		return Setters.synchronize(this, mutex);
+		return Setters.synchronizeSetter(this, mutex);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Fields#from(Setter) Fields.from(this)}. */

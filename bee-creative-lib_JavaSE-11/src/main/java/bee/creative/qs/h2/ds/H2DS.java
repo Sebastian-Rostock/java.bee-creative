@@ -1,5 +1,6 @@
 package bee.creative.qs.h2.ds;
 
+import static bee.creative.util.Translators.translatorFrom;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collections;
@@ -15,7 +16,6 @@ import bee.creative.qs.h2.H2QS;
 import bee.creative.util.HashMap2;
 import bee.creative.util.Set2;
 import bee.creative.util.Translator2;
-import bee.creative.util.Translators;
 
 public class H2DS implements DS, AutoCloseable {
 
@@ -97,7 +97,7 @@ public class H2DS implements DS, AutoCloseable {
 	}
 
 	private Translator2<QN, DM> createModelTrans() {
-		return Translators.translatorFrom(QN.class, DM.class, this::asModel, DM::context).optionalize();
+		return translatorFrom(QN.class, DM.class, this::asModel, DM::context).optionalize();
 	}
 
 	private static class Items extends H2DSNSet {

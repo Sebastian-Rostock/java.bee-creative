@@ -2,6 +2,7 @@ package bee.creative.qs.h2.ds;
 
 import static bee.creative.qs.ds.DL.Handling.handlingTrans;
 import static bee.creative.qs.ds.DL.Multiplicity.multiplicityTrans;
+import static bee.creative.util.Translators.translatorFrom;
 import bee.creative.qs.QN;
 import bee.creative.qs.ds.DE;
 import bee.creative.qs.ds.DH;
@@ -19,7 +20,6 @@ import bee.creative.util.Getters;
 import bee.creative.util.HashMap2;
 import bee.creative.util.Hashers;
 import bee.creative.util.Translator2;
-import bee.creative.util.Translators;
 
 public class H2DM implements DM {
 
@@ -126,12 +126,12 @@ public class H2DM implements DM {
 
 	@Override
 	public Translator2<QN, DL> linkTrans() {
-		return this.linkTrans == null ? this.linkTrans = Translators.translatorFrom(QN.class, DL.class, this::asLink, DL::node).optionalize() : this.linkTrans;
+		return this.linkTrans == null ? this.linkTrans = translatorFrom(QN.class, DL.class, this::asLink, DL::node).optionalize() : this.linkTrans;
 	}
 
 	@Override
 	public Translator2<QN, DT> typeTrans() {
-		return this.typeTrans == null ? this.typeTrans = Translators.translatorFrom(QN.class, DT.class, this::asType, DT::node).optionalize() : this.typeTrans;
+		return this.typeTrans == null ? this.typeTrans = translatorFrom(QN.class, DT.class, this::asType, DT::node).optionalize() : this.typeTrans;
 	}
 
 	protected H2DL asLink(QN node) {

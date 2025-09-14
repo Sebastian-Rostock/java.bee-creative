@@ -35,9 +35,9 @@ public interface Getter2<GItem, GValue> extends Getter<GItem, GValue> {
 		return Getters.concat(this, target);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Setters#translate(Getter, Setter) Setters.translate(this, target)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Setters#concatSetter(Getter, Setter) Setters.translate(this, target)}. */
 	default <GValue2> Setter3<GItem, GValue2> concat(Setter<? super GValue, ? super GValue2> target) {
-		return Setters.translate(this, target);
+		return Setters.concatSetter(this, target);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Iterables#translate(Iterable, Getter) Iterables.translate(target, this)}. */

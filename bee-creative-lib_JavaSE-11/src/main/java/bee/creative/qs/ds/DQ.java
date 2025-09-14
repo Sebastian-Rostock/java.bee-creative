@@ -1,5 +1,6 @@
 package bee.creative.qs.ds;
 
+import static bee.creative.util.Translators.translatorFrom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -15,13 +16,12 @@ import bee.creative.util.HashMap2;
 import bee.creative.util.HashSet2;
 import bee.creative.util.Iterables;
 import bee.creative.util.Translator2;
-import bee.creative.util.Translators;
 
 // TODO
 public class DQ {
 
 	public static final Translator2<String, FEMDatetime> datetimeTrans =
-		Translators.translatorFrom(String.class, FEMDatetime.class, FEMDatetime::from, FEMDatetime::toString).optionalize();
+		translatorFrom(String.class, FEMDatetime.class, FEMDatetime::from, FEMDatetime::toString).optionalize();
 
 	public static List<QN> getObjectSet(QN context, QN predicate, QN subject) throws NullPointerException, IllegalArgumentException {
 		return DQ.getEdgesHavingContextAndPredicate(context, predicate).withSubject(subject).objects().toList();

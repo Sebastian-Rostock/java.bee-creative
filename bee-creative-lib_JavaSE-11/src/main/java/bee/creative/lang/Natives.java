@@ -45,7 +45,7 @@ public class Natives {
 	 * @throws NullPointerException Wenn {@code memberPath} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@link #parseClass}, {@link #parseField(String)}, {@link #parseMethod(String)} bzw. {@link #parseConstructor(String)}
 	 *         eine entsprechende Ausnahme auslöst. */
-	public static Object parse(final String memberPath) throws NullPointerException, IllegalArgumentException {
+	public static Object parseNative(final String memberPath) throws NullPointerException, IllegalArgumentException {
 		if (memberPath.endsWith(".class")) return Natives.parseClass(memberPath.substring(0, memberPath.length() - 6));
 		if (memberPath.contains(".new(")) return Natives.parseConstructor(memberPath);
 		if (memberPath.contains("(")) return Natives.parseMethod(memberPath);

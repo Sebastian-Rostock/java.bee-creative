@@ -1,5 +1,6 @@
 package bee.creative.util;
 
+import static bee.creative.util.Getters.neutralGetter;
 import java.util.Arrays;
 import java.util.Map;
 import bee.creative.lang.Objects;
@@ -51,13 +52,13 @@ public class Translators {
 	 * Translators.neutral(Object.class)}. */
 	@SuppressWarnings ("unchecked")
 	public static <GValue> Translator2<GValue, GValue> neutralTranslator() {
-		return (Translator2<GValue, GValue>)Translators.neutralTranslator(Object.class);
+		return (Translator2<GValue, GValue>)neutralTranslator(Object.class);
 	}
 
 	/** Diese Methode liefert einen neutralen {@link Translator2} und ist eine Abkürzung für {@link Translators#translatorFrom(Class, Class, Getter, Getter)
 	 * Translators.from(valueClass, valueClass, Getters.neutral(), Getters.neutral())}. */
 	public static <GValue> Translator2<GValue, GValue> neutralTranslator(Class<GValue> valueClass) throws NullPointerException {
-		return Translators.translatorFrom(valueClass, valueClass, Getters.<GValue>neutralGetter(), Getters.<GValue>neutralGetter());
+		return translatorFrom(valueClass, valueClass, neutralGetter(), neutralGetter());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ConcatTranslator new ConcatTranslator<>(that, trans)}. */
@@ -76,9 +77,9 @@ public class Translators {
 		return new OptionalizedTranslator<>(that);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #synchronizeTranslator(Translator, Object) Translators.synchronize(that, that)}. */
+	/** Diese Methode ist eine Abkürzung für {@link #synchronizeTranslator(Translator, Object) synchronizeTranslator(that, that)}. */
 	public static <SOURCE, TARGET> Translator2<SOURCE, TARGET> synchronizeTranslator(Translator<SOURCE, TARGET> that) throws NullPointerException {
-		return Translators.synchronizeTranslator(that, that);
+		return synchronizeTranslator(that, that);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link SynchronizedTranslator new SynchronizedTranslator<>(that, mutex)}. */

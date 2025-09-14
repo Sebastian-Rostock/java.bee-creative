@@ -586,7 +586,7 @@ public class Iterators {
 
 	/** Diese Methode liefert den gegebenen {@link Iterator} als {@link Iterator2}. Wenn er {@code null} ist, wird der {@link EmptyIterator} geliefert. */
 	@SuppressWarnings ("unchecked")
-	public static <GItem> Iterator2<GItem> from(final Iterator<? extends GItem> that) {
+	public static <GItem> Iterator2<GItem> iteratorFrom(final Iterator<? extends GItem> that) {
 		if (that == null) return Iterators.empty();
 		if (that instanceof Iterator2<?>) return (Iterator2<GItem>)that;
 		return Iterators.translate(that, Getters.<GItem>neutralGetter());
@@ -605,7 +605,7 @@ public class Iterators {
 
 	/** Diese Methode ist eine Abkürzung für {@link Iterables#iterableFromArray(Object...) Iterables.fromArray(items).iterator()}. */
 	@SafeVarargs
-	public static <GItem> Iterator2<GItem> fromArray(final GItem... items) throws NullPointerException {
+	public static <GItem> Iterator2<GItem> iteratorFromArray(final GItem... items) throws NullPointerException {
 		return Iterables.iterableFromArray(items).iterator();
 	}
 
@@ -739,9 +739,9 @@ public class Iterators {
 
 	/** Diese Methode ist eine Abkürzung für {@link #concatAll(Iterator) Iterators.concatAll(Iterators.fromArray(iter1, iter2))}.
 	 *
-	 * @see #fromArray(Object...) */
+	 * @see #iteratorFromArray(Object...) */
 	public static <GItem> Iterator2<GItem> concat(final Iterator<? extends GItem> iter1, final Iterator<? extends GItem> iter2) {
-		return Iterators.concatAll(Iterators.fromArray(iter1, iter2));
+		return Iterators.concatAll(Iterators.iteratorFromArray(iter1, iter2));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ConcatIterator new ConcatIterator(that)}. */
@@ -763,7 +763,7 @@ public class Iterators {
 	public static <GItem> Iterator2<GItem> unionAll(final Comparator<? super GItem> order, final Iterator<? extends Iterator<? extends GItem>> iters)
 		throws NullPointerException {
 		if (!iters.hasNext()) return Iterators.empty();
-		Iterator2<GItem> result = Iterators.from(iters.next());
+		Iterator2<GItem> result = Iterators.iteratorFrom(iters.next());
 		while (iters.hasNext()) {
 			result = Iterators.union(order, result, iters.next());
 		}
@@ -790,7 +790,7 @@ public class Iterators {
 	public static <GItem> Iterator2<GItem> intersectAll(final Comparator<? super GItem> order, final Iterator<? extends Iterator<? extends GItem>> iters)
 		throws NullPointerException {
 		if (!iters.hasNext()) return Iterators.empty();
-		Iterator2<GItem> result = Iterators.from(iters.next());
+		Iterator2<GItem> result = Iterators.iteratorFrom(iters.next());
 		while (iters.hasNext()) {
 			result = Iterators.intersect(order, result, iters.next());
 		}

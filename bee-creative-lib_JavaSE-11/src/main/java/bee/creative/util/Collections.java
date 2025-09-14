@@ -1,5 +1,6 @@
 package bee.creative.util;
 
+import static bee.creative.util.Translators.reverseTranslator;
 import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.Iterator;
@@ -600,7 +601,7 @@ public class Collections {
 		@Override
 		@SuppressWarnings ("unchecked")
 		public void putAll(Map<? extends GKey, ? extends GValue> entries2) {
-			this.that.putAll(Collections.translate((Map<GKey, GValue>)entries2, Translators.reverseTranslator(this.keyTrans), Translators.reverseTranslator(this.valueTrans)));
+			this.that.putAll(Collections.translate((Map<GKey, GValue>)entries2, reverseTranslator(this.keyTrans), reverseTranslator(this.valueTrans)));
 		}
 
 		@Override
@@ -669,13 +670,13 @@ public class Collections {
 		@Override
 		@SuppressWarnings ("unchecked")
 		public boolean addAll(Collection<? extends GItem> items2) {
-			return this.that.addAll(Collections.translate((Collection<GItem>)items2, Translators.reverseTranslator(this.trans)));
+			return this.that.addAll(Collections.translate((Collection<GItem>)items2, reverseTranslator(this.trans)));
 		}
 
 		@Override
 		@SuppressWarnings ("unchecked")
 		public boolean addAll(int index, Collection<? extends GItem> items2) {
-			return this.that.addAll(index, Collections.translate((Collection<GItem>)items2, Translators.reverseTranslator(this.trans)));
+			return this.that.addAll(index, Collections.translate((Collection<GItem>)items2, reverseTranslator(this.trans)));
 		}
 
 		@Override
@@ -692,13 +693,13 @@ public class Collections {
 		@Override
 		@SuppressWarnings ("unchecked")
 		public boolean removeAll(Collection<?> items2) {
-			return this.that.removeAll(Collections.translate((Collection<GItem>)items2, Translators.reverseTranslator(this.trans)));
+			return this.that.removeAll(Collections.translate((Collection<GItem>)items2, reverseTranslator(this.trans)));
 		}
 
 		@Override
 		@SuppressWarnings ("unchecked")
 		public boolean retainAll(Collection<?> items2) {
-			return this.that.retainAll(Collections.translate((Collection<GItem>)items2, Translators.reverseTranslator(this.trans)));
+			return this.that.retainAll(Collections.translate((Collection<GItem>)items2, reverseTranslator(this.trans)));
 		}
 
 		@Override
@@ -763,7 +764,7 @@ public class Collections {
 		@Override
 		@SuppressWarnings ("unchecked")
 		public boolean addAll(Collection<? extends GItem> items2) {
-			return this.that.addAll(Collections.translate((Collection<GItem>)items2, Translators.reverseTranslator(this.trans)));
+			return this.that.addAll(Collections.translate((Collection<GItem>)items2, reverseTranslator(this.trans)));
 		}
 
 		@Override
@@ -775,13 +776,13 @@ public class Collections {
 		@Override
 		@SuppressWarnings ("unchecked")
 		public boolean removeAll(Collection<?> items2) {
-			return this.that.removeAll(Collections.translate((Collection<GItem>)items2, Translators.reverseTranslator(this.trans)));
+			return this.that.removeAll(Collections.translate((Collection<GItem>)items2, reverseTranslator(this.trans)));
 		}
 
 		@Override
 		@SuppressWarnings ("unchecked")
 		public boolean retainAll(Collection<?> items2) {
-			return this.that.retainAll(Collections.translate((Collection<GItem>)items2, Translators.reverseTranslator(this.trans)));
+			return this.that.retainAll(Collections.translate((Collection<GItem>)items2, reverseTranslator(this.trans)));
 		}
 
 		@Override
@@ -835,7 +836,7 @@ public class Collections {
 		@Override
 		@SuppressWarnings ("unchecked")
 		public boolean addAll(Collection<? extends GItem> items2) {
-			return this.that.addAll(Collections.translate((Collection<GItem>)items2, Translators.reverseTranslator(this.trans)));
+			return this.that.addAll(Collections.translate((Collection<GItem>)items2, reverseTranslator(this.trans)));
 		}
 
 		@Override
@@ -847,13 +848,13 @@ public class Collections {
 		@Override
 		@SuppressWarnings ("unchecked")
 		public boolean removeAll(Collection<?> items2) {
-			return this.that.removeAll(Collections.translate((Collection<GItem>)items2, Translators.reverseTranslator(this.trans)));
+			return this.that.removeAll(Collections.translate((Collection<GItem>)items2, reverseTranslator(this.trans)));
 		}
 
 		@Override
 		@SuppressWarnings ("unchecked")
 		public boolean retainAll(Collection<?> items2) {
-			return this.that.retainAll(Collections.translate((Collection<GItem>)items2, Translators.reverseTranslator(this.trans)));
+			return this.that.retainAll(Collections.translate((Collection<GItem>)items2, reverseTranslator(this.trans)));
 		}
 
 		@Override

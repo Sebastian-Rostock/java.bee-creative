@@ -46,19 +46,19 @@ public abstract class FEMReflection implements FEMFunction {
 	}
 
 	/** Diese Methode gibt die native Funktion zur gegebenen Pfadangabe zurück. Die Pfadangabe kodiert hierbei eine Funktion, die eine Klasse liefert, an eine
-	 * Methode bzw. einen Konstruktor delegiert oder ein Datenfeld liest bzw. schreibt. Die unterstützten Pfadangaben sind bei {@link Natives#parse(String)}
+	 * Methode bzw. einen Konstruktor delegiert oder ein Datenfeld liest bzw. schreibt. Die unterstützten Pfadangaben sind bei {@link Natives#parseNative(String)}
 	 * beschrieben.
 	 *
-	 * @see Natives#parse(String)
+	 * @see Natives#parseNative(String)
 	 * @see #from(Field)
 	 * @see #from(Method)
 	 * @see #from(Constructor)
 	 * @param memberPath Pfad einer Klasse, einer Methode, eines Konstruktors oder eines Datenfelds.
 	 * @return {@link FEMReflection}.
-	 * @throws NullPointerException Wenn {@link Natives#parse(String)} eine entsprechende Ausnahme auslöst.
-	 * @throws IllegalArgumentException Wenn {@link Natives#parse(String)} eine entsprechende Ausnahme auslöst. */
+	 * @throws NullPointerException Wenn {@link Natives#parseNative(String)} eine entsprechende Ausnahme auslöst.
+	 * @throws IllegalArgumentException Wenn {@link Natives#parseNative(String)} eine entsprechende Ausnahme auslöst. */
 	public static FEMFunction from(String memberPath) throws NullPointerException, IllegalArgumentException {
-		var object = Natives.parse(memberPath);
+		var object = Natives.parseNative(memberPath);
 		if (object instanceof Class<?>) return new FEMNative(object);
 		if (object instanceof Constructor<?>) return FEMReflection.from((Constructor<?>)object);
 		if (object instanceof Method) return FEMReflection.from((Method)object);

@@ -1,5 +1,7 @@
 package bee.creative.lang;
 
+import static bee.creative.util.Iterators.iteratorFrom;
+import static bee.creative.util.Iterators.iteratorFromArray;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.IllegalFormatException;
@@ -7,7 +9,6 @@ import java.util.LinkedList;
 import java.util.List;
 import bee.creative.util.Collections.ConcatList;
 import bee.creative.util.Iterator2;
-import bee.creative.util.Iterators;
 import bee.creative.util.List2;
 
 /** Diese Klasse implementiert eine {@link RuntimeException}, an welche mehrere {@link #getMessages() Nachrichten} {@link #push(Object) angefügt} werden können
@@ -107,12 +108,11 @@ public class Exception2 extends RuntimeException implements Iterable<String> {
 	 * {@code null} sind, werden sie ignoriert.
 	 *
 	 * @see #pushAll(Iterable)
-	 * @see Arrays#asList(Object...)
 	 * @param messages Nachrichten oder {@code null}.
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code messages} {@code null} ist. */
 	public Exception2 pushAll(Object... messages) {
-		return messages != null ? this.pushAll(Arrays.asList(messages)) : this;
+		return messages != null ? this.pushAll(iteratorFromArray(messages)) : this;
 	}
 
 	/** Diese Methode fügt die gegebenen Nachrichten {@link #push(Object) hinzu} gibt {@code this} zurück. Wenn die Nachrichten {@code null} sind, werden sie
@@ -129,7 +129,7 @@ public class Exception2 extends RuntimeException implements Iterable<String> {
 
 	@Override
 	public Iterator2<String> iterator() {
-		return Iterators.from(this.messages.iterator());
+		return iteratorFrom(this.messages.iterator());
 	}
 
 	private static final long serialVersionUID = 856089094921728079L;

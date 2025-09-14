@@ -139,7 +139,7 @@ public class Builders {
 
 		@Override
 		public Iterator2<GItem> iterator() {
-			return Iterators.from(this.get().iterator());
+			return Iterators.iteratorFrom(this.get().iterator());
 		}
 
 	}
@@ -388,7 +388,7 @@ public class Builders {
 
 		@Override
 		public Iterator2<Entry<GKey, GValue>> iterator() {
-			return Iterators.from(this.get().entrySet().iterator());
+			return Iterators.iteratorFrom(this.get().entrySet().iterator());
 		}
 
 	}

@@ -9,7 +9,7 @@ public abstract class AbstractList2<E> extends AbstractList<E> implements List2<
 
 	@Override
 	public Iterator2<E> iterator() {
-		return Iterators.from(super.iterator());
+		return Iterators.iteratorFrom(super.iterator());
 	}
 
 }

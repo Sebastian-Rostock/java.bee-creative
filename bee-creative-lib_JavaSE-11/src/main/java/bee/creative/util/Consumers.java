@@ -177,12 +177,12 @@ public class Consumers {
 
 	/** Diese Methode ist effektiv eine Abkürzung für {@code Consumers.fromNative(Natives.parse(memberText), forceAccessible)}.
 	 *
-	 * @see Natives#parse(String)
+	 * @see Natives#parseNative(String)
 	 * @see #fromNative(java.lang.reflect.Field, boolean)
 	 * @see #fromNative(java.lang.reflect.Method, boolean) */
 	public static <GValue> Consumer3<GValue> fromNative(final String memberText, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
-		final Object object = Natives.parse(memberText);
+		final Object object = Natives.parseNative(memberText);
 		if (object instanceof java.lang.reflect.Field) return Consumers.fromNative((java.lang.reflect.Field)object, forceAccessible);
 		if (object instanceof Method) return Consumers.fromNative((Method)object, forceAccessible);
 		throw new IllegalArgumentException();

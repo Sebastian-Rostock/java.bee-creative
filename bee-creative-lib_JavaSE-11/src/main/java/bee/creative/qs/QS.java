@@ -1,10 +1,10 @@
 package bee.creative.qs;
 
+import static bee.creative.util.Translators.translatorFrom;
 import java.util.Arrays;
 import java.util.List;
 import bee.creative.util.Translator;
 import bee.creative.util.Translator2;
-import bee.creative.util.Translators;
 import bee.creative.util.Translators.OptionalizedTranslator;
 
 /** Diese Schnittstelle definiert einen Graphspeicher für einen Hypergraphen vierter Ordnung (Quad-Store), dessen {@link QN Hyperknoten} über einen optionalen
@@ -194,7 +194,7 @@ public interface QS {
 	/** Diese Methode liefert den {@link OptionalizedTranslator optionalisierten} {@link QN#value() Textwert}-{@link #newNode(Object)
 	 * Hyperknoten}-{@link Translator}. */
 	default Translator2<QN, String> valueTrans() {
-		return Translators.translatorFrom(QN.class, String.class, QN::value, this::newNode).optionalize();
+		return translatorFrom(QN.class, String.class, QN::value, this::newNode).optionalize();
 	}
 
 }
