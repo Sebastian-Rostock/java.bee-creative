@@ -1,54 +1,78 @@
 package bee.creative.util;
 
+import static bee.creative.util.Filters.conjoinedFilter;
+import static bee.creative.util.Filters.disjoinedFilter;
+import static bee.creative.util.Filters.negatedFilter;
+import static bee.creative.util.Filters.synchronizedFilter;
+import static bee.creative.util.Filters.translatedFilter;
+import static bee.creative.util.Getters.getterFrom;
+import static bee.creative.util.Getters.BufferedGetter.softRefMode;
+import static bee.creative.util.Hashers.naturalHasher;
+
 /** Diese Schnittstelle ergänzt einen {@link Filter} insb. um eine Anbindung an Methoden von {@link Filters}.
  *
  * @author [cc-by] 2021 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GItem> Typ der Datensätze. */
-public interface Filter2<GItem> extends Filter<GItem> {
+ * @param <ITEM> Typ der Datensätze. */
+public interface Filter2<ITEM> extends Filter<ITEM> {
 
-	/** Diese Methode ist eine Abkürzung für {@link Filters#negateFilter(Filter) Filters.negate(this)}. */
-	default Filter2<GItem> negate() {
-		return Filters.negateFilter(this);
+	/** Diese Methode ist eine Abkürzung für {@link Filters#disjoinedFilter(Filter, Filter) disjoinedFilter(this, that)}. */
+	default Filter2<ITEM> or(Filter<? super ITEM> that) throws NullPointerException {
+		return disjoinedFilter(this, that);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Filters#disjoinFilter(Filter, Filter) Filters.disjoin(this, that)}. */
-	default Filter2<GItem> disjoin(final Filter<? super GItem> that) throws NullPointerException {
-		return Filters.disjoinFilter(this, that);
+	/** Diese Methode ist eine Abkürzung für {@link Filters#conjoinedFilter(Filter, Filter) conjoinedFilter(this, that)}. */
+	default Filter2<ITEM> and(Filter<? super ITEM> that) throws NullPointerException {
+		return conjoinedFilter(this, that);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Filters#conjoinFilter(Filter, Filter) Filters.conjoin(this, that)}. */
-	default Filter2<GItem> conjoin(final Filter<? super GItem> that) throws NullPointerException {
-		return Filters.conjoinFilter(this, that);
+	/** Diese Methode ist eine Abkürzung für {@link Filters#negatedFilter(Filter) negatedFilter(this)}. */
+	default Filter2<ITEM> not() {
+		return negatedFilter(this);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Filters#bufferFilter(Filter) Filters.buffer(this)}. */
-	default Filter2<GItem> buffer() {
-		return Filters.bufferFilter(this);
+	/** Diese Methode ist eine Abkürzung für {@link Filters#negatedFilter(Filter) negatedFilter(this)}. */
+	default Filter2<ITEM> negate() {
+		return negatedFilter(this);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Filters#bufferFilter(Filter) Filters.buffer(this, mode, hasher)}. */
-	default Filter2<GItem> buffer(final int mode, final Hasher hasher) throws IllegalArgumentException {
-		return Filters.bufferFilter(this, mode, hasher);
+	/** Diese Methode ist eine Abkürzung für {@link Filters#disjoinedFilter(Filter, Filter) disjoinedFilter(this, that)}. */
+	default Filter2<ITEM> disjoin(Filter<? super ITEM> that) throws NullPointerException {
+		return disjoinedFilter(this, that);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Filters#translateFilter(Filter, Getter) Filters.translate(this, trans)}. */
-	default <GItem2> Filter2<GItem2> translate(final Getter<? super GItem2, ? extends GItem> trans) throws NullPointerException {
-		return Filters.translateFilter(this, trans);
+	/** Diese Methode ist eine Abkürzung für {@link Filters#conjoinedFilter(Filter, Filter) conjoinedFilter(this, that)}. */
+	default Filter2<ITEM> conjoin(Filter<? super ITEM> that) throws NullPointerException {
+		return conjoinedFilter(this, that);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Filters#synchronizeFilter(Filter) Filters.synchronize(this)}. */
-	default Filter2<GItem> synchronize() {
-		return Filters.synchronizeFilter(this);
+	/** Diese Methode ist eine Abkürzung für {@link #buffer(int, Hasher) this.buffer(softRefMode(), naturalHasher())}. */
+	default Filter2<ITEM> buffer() {
+		return this.buffer(softRefMode(), naturalHasher());
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Filters#synchronizeFilter(Filter, Object) Filters.synchronize(this, mutex)}. */
-	default Filter2<GItem> synchronize(final Object mutex) {
-		return Filters.synchronizeFilter(this, mutex);
+	/** Diese Methode ist eine Abkürzung für {@link Getters#bufferedGetter(Getter, int, Hasher) this.toGetter().buffer(mode, hasher)::get}. */
+	default Filter2<ITEM> buffer(int mode, Hasher hasher) throws IllegalArgumentException {
+		return this.toGetter().buffer(mode, hasher)::get;
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Getters#fromFilter(Filter) Getters.fromFilter(this)}. */
-	default Getter3<GItem, Boolean> toGetter() {
-		return Getters.fromFilter(this);
+	/** Diese Methode ist eine Abkürzung für {@link Filters#translatedFilter(Filter, Getter) translatedFilter(this, trans)}. */
+	default <GItem2> Filter2<GItem2> translate(Getter<? super GItem2, ? extends ITEM> trans) throws NullPointerException {
+		return translatedFilter(this, trans);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #synchronize(Object) this.synchronize(this)}. */
+	default Filter2<ITEM> synchronize() {
+		return this.synchronize(this);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link Filters#synchronizedFilter(Filter, Object) synchronizedFilter(this, mutex)}. */
+	default Filter2<ITEM> synchronize(Object mutex) {
+		return synchronizedFilter(this, mutex);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link Getters#getterFrom(Getter) getterFrom(this::accept)}. */
+	default Getter3<ITEM, Boolean> toGetter() {
+		return getterFrom(this::accept);
 	}
 
 }

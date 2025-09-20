@@ -1,10 +1,11 @@
 package bee.creative.util;
 
 import static bee.creative.util.Fields.fieldFrom;
-import static bee.creative.util.Setters.aggregateSetter;
-import static bee.creative.util.Setters.optionalizeSetter;
-import static bee.creative.util.Setters.synchronizeSetter;
-import static bee.creative.util.Setters.translateSetter;
+import static bee.creative.util.Getters.neutralGetter;
+import static bee.creative.util.Setters.aggregatedSetter;
+import static bee.creative.util.Setters.optionalizedSetter;
+import static bee.creative.util.Setters.synchronizedSetter;
+import static bee.creative.util.Setters.translatedSetter;
 
 /** Diese Schnittstelle ergänzt einen {@link Setter2} insb. um eine erweiterte Anbindung an Methoden von {@link Setters}.
  *
@@ -13,34 +14,34 @@ import static bee.creative.util.Setters.translateSetter;
  * @param <VALUE> Typ des Werts der Eigenschaft. */
 public interface Setter3<ITEM, VALUE> extends Setter2<ITEM, VALUE> {
 
-	/** Diese Methode ist eine Abkürzung für {@link Setters#translateSetter(Setter, Getter) Setters.translate(this, trans)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Setters#translatedSetter(Setter, Getter) translatedSetter(this, trans)}. */
 	default <VALUE2> Setter3<ITEM, VALUE2> translate(Getter<? super VALUE2, ? extends VALUE> trans) {
-		return translateSetter(this, trans);
+		return translatedSetter(this, trans);
 	}
 
 	@Override
 	default Setter3<Iterable<? extends ITEM>, VALUE> aggregate() {
-		return aggregateSetter(this);
+		return aggregatedSetter(this, neutralGetter());
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Setters#aggregateSetter(Setter, Getter) aggregateSetter(this, trans)}. */
-	default <VALUE2> Setter3<Iterable<? extends ITEM>, VALUE2> aggregate(final Getter<? super VALUE2, ? extends VALUE> trans) {
-		return aggregateSetter(this, trans);
+	/** Diese Methode ist eine Abkürzung für {@link Setters#aggregatedSetter(Setter, Getter) aggregatedSetter(this, trans)}. */
+	default <VALUE2> Setter3<Iterable<? extends ITEM>, VALUE2> aggregate(Getter<? super VALUE2, ? extends VALUE> trans) {
+		return aggregatedSetter(this, trans);
 	}
 
 	@Override
 	default Setter3<ITEM, VALUE> optionalize() {
-		return optionalizeSetter(this);
+		return optionalizedSetter(this);
 	}
 
 	@Override
 	default Setter3<ITEM, VALUE> synchronize() {
-		return synchronizeSetter(this);
+		return synchronizedSetter(this);
 	}
 
 	@Override
-	default Setter3<ITEM, VALUE> synchronize(final Object mutex) {
-		return synchronizeSetter(this, mutex);
+	default Setter3<ITEM, VALUE> synchronize(Object mutex) {
+		return synchronizedSetter(this, mutex);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Fields#fieldFrom(Setter) fieldFrom(this)}. */

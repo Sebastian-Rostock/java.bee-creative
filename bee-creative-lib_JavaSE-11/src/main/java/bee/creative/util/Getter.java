@@ -12,6 +12,6 @@ public interface Getter<ITEM, VALUE> {
 	 *
 	 * @param item Datensatz.
 	 * @return Wert der Eigenschaft. */
-	abstract VALUE get(ITEM item);
+	VALUE get(ITEM item);
 
 }

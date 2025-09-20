@@ -4,13 +4,13 @@ package bee.creative.util;
  *
  * @see Filters
  * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GItem> Typ der Datensätze. */
-public interface Filter<GItem> {
+ * @param <ITEM> Typ der Datensätze. */
+public interface Filter<ITEM> {
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn der gegebene Datensatz akzeptiert wird.
 	 *
 	 * @param item Datensätze.
 	 * @return Akzeptanz. */
-	boolean accept(GItem item);
+	boolean accept(ITEM item);
 
 }

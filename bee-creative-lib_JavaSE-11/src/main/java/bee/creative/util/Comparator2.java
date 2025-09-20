@@ -28,9 +28,9 @@ public interface Comparator2<GItem> extends Comparator<GItem> {
 		return Comparators.optionalize(this);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Comparators#translate(Comparator, Getter) Comparators.translate(this, trans)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Comparators#translatedComparator(Comparator, Getter) Comparators.translate(this, trans)}. */
 	default <GItem2> Comparator2<GItem2> translate(Getter<? super GItem2, ? extends GItem> trans) throws NullPointerException {
-		return Comparators.translate(this, trans);
+		return Comparators.translatedComparator(this, trans);
 	}
 
 }

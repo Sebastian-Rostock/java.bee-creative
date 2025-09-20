@@ -22,7 +22,7 @@ public interface DH extends DO {
 	}
 
 	default boolean redo(Iterable<? extends DC> changes) throws NullPointerException, IllegalArgumentException {
-		var redoChangeNodes = changeTrans().toSource().concat(changes).toList();
+		var redoChangeNodes = changeTrans().toSource().translate(changes).toList();
 		if (redoChangeNodes.isEmpty()) return false;
 		if (redoChangeNodes.contains(null)) throw new NullPointerException();
 		var currentChangeNode = this.currentAsNode().get();

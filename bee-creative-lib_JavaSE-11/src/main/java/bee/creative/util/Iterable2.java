@@ -42,9 +42,9 @@ public interface Iterable2<GItem> extends Iterable<GItem> {
 		return Iterables.repeat(this, count);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Iterables#translate(Iterable, Getter) Iterables.translate(this, trans)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Iterables#translatedIterable(Iterable, Getter) Iterables.translate(this, trans)}. */
 	default <GItem2> Iterable2<GItem2> translate(final Getter<? super GItem, ? extends GItem2> trans) throws NullPointerException {
-		return Iterables.translate(this, trans);
+		return Iterables.translatedIterable(this, trans);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Iterables#unmodifiable(Iterable) Iterables.unmodifiable(this)}. */

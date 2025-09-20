@@ -17,7 +17,7 @@ public class HashMap2<GKey, GValue> extends HashMap<GKey, GValue> {
 
 	/** Diese Methode ist eine Abkürzung für {@link #from(Hasher, Getter, Getter, Setter) HashMap2.from(hasher, Getters.neutral(), Getters.empty(), null)}. */
 	public static <GKey, GValue> HashMap2<GKey, GValue> from(Hasher hasher) throws NullPointerException {
-		return HashMap2.from(hasher, Getters.neutralGetter(), Getters.empty(), null);
+		return HashMap2.from(hasher, Getters.neutralGetter(), Getters.emptyGetter(), null);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #from(Hasher, Getter, Getter, Setter) HashMap2.from(hasher, Getters.neutral(), installValue, null)}. */

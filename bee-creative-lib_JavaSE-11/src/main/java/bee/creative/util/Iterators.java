@@ -157,7 +157,7 @@ public class Iterators {
 		public UniqueIterator(final Iterator<? extends GItem> that, final Collection<? super GItem> buffer) throws NullPointerException {
 			this.that = Objects.notNull(that);
 			this.buffer = Objects.notNull(buffer);
-			this.helper = Iterators.filter(that, Filters.negateFilter(Filters.fromItems(buffer)));
+			this.helper = Iterators.filter(that, Filters.negatedFilter(Filters.fromItems(buffer)));
 		}
 
 		@Override
@@ -589,7 +589,7 @@ public class Iterators {
 	public static <GItem> Iterator2<GItem> iteratorFrom(final Iterator<? extends GItem> that) {
 		if (that == null) return Iterators.empty();
 		if (that instanceof Iterator2<?>) return (Iterator2<GItem>)that;
-		return Iterators.translate(that, Getters.<GItem>neutralGetter());
+		return Iterators.translatedIterator(that, Getters.<GItem>neutralGetter());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #fromItem(Object, int) Iterators.fromItem(item, 1)}. */
@@ -823,7 +823,7 @@ public class Iterators {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link TranslatedIterator new TranslatedIterator<>(that, trans)}. */
-	public static <GItem, GItem2> Iterator2<GItem> translate(final Iterator<? extends GItem2> that, final Getter<? super GItem2, ? extends GItem> trans)
+	public static <GItem, GItem2> Iterator2<GItem> translatedIterator(final Iterator<? extends GItem2> that, final Getter<? super GItem2, ? extends GItem> trans)
 		throws NullPointerException {
 		return new TranslatedIterator<>(that, trans);
 	}

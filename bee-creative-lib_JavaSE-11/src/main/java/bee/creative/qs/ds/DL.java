@@ -358,7 +358,7 @@ public interface DL extends DE {
 
 	default Property2<QN> asSourceProperty(QN target) {
 		Objects.notNull(target);
-		return Properties.from(() -> this.getSource(target), source -> this.setSource(target, source));
+		return Properties.propertyFrom(() -> this.getSource(target), source -> this.setSource(target, source));
 	}
 
 	default Set2<QN> asTargetSet(QN source) throws NullPointerException, IllegalArgumentException {
@@ -367,7 +367,7 @@ public interface DL extends DE {
 
 	default Property2<QN> asTargetProperty(QN source) throws NullPointerException, IllegalArgumentException {
 		Objects.notNull(source);
-		return Properties.from(() -> this.getTarget(source), target -> this.setTarget(source, target));
+		return Properties.propertyFrom(() -> this.getTarget(source), target -> this.setTarget(source, target));
 	}
 
 	/** Diese Klasse definiert die Handhabung eines referenzierten {@link QN Hyperknoten} beim Entfernen oder Duplizieren eines referenzierenden {@link QN

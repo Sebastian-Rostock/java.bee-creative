@@ -6,12 +6,12 @@ package bee.creative.util;
  * @see Getter
  * @see Property
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GValue> Typ des Werts. */
-public interface Producer<GValue> {
+ * @param <VALUE> Typ des Werts. */
+public interface Producer<VALUE> {
 
 	/** Diese Methode gibt den Werts zurück, der durch dieses Objekt erzeugt, verwaltet, konfiguriert oder anderweitig bereitgestellt wird.
 	 *
 	 * @return Wert. */
-	GValue get();
+	VALUE get();
 
 }

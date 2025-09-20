@@ -171,7 +171,7 @@ public class EMU {
 	private static final HashMap2<Class<?>, Emuator<?>> useMap = new HashMap2<>();
 
 	/** Dieses Feld speichert die in {@link #fromClass(Class)} gepufferten Größen. */
-	private static final HashMap2<Class<?>, Integer> integerCache = HashMap2.from(Hashers.identity(), clazz -> {
+	private static final HashMap2<Class<?>, Integer> integerCache = HashMap2.from(Hashers.identityHasher(), clazz -> {
 		var result = 8;
 		for (var type = clazz; type != null; type = type.getSuperclass()) {
 			for (var field: type.getDeclaredFields()) {
@@ -184,7 +184,7 @@ public class EMU {
 	});
 
 	/** Dieses Feld speichert die in {@link #from(Object)} gepufferten {@link Emuator}. */
-	private static final HashMap2<Class<?>, Emuator<?>> emuatorCache = HashMap2.from(Hashers.identity(), clazz -> {
+	private static final HashMap2<Class<?>, Emuator<?>> emuatorCache = HashMap2.from(Hashers.identityHasher(), clazz -> {
 		for (var type = clazz; type != null; type = type.getSuperclass()) {
 			var emuator = EMU.useMap.get(type);
 			if (emuator != null) return emuator;

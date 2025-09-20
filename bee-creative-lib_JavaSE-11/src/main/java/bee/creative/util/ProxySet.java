@@ -10,16 +10,16 @@ import bee.creative.lang.Objects;
 public class ProxySet<E> extends AbstractProxySet<E, Set<E>> {
 
 	public static <E> ProxySet<E> from(Producer<Set<E>> getValue, Consumer<Set<E>> setValue) throws NullPointerException {
-		return ProxySet.<E>from(Producers.translate(getValue, value -> {
+		return ProxySet.<E>from(Producers.translatedProducer(getValue, value -> {
 			if (value instanceof HashSet2) return value;
 			if (value != null) return new HashSet2<>(value);
 			return new HashSet2<>();
-		}), Consumers.translate(setValue, value -> {
+		}), Consumers.translatedConsumer(setValue, value -> {
 			if (value.size() > 1) return value;
 			for (var item: value)
 				return Collections.singleton(item);
 			return null;
-		}), Producers.translate(getValue, value -> {
+		}), Producers.translatedProducer(getValue, value -> {
 			if (value != null) return value;
 			return Collections.emptySet();
 		}));

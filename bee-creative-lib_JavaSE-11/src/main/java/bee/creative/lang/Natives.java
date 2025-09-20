@@ -10,10 +10,16 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
+import bee.creative.util.AbstractConsumer;
 import bee.creative.util.AbstractField;
 import bee.creative.util.AbstractGetter;
+import bee.creative.util.AbstractProducer;
+import bee.creative.util.AbstractProperty;
 import bee.creative.util.AbstractSetter;
 import bee.creative.util.Builders.MapBuilder;
+import bee.creative.util.Consumer;
+import bee.creative.util.Consumer3;
+import bee.creative.util.Consumers;
 import bee.creative.util.Field2;
 import bee.creative.util.Fields;
 import bee.creative.util.Getter;
@@ -21,6 +27,11 @@ import bee.creative.util.Getter3;
 import bee.creative.util.Getters;
 import bee.creative.util.HashMap;
 import bee.creative.util.Iterables;
+import bee.creative.util.Producer;
+import bee.creative.util.Producer3;
+import bee.creative.util.Producers;
+import bee.creative.util.Properties;
+import bee.creative.util.Property2;
 import bee.creative.util.Setter;
 import bee.creative.util.Setter3;
 import bee.creative.util.Setters;
@@ -257,7 +268,7 @@ public class Natives {
 	 * @throws NullPointerException Wenn {@code types} {@code null} ist oder enthält. */
 	public static String printParams(final Class<?>... types) throws NullPointerException {
 		final StringBuilder res = new StringBuilder().append('(');
-		Strings.join(res, ",", Iterables.translate(Arrays.asList(types), Natives.printClass));
+		Strings.join(res, ",", Iterables.translatedIterable(Arrays.asList(types), Natives.printClass));
 		return res.append(')').toString();
 	}
 
@@ -384,11 +395,11 @@ public class Natives {
 	/** Diese Methode ist eine Abkürzung für {@link Fields#fieldFrom(Getter, Setter) Fields.from(Getters.fromNative(get, forceAccessible), Setters.fromNative(set,
 	 * forceAccessible))}.
 	 *
-	 * @see Natives#fromNative(Method, boolean)
+	 * @see Natives#nativeGetter(Method, boolean)
 	 * @see #nativeSetter */
 	public static <GItem, GValue> Field2<GItem, GValue> nativeField(final Method get, final Method set, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
-		return Fields.fieldFrom(Natives.<GItem, GValue>fromNative(get, forceAccessible), nativeSetter(set, forceAccessible));
+		return Fields.fieldFrom(Natives.<GItem, GValue>nativeGetter(get, forceAccessible), nativeSetter(set, forceAccessible));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Natives#nativeField(Class, String, boolean) Fields.fromNative(fieldOwner, fieldName, true)}. */
@@ -406,73 +417,256 @@ public class Natives {
 		return Natives.nativeField(parseField(fieldOwner, fieldName), forceAccessible);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #fromNative(String, boolean) Getters.fromNative(memberText, true)}. */
-	public static <GItem, GValue> Getter3<GItem, GValue> fromNative(final String memberText) throws NullPointerException, IllegalArgumentException {
-		return Natives.fromNative(memberText, true);
+	/** Diese Methode ist eine Abkürzung für {@link #nativeGetter(String, boolean) Getters.fromNative(memberText, true)}. */
+	public static <GItem, GValue> Getter3<GItem, GValue> nativeGetter(final String memberText) throws NullPointerException, IllegalArgumentException {
+		return Natives.nativeGetter(memberText, true);
 	}
 
 	/** Diese Methode ist effektiv eine Abkürzung für {@code Getters.fromNative(Natives.parse(memberText), forceAccessible)}.
 	 *
 	 * @see #parseNative
-	 * @see Natives#fromNative(java.lang.reflect.Field, boolean)
-	 * @see Natives#fromNative(Method, boolean)
-	 * @see Natives#fromNative(Constructor, boolean) */
-	public static <GItem, GValue> Getter3<GItem, GValue> fromNative(final String memberText, final boolean forceAccessible)
+	 * @see Natives#nativeGetter(java.lang.reflect.Field, boolean)
+	 * @see Natives#nativeGetter(Method, boolean)
+	 * @see Natives#nativeGetter(Constructor, boolean) */
+	public static <GItem, GValue> Getter3<GItem, GValue> nativeGetter(final String memberText, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
 		final Object object = parseNative(memberText);
-		if (object instanceof java.lang.reflect.Field) return Natives.fromNative((java.lang.reflect.Field)object, forceAccessible);
-		if (object instanceof Method) return Natives.fromNative((Method)object, forceAccessible);
-		if (object instanceof Constructor<?>) return Natives.fromNative((Constructor<?>)object, forceAccessible);
+		if (object instanceof java.lang.reflect.Field) return Natives.nativeGetter((java.lang.reflect.Field)object, forceAccessible);
+		if (object instanceof Method) return Natives.nativeGetter((Method)object, forceAccessible);
+		if (object instanceof Constructor<?>) return Natives.nativeGetter((Constructor<?>)object, forceAccessible);
 		throw new IllegalArgumentException();
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #fromNative(java.lang.reflect.Field, boolean) Getters.fromNative(field, true)}. */
-	public static <GItem, GValue> Getter3<GItem, GValue> fromNative(final java.lang.reflect.Field that) throws NullPointerException, IllegalArgumentException {
-		return Natives.fromNative(that, true);
+	/** Diese Methode ist eine Abkürzung für {@link #nativeGetter(java.lang.reflect.Field, boolean) Getters.fromNative(field, true)}. */
+	public static <GItem, GValue> Getter3<GItem, GValue> nativeGetter(final java.lang.reflect.Field that) throws NullPointerException, IllegalArgumentException {
+		return Natives.nativeGetter(that, true);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Getters#getterFrom(Getter) Getters.from(Fields.fromNative(that, forceAccessible))}.
 	 *
 	 * @see #nativeField */
-	public static <GItem, GValue> Getter3<GItem, GValue> fromNative(final java.lang.reflect.Field that, final boolean forceAccessible)
+	public static <GItem, GValue> Getter3<GItem, GValue> nativeGetter(final java.lang.reflect.Field that, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
-		return Getters.getterFrom( nativeField(that, forceAccessible));
+		return Getters.getterFrom(nativeField(that, forceAccessible));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #fromNative(Method, boolean) Getters.fromNative(that, true)}. */
-	public static <GItem, GOutput> Getter3<GItem, GOutput> fromNative(final Method that) throws NullPointerException, IllegalArgumentException {
-		return Natives.fromNative(that, true);
+	/** Diese Methode ist eine Abkürzung für {@link #nativeGetter(Method, boolean) Getters.fromNative(that, true)}. */
+	public static <GItem, GOutput> Getter3<GItem, GOutput> nativeGetter(final Method that) throws NullPointerException, IllegalArgumentException {
+		return Natives.nativeGetter(that, true);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link MethodGetter new MethodGetter<>(that, forceAccessible)}. */
-	public static <GItem, GValue> Getter3<GItem, GValue> fromNative(final Method that, final boolean forceAccessible)
+	public static <GItem, GValue> Getter3<GItem, GValue> nativeGetter(final Method that, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
 		return new MethodGetter<>(that, forceAccessible);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #fromNative(Constructor, boolean) Getters.fromNative(that, true)}. */
-	public static <GItem, GOutput> Getter3<GItem, GOutput> fromNative(final Constructor<?> that) throws NullPointerException, IllegalArgumentException {
-		return Natives.fromNative(that, true);
+	/** Diese Methode ist eine Abkürzung für {@link #nativeGetter(Constructor, boolean) Getters.fromNative(that, true)}. */
+	public static <GItem, GOutput> Getter3<GItem, GOutput> nativeGetter(final Constructor<?> that) throws NullPointerException, IllegalArgumentException {
+		return Natives.nativeGetter(that, true);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ConstructorGetter new ConstructorGetter<>(that, forceAccessible)}. */
-	public static <GItem, GValue> Getter3<GItem, GValue> fromNative(final Constructor<?> that, final boolean forceAccessible)
+	public static <GItem, GValue> Getter3<GItem, GValue> nativeGetter(final Constructor<?> that, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
 		return new ConstructorGetter<>(that, forceAccessible);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #fromNative(Class, String, boolean) Getters.fromNative(fieldOwner, fieldName, true)}. */
-	public static <GItem, GValue> Getter3<GItem, GValue> fromNative(final Class<? extends GItem> fieldOwner, final String fieldName)
+	/** Diese Methode ist eine Abkürzung für {@link #nativeGetter(Class, String, boolean) Getters.fromNative(fieldOwner, fieldName, true)}. */
+	public static <GItem, GValue> Getter3<GItem, GValue> nativeGetter(final Class<? extends GItem> fieldOwner, final String fieldName)
 		throws NullPointerException, IllegalArgumentException {
-		return Natives.fromNative(fieldOwner, fieldName, true);
+		return Natives.nativeGetter(fieldOwner, fieldName, true);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Getters#getterFrom(Getter) Getters.from(Fields.fromNative(fieldOwner, fieldName, forceAccessible))}.
 	 *
 	 * @see #nativeField */
-	public static <GItem, GValue> Getter3<GItem, GValue> fromNative(final Class<? extends GItem> fieldOwner, final String fieldName,
+	public static <GItem, GValue> Getter3<GItem, GValue> nativeGetter(final Class<? extends GItem> fieldOwner, final String fieldName,
 		final boolean forceAccessible) throws NullPointerException, IllegalArgumentException {
 		return Getters.getterFrom(nativeField(fieldOwner, fieldName, forceAccessible));
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #nativeConsumerFrom(String, boolean) Consumers.fromNative(memberText, true)}. */
+	public static <GValue> Consumer3<GValue> nativeConsumerFrom(String memberText) throws NullPointerException, IllegalArgumentException {
+		return Natives.nativeConsumerFrom(memberText, true);
+	}
+
+	/** Diese Methode ist effektiv eine Abkürzung für {@code Consumers.fromNative(Natives.parse(memberText), forceAccessible)}.
+	 *
+	 * @see #parseNative
+	 * @see #nativeConsumerFrom(java.lang.reflect.Field, boolean)
+	 * @see #nativeConsumerFrom(java.lang.reflect.Method, boolean) */
+	public static <GValue> Consumer3<GValue> nativeConsumerFrom(String memberText, boolean forceAccessible)
+		throws NullPointerException, IllegalArgumentException {
+		final Object object = parseNative(memberText);
+		if (object instanceof java.lang.reflect.Field) return Natives.nativeConsumerFrom((java.lang.reflect.Field)object, forceAccessible);
+		if (object instanceof Method) return Natives.nativeConsumerFrom((Method)object, forceAccessible);
+		throw new IllegalArgumentException();
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #nativeConsumerFrom(java.lang.reflect.Field, boolean) Consumers.fromNative(that, true)}. */
+	public static <GValue> Consumer3<GValue> nativeConsumerFrom(java.lang.reflect.Field that) {
+		return Natives.nativeConsumerFrom(that, true);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link Consumers#consumerFrom(Consumer) Consumers.from(Properties.fromNative(that, forceAccessible))}.
+	 *
+	 * @see Natives#nativePropertyFrom(java.lang.reflect.Field, boolean) */
+	public static <GValue> Consumer3<GValue> nativeConsumerFrom(java.lang.reflect.Field that, boolean forceAccessible) {
+		return Consumers.consumerFrom(Natives.nativePropertyFrom(that, forceAccessible));
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #nativeConsumerFrom(Method, boolean) Consumers.fromNative(that, true)}. */
+	public static <GValue> Consumer3<GValue> nativeConsumerFrom(Method that) {
+		return Natives.nativeConsumerFrom(that, true);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link MethodConsumer new MethodConsumer<>(that, forceAccessible)}. */
+	public static <GValue> Consumer3<GValue> nativeConsumerFrom(Method that, boolean forceAccessible) throws NullPointerException, IllegalArgumentException {
+		return new MethodConsumer<>(that, forceAccessible);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #nativeConsumerFrom(Class, String, boolean) Consumers.fromNative(fieldOwner, fieldName, true)}. */
+	public static <GValue> Consumer3<GValue> nativeConsumerFrom(Class<?> fieldOwner, String fieldName) throws NullPointerException, IllegalArgumentException {
+		return Natives.nativeConsumerFrom(fieldOwner, fieldName, true);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link Consumers#consumerFrom(Consumer) Consumers.from(Properties.fromNative(fieldOwner, fieldName,
+	 * forceAccessible))}.
+	 *
+	 * @see Natives#nativePropertyFrom(Class, String, boolean) */
+	public static <GValue> Consumer3<GValue> nativeConsumerFrom(Class<?> fieldOwner, String fieldName, boolean forceAccessible)
+		throws NullPointerException, IllegalArgumentException {
+		return Consumers.consumerFrom(Natives.nativePropertyFrom(fieldOwner, fieldName, forceAccessible));
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #nativeProducerFrom(String, boolean) Producers.fromNative(memberPath, true)}. */
+	public static <VALUE> Producer3<VALUE> nativeProducerFrom(final String memberPath) throws NullPointerException, IllegalArgumentException {
+		return Natives.nativeProducerFrom(memberPath, true);
+	}
+
+	/** Diese Methode ist effektiv eine Abkürzung für {@code Producers.fromNative(Natives.parse(memberPath), forceAccessible)}.
+	 *
+	 * @see #parseNative
+	 * @see #nativeProducerFrom(Class, boolean)
+	 * @see #nativeProducerFrom(java.lang.reflect.Field, boolean)
+	 * @see #nativeProducerFrom(Method, boolean)
+	 * @see #nativeProducerFrom(Constructor, boolean) */
+	@SuppressWarnings ("unchecked")
+	public static <VALUE> Producer3<VALUE> nativeProducerFrom(final String memberPath, final boolean forceAccessible)
+		throws NullPointerException, IllegalArgumentException {
+		final Object object = parseNative(memberPath);
+		if (object instanceof Class<?>) return Natives.nativeProducerFrom((Class<VALUE>)object, forceAccessible);
+		if (object instanceof java.lang.reflect.Field) return Natives.nativeProducerFrom((java.lang.reflect.Field)object, forceAccessible);
+		if (object instanceof Method) return Natives.nativeProducerFrom((Method)object, forceAccessible);
+		if (object instanceof Constructor<?>) return Natives.nativeProducerFrom((Constructor<?>)object, forceAccessible);
+		throw new IllegalArgumentException();
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #nativeProducerFrom(java.lang.reflect.Field, boolean) Producers.fromNative(that, true)}. */
+	public static <VALUE> Producer3<VALUE> nativeProducerFrom(final java.lang.reflect.Field that) throws NullPointerException {
+		return Natives.nativeProducerFrom(that, true);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link Natives#nativePropertyFrom(java.lang.reflect.Field, boolean) Producers.from(Properties.fromNative(that,
+	 * forceAccessible))}. */
+	public static <VALUE> Producer3<VALUE> nativeProducerFrom(final java.lang.reflect.Field that, final boolean forceAccessible) throws NullPointerException {
+		return Producers.producerFrom(Natives.<VALUE>nativePropertyFrom(that, forceAccessible));
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #nativeProducerFrom(Method, boolean) Producers.fromNative(that, true)}. */
+	public static <VALUE> Producer3<VALUE> nativeProducerFrom(final Method that) throws NullPointerException, IllegalArgumentException {
+		return Natives.nativeProducerFrom(that, true);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link MethodProducer new MethodProducer<>(that, forceAccessible)}. */
+	public static <VALUE> Producer3<VALUE> nativeProducerFrom(final Method that, final boolean forceAccessible)
+		throws NullPointerException, IllegalArgumentException {
+		return new MethodProducer<>(that, forceAccessible);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #nativeProducerFrom(Class, boolean) Producers.fromNative(valueClass, true)}. */
+	public static <VALUE> Producer3<VALUE> nativeProducerFrom(final Class<? extends VALUE> valueClass) throws NullPointerException, IllegalArgumentException {
+		return Natives.nativeProducerFrom(valueClass, true);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #nativeProducerFrom(Constructor, boolean) Producers.fromNative(Natives.parseConstructor(valueClass),
+	 * forceAccessible)}. */
+	public static <VALUE> Producer3<VALUE> nativeProducerFrom(final Class<? extends VALUE> valueClass, final boolean forceAccessible)
+		throws NullPointerException, IllegalArgumentException {
+		return Natives.nativeProducerFrom(parseConstructor(valueClass), forceAccessible);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #nativeProducerFrom(Constructor, boolean) Producers.fromNative(that, true)}. */
+	public static <VALUE> Producer3<VALUE> nativeProducerFrom(final Constructor<?> that) throws NullPointerException, IllegalArgumentException {
+		return Natives.nativeProducerFrom(that, true);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link ConstructorProducer new ConstructorProducer<>(that, forceAccessible)}. */
+	public static <VALUE> Producer3<VALUE> nativeProducerFrom(final Constructor<?> that, final boolean forceAccessible)
+		throws NullPointerException, IllegalArgumentException {
+		return new ConstructorProducer<>(that, forceAccessible);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #nativeProducerFrom(Class, String, boolean) Producers.fromNative(fieldOwner, fieldName, true)}. */
+	public static <VALUE> Producer3<VALUE> nativeProducerFrom(final Class<?> fieldOwner, final String fieldName)
+		throws NullPointerException, IllegalArgumentException {
+		return Natives.nativeProducerFrom(fieldOwner, fieldName, true);
+	}
+
+	/** MAMA Diese Methode ist eine Abkürzung für {@link #nativeProducerFrom(Class, String, boolean) Producers.from(Properties.fromNative(fieldOwner, fieldName,
+	 * forceAccessible))}. */
+	public static <VALUE> Producer3<VALUE> nativeProducerFrom(final Class<?> fieldOwner, final String fieldName, final boolean forceAccessible)
+		throws NullPointerException, IllegalArgumentException {
+		return Producers.producerFrom(Natives.<VALUE>nativePropertyFrom(fieldOwner, fieldName, forceAccessible));
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #nativePropertyFrom(String, boolean) Properties.fromNative(fieldPath, true)}. */
+	public static <VALUE> Property2<VALUE> nativePropertyFrom(final String fieldPath) throws NullPointerException, IllegalArgumentException {
+		return Natives.nativePropertyFrom(fieldPath, true);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #nativePropertyFrom(java.lang.reflect.Field) Properties.fromNative(Natives.parseField(fieldPath),
+	 * forceAccessible)}. */
+	public static <VALUE> Property2<VALUE> nativePropertyFrom(final String fieldPath, final boolean forceAccessible)
+		throws NullPointerException, IllegalArgumentException {
+		return Natives.nativePropertyFrom(parseField(fieldPath), forceAccessible);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #nativePropertyFrom(java.lang.reflect.Field, boolean) Properties.fromNative(field, true)}. */
+	public static <VALUE> Property2<VALUE> nativePropertyFrom(final java.lang.reflect.Field field) throws NullPointerException, IllegalArgumentException {
+		return Natives.nativePropertyFrom(field, true);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link NativeProperty new NativeProperty<>(field, forceAccessible)}. */
+	public static <VALUE> Property2<VALUE> nativePropertyFrom(final java.lang.reflect.Field field, final boolean forceAccessible)
+		throws NullPointerException, IllegalArgumentException {
+		return new NativeProperty<>(field, forceAccessible);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #nativePropertyFrom(Method, Method, boolean) Properties.fromNative(get, set, true)}. **/
+	public static <VALUE> Property2<VALUE> nativePropertyFrom(final Method get, final Method set) throws NullPointerException, IllegalArgumentException {
+		return Natives.nativePropertyFrom(get, set, true);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #nativeProducerFrom(Class) Properties.from(Producers.fromNative(get, forceAccessible),
+	 * Consumers.fromNative(set, forceAccessible))}. */
+	public static <VALUE> Property2<VALUE> nativePropertyFrom(final Method get, final Method set, final boolean forceAccessible)
+		throws NullPointerException, IllegalArgumentException {
+		return Properties.propertyFrom(nativeProducerFrom(set, forceAccessible), nativeConsumerFrom(get, forceAccessible));
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #nativePropertyFrom(Class, String, boolean) Properties.fromNative(fieldOwner, fieldName, true)}. */
+	public static <VALUE> Property2<VALUE> nativePropertyFrom(final Class<?> fieldOwner, final String fieldName)
+		throws NullPointerException, IllegalArgumentException {
+		return Natives.nativePropertyFrom(fieldOwner, fieldName, true);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #nativePropertyFrom(java.lang.reflect.Field, boolean) Properties.fromNative(Natives.parseField(fieldOwner,
+	 * fieldName), forceAccessible)}. */
+	public static <VALUE> Property2<VALUE> nativePropertyFrom(final Class<?> fieldOwner, final String fieldName, final boolean forceAccessible)
+		throws NullPointerException, IllegalArgumentException {
+		return Natives.nativePropertyFrom(parseField(fieldOwner, fieldName), forceAccessible);
 	}
 
 	/** Diese Klasse implementiert einen {@link Setter3}, der das {@link #set(Object, Object) Schreiben} an eine gegebene {@link Method nativen Methode}
@@ -565,17 +759,17 @@ public class Natives {
 	 * @param <GItem> Typ des Datensatzes.
 	 * @param <GValue> Typ des Werts. */
 	public static class MethodGetter<GItem, GValue> extends AbstractGetter<GItem, GValue> {
-	
+
 		public final Method that;
-	
+
 		public final boolean forceAccessible;
-	
+
 		public MethodGetter(final Method that, final boolean forceAccessible) throws NullPointerException, IllegalArgumentException {
 			this.forceAccessible = forceAccessible;
 			if (that.getParameterTypes().length != (Modifier.isStatic(that.getModifiers()) ? 1 : 0)) throw new IllegalArgumentException();
 			this.that = forceAccessible ? forceAccessible(that) : Objects.notNull(that);
 		}
-	
+
 		@Override
 		@SuppressWarnings ("unchecked")
 		public GValue get(final GItem item) {
@@ -591,12 +785,12 @@ public class Natives {
 				throw new IllegalArgumentException(cause);
 			}
 		}
-	
+
 		@Override
 		public String toString() {
 			return Objects.toInvokeString(this, this.that, this.forceAccessible);
 		}
-	
+
 	}
 
 	/** Diese Klasse implementiert einen {@link Getter3}, der das {@link #get(Object) Lesen} an einen gegebenen {@link Constructor nativen Kontruktor} delegiert.
@@ -605,17 +799,17 @@ public class Natives {
 	 * @param <GItem> Typ des Datensatzes.
 	 * @param <GValue> Typ des Werts. */
 	public static class ConstructorGetter<GItem, GValue> extends AbstractGetter<GItem, GValue> {
-	
+
 		public final Constructor<?> that;
-	
+
 		public final boolean forceAccessible;
-	
+
 		public ConstructorGetter(final Constructor<?> that, final boolean forceAccessible) throws NullPointerException, IllegalArgumentException {
 			this.forceAccessible = forceAccessible;
 			if (!Modifier.isStatic(that.getModifiers()) || (that.getParameterTypes().length != 1)) throw new IllegalArgumentException();
 			this.that = forceAccessible ? forceAccessible(that) : Objects.notNull(that);
 		}
-	
+
 		@Override
 		public GValue get(final GItem item) {
 			try {
@@ -626,12 +820,156 @@ public class Natives {
 				throw new IllegalArgumentException(cause);
 			}
 		}
-	
+
 		@Override
 		public String toString() {
 			return Objects.toInvokeString(this, this.that, this.forceAccessible);
 		}
-	
+
+	}
+
+	/** Diese Klasse implementiert einen {@link Consumer3}, der das {@link #set(Object) Schreiben} an eine gegebene {@link Method nativen statische Methode}
+	 * delegiert. Das Schreiben des Werts {@code value} erfolgt über {@code this.that.invoke(null, value)}.
+	 *
+	 * @param <GValue> Typ des Werts. */
+	public static class MethodConsumer<GValue> extends AbstractConsumer<GValue> {
+
+		public final Method that;
+
+		public final boolean forceAccessible;
+
+		/** Dieser Konstruktor initialisiert Methode und {@link Natives#forceAccessible(AccessibleObject) Zugreifbarkeit}. */
+		public MethodConsumer(final Method that, final boolean forceAccessible) throws NullPointerException, IllegalArgumentException {
+			this.forceAccessible = forceAccessible;
+			if (!Modifier.isStatic(that.getModifiers()) || (that.getParameterTypes().length != 1)) throw new IllegalArgumentException();
+			this.that = forceAccessible ? forceAccessible(that) : Objects.notNull(that);
+		}
+
+		@Override
+		public void set(final GValue value) {
+			try {
+				this.that.invoke(null, value);
+			} catch (IllegalAccessException | InvocationTargetException cause) {
+				throw new IllegalArgumentException(cause);
+			}
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.that, this.forceAccessible);
+		}
+
+	}
+
+	/** Diese Klasse implementiert einen {@link Producer3}, der das {@link #get() Lesen} an eine gegebene {@link Method nativen statische Methode} delegiert. Das
+	 * Lesen erfolgt über {@code this.that.invoke(null)}.
+	 *
+	 * @param <VALUE> Typ des Werts. */
+	public static class MethodProducer<VALUE> extends AbstractProducer<VALUE> {
+
+		public final Method that;
+
+		public final boolean forceAccessible;
+
+		/** Dieser Konstruktor initialisiert Methode und {@link Natives#forceAccessible(AccessibleObject) Zugreifbarkeit}. */
+		public MethodProducer(final Method that, final boolean forceAccessible) throws NullPointerException, IllegalArgumentException {
+			this.forceAccessible = forceAccessible;
+			if (!Modifier.isStatic(that.getModifiers()) || (that.getParameterTypes().length != 0)) throw new IllegalArgumentException();
+			this.that = forceAccessible ? forceAccessible(that) : Objects.notNull(that);
+		}
+
+		@Override
+		@SuppressWarnings ("unchecked")
+		public VALUE get() {
+			try {
+				return (VALUE)this.that.invoke(null);
+			} catch (IllegalAccessException | InvocationTargetException cause) {
+				throw new IllegalArgumentException(cause);
+			}
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.that, this.forceAccessible);
+		}
+
+	}
+
+	/** Diese Klasse implementiert einen {@link Producer3}, der das {@link #get() Lesen} an einen gegebenen {@link Method nativen statischen Konstruktor}
+	 * delegiert. Das Lesen erfolgt über {@code this.that.newInstance()}.
+	 *
+	 * @param <VALUE> Typ des Werts. */
+	public static class ConstructorProducer<VALUE> extends AbstractProducer<VALUE> {
+
+		public final Constructor<?> that;
+
+		public final boolean forceAccessible;
+
+		/** Dieser Konstruktor initialisiert Konstruktor und {@link Natives#forceAccessible(AccessibleObject) Zugreifbarkeit}. */
+		public ConstructorProducer(final Constructor<?> that, final boolean forceAccessible) throws NullPointerException, IllegalArgumentException {
+			this.forceAccessible = forceAccessible;
+			if (!Modifier.isStatic(that.getModifiers()) || (that.getParameterTypes().length != 0)) throw new IllegalArgumentException();
+			this.that = forceAccessible ? forceAccessible(that) : Objects.notNull(that);
+		}
+
+		@Override
+		@SuppressWarnings ("unchecked")
+		public VALUE get() {
+			try {
+				return (VALUE)this.that.newInstance();
+			} catch (IllegalAccessException | InstantiationException | InvocationTargetException cause) {
+				throw new IllegalArgumentException(cause);
+			}
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.that, this.forceAccessible);
+		}
+
+	}
+
+	/** Diese Klasse implementiert ein {@link Property2}, das das {@link #get() Lesen} und {@link #set(Object) Schreiben} an ein gegebenes
+	 * {@link java.lang.reflect.Field natives statisches Datenfeld} delegiert. *
+	 *
+	 * @param <VALUE> Typ des Werts. */
+	public static class NativeProperty<VALUE> extends AbstractProperty<VALUE> {
+
+		public final java.lang.reflect.Field that;
+
+		public final boolean forceAccessible;
+
+		/** Dieser Konstruktor initialisiert das Datenfeld und {@link Natives#forceAccessible(AccessibleObject) Zugreifbarkeit}. */
+		public NativeProperty(final java.lang.reflect.Field that, final boolean forceAccessible) throws NullPointerException, IllegalArgumentException {
+			this.forceAccessible = forceAccessible;
+			if (!Modifier.isStatic(that.getModifiers())) throw new IllegalArgumentException();
+			this.that = forceAccessible ? forceAccessible(that) : Objects.notNull(that);
+		}
+
+		@Override
+		@SuppressWarnings ("unchecked")
+		public VALUE get() {
+			try {
+				return (VALUE)this.that.get(null);
+			} catch (final IllegalAccessException cause) {
+				throw new IllegalArgumentException(cause);
+			}
+		}
+
+		@Override
+		public void set(final VALUE value) {
+			try {
+				this.that.set(null, value);
+			} catch (final IllegalAccessException cause) {
+				throw new IllegalArgumentException(cause);
+			}
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.that, this.forceAccessible);
+		}
+
 	}
 
 }

@@ -209,7 +209,7 @@ public class DQ {
 
 	static QESet newObjectSubjectMapEdges(QN context, QN predicate, Map<? extends QN, ? extends QN> objectSubjectMap) {
 		var owner = context.owner();
-		return owner.newEdges(Iterables.translate(objectSubjectMap.entrySet(), entry -> {
+		return owner.newEdges(Iterables.translatedIterable(objectSubjectMap.entrySet(), entry -> {
 			var subject = entry.getValue();
 			return subject != null ? owner.newEdge(context, predicate, subject, entry.getKey()) : null;
 		}).filter(Filters.emptyFilter()));
@@ -217,15 +217,15 @@ public class DQ {
 
 	static QESet newObjectSubjectSetMapEdges(QN context, QN predicate, Map<? extends QN, ? extends Iterable<? extends QN>> objectSubjectSetMap) {
 		var owner = context.owner();
-		return owner.newEdges(Iterables.concatAll(Iterables.translate(objectSubjectSetMap.entrySet(), entry -> {
+		return owner.newEdges(Iterables.concatAll(Iterables.translatedIterable(objectSubjectSetMap.entrySet(), entry -> {
 			var object = entry.getKey();
-			return Iterables.translate(entry.getValue(), subject -> owner.newEdge(context, predicate, subject, object));
+			return Iterables.translatedIterable(entry.getValue(), subject -> owner.newEdge(context, predicate, subject, object));
 		})));
 	}
 
 	static QESet newSubjectObjectMapEdges(QN context, QN predicate, Map<? extends QN, ? extends QN> subjectObjectMap) {
 		var owner = context.owner();
-		return owner.newEdges(Iterables.translate(subjectObjectMap.entrySet(), entry -> {
+		return owner.newEdges(Iterables.translatedIterable(subjectObjectMap.entrySet(), entry -> {
 			var object = entry.getValue();
 			return object != null ? owner.newEdge(context, predicate, entry.getKey(), object) : null;
 		}).filter(Filters.emptyFilter()));
@@ -233,9 +233,9 @@ public class DQ {
 
 	static QESet newSubjectObjectSetMapEdges(QN context, QN predicate, Map<? extends QN, ? extends Iterable<? extends QN>> subjectObjectSetMap) {
 		var owner = context.owner();
-		return owner.newEdges(Iterables.concatAll(Iterables.translate(subjectObjectSetMap.entrySet(), entry -> {
+		return owner.newEdges(Iterables.concatAll(Iterables.translatedIterable(subjectObjectSetMap.entrySet(), entry -> {
 			var subject = entry.getKey();
-			return Iterables.translate(entry.getValue(), object -> owner.newEdge(context, predicate, subject, object));
+			return Iterables.translatedIterable(entry.getValue(), object -> owner.newEdge(context, predicate, subject, object));
 		})));
 	}
 
@@ -483,7 +483,7 @@ public class DQ {
 
 		var edgesHavingObjectsToClone = edges.havingObjects(nodesToCloneWithoutValue);
 
-		var edgesHavingObjectsToCloneIterable = Iterables.translate(edgesHavingObjectsToClone, edge -> {
+		var edgesHavingObjectsToCloneIterable = Iterables.translatedIterable(edgesHavingObjectsToClone, edge -> {
 			var cloneWith = cloneWithObject.get(edge.predicate());
 			if ((cloneWith != CLONE_WITH_EDGE) && (cloneWith != CLONE_WITH_NODE)) return null;
 			QN sourceObject = edge.object(), targetObject = clones.get(sourceObject);
@@ -496,7 +496,7 @@ public class DQ {
 
 		var edgesHavingSubjectsToClone = edges.havingSubjects(nodesToCloneWithoutValue);
 
-		var edgesHavingSubjectsToCloneIterable = Iterables.translate(edgesHavingSubjectsToClone, edge -> {
+		var edgesHavingSubjectsToCloneIterable = Iterables.translatedIterable(edgesHavingSubjectsToClone, edge -> {
 			var cloneWith = cloneWithObject.get(edge.predicate());
 			if ((cloneWith != CLONE_WITH_EDGE) && (cloneWith != CLONE_WITH_NODE)) return null;
 			QN sourceObject = edge.object(), targetObject = clones.get(sourceObject);

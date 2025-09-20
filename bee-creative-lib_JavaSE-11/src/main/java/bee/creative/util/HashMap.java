@@ -23,7 +23,7 @@ public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> impleme
 
 	/** Diese Methode ist eine Abkürzung für {@link #from(Hasher, Getter, Getter, Setter) HashMap.from(hasher, Getters.neutral(), Getters.empty(), null)}. */
 	public static <GKey, GValue> HashMap<GKey, GValue> from(final Hasher hasher) throws NullPointerException {
-		return HashMap.from(hasher, Getters.<GKey>neutralGetter(), Getters.<GKey, GValue>empty(), null);
+		return HashMap.from(hasher, Getters.<GKey>neutralGetter(), Getters.<GKey, GValue>emptyGetter(), null);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #from(Hasher, Getter, Getter, Setter) HashMap.from(hasher, Getters.neutral(), installValue, null)}. */

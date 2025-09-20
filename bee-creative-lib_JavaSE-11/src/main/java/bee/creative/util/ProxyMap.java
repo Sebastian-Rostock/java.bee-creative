@@ -16,16 +16,16 @@ public class ProxyMap<K, V> extends AbstractProxyMap<K, V, Map<K, V>> {
 	 *
 	 * @throws NullPointerException */
 	public static <K, V> ProxyMap<K, V> from(Producer<Map<K, V>> getValue, Consumer<Map<K, V>> setValue) throws NullPointerException {
-		return ProxyMap.from(Producers.translate(getValue, value -> {
+		return ProxyMap.from(Producers.translatedProducer(getValue, value -> {
 			if (value instanceof HashMap2) return value;
 			if (value != null) return new HashMap2<>(value);
 			return new HashMap2<>();
-		}), Consumers.translate(setValue, value -> {
+		}), Consumers.translatedConsumer(setValue, value -> {
 			if (value.size() > 1) return value;
 			for (var entry: value.entrySet())
 				return Collections.singletonMap(entry.getKey(), entry.getValue());
 			return null;
-		}), Producers.translate(getValue, value -> {
+		}), Producers.translatedProducer(getValue, value -> {
 			if (value != null) return value;
 			return Collections.emptyMap();
 		}));

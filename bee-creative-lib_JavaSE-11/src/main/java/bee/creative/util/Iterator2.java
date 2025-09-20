@@ -41,9 +41,9 @@ public interface Iterator2<E> extends Iterator<E> {
 		return Iterators.limit(this, count);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Iterators#translate(Iterator, Getter) Iterators.translate(this, trans)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Iterators#translatedIterator(Iterator, Getter) Iterators.translate(this, trans)}. */
 	default <GTarget> Iterator2<GTarget> translate(Getter<? super E, ? extends GTarget> trans) throws NullPointerException {
-		return Iterators.translate(this, trans);
+		return Iterators.translatedIterator(this, trans);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Iterators#unique(Iterator) Iterators.unique(this)}. */

@@ -1,10 +1,12 @@
 package bee.creative.util;
 
-import static bee.creative.util.Consumers.consumerFrom;
+import static bee.creative.util.Consumers.consumerFromSetter;
 import static bee.creative.util.Fields.fieldFrom;
-import static bee.creative.util.Setters.aggregateSetter;
-import static bee.creative.util.Setters.optionalizeSetter;
-import static bee.creative.util.Setters.synchronizeSetter;
+import static bee.creative.util.Getters.neutralGetter;
+import static bee.creative.util.Producers.producerFromValue;
+import static bee.creative.util.Setters.aggregatedSetter;
+import static bee.creative.util.Setters.optionalizedSetter;
+import static bee.creative.util.Setters.synchronizedSetter;
 
 /** Diese Schnittstelle ergänzt einen {@link Setter} insb. um eine Anbindung an Methoden von {@link Setters}.
  *
@@ -13,24 +15,24 @@ import static bee.creative.util.Setters.synchronizeSetter;
  * @param <VALUE> Typ des Werts der Eigenschaft. */
 public interface Setter2<ITEM, VALUE> extends Setter<ITEM, VALUE> {
 
-	/** Diese Methode ist eine Abkürzung für {@link Setters#aggregateSetter(Setter) aggregateSetter(this)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Setters#aggregatedSetter(Setter) aggregatedSetter(this, neutralGetter())}. */
 	default Setter2<Iterable<? extends ITEM>, VALUE> aggregate() {
-		return aggregateSetter(this);
+		return aggregatedSetter(this, neutralGetter());
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Setters#optionalizeSetter(Setter) optionalizeSetter(this)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Setters#optionalizedSetter(Setter) optionalizedSetter(this)}. */
 	default Setter2<ITEM, VALUE> optionalize() {
-		return optionalizeSetter(this);
+		return optionalizedSetter(this);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Setters#synchronizeSetter(Setter) synchronizeSetter(this)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Setters#synchronizedSetter(Setter) synchronizedSetter(this)}. */
 	default Setter2<ITEM, VALUE> synchronize() {
-		return synchronizeSetter(this);
+		return synchronizedSetter(this);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Setters#synchronizeSetter(Setter, Object) synchronizeSetter(this)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Setters#synchronizedSetter(Setter, Object) synchronizedSetter(this)}. */
 	default Setter2<ITEM, VALUE> synchronize(Object mutex) {
-		return synchronizeSetter(this, mutex);
+		return synchronizedSetter(this, mutex);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Fields#fieldFrom(Getter, Setter) fieldFrom(get, this)}. */
@@ -38,14 +40,14 @@ public interface Setter2<ITEM, VALUE> extends Setter<ITEM, VALUE> {
 		return fieldFrom(get, this);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Consumers#consumerFrom(Setter) consumerFrom(this)}. */
+	/** Diese Methode ist eine Abkürzung für {@link #toConsumer(Object) toConsumer(null)}. */
 	default Consumer3<VALUE> toConsumer() {
-		return consumerFrom(this);
+		return this.toConsumer(null);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Consumers#consumerFrom(Setter, Object) consumerFrom(this, item)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Consumers#consumerFromSetter(Setter, Producer) consumerFrom(producerFromValue(item), this)}. */
 	default Consumer3<VALUE> toConsumer(ITEM item) {
-		return consumerFrom(this, item);
+		return consumerFromSetter(this, producerFromValue(item));
 	}
 
 }

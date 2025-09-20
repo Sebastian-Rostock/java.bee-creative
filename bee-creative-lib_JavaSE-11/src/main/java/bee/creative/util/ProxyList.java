@@ -11,16 +11,16 @@ import bee.creative.lang.Objects;
 public class ProxyList<E> extends AbstractProxyList<E, List<E>> {
 
 	public static <E> ProxyList<E> from(Producer<List<E>> getValue, Consumer<List<E>> setValue) throws NullPointerException {
-		return ProxyList.<E>from(Producers.translate(getValue, value -> {
+		return ProxyList.<E>from(Producers.translatedProducer(getValue, value -> {
 			if (value instanceof ArrayList) return value;
 			if (value != null) return new ArrayList<>(value);
 			return new ArrayList<>();
-		}), Consumers.translate(setValue, value -> {
+		}), Consumers.translatedConsumer(setValue, value -> {
 			if (value.size() > 1) return value;
 			for (var item: value)
 				return Collections.singletonList(item);
 			return null;
-		}), Producers.translate(getValue, value -> {
+		}), Producers.translatedProducer(getValue, value -> {
 			if (value != null) return value;
 			return Collections.emptyList();
 		}));

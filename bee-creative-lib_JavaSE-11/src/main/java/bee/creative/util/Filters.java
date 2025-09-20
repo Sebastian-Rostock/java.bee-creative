@@ -22,30 +22,15 @@ public class Filters {
 	public static <ITEM> Filter2<ITEM> filterFrom(final Filter<? super ITEM> that) {
 		if (that == null) return Filters.emptyFilter();
 		if (that instanceof Filter2) return (Filter2<ITEM>)that;
-		return Filters.translateFilter(that, Getters.<ITEM>neutralGetter());
+		return Filters.translatedFilter(that, Getters.<ITEM>neutralGetter());
 	}
 
-	/** Diese Methode liefert den {@link EmptyFilter}. */
-	@SuppressWarnings ("unchecked")
-	public static <ITEM> Filter2<ITEM> emptyFilter() {
-		return (Filter2<ITEM>)EmptyFilter.INSTANCE;
-	}
-
-	/** Diese Methode liefert den {@link AcceptFilter}. */
-	@SuppressWarnings ("unchecked")
-	public static <ITEM> Filter2<ITEM> acceptFilter() {
-		return (Filter2<ITEM>)AcceptFilter.INSTANCE;
-	}
-
-	/** Diese Methode liefert den {@link RejectFilter}. */
-	@SuppressWarnings ("unchecked")
-	public static <ITEM> Filter2<ITEM> rejectFilter() {
-		return (Filter2<ITEM>)RejectFilter.INSTANCE;
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link ClassFilter new ClassFilter<>(that)}. */
-	public static <ITEM> Filter2<ITEM> fromClass(final Class<?> that) throws NullPointerException {
-		return new ClassFilter<>(that);
+	/** Diese Methode liefert einen {@link Filter2} zu {@link Getter#get(Object)} des gegebenen {@link Getter}. Die Akzeptanz eines Datensatzes {@code item}
+	 * entspricht {@code Boolean.TRUE.equals(that.get(item))}.
+	 *
+	 * @param <ITEM> Typ des Datensatzes. */
+	public static <ITEM> Filter2<ITEM> fromGetter(final Getter<? super ITEM, Boolean> that) throws NullPointerException {
+		return new GetterFilter<>(that);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link EqualFilter new EqualFilter<>(that)}. */
@@ -67,75 +52,63 @@ public class Filters {
 	 *
 	 * @see Arrays#asList(Object...)
 	 * @see Iterables#toSet(Iterable) */
-	public static Filter2<Object> fromItems(final Object... items) throws NullPointerException {
-		return Filters.fromItems(Iterables.toSet(Arrays.asList(items)));
+	public static Filter2<Object> fromItems(Object... items) throws NullPointerException {
+		return Filters.fromItems(Iterables.iterableFromArray(items).toSet());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #fromItems(Collection) Filters.fromItems(Iterables.toSet(that))}.
 	 *
 	 * @see Iterables#toSet(Iterable) */
-	public static Filter2<Object> fromItems(final Iterable<?> that) throws NullPointerException {
+	public static Filter2<Object> fromItems(Iterable<?> that) throws NullPointerException {
 		return Filters.fromItems(Iterables.toSet(that));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ContainsFilter new ContainsFilter<>(that)}. */
-	public static Filter2<Object> fromItems(final Collection<?> that) throws NullPointerException {
+	public static Filter2<Object> fromItems(Collection<?> that) throws NullPointerException {
 		return new ContainsFilter(that);
 	}
 
-	/** Diese Methode liefert einen {@link Filter2} zu {@link Getter#get(Object)} des gegebenen {@link Getter}. Die Akzeptanz eines Datensatzes {@code item}
-	 * entspricht {@code Boolean.TRUE.equals(that.get(item))}.
-	 *
-	 * @param <ITEM> Typ des Datensatzes. */
-	public static <ITEM> Filter2<ITEM> fromGetter(final Getter<? super ITEM, Boolean> that) throws NullPointerException {
-		return new GetterFilter<>(that);
+	/** Diese Methode liefert den {@link EmptyFilter}. */
+	@SuppressWarnings ("unchecked")
+	public static <ITEM> Filter2<ITEM> emptyFilter() {
+		return (Filter2<ITEM>)EmptyFilter.INSTANCE;
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link NegationFilter new NegationFilter<>(that)}. */
-	public static <ITEM> Filter2<ITEM> negateFilter(final Filter<? super ITEM> that) throws NullPointerException {
-		return new NegationFilter<>(that);
+	/** Diese Methode liefert den {@link AcceptFilter}. */
+	@SuppressWarnings ("unchecked")
+	public static <ITEM> Filter2<ITEM> acceptFilter() {
+		return (Filter2<ITEM>)AcceptFilter.INSTANCE;
+	}
+
+	/** Diese Methode liefert den {@link RejectFilter}. */
+	@SuppressWarnings ("unchecked")
+	public static <ITEM> Filter2<ITEM> rejectFilter() {
+		return (Filter2<ITEM>)RejectFilter.INSTANCE;
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link NegatiedFilter new NegationFilter<>(that)}. */
+	public static <ITEM> Filter2<ITEM> negatedFilter(Filter<? super ITEM> that) throws NullPointerException {
+		return new NegatiedFilter<>(that);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link DisjunctionFilter new DisjunctionFilter<>(that1, that2)}. */
-	public static <ITEM> Filter2<ITEM> disjoinFilter(final Filter<? super ITEM> that1, final Filter<? super ITEM> that2) throws NullPointerException {
+	public static <ITEM> Filter2<ITEM> disjoinedFilter(Filter<? super ITEM> that1, Filter<? super ITEM> that2) throws NullPointerException {
 		return new DisjunctionFilter<>(that1, that2);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ConjunctionFilter new ConjunctionFilter<>(that1, that2)}. */
-	public static <ITEM> Filter2<ITEM> conjoinFilter(final Filter<? super ITEM> that1, final Filter<? super ITEM> that2) throws NullPointerException {
+	public static <ITEM> Filter2<ITEM> conjoinedFilter(Filter<? super ITEM> that1, Filter<? super ITEM> that2) throws NullPointerException {
 		return new ConjunctionFilter<>(that1, that2);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Filters#fromGetter(Getter) Filters.fromGetter(Getters.fromFilter(that).buffer())}.
-	 *
-	 * @see Getters#fromFilter(Filter)
-	 * @see Getters#buffer(Getter) */
-	public static <ITEM> Filter2<ITEM> bufferFilter(final Filter<? super ITEM> that) throws NullPointerException {
-		return Filters.fromGetter(Getters.fromFilter(that).buffer());
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link Filters#fromGetter(Getter) Filters.fromGetter(Getters.fromFilter(that).buffer(mode, hasher))}.
-	 *
-	 * @see Getters#fromFilter(Filter)
-	 * @see Getters#buffer(Getter, int, Hasher) */
-	public static <ITEM> Filter2<ITEM> bufferFilter(final Filter<? super ITEM> that, final int mode, final Hasher hasher)
-		throws NullPointerException, IllegalArgumentException {
-		return Filters.fromGetter(Getters.fromFilter(that).buffer(mode, hasher));
-	}
-
 	/** Diese Methode ist eine Abkürzung für {@link TranslatedFilter new TranslatedFilter<>(that, trans)}. */
-	public static <GSource, GTarget> Filter2<GTarget> translateFilter(final Filter<? super GSource> that, final Getter<? super GTarget, ? extends GSource> trans)
+	public static <GSource, GTarget> Filter2<GTarget> translatedFilter(final Filter<? super GSource> that, final Getter<? super GTarget, ? extends GSource> trans)
 		throws NullPointerException {
 		return new TranslatedFilter<>(that, trans);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Filters#synchronizeFilter(Filter, Object) Filters.synchronize(that, that)}. */
-	public static <ITEM> Filter2<ITEM> synchronizeFilter(final Filter<? super ITEM> that) throws NullPointerException {
-		return Filters.synchronizeFilter(that, that);
-	}
-
 	/** Diese Methode ist eine Abkürzung für {@link SynchronizedFilter new SynchronizedFilter<>(that, mutex)}. */
-	public static <ITEM> Filter2<ITEM> synchronizeFilter(final Filter<? super ITEM> that, final Object mutex) throws NullPointerException {
+	public static <ITEM> Filter2<ITEM> synchronizedFilter(final Filter<? super ITEM> that, final Object mutex) throws NullPointerException {
 		return new SynchronizedFilter<>(that, mutex);
 	}
 
@@ -155,7 +128,7 @@ public class Filters {
 		public static final Filter<?> INSTANCE = new AcceptFilter();
 
 		@Override
-		public boolean accept(final Object item) {
+		public boolean accept(Object item) {
 			return true;
 		}
 
@@ -168,33 +141,8 @@ public class Filters {
 		public static final Filter<?> INSTANCE = new RejectFilter();
 
 		@Override
-		public boolean accept(final Object item) {
+		public boolean accept(Object item) {
 			return false;
-		}
-
-	}
-
-	/** Diese Klasse implementiert einen {@link Filter2}, der alle Datensätze akzeptiert, die Instanzen einer gegebenen {@link Class} sind. Die Akzeptanz eines
-	 * Datensatzes {@code item} ist {@code this.that.isInstance(item)}.
-	 *
-	 * @param <ITEM> Typ der Datensätze. */
-
-	public static class ClassFilter<ITEM> extends AbstractFilter<ITEM> {
-
-		public final Class<?> that;
-
-		public ClassFilter(final Class<?> source) throws NullPointerException {
-			this.that = Objects.notNull(source);
-		}
-
-		@Override
-		public boolean accept(final ITEM item) {
-			return this.that.isInstance(item);
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.that);
 		}
 
 	}
@@ -302,11 +250,11 @@ public class Filters {
 	 *
 	 * @param <ITEM> Typ der Datensätze. */
 
-	public static class NegationFilter<ITEM> extends AbstractFilter<ITEM> {
+	public static class NegatiedFilter<ITEM> extends AbstractFilter<ITEM> {
 
 		public final Filter<? super ITEM> that;
 
-		public NegationFilter(final Filter<? super ITEM> that) throws NullPointerException {
+		public NegatiedFilter(final Filter<? super ITEM> that) throws NullPointerException {
 			this.that = Objects.notNull(that);
 		}
 
@@ -419,7 +367,7 @@ public class Filters {
 
 	public static class SynchronizedFilter<ITEM> extends AbstractFilter<ITEM> {
 
-		public SynchronizedFilter(final Filter<? super ITEM> that, final Object mutex) throws NullPointerException {
+		public SynchronizedFilter(Filter<? super ITEM> that, Object mutex) throws NullPointerException {
 			this.that = Objects.notNull(that);
 			this.mutex = Objects.notNull(mutex, this);
 		}

@@ -90,7 +90,7 @@ public class Iterables {
 
 		@Override
 		public Iterator2<GItem> iterator() {
-			return Iterators.concatAll(Iterators.translate(this.that.iterator(), Iterables.<GItem>iterator()));
+			return Iterators.concatAll(Iterators.translatedIterator(this.that.iterator(), Iterables.<GItem>iterator()));
 		}
 
 		@Override
@@ -203,7 +203,7 @@ public class Iterables {
 
 	}
 
-	/** Diese Klasse implementiert das {@link Iterable2} zu {@link Iterators#translate(Iterator, Getter)}. */
+	/** Diese Klasse implementiert das {@link Iterable2} zu {@link Iterators#translatedIterator(Iterator, Getter)}. */
 	public static class TranslatedIterable<GItem, GItem2> extends AbstractIterable<GItem> {
 
 		public final Iterable<? extends GItem2> that;
@@ -217,7 +217,7 @@ public class Iterables {
 
 		@Override
 		public Iterator2<GItem> iterator() {
-			return Iterators.translate(this.that.iterator(), this.trans);
+			return Iterators.translatedIterator(this.that.iterator(), this.trans);
 		}
 
 		@Override
@@ -266,7 +266,7 @@ public class Iterables {
 
 		@Override
 		public Iterator2<GItem> iterator() {
-			return Iterators.unionAll(this.order, Iterators.translate(this.iters.iterator(), Iterables.<GItem>iterator()));
+			return Iterators.unionAll(this.order, Iterators.translatedIterator(this.iters.iterator(), Iterables.<GItem>iterator()));
 		}
 
 		@Override
@@ -321,7 +321,7 @@ public class Iterables {
 
 		@Override
 		public Iterator2<GItem> iterator() {
-			return Iterators.intersectAll(this.order, Iterators.translate(this.iters.iterator(), Iterables.<GItem>iterator()));
+			return Iterators.intersectAll(this.order, Iterators.translatedIterator(this.iters.iterator(), Iterables.<GItem>iterator()));
 		}
 
 		@Override
@@ -353,7 +353,7 @@ public class Iterables {
 	public static <GItem> Iterable2<GItem> from(Iterable<? extends GItem> that) {
 		if (that == null) return emptyIterable();
 		if (that instanceof Iterable2<?>) return (Iterable2<GItem>)that;
-		return translate(that, Getters.<GItem>neutralGetter());
+		return translatedIterable(that, Getters.<GItem>neutralGetter());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #fromItem(Object, int) Iterables.fromItem(item, 1)}. */
@@ -511,7 +511,7 @@ public class Iterables {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link TranslatedIterable new TranslatedIterable<>(that, trans)}. */
-	public static <GSource, GTarget> Iterable2<GTarget> translate(Iterable<? extends GSource> that, Getter<? super GSource, ? extends GTarget> trans)
+	public static <GSource, GTarget> Iterable2<GTarget> translatedIterable(Iterable<? extends GSource> that, Getter<? super GSource, ? extends GTarget> trans)
 		throws NullPointerException {
 		return new TranslatedIterable<>(that, trans);
 	}

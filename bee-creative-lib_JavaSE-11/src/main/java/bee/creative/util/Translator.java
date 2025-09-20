@@ -4,9 +4,9 @@ package bee.creative.util;
  * bidirektionalen {@link Getter}.
  *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GSource> Typ der Quellobjekte.
- * @param <GTarget> Typ der Zielobjekte. */
-public interface Translator<GSource, GTarget> {
+ * @param <SOURCE> Typ der Quellobjekte.
+ * @param <TARGET> Typ der Zielobjekte. */
+public interface Translator<SOURCE, TARGET> {
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn das gegebene Objekt ein gültiges Zielobjekt ist.
 	 *
@@ -26,7 +26,7 @@ public interface Translator<GSource, GTarget> {
 	 * @return Zielobjekt.
 	 * @throws ClassCastException Wenn {@code object} kein {@link #isSource(Object) Quellobjekt} ist.
 	 * @throws IllegalArgumentException Wenn {@code object} nicht übersetzt werden kann. */
-	GTarget toTarget(Object object) throws ClassCastException, IllegalArgumentException;
+	TARGET toTarget(Object object) throws ClassCastException, IllegalArgumentException;
 
 	/** Diese Methode übersetzt das gegebene Zielobjekt in den Quelldatentyp und gibt das so ermittelte Quellobjekt zurück.
 	 *
@@ -34,6 +34,6 @@ public interface Translator<GSource, GTarget> {
 	 * @return Quellobjekt.
 	 * @throws ClassCastException Wenn {@code object} kein {@link #isTarget(Object) Zielobjekt} ist.
 	 * @throws IllegalArgumentException Wenn {@code object} nicht übersetzt werden kann. */
-	GSource toSource(Object object) throws ClassCastException, IllegalArgumentException;
+	SOURCE toSource(Object object) throws ClassCastException, IllegalArgumentException;
 
 }

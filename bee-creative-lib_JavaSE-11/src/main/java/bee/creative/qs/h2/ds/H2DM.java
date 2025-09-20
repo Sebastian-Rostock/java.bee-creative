@@ -185,7 +185,7 @@ public class H2DM implements DM {
 
 	protected void installInstances(String typeIdent, Iterable<? extends H2DE> instances) {
 		var typeMap = new HashMap2<QN, QN>();
-		typeMap.putAll(instances, H2DE::node, Getters.fromValue(this.installType(typeIdent).node));
+		typeMap.putAll(instances, H2DE::node, Getters.getterFromValue(this.installType(typeIdent).node));
 		this.installLink(DT.IDENT_IsTypeWithInstance).setSourceMap(typeMap);
 	}
 
@@ -196,7 +196,7 @@ public class H2DM implements DM {
 		});
 		var identByNodeMap = new HashMap2<QN, String>(itemNodeByIdentNodeMap.size());
 		identLink.owner().newNodes(itemNodeByIdentNodeMap.keySet()).values(identByNodeMap::put);
-		var itemByNodeMap = HashMap2.from(Hashers.natural(), asItem);
+		var itemByNodeMap = HashMap2.from(Hashers.naturalHasher(), asItem);
 		itemNodeByIdentNodeMap.forEach((identNode, itemNode) -> itemByIdentMap.put(identByNodeMap.get(identNode), itemByNodeMap.install(itemNode)));
 	}
 

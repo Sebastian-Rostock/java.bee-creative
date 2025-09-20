@@ -6,8 +6,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import bee.creative.util.AbstractGetter;
 import bee.creative.util.Getter;
-import bee.creative.util.Getters;
+import bee.creative.util.Getter3;
 import bee.creative.util.Setter;
 
 /** Diese Klasse stellt einige statische Methoden zur Verarbeitung von regulären Ausdrücken und Zeichenketten zur Verfügung.
@@ -420,7 +421,7 @@ public class Strings {
 	 * @param flags Flags ({@link Pattern#CASE_INSENSITIVE}, {@link Pattern#MULTILINE}, {@link Pattern#DOTALL}, {@link Pattern#UNICODE_CASE},
 	 *        {@link Pattern#CANON_EQ}, {@link Pattern#UNIX_LINES}, {@link Pattern#LITERAL}, {@link Pattern#COMMENTS})
 	 * @return {@link Pattern}-Compiler. */
-	public static Getter<String, Pattern> patternCompiler(final int flags) {
+	public static Getter3<String, Pattern> patternCompiler(int flags) {
 		return new PatternCompiler(flags);
 	}
 
@@ -537,16 +538,16 @@ public class Strings {
 
 	}
 
-	private static class PatternCompiler implements Getter<String, Pattern> {
+	private static class PatternCompiler extends AbstractGetter<String, Pattern> {
 
 		final int flags;
 
-		PatternCompiler(final int flags) {
+		PatternCompiler(int flags) {
 			this.flags = flags;
 		}
 
 		@Override
-		public Pattern get(final String input) {
+		public Pattern get(String input) {
 			return Pattern.compile(input, this.flags);
 		}
 
@@ -559,7 +560,7 @@ public class Strings {
 
 	/** Dieses Feld speichert einen synchronisierten, gepufferten {@link #patternCompiler(int)} mit Flag {@code 0}. Dieser wird von den Methoden in
 	 * {@link #Strings()} genutzt, die einen regulärer Ausdruck kompilieren müssen. */
-	public static final Getter<String, Pattern> PATTERN_COMPILER = Getters.synchronize(Getters.buffer(Strings.patternCompiler(0)));
+	public static final Getter<String, Pattern> PATTERN_COMPILER = Strings.patternCompiler(0).buffer().synchronize();
 
 	/** Diese Methode wendet den gegebenen regulären Ausdruck auf die gegebene Zeichenkette an und gibt eine Liste von Zeichenketten zurück. Mit den beiden
 	 * Schaltern kann dazu entschieden werden, ob die von der {@code index} -ten Gruppen des regulären Ausdrucks getroffenen bzw. nicht getroffenen Zeichenkette

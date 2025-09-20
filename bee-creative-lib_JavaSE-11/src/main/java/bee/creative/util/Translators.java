@@ -14,7 +14,7 @@ public class Translators {
 	public static <SOURCE, TARGET> Translator2<SOURCE, TARGET> translatorFrom(Translator<SOURCE, TARGET> that) {
 		if (that == null) return emptyTranslator();
 		if (that instanceof Translator2) return (Translator2<SOURCE, TARGET>)that;
-		return reverseTranslator(reverseTranslator(that));
+		return reversedTranslator(reversedTranslator(that));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link CompositeTranslator new CompositeTranslator<>(sourceClass, targetClass, sourceTrans, targetTrans)}. */
@@ -49,15 +49,15 @@ public class Translators {
 	}
 
 	/** Diese Methode liefert einen neutralen {@link Translator2} und ist eine Abkürzung für {@link Translators#neutralTranslator(Class)
-	 * Translators.neutral(Object.class)}. */
+	 * neutralTranslator(Object.class)}. */
 	@SuppressWarnings ("unchecked")
-	public static <GValue> Translator2<GValue, GValue> neutralTranslator() {
-		return (Translator2<GValue, GValue>)neutralTranslator(Object.class);
+	public static <VALUE> Translator2<VALUE, VALUE> neutralTranslator() {
+		return (Translator2<VALUE, VALUE>)neutralTranslator(Object.class);
 	}
 
 	/** Diese Methode liefert einen neutralen {@link Translator2} und ist eine Abkürzung für {@link Translators#translatorFrom(Class, Class, Getter, Getter)
-	 * Translators.from(valueClass, valueClass, Getters.neutral(), Getters.neutral())}. */
-	public static <GValue> Translator2<GValue, GValue> neutralTranslator(Class<GValue> valueClass) throws NullPointerException {
+	 * translatorFrom(valueClass, valueClass, neutralGetter(), neutralGetter())}. */
+	public static <VALUE> Translator2<VALUE, VALUE> neutralTranslator(Class<VALUE> valueClass) throws NullPointerException {
 		return translatorFrom(valueClass, valueClass, neutralGetter(), neutralGetter());
 	}
 
@@ -67,23 +67,23 @@ public class Translators {
 		return new ConcatTranslator<>(that, trans);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link ReverseTranslator new ReverseTranslator<>(that)}. */
-	public static <SOURCE, TARGET> Translator2<SOURCE, TARGET> reverseTranslator(Translator<TARGET, SOURCE> that) throws NullPointerException {
-		return new ReverseTranslator<>(that);
+	/** Diese Methode ist eine Abkürzung für {@link ReversedTranslator new ReversedTranslator<>(that)}. */
+	public static <SOURCE, TARGET> Translator2<SOURCE, TARGET> reversedTranslator(Translator<TARGET, SOURCE> that) throws NullPointerException {
+		return new ReversedTranslator<>(that);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link OptionalizedTranslator new OptionalizedTranslator<>(that, mutex)}. */
-	public static <SOURCE, TARGET> Translator2<SOURCE, TARGET> optionalizeTranslator(Translator<SOURCE, TARGET> that) throws NullPointerException {
+	public static <SOURCE, TARGET> Translator2<SOURCE, TARGET> optionalizedTranslator(Translator<SOURCE, TARGET> that) throws NullPointerException {
 		return new OptionalizedTranslator<>(that);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #synchronizeTranslator(Translator, Object) synchronizeTranslator(that, that)}. */
-	public static <SOURCE, TARGET> Translator2<SOURCE, TARGET> synchronizeTranslator(Translator<SOURCE, TARGET> that) throws NullPointerException {
-		return synchronizeTranslator(that, that);
+	/** Diese Methode ist eine Abkürzung für {@link #synchronizedTranslator(Translator, Object) synchronizedTranslator(that, that)}. */
+	public static <SOURCE, TARGET> Translator2<SOURCE, TARGET> synchronizedTranslator(Translator<SOURCE, TARGET> that) throws NullPointerException {
+		return synchronizedTranslator(that, that);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link SynchronizedTranslator new SynchronizedTranslator<>(that, mutex)}. */
-	public static <SOURCE, TARGET> Translator2<SOURCE, TARGET> synchronizeTranslator(Translator<SOURCE, TARGET> that, Object mutex) throws NullPointerException {
+	public static <SOURCE, TARGET> Translator2<SOURCE, TARGET> synchronizedTranslator(Translator<SOURCE, TARGET> that, Object mutex) throws NullPointerException {
 		return new SynchronizedTranslator<>(that, mutex);
 	}
 
@@ -194,9 +194,9 @@ public class Translators {
 	 *
 	 * @param <SOURCE> Typ der Quellobjekte dieses sowie der Zielobjekte des gegebenen {@link Translator}.
 	 * @param <TARGET> Typ der Zielobjekte dieses sowie der Quellobjekte des gegebenen {@link Translator}. */
-	public static class ReverseTranslator<SOURCE, TARGET> extends AbstractTranslator<SOURCE, TARGET> {
+	public static class ReversedTranslator<SOURCE, TARGET> extends AbstractTranslator<SOURCE, TARGET> {
 
-		public ReverseTranslator(Translator<TARGET, SOURCE> that) throws NullPointerException {
+		public ReversedTranslator(Translator<TARGET, SOURCE> that) throws NullPointerException {
 			this.that = Objects.notNull(that);
 		}
 

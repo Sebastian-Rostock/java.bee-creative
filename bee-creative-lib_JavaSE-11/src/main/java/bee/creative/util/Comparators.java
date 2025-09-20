@@ -543,7 +543,7 @@ public class Comparators {
 	public static <GItem> Comparator2<GItem> from(final Comparator<? super GItem> that) {
 		if (that == null) return Comparators.neutral();
 		if (that instanceof Comparator2<?>) return (Comparator2<GItem>)that;
-		return Comparators.translate(that, Getters.<GItem>neutralGetter());
+		return Comparators.translatedComparator(that, Getters.<GItem>neutralGetter());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ConcatComparator new ConcatComparator<>(that1, that2)}. */
@@ -562,7 +562,7 @@ public class Comparators {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link TranslatedComparator new TranslatedComparator<>(that, trans)}. */
-	public static <GItem, GItem2> Comparator2<GItem> translate(final Comparator<? super GItem2> that, final Getter<? super GItem, ? extends GItem2> trans)
+	public static <GItem, GItem2> Comparator2<GItem> translatedComparator(final Comparator<? super GItem2> that, final Getter<? super GItem, ? extends GItem2> trans)
 		throws NullPointerException {
 		return new TranslatedComparator<>(that, trans);
 	}

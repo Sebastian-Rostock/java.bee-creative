@@ -70,7 +70,7 @@ public interface DSNSet extends QNSet {
 	 * @see #setNode(QN)
 	 * @return Elementsicht. */
 	default Property2<QN> asNode() {
-		return Properties.from(this::getNode, this::setNode);
+		return Properties.propertyFrom(this::getNode, this::setNode);
 	}
 
 	/** Diese Methode erlaubt Zugriff auf den {@link QN Hyperknoten} dieser Menge.
