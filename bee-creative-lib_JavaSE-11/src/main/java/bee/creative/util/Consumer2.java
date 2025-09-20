@@ -2,7 +2,7 @@ package bee.creative.util;
 
 import static bee.creative.util.Consumers.synchronizedConsumer;
 import static bee.creative.util.Properties.propertyFrom;
-import static bee.creative.util.Setters.setterFromConsumer;
+import static bee.creative.util.Setters.setterFrom;
 
 /** Diese Schnittstelle ergänzt einen {@link Consumer} insb. um eine Anbindung an Methoden von {@link Consumers}.
  *
@@ -10,9 +10,9 @@ import static bee.creative.util.Setters.setterFromConsumer;
  * @param <VALUE> Typ des Werts. */
 public interface Consumer2<VALUE> extends Consumer<VALUE> {
 
-	/** Diese Methode ist eine Abkürzung für {@link Consumers#synchronizedConsumer(Consumer) synchronizeConsumer(this)}. */
+	/** Diese Methode ist eine Abkürzung für {@link #synchronize(Object) this.synchronize(this)}. */
 	default Consumer2<VALUE> synchronize() {
-		return synchronizedConsumer(this);
+		return this.synchronize(this);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Consumers#synchronizedConsumer(Consumer, Object) synchronizeConsumer(this, mutex)}. */
@@ -20,9 +20,9 @@ public interface Consumer2<VALUE> extends Consumer<VALUE> {
 		return synchronizedConsumer(this, mutex);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Setters#setterFromConsumer(Consumer) setterFromConsumer(this)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Setters#setterFrom(Consumer) setterFromConsumer(this)}. */
 	default Setter3<Object, VALUE> toSetter() {
-		return setterFromConsumer(this);
+		return setterFrom(this);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Properties#propertyFrom(Producer, Consumer) propertyFrom(get, this)}. */

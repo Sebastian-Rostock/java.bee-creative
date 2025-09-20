@@ -24,11 +24,11 @@ public class Getters {
 
 	/** Diese Methode ist eine Abkürzung für {@link Producers#producerFromValue(Producer) getterFromProducer(producerFromValue(that))}. */
 	public static <VALUE> Getter3<Object, VALUE> getterFromValue(VALUE that) {
-		return getterFromProducer(producerFromValue(that));
+		return getterFrom(producerFromValue(that));
 	}
 
 	/** Diese Methode liefert einen {@link Getter3} zu {@link Producer#get()} des gegebenen {@link Producer}. */
-	public static <VALUE> Getter3<Object, VALUE> getterFromProducer(Producer<? extends VALUE> that) throws NullPointerException {
+	public static <VALUE> Getter3<Object, VALUE> getterFrom(Producer<? extends VALUE> that) throws NullPointerException {
 		return notNull(that) == emptyProducer() ? emptyGetter() : item -> that.get();
 	}
 
@@ -147,21 +147,6 @@ public class Getters {
 
 		/** Dieses Feld identifiziert die {@link SoftReference}. */
 		public static final int SOFT_REF_MODE = 2;
-
-		/** Diese Methode liefert {@value #HARD_REF_MODE}. */
-		public static int hardRefMode() {
-			return HARD_REF_MODE;
-		}
-
-		/** Diese Methode liefert {@value #WEAK_REF_MODE}. */
-		public static int weakRefMode() {
-			return WEAK_REF_MODE;
-		}
-
-		/** Diese Methode liefert {@value #SOFT_REF_MODE}. */
-		public static int softRefMode() {
-			return SOFT_REF_MODE;
-		}
 
 		public BufferedGetter(final Getter<? super ITEM, ? extends VALUE> that, final int mode, final Hasher hasher)
 			throws NullPointerException, IllegalArgumentException {

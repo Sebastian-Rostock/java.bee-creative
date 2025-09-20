@@ -1,5 +1,7 @@
 package bee.creative.util;
 
+import static bee.creative.util.Getters.getterFrom;
+import static bee.creative.util.Setters.setterFrom;
 import java.util.Map;
 import bee.creative.lang.Natives;
 import bee.creative.lang.Objects;
@@ -15,6 +17,10 @@ public final class Fields {
 		return new CompositeField<>(get, set);
 	}
 
+	public static <VALUE> Field2<Object, VALUE> fieldFrom(Property<VALUE> that) {
+		return fieldFrom(getterFrom(that), setterFrom(that));
+	}
+
 	/** Diese Methode liefert das {@link EmptyField}. */
 	@SuppressWarnings ("unchecked")
 	public static <GItem, VALUE> Field2<GItem, VALUE> emptyField() {
@@ -27,19 +33,12 @@ public final class Fields {
 	 * @see Setters#translatedSetter(Setter, Getter) */
 	public static <GSource, GTarget, VALUE> Field2<GSource, VALUE> concatField(final Getter<? super GSource, ? extends GTarget> trans,
 		final Field<? super GTarget, VALUE> that) throws NullPointerException {
-		return Fields.fieldFrom(Getters.concatGetter(trans, that), Setters.concatSetter(that, trans));
+		return Fields.fieldFrom(Getters.concatGetter(trans, that), Setters.concatSetter(trans, that));
 	}
 
 	/** Diese Methode liefert einen {@link Field2} zu {@link Property#get()} und {@link Property#set(Object)} des gegebenen {@link Property}. */
 	public static <VALUE> Field2<Object, VALUE> from(final Property<VALUE> target) throws NullPointerException {
 		return new PropertyField<>(target);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link #fieldFrom(Getter, Setter) Fields.from(Fields.empty(), that)}.
-	 *
-	 * @see #emptyField() */
-	public static <GItem, VALUE> Field2<GItem, VALUE> fieldFrom(final Setter<? super GItem, ? super VALUE> that) throws NullPointerException {
-		return Fields.fieldFrom(Fields.<GItem, VALUE>emptyField(), that);
 	}
 
 	/** Diese Methode liefert ein {@link Field} zu {@link Map#get(Object)} und {@link Map#put(Object, Object)} der gegebenen {@link Map}. */

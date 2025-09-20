@@ -1,6 +1,6 @@
 package bee.creative.util;
 
-import static bee.creative.util.Getters.neutralGetter;
+import static bee.creative.util.Producers.emptyProducer;
 import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert grundlegende {@link Consumer}.
@@ -8,16 +8,16 @@ import bee.creative.lang.Objects;
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Consumers {
 
-	/** Diese Methode liefert den gegebenen {@link Consumer} als {@link Consumer3}. Wenn er {@code null} ist, wird der {@link EmptyConsumer} geliefert. */
+	/** Diese Methode liefert den gegebenen {@link Consumer} als {@link Consumer3}. Wenn er {@code null} ist, wird der {@link #emptyConsumer()} geliefert. */
 	@SuppressWarnings ("unchecked")
 	public static <VALUE> Consumer3<VALUE> consumerFrom(Consumer<? super VALUE> that) {
 		if (that == null) return emptyConsumer();
 		if (that instanceof Consumer3<?>) return (Consumer3<VALUE>)that;
-		return translatedConsumer(that, neutralGetter());
+		return that::set;
 	}
 
 	public static <ITEM, VALUE> Consumer3<VALUE> consumerFromSetter(Setter<? super ITEM, ? super VALUE> that) throws NullPointerException {
-		return Consumers.consumerFromSetter(that, Producers.emptyProducer());
+		return consumerFromSetter(that, emptyProducer());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link SetterConsumer new SetterConsumer<>(that, item)}. */
@@ -36,11 +36,6 @@ public class Consumers {
 	public static <VALUE, VALUE2> Consumer3<VALUE2> translatedConsumer(Consumer<? super VALUE> that, Getter<? super VALUE2, ? extends VALUE> trans)
 		throws NullPointerException {
 		return new TranslatedConsumer<>(that, trans);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link #synchronizedConsumer(Consumer, Object) synchronizeConsumer(that, that)}. */
-	public static <VALUE> Consumer3<VALUE> synchronizedConsumer(Consumer<? super VALUE> that) {
-		return synchronizedConsumer(that, that);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link SynchronizedConsumer new SynchronizedConsumer<>(that, mutex)}. */

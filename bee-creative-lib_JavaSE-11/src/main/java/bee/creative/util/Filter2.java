@@ -6,7 +6,7 @@ import static bee.creative.util.Filters.negatedFilter;
 import static bee.creative.util.Filters.synchronizedFilter;
 import static bee.creative.util.Filters.translatedFilter;
 import static bee.creative.util.Getters.getterFrom;
-import static bee.creative.util.Getters.BufferedGetter.softRefMode;
+import static bee.creative.util.Getters.BufferedGetter.SOFT_REF_MODE;
 import static bee.creative.util.Hashers.naturalHasher;
 
 /** Diese Schnittstelle ergänzt einen {@link Filter} insb. um eine Anbindung an Methoden von {@link Filters}.
@@ -45,9 +45,9 @@ public interface Filter2<ITEM> extends Filter<ITEM> {
 		return conjoinedFilter(this, that);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #buffer(int, Hasher) this.buffer(softRefMode(), naturalHasher())}. */
+	/** Diese Methode ist eine Abkürzung für {@link #buffer(int, Hasher) this.buffer(SOFT_REF_MODE, naturalHasher())}. */
 	default Filter2<ITEM> buffer() {
-		return this.buffer(softRefMode(), naturalHasher());
+		return this.buffer(SOFT_REF_MODE, naturalHasher());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Getters#bufferedGetter(Getter, int, Hasher) this.toGetter().buffer(mode, hasher)::get}. */

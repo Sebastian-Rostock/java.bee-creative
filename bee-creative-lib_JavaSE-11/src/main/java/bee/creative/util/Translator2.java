@@ -1,7 +1,5 @@
 package bee.creative.util;
 
-import static bee.creative.util.Filters.filterFrom;
-import static bee.creative.util.Getters.getterFrom;
 import static bee.creative.util.Translators.concatTranslator;
 import static bee.creative.util.Translators.optionalizedTranslator;
 import static bee.creative.util.Translators.reversedTranslator;
@@ -16,22 +14,22 @@ public interface Translator2<SOURCE, TARGET> extends Translator<SOURCE, TARGET> 
 
 	/** Diese Methode ist eine Abkürzung für {@link Filters#filterFrom(Filter) filterFrom(this::isTarget)}. */
 	default Filter2<Object> isTarget() {
-		return filterFrom(this::isTarget);
+		return this::isTarget;
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Filters#filterFrom(Filter) filterFrom(this::isSource)}. */
 	default Filter2<Object> isSource() {
-		return filterFrom(this::isSource);
+		return this::isSource;
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Getters#getterFrom(Getter) getterFrom(item -> this.toTarget(item))}. */
 	default Getter3<Object, TARGET> toTarget() {
-		return getterFrom(item -> this.toTarget(item));
+		return item -> this.toTarget(item);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Getters#getterFrom(Getter) getterFrom(item -> this.toSource(item))}. */
 	default Getter3<Object, SOURCE> toSource() {
-		return getterFrom(item -> this.toSource(item));
+		return item -> this.toSource(item);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Translators#concatTranslator(Translator, Translator) concatTranslator(this, trans)}. */
@@ -49,9 +47,9 @@ public interface Translator2<SOURCE, TARGET> extends Translator<SOURCE, TARGET> 
 		return optionalizedTranslator(this);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Translators#synchronizedTranslator(Translator) synchronizedTranslator(this)}. */
+	/** Diese Methode ist eine Abkürzung für {@link #synchronize(Object) this.synchronize(this)}. */
 	default Translator2<SOURCE, TARGET> synchronize() {
-		return synchronizedTranslator(this);
+		return this.synchronize(this);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Translators#synchronizedTranslator(Translator) synchronizedTranslator(this, mutex)}. */

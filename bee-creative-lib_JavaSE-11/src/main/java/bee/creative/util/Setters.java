@@ -3,7 +3,6 @@ package bee.creative.util;
 import static bee.creative.lang.Objects.notNull;
 import static bee.creative.util.Getters.neutralGetter;
 import bee.creative.lang.Objects;
-import bee.creative.util.Setters.TranslatedSetter;
 
 /** Diese Klasse implementiert grundlegende {@link Setter}.
  *
@@ -13,13 +12,13 @@ public class Setters {
 	/** Diese Methode liefert den gegebenen {@link Setter} als {@link Setter}. Wenn er {@code null} ist, wird der {@link EmptySetter} geliefert. */
 	@SuppressWarnings ("unchecked")
 	public static <ITEM, VALUE> Setter3<ITEM, VALUE> setterFrom(Setter<? super ITEM, ? super VALUE> that) {
-		if (that == null) return Setters.emptySetter();
+		if (that == null) return emptySetter();
 		if (that instanceof Setter3) return (Setter3<ITEM, VALUE>)that;
-		return Setters.translatedSetter(that, neutralGetter());
+		return translatedSetter(that, neutralGetter());
 	}
 
-	public static <VALUE> Setter3<Object, VALUE> setterFromConsumer(Consumer<? super VALUE> that) {
-		return setterFrom((item, value) -> that.set(value));
+	public static <VALUE> Setter3<Object, VALUE> setterFrom(Consumer<? super VALUE> that) {
+		return new ConsumerSetter<>(that);
 	}
 
 	/** Diese Methode liefert den {@link EmptySetter}. */
@@ -29,7 +28,7 @@ public class Setters {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ConcatSetter new ConcatSetter<>(that, trans)}. */
-	public static <ITEM, ITEM2, VALUE> Setter3<ITEM, VALUE> concatSetter(Setter<? super ITEM2, ? super VALUE> that, Getter<? super ITEM, ? extends ITEM2> trans)
+	public static <ITEM, ITEM2, VALUE> Setter3<ITEM, VALUE> concatSetter(Getter<? super ITEM, ? extends ITEM2> trans, Setter<? super ITEM2, ? super VALUE> that)
 		throws NullPointerException {
 		return new ConcatSetter<>(that, trans);
 	}
@@ -38,11 +37,6 @@ public class Setters {
 	public static <ITEM, VALUE, VALUE2> Setter3<ITEM, VALUE> translatedSetter(Setter<? super ITEM, ? super VALUE2> that,
 		Getter<? super VALUE, ? extends VALUE2> trans) throws NullPointerException {
 		return new TranslatedSetter<>(that, trans);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link #aggregatedSetter(Setter, Getter) aggregatedSetter(that, Getters.neutral())}. */
-	public static <ITEM, VALUE> Setter3<Iterable<? extends ITEM>, VALUE> aggregatedSetter(Setter<? super ITEM, ? super VALUE> that) throws NullPointerException {
-		return aggregatedSetter(that, neutralGetter());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link AggregatedSetter new AggregatedSetter<>(that, trans)}. */
@@ -56,11 +50,6 @@ public class Setters {
 		return new OptionalizedSetter<>(that);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #synchronizedSetter(Setter, Object) synchronizedSetter(that, that)}. */
-	public static <ITEM, VALUE> Setter3<ITEM, VALUE> synchronizedSetter(Setter<? super ITEM, ? super VALUE> that) throws NullPointerException {
-		return synchronizedSetter(that, that);
-	}
-
 	/** Diese Methode ist eine Abkürzung für {@link SynchronizedSetter new SynchronizedSetter<>(that, mutex)}. */
 	public static <ITEM, VALUE> Setter3<ITEM, VALUE> synchronizedSetter(Setter<? super ITEM, ? super VALUE> that, Object mutex) throws NullPointerException {
 		return new SynchronizedSetter<>(that, mutex);
@@ -70,6 +59,21 @@ public class Setters {
 	public static class EmptySetter extends AbstractSetter<Object, Object> {
 
 		public static final Setter3<?, ?> INSTANCE = new EmptySetter();
+
+	}
+
+	public static final class ConsumerSetter<VALUE> extends AbstractSetter<Object, VALUE> {
+
+		private final Consumer<? super VALUE> that;
+
+		private ConsumerSetter(Consumer<? super VALUE> that) {
+			this.that = that;
+		}
+
+		@Override
+		public void set(Object item, VALUE value) {
+			that.set(value);
+		}
 
 	}
 

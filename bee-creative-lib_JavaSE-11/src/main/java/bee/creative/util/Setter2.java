@@ -15,7 +15,7 @@ import static bee.creative.util.Setters.synchronizedSetter;
  * @param <VALUE> Typ des Werts der Eigenschaft. */
 public interface Setter2<ITEM, VALUE> extends Setter<ITEM, VALUE> {
 
-	/** Diese Methode ist eine Abkürzung für {@link Setters#aggregatedSetter(Setter) aggregatedSetter(this, neutralGetter())}. */
+	/** Diese Methode ist eine Abkürzung für {@link Setters#aggregatedSetter(Setter, Getter) aggregatedSetter(this, neutralGetter())}. */
 	default Setter2<Iterable<? extends ITEM>, VALUE> aggregate() {
 		return aggregatedSetter(this, neutralGetter());
 	}
@@ -25,9 +25,9 @@ public interface Setter2<ITEM, VALUE> extends Setter<ITEM, VALUE> {
 		return optionalizedSetter(this);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Setters#synchronizedSetter(Setter) synchronizedSetter(this)}. */
+	/** Diese Methode ist eine Abkürzung für {@link #synchronize(Object) this.synchronize(this)}. */
 	default Setter2<ITEM, VALUE> synchronize() {
-		return synchronizedSetter(this);
+		return this.synchronize(this);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Setters#synchronizedSetter(Setter, Object) synchronizedSetter(this)}. */

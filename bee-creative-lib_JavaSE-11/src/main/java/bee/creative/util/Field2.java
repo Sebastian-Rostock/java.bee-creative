@@ -84,7 +84,7 @@ public interface Field2<GItem, GValue> extends Field<GItem, GValue>, Getter2<GIt
 	/** Diese Methode ist eine Abkürzung für {@link Properties#propertyFrom(Producer, Consumer) propertyFrom(() -> this.get(item), (value) -> this.set(item,
 	 * value))}. */
 	default Property2<GValue> toProperty(GItem item) {
-		return Properties.propertyFromField(this);
+		return Properties.propertyFrom(this);
 	}
 
 }

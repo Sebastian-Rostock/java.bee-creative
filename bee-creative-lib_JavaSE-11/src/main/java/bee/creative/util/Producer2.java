@@ -1,6 +1,7 @@
 package bee.creative.util;
 
 import static bee.creative.util.Consumers.consumerFromSetter;
+import static bee.creative.util.Getters.getterFrom;
 import static bee.creative.util.Getters.BufferedGetter.SOFT_REF_MODE;
 import static bee.creative.util.Hashers.naturalHasher;
 import static bee.creative.util.Producers.synchronizedProducer;
@@ -43,9 +44,9 @@ public interface Producer2<VALUE> extends Producer<VALUE> {
 		return synchronizedProducer(this, mutex);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Getters#getterFromProducer(Producer) getterFromProducer(this)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Getters#getterFrom(Producer) getterFromProducer(this)}. */
 	default Getter3<Object, VALUE> toGetter() {
-		return Getters.getterFromProducer(this);
+		return getterFrom(this);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Properties#propertyFrom(Producer, Consumer) propertyFrom(this, set)}. */

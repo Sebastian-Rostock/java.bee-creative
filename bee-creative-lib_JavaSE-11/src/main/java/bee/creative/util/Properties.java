@@ -20,23 +20,23 @@ public class Properties {
 		return new CompositeProperty<>(get, set);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link ValueProperty new ValueProperty<>(value)}. */
-	public static <VALUE> Property2<VALUE> propertyFromValue(VALUE value) {
-		return new ValueProperty<>(value);
-	}
-
-	public static <VALUE> Property2<VALUE> propertyFromField(Field<?, VALUE> that) {
+	public static <VALUE> Property2<VALUE> propertyFrom(Field<?, VALUE> that) {
 		return propertyFrom(Producers.producerFromGetter(that), Consumers.consumerFromSetter(that));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #propertyFrom(Producer, Consumer) Properties.from(get, Properties.empty())}. */
-	public static <VALUE> Property2<VALUE> propertyFromProducer(Producer<? extends VALUE> get) throws NullPointerException {
+	public static <VALUE> Property2<VALUE> propertyFrom(Producer<? extends VALUE> get) throws NullPointerException {
 		return propertyFrom(get, emptyProperty());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #propertyFrom(Producer, Consumer) Properties.from(Properties.empty(), set)}. */
-	public static <VALUE> Property2<VALUE> propertyFromConsumer(Consumer<? super VALUE> set) throws NullPointerException {
+	public static <VALUE> Property2<VALUE> propertyFrom(Consumer<? super VALUE> set) throws NullPointerException {
 		return propertyFrom(emptyProperty(), set);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link ValueProperty new ValueProperty<>(value)}. */
+	public static <VALUE> Property2<VALUE> propertyFromValue(VALUE value) {
+		return new ValueProperty<>(value);
 	}
 
 	/** Diese Methode liefert das {@link EmptyProperty}. */
@@ -46,7 +46,7 @@ public class Properties {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link SetupProperty new SetupProperty<>(that, setup)}. */
-	public static <VALUE> Property2<VALUE> setupProperty(final Property<VALUE> that, final Producer<? extends VALUE> setup) throws NullPointerException {
+	public static <VALUE> Property2<VALUE> setupProperty(Property<VALUE> that, Producer<? extends VALUE> setup) throws NullPointerException {
 		return new SetupProperty<>(that, setup);
 	}
 
@@ -55,8 +55,7 @@ public class Properties {
 	 *
 	 * @see Translator#toTarget(Object)
 	 * @see Translator#toSource(Object) */
-	public static <VALUE, VALUE2> Property2<VALUE> translatedProperty(final Property<VALUE2> that, final Translator<VALUE2, VALUE> trans)
-		throws NullPointerException {
+	public static <VALUE, VALUE2> Property2<VALUE> translatedProperty(Property<VALUE2> that, Translator<VALUE2, VALUE> trans) throws NullPointerException {
 		return Properties.translatedProperty(that, trans::toTarget, trans::toSource);
 	}
 
@@ -65,23 +64,23 @@ public class Properties {
 	 *
 	 * @see Producers#translatedProducer(Producer, Getter)
 	 * @see Consumers#translatedConsumer(Consumer, Getter) */
-	public static <GSource, GTarget> Property2<GTarget> translatedProperty(final Property<GSource> that,
-		final Getter<? super GSource, ? extends GTarget> transGet, final Getter<? super GTarget, ? extends GSource> transSet) throws NullPointerException {
+	public static <GSource, GTarget> Property2<GTarget> translatedProperty(Property<GSource> that, Getter<? super GSource, ? extends GTarget> transGet,
+		Getter<? super GTarget, ? extends GSource> transSet) throws NullPointerException {
 		return Properties.propertyFrom(Producers.translatedProducer(that, transGet), Consumers.translatedConsumer(that, transSet));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ObservableProperty new ObservableProperty<>(property)}. */
-	public static <VALUE> ObservableProperty<VALUE> observableProperty(final Property<VALUE> that) throws NullPointerException {
+	public static <VALUE> ObservableProperty<VALUE> observableProperty(Property<VALUE> that) throws NullPointerException {
 		return new ObservableProperty<>(that);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #synchronizedProperty(Property, Object) Properties.synchronize(that, that)}. */
-	public static <VALUE> Property2<VALUE> synchronizedProperty(final Property<VALUE> that) throws NullPointerException {
+	public static <VALUE> Property2<VALUE> synchronizedProperty(Property<VALUE> that) throws NullPointerException {
 		return synchronizedProperty(that, that);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link SynchronizedProperty new SynchronizedProperty<>(that, mutex)}. */
-	public static <VALUE> Property2<VALUE> synchronizedProperty(final Property<VALUE> that, final Object mutex) throws NullPointerException {
+	public static <VALUE> Property2<VALUE> synchronizedProperty(Property<VALUE> that, final Object mutex) throws NullPointerException {
 		return new SynchronizedProperty<>(that, mutex);
 	}
 
@@ -101,7 +100,7 @@ public class Properties {
 
 		public VALUE value;
 
-		public ValueProperty(final VALUE value) {
+		public ValueProperty(VALUE value) {
 			this.value = value;
 		}
 
@@ -111,7 +110,7 @@ public class Properties {
 		}
 
 		@Override
-		public void set(final VALUE value) {
+		public void set(VALUE value) {
 			this.value = value;
 		}
 
@@ -133,7 +132,7 @@ public class Properties {
 
 		public final Producer<? extends VALUE> setup;
 
-		public SetupProperty(final Property<VALUE> that, final Producer<? extends VALUE> setup) throws NullPointerException {
+		public SetupProperty(Property<VALUE> that, Producer<? extends VALUE> setup) throws NullPointerException {
 			this.that = Objects.notNull(that);
 			this.setup = Objects.notNull(setup);
 		}
@@ -148,7 +147,7 @@ public class Properties {
 		}
 
 		@Override
-		public void set(final VALUE value) {
+		public void set(VALUE value) {
 			this.that.set(value);
 		}
 
@@ -169,7 +168,7 @@ public class Properties {
 
 		public final Consumer<? super VALUE> set;
 
-		public CompositeProperty(final Producer<? extends VALUE> get, final Consumer<? super VALUE> set) throws NullPointerException {
+		public CompositeProperty(Producer<? extends VALUE> get, Consumer<? super VALUE> set) throws NullPointerException {
 			this.get = Objects.notNull(get);
 			this.set = Objects.notNull(set);
 		}
@@ -180,7 +179,7 @@ public class Properties {
 		}
 
 		@Override
-		public void set(final VALUE value) {
+		public void set(VALUE value) {
 			this.set.set(value);
 		}
 
@@ -201,7 +200,7 @@ public class Properties {
 		public final Property<VALUE> that;
 
 		/** Dieser Konstruktor initialisiert die überwachte Eigenschaft. */
-		public ObservableProperty(final Property<VALUE> that) {
+		public ObservableProperty(Property<VALUE> that) {
 			this.that = Objects.notNull(that);
 		}
 
@@ -211,7 +210,7 @@ public class Properties {
 		 *
 		 * @param value alter Wert.
 		 * @return gegebener oder kopierter Wert. */
-		protected VALUE customClone(final VALUE value) {
+		protected VALUE customClone(VALUE value) {
 			return value;
 		}
 
@@ -221,7 +220,7 @@ public class Properties {
 		 * @param value1 alter Wert.
 		 * @param value2 neuer Wert.
 		 * @return {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte. */
-		protected boolean customEquals(final VALUE value1, final VALUE value2) {
+		protected boolean customEquals(VALUE value1, VALUE value2) {
 			return Objects.deepEquals(value1, value2);
 		}
 
@@ -231,7 +230,7 @@ public class Properties {
 		}
 
 		@Override
-		public void set(final VALUE newValue) {
+		public void set(VALUE newValue) {
 			var oldValue = this.that.get();
 			if (this.customEquals(oldValue, newValue)) return;
 			oldValue = this.customClone(oldValue);
@@ -240,22 +239,22 @@ public class Properties {
 		}
 
 		@Override
-		public UpdatePropertyListener put(final UpdatePropertyListener listener) throws IllegalArgumentException {
+		public UpdatePropertyListener put(UpdatePropertyListener listener) throws IllegalArgumentException {
 			return UpdatePropertyObservables.INSTANCE.put(this, listener);
 		}
 
 		@Override
-		public UpdatePropertyListener putWeak(final UpdatePropertyListener listener) throws IllegalArgumentException {
+		public UpdatePropertyListener putWeak(UpdatePropertyListener listener) throws IllegalArgumentException {
 			return UpdatePropertyObservables.INSTANCE.putWeak(this, listener);
 		}
 
 		@Override
-		public void pop(final UpdatePropertyListener listener) throws IllegalArgumentException {
+		public void pop(UpdatePropertyListener listener) throws IllegalArgumentException {
 			UpdatePropertyObservables.INSTANCE.pop(this, listener);
 		}
 
 		@Override
-		public UpdatePropertyEvent fire(final UpdatePropertyEvent event) throws NullPointerException {
+		public UpdatePropertyEvent fire(UpdatePropertyEvent event) throws NullPointerException {
 			return UpdatePropertyObservables.INSTANCE.fire(this, event);
 		}
 
@@ -276,7 +275,7 @@ public class Properties {
 
 		public final Object mutex;
 
-		public SynchronizedProperty(final Property<VALUE> that, final Object mutex) throws NullPointerException {
+		public SynchronizedProperty(Property<VALUE> that, Object mutex) throws NullPointerException {
 			this.that = Objects.notNull(that);
 			this.mutex = Objects.notNull(mutex, this);
 		}
@@ -289,7 +288,7 @@ public class Properties {
 		}
 
 		@Override
-		public void set(final VALUE value) {
+		public void set(VALUE value) {
 			synchronized (this.mutex) {
 				this.that.set(value);
 			}

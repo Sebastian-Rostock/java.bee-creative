@@ -10,7 +10,7 @@ import static bee.creative.util.Getters.emptyGetter;
 import static bee.creative.util.Getters.neutralGetter;
 import static bee.creative.util.Getters.optionalizedGetter;
 import static bee.creative.util.Getters.synchronizedGetter;
-import static bee.creative.util.Getters.BufferedGetter.softRefMode;
+import static bee.creative.util.Getters.BufferedGetter.SOFT_REF_MODE;
 import static bee.creative.util.Hashers.naturalHasher;
 import static bee.creative.util.Iterables.translatedIterable;
 import static bee.creative.util.Iterators.translatedIterator;
@@ -36,9 +36,9 @@ public interface Getter2<ITEM, VALUE> extends Getter<ITEM, VALUE> {
 		return concatGetter(this, that);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Setters#concatSetter(Setter, Getter) concatSetter(this, that)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Setters#concatSetter(Getter, Setter) concatSetter(this, that)}. */
 	default <VALUE2> Setter3<ITEM, VALUE2> concat(Setter<? super VALUE, ? super VALUE2> that) {
-		return concatSetter(that, this);
+		return concatSetter(this, that);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Filters#translatedFilter(Filter, Getter) translatedFilter(that, this)}. */
@@ -66,9 +66,9 @@ public interface Getter2<ITEM, VALUE> extends Getter<ITEM, VALUE> {
 		return translatedIterator(that, this);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #buffer(int, Hasher) this.buffer(softRefMode(), naturalHasher())}. */
+	/** Diese Methode ist eine Abkürzung für {@link #buffer(int, Hasher) this.buffer(SOFT_REF_MODE, naturalHasher())}. */
 	default Getter3<ITEM, VALUE> buffer() {
-		return this.buffer(softRefMode(), naturalHasher());
+		return this.buffer(SOFT_REF_MODE, naturalHasher());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Getters#bufferedGetter(Getter, int, Hasher) bufferedGetter(this, mode, hasher)}. */

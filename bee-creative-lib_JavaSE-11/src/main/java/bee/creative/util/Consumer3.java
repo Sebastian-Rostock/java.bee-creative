@@ -18,7 +18,7 @@ public interface Consumer3<VALUE> extends Consumer2<VALUE> {
 
 	@Override
 	default Consumer3<VALUE> synchronize() {
-		return synchronizedConsumer(this);
+		return this.synchronize(this);
 	}
 
 	@Override
