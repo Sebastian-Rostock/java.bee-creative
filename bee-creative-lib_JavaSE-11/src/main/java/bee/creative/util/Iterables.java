@@ -350,10 +350,10 @@ public class Iterables {
 
 	/** Diese Methode liefert den gegebenen {@link Iterable} als {@link Iterable2}. Wenn er {@code null} ist, wird {@link #emptyIterable()} geliefert. */
 	@SuppressWarnings ("unchecked")
-	public static <GItem> Iterable2<GItem> from(Iterable<? extends GItem> that) {
+	public static <ITEM> Iterable2<ITEM> from(Iterable<? extends ITEM> that) {
 		if (that == null) return emptyIterable();
-		if (that instanceof Iterable2<?>) return (Iterable2<GItem>)that;
-		return translatedIterable(that, Getters.<GItem>neutralGetter());
+		if (that instanceof Iterable2<?>) return (Iterable2<ITEM>)that;
+		return () -> Iterators.iteratorFrom(that.iterator());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #fromItem(Object, int) Iterables.fromItem(item, 1)}. */
@@ -414,7 +414,7 @@ public class Iterables {
 	/** Diese Methode entfernt alle Elemente der gegebenen {@link Collection}, die nicht im gegebenen {@link Iterable} vorkommen, fügt alle Elemetne des
 	 * {@link Iterable} in die {@link Collection} ein und gibt nur bei Veränderung der {@link Collection} {@code true} zurück. */
 	public static <GItem> boolean replaceAll(Collection<GItem> target, Iterable<? extends GItem> source) throws NullPointerException {
-		var buffer = Iterables.toSet(source);
+		var buffer = Iterables.iterableToSet(source);
 		return target.retainAll(buffer) | target.addAll(buffer);
 	}
 
@@ -434,7 +434,7 @@ public class Iterables {
 	 * {@link Collection} {@code true} zurück. */
 	public static boolean removeAll(Collection<?> target, Iterable<?> filter) throws NullPointerException {
 		if (filter instanceof Collection<?>) return target.removeAll((Collection<?>)filter);
-		return target.removeAll(Iterables.toSet(filter));
+		return target.removeAll(Iterables.iterableToSet(filter));
 	}
 
 	/** Diese Methode liefert nur dann {@code true} zurück, wenn alle Elemente des gegebenen {@link Iterable} in der gegebenen {@link Collection} enthalten
@@ -529,7 +529,7 @@ public class Iterables {
 
 	/** Diese Methode liefert die Elemente des gegebenen {@link Iterable} als {@link Set}. Wenn das Iterable ein {@link Set} ist, wird dieses geliefert.
 	 * Andernfalls wird ein über {@link #addAll(Collection, Iterable)} befülltes {@link HashSet2} geliefert. */
-	public static <GItem> Set<GItem> toSet(Iterable<GItem> source) throws NullPointerException {
+	public static <GItem> Set<GItem> iterableToSet(Iterable<GItem> source) throws NullPointerException {
 		if (source instanceof Set<?>) return (Set<GItem>)source;
 		var result = new HashSet2<GItem>();
 		Iterables.addAll(result, source);

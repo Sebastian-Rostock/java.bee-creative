@@ -15,7 +15,7 @@ public interface Consumer2<VALUE> extends Consumer<VALUE> {
 		return this.synchronize(this);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Consumers#synchronizedConsumer(Consumer, Object) synchronizeConsumer(this, mutex)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Consumers#synchronizedConsumer(Consumer, Object) synchronizedConsumer(this, mutex)}. */
 	default Consumer2<VALUE> synchronize(Object mutex) {
 		return synchronizedConsumer(this, mutex);
 	}

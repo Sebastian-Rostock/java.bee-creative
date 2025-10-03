@@ -7,7 +7,7 @@ import bee.creative.iam.IAMIndex;
 import bee.creative.iam.IAMListing;
 import bee.creative.lang.Array;
 import bee.creative.lang.Objects;
-import bee.creative.util.Filters;
+import bee.creative.util.Filter;
 import bee.creative.util.Iterables;
 
 /** Diese Klasse implementiert die Algorithmen zur Dekodierung der {@code Binary Encoded XML} Datenstrukturen.
@@ -769,7 +769,7 @@ public class BEXLoader {
 
 		@Override
 		public String toString() {
-			return Objects.toString(true, Iterables.filter(Arrays.asList(this.cache), Filters.emptyFilter()));
+			return Objects.toString(true, Iterables.filter(Arrays.asList(this.cache), Filter.emptyFilter()));
 		}
 
 		/** Dieses Feld speichert die Elemente, deren Zeichenketten verwaltet werden. */

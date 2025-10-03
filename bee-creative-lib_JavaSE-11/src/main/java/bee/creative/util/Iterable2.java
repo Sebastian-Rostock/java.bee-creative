@@ -57,9 +57,9 @@ public interface Iterable2<GItem> extends Iterable<GItem> {
 		Iterables.collectAll(this, target);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Iterables#toSet(Iterable) Iterables.toSet(this)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Iterables#iterableToSet(Iterable) Iterables.toSet(this)}. */
 	default Set<GItem> toSet() {
-		return Iterables.toSet(this);
+		return Iterables.iterableToSet(this);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Iterables#toList(Iterable) Iterables.toList(this)}. */

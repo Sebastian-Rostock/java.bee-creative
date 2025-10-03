@@ -1,5 +1,6 @@
 package bee.creative.util;
 
+import static bee.creative.util.Getters.neutralGetter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -157,7 +158,7 @@ public class Iterators {
 		public UniqueIterator(final Iterator<? extends GItem> that, final Collection<? super GItem> buffer) throws NullPointerException {
 			this.that = Objects.notNull(that);
 			this.buffer = Objects.notNull(buffer);
-			this.helper = Iterators.filter(that, Filters.negatedFilter(Filters.fromItems(buffer)));
+			this.helper = Iterators.filter(that, Filter.filterFromItems(buffer).negate());
 		}
 
 		@Override
@@ -589,7 +590,7 @@ public class Iterators {
 	public static <GItem> Iterator2<GItem> iteratorFrom(final Iterator<? extends GItem> that) {
 		if (that == null) return Iterators.empty();
 		if (that instanceof Iterator2<?>) return (Iterator2<GItem>)that;
-		return Iterators.translatedIterator(that, Getters.<GItem>neutralGetter());
+		return Iterators.translatedIterator(that, neutralGetter());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #fromItem(Object, int) Iterators.fromItem(item, 1)}. */
@@ -672,7 +673,7 @@ public class Iterators {
 	 *
 	 * @see Collection#retainAll(Collection) */
 	public static boolean retainAll(final Iterator<?> target, final Collection<?> filter) throws NullPointerException {
-		return Iterators.removeAll(Iterators.filter(target, Filters.fromItems(filter).negate()));
+		return Iterators.removeAll(Iterators.filter(target, Filter.filterFromItems(filter).negate()));
 	}
 
 	/** Diese Methode entfernt alle Elemente der gegebenen {@link Collection}, die nicht im gegebenen {@link Iterator} vorkommen, und gibt nur dann {@code true}
@@ -703,7 +704,7 @@ public class Iterators {
 	 *
 	 * @see Collection#removeAll(Collection) */
 	public static boolean removeAll(final Iterator<?> target, final Collection<?> filter) throws NullPointerException {
-		return Iterators.removeAll(Iterators.filter(target, Filters.fromItems(filter)));
+		return Iterators.removeAll(Iterators.filter(target, Filter.filterFromItems(filter)));
 	}
 
 	/** Diese Methode entfernt alle Elemente des gegebenen {@link Iterator} aus der gegebenen {@link Collection} und gibt nur dann {@code true} zurück, wenn

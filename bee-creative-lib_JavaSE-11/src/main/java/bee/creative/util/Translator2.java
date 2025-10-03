@@ -12,13 +12,13 @@ import static bee.creative.util.Translators.synchronizedTranslator;
  * @param <TARGET> Typ der Zielobjekte. */
 public interface Translator2<SOURCE, TARGET> extends Translator<SOURCE, TARGET> {
 
-	/** Diese Methode ist eine Abkürzung für {@link Filters#filterFrom(Filter) filterFrom(this::isTarget)}. */
-	default Filter2<Object> isTarget() {
+	/** Diese Methode ist eine Abkürzung für {@link #isTarget(Object) this::isTarget}. */
+	default Filter<Object> isTarget() {
 		return this::isTarget;
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Filters#filterFrom(Filter) filterFrom(this::isSource)}. */
-	default Filter2<Object> isSource() {
+	/** Diese Methode ist eine Abkürzung für {@link Filter#filterFrom(Filter) filterFrom(this::isSource)}. */
+	default Filter<Object> isSource() {
 		return this::isSource;
 	}
 

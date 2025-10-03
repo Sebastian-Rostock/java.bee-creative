@@ -2,7 +2,6 @@ package bee.creative.util;
 
 import static bee.creative.util.Comparators.translatedComparator;
 import static bee.creative.util.Fields.concatField;
-import static bee.creative.util.Filters.translatedFilter;
 import static bee.creative.util.Getters.aggregatedGetter;
 import static bee.creative.util.Getters.bufferedGetter;
 import static bee.creative.util.Getters.concatGetter;
@@ -41,9 +40,9 @@ public interface Getter2<ITEM, VALUE> extends Getter<ITEM, VALUE> {
 		return concatSetter(this, that);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Filters#translatedFilter(Filter, Getter) translatedFilter(that, this)}. */
-	default Filter2<ITEM> translate(Filter<? super VALUE> that) {
-		return translatedFilter(that, this);
+	/** Diese Methode ist eine Abkürzung für {@link Filter#translate(Getter) that.translate(this)}. */
+	default Filter<ITEM> translate(Filter<? super VALUE> that) {
+		return that.translate(this);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Comparables#translate(Comparable, Getter) Comparables.translate(that, this)}. */

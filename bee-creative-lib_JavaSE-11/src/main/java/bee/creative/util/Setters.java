@@ -1,15 +1,15 @@
 package bee.creative.util;
 
 import static bee.creative.lang.Objects.notNull;
+import static bee.creative.lang.Objects.toInvokeString;
 import static bee.creative.util.Getters.neutralGetter;
-import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert grundlegende {@link Setter}.
  *
  * @author [cc-by] 2017 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Setters {
 
-	/** Diese Methode liefert den gegebenen {@link Setter} als {@link Setter}. Wenn er {@code null} ist, wird der {@link EmptySetter} geliefert. */
+	/** Diese Methode liefert den gegebenen {@link Setter} als {@link Setter3}. Wenn er {@code null} ist, wird der {@link EmptySetter} geliefert. */
 	@SuppressWarnings ("unchecked")
 	public static <ITEM, VALUE> Setter3<ITEM, VALUE> setterFrom(Setter<? super ITEM, ? super VALUE> that) {
 		if (that == null) return emptySetter();
@@ -17,8 +17,10 @@ public class Setters {
 		return translatedSetter(that, neutralGetter());
 	}
 
+	/** Diese Methode liefert den gegebenen {@link Setter3} zu {@link Consumer#set(Object)}. */
 	public static <VALUE> Setter3<Object, VALUE> setterFrom(Consumer<? super VALUE> that) {
-		return new ConsumerSetter<>(that);
+		notNull(that);
+		return (item, value) -> that.set(value);
 	}
 
 	/** Diese Methode liefert den {@link EmptySetter}. */
@@ -62,18 +64,33 @@ public class Setters {
 
 	}
 
-	public static final class ConsumerSetter<VALUE> extends AbstractSetter<Object, VALUE> {
+	/** Diese Klasse implementiert einen übersetzten {@link Setter3}, der das {@link #set(Object, Object) Schreiben} mit dem über einen gegebenen {@link Getter}
+	 * übersetzten Datensatz an einen gegebenen {@link Setter} delegeirt. Das Schreiben des Werts {@code value} der Eigenschaft eines Datensatzes {@code item}
+	 * erfolgt über {@code this.that.set(this.trans.get(item), value)}.
+	 *
+	 * @param <ITEM> Typ des Datensatzes.
+	 * @param <ITEM2> Typ des Datensatzes des gegebenen {@link Setter}.
+	 * @param <VALUE> Typ des Werts der Eigenschaft. */
+	public static class ConcatSetter<ITEM, ITEM2, VALUE> extends AbstractSetter<ITEM, VALUE> {
 
-		private final Consumer<? super VALUE> that;
-
-		private ConsumerSetter(Consumer<? super VALUE> that) {
-			this.that = that;
+		public ConcatSetter(Setter<? super ITEM2, ? super VALUE> that, Getter<? super ITEM, ? extends ITEM2> trans) throws NullPointerException {
+			this.that = notNull(that);
+			this.trans = notNull(trans);
 		}
 
 		@Override
-		public void set(Object item, VALUE value) {
-			that.set(value);
+		public void set(ITEM item, VALUE value) {
+			this.that.set(this.trans.get(item), value);
 		}
+
+		@Override
+		public String toString() {
+			return toInvokeString(this, this.that, this.trans);
+		}
+
+		private final Setter<? super ITEM2, ? super VALUE> that;
+
+		private final Getter<? super ITEM, ? extends ITEM2> trans;
 
 	}
 
@@ -98,7 +115,7 @@ public class Setters {
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.that, this.trans);
+			return toInvokeString(this, this.that, this.trans);
 		}
 
 		private final Setter<? super ITEM, ? super VALUE2> that;
@@ -134,7 +151,7 @@ public class Setters {
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.that, this.trans);
+			return toInvokeString(this, this.that, this.trans);
 		}
 
 		private final Setter<? super ITEM, VALUE2> that;
@@ -162,7 +179,7 @@ public class Setters {
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.that);
+			return toInvokeString(this, this.that);
 		}
 
 		private final Setter<? super ITEM, ? super VALUE> that;
@@ -190,42 +207,12 @@ public class Setters {
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.that, this.mutex == this ? null : this.mutex);
+			return toInvokeString(this, this.that, this.mutex == this ? null : this.mutex);
 		}
 
 		private final Setter<? super ITEM, ? super VALUE> that;
 
 		private final Object mutex;
-
-	}
-
-	/** Diese Klasse implementiert einen übersetzten {@link Setter3}, der das {@link #set(Object, Object) Schreiben} mit dem über einen gegebenen {@link Getter}
-	 * übersetzten Datensatz an einen gegebenen {@link Setter} delegeirt. Das Schreiben des Werts {@code value} der Eigenschaft eines Datensatzes {@code item}
-	 * erfolgt über {@code this.that.set(this.trans.get(item), value)}.
-	 *
-	 * @param <ITEM> Typ des Datensatzes.
-	 * @param <ITEM2> Typ des Datensatzes des gegebenen {@link Setter}.
-	 * @param <VALUE> Typ des Werts der Eigenschaft. */
-	public static class ConcatSetter<ITEM, ITEM2, VALUE> extends AbstractSetter<ITEM, VALUE> {
-
-		public ConcatSetter(Setter<? super ITEM2, ? super VALUE> that, Getter<? super ITEM, ? extends ITEM2> trans) throws NullPointerException {
-			this.that = notNull(that);
-			this.trans = notNull(trans);
-		}
-
-		@Override
-		public void set(ITEM item, VALUE value) {
-			this.that.set(this.trans.get(item), value);
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.that, this.trans);
-		}
-
-		private final Setter<? super ITEM2, ? super VALUE> that;
-
-		private final Getter<? super ITEM, ? extends ITEM2> trans;
 
 	}
 
