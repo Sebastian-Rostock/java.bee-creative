@@ -117,7 +117,7 @@ public interface DSNSet extends QNSet {
 			@Override
 			public boolean removeAll(Collection<?> c) {
 				@SuppressWarnings ("unchecked")
-				var nodes = (Iterable<QN>)Iterables.filter(c, e -> e instanceof QN);
+				var nodes = (Iterable<QN>)Iterables.filter(c, QN.class::isInstance);
 				return DSNSet.this.popNodes(nodes);
 			}
 

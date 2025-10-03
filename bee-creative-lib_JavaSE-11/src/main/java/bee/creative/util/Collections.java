@@ -41,7 +41,7 @@ public class Collections {
 
 		@Override
 		public Iterator2<GItem> iterator() {
-			return Iterators.<GItem>filter(this.items1.iterator(), Filter.filterFromItems(this.items2).negate()).concat(this.items2.iterator()).unmodifiable();
+			return Iterators.<GItem>filter(this.items1.iterator(), Filters.filterFromItems(this.items2).negate()).concat(this.items2.iterator()).unmodifiable();
 		}
 
 		@Override
@@ -78,7 +78,7 @@ public class Collections {
 
 		@Override
 		public Iterator2<GItem> iterator() {
-			return Iterators.<GItem>filter(this.items1.iterator(), Filter.filterFromItems(this.items2).negate()).unmodifiable();
+			return Iterators.<GItem>filter(this.items1.iterator(), Filters.filterFromItems(this.items2).negate()).unmodifiable();
 		}
 
 		@Override
@@ -115,7 +115,7 @@ public class Collections {
 
 		@Override
 		public Iterator2<GItem> iterator() {
-			return Iterators.<GItem>filter(this.items1.iterator(), Filter.filterFromItems(this.items2)).unmodifiable();
+			return Iterators.<GItem>filter(this.items1.iterator(), Filters.filterFromItems(this.items2)).unmodifiable();
 		}
 
 		@Override

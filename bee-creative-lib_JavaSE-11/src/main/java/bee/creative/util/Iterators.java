@@ -158,7 +158,7 @@ public class Iterators {
 		public UniqueIterator(final Iterator<? extends GItem> that, final Collection<? super GItem> buffer) throws NullPointerException {
 			this.that = Objects.notNull(that);
 			this.buffer = Objects.notNull(buffer);
-			this.helper = Iterators.filter(that, Filter.filterFromItems(buffer).negate());
+			this.helper = Iterators.filter(that, Filters.filterFromItems(buffer).negate());
 		}
 
 		@Override
@@ -673,7 +673,7 @@ public class Iterators {
 	 *
 	 * @see Collection#retainAll(Collection) */
 	public static boolean retainAll(final Iterator<?> target, final Collection<?> filter) throws NullPointerException {
-		return Iterators.removeAll(Iterators.filter(target, Filter.filterFromItems(filter).negate()));
+		return Iterators.removeAll(Iterators.filter(target, Filters.filterFromItems(filter).negate()));
 	}
 
 	/** Diese Methode entfernt alle Elemente der gegebenen {@link Collection}, die nicht im gegebenen {@link Iterator} vorkommen, und gibt nur dann {@code true}
@@ -704,7 +704,7 @@ public class Iterators {
 	 *
 	 * @see Collection#removeAll(Collection) */
 	public static boolean removeAll(final Iterator<?> target, final Collection<?> filter) throws NullPointerException {
-		return Iterators.removeAll(Iterators.filter(target, Filter.filterFromItems(filter)));
+		return Iterators.removeAll(Iterators.filter(target, Filters.filterFromItems(filter)));
 	}
 
 	/** Diese Methode entfernt alle Elemente des gegebenen {@link Iterator} aus der gegebenen {@link Collection} und gibt nur dann {@code true} zurück, wenn
