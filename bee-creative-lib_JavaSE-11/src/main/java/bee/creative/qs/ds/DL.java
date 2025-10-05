@@ -11,7 +11,7 @@ import bee.creative.qs.QESet;
 import bee.creative.qs.QN;
 import bee.creative.qs.QS;
 import bee.creative.util.Properties;
-import bee.creative.util.Property2;
+import bee.creative.util.Property3;
 import bee.creative.util.Set2;
 import bee.creative.util.Translator2;
 import bee.creative.util.Translators.EnumTranslator;
@@ -59,7 +59,7 @@ public interface DL extends DE {
 	 *
 	 * @see #IDENT_IsLinkWithLabel */
 	@Override
-	default Property2<QN> labelAsNode() {
+	default Property3<QN> labelAsNode() {
 		return this.parent().getLink(DL.IDENT_IsLinkWithLabel).asTargetProperty(this.node());
 	}
 
@@ -85,7 +85,7 @@ public interface DL extends DE {
 	 * @see DM#typeTrans()
 	 * @see DL#sourceTypeAsNode()
 	 * @return Subjektdatentyp. */
-	default Property2<DT> sourceType() {
+	default Property3<DT> sourceType() {
 		return this.sourceTypeAsNode().translate(this.parent().typeTrans());
 	}
 
@@ -95,7 +95,7 @@ public interface DL extends DE {
 	 * @see DL#IDENT_IsLinkWithSourceType
 	 * @see DL#asTargetProperty(QN)
 	 * @return Subjektdatentypknoten. */
-	default Property2<QN> sourceTypeAsNode() {
+	default Property3<QN> sourceTypeAsNode() {
 		return this.parent().getLink(DL.IDENT_IsLinkWithSourceType).asTargetProperty(this.node());
 	}
 
@@ -106,7 +106,7 @@ public interface DL extends DE {
 	 * @see QS#valueTrans()
 	 * @see Handling#handlingTrans()
 	 * @return Subjekthandhabung. */
-	default Property2<Handling> sourceHandling() {
+	default Property3<Handling> sourceHandling() {
 		return this.sourceHandlingAsNode().translate(this.owner().valueTrans()).translate(handlingTrans());
 	}
 
@@ -115,7 +115,7 @@ public interface DL extends DE {
 	 *
 	 * @see DL#IDENT_IsLinkWithSourceHandling
 	 * @return Subjekthandhabungsknoten. */
-	default Property2<QN> sourceHandlingAsNode() {
+	default Property3<QN> sourceHandlingAsNode() {
 		return this.parent().getLink(DL.IDENT_IsLinkWithSourceHandling).asTargetProperty(this.node());
 	}
 
@@ -125,7 +125,7 @@ public interface DL extends DE {
 	 * @see QS#valueTrans()
 	 * @see Multiplicity#multiplicityTrans()
 	 * @return Subjektvielzahl. */
-	default Property2<Multiplicity> sourceMultiplicity() {
+	default Property3<Multiplicity> sourceMultiplicity() {
 		return this.sourceMultiplicityAsNode().translate(this.owner().valueTrans()).translate(Multiplicity.trans);
 	}
 
@@ -134,11 +134,11 @@ public interface DL extends DE {
 	 *
 	 * @see DL#IDENT_IsLinkWithSourceMultiplicity
 	 * @return Subjektvielzahlknoten. */
-	default Property2<QN> sourceMultiplicityAsNode() {
+	default Property3<QN> sourceMultiplicityAsNode() {
 		return this.parent().getLink(DL.IDENT_IsLinkWithSourceMultiplicity).asTargetProperty(this.node());
 	}
 
-	default Property2<DT> targetType() {
+	default Property3<DT> targetType() {
 		return this.targetTypeAsNode().translate(this.parent().typeTrans());
 	}
 
@@ -148,23 +148,23 @@ public interface DL extends DE {
 	 * @see DL#IDENT_IsLinkWithTargetType
 	 * @see DL#asTargetProperty(QN)
 	 * @return Objektdatentypknoten. */
-	default Property2<QN> targetTypeAsNode() {
+	default Property3<QN> targetTypeAsNode() {
 		return this.parent().getLink(DL.IDENT_IsLinkWithTargetType).asTargetProperty(this.node());
 	}
 
-	default Property2<Handling> targetHandling() {
+	default Property3<Handling> targetHandling() {
 		return this.targetHandlingAsNode().translate(this.owner().valueTrans()).translate(handlingTrans());
 	}
 
-	default Property2<QN> targetHandlingAsNode() {
+	default Property3<QN> targetHandlingAsNode() {
 		return this.parent().getLink(DL.IDENT_IsLinkWithTargetHandling).asTargetProperty(this.node());
 	}
 
-	default Property2<Multiplicity> targetMultiplicity() {
+	default Property3<Multiplicity> targetMultiplicity() {
 		return this.targetMultiplicityAsNode().translate(this.owner().valueTrans()).translate(Multiplicity.trans);
 	}
 
-	default Property2<QN> targetMultiplicityAsNode() {
+	default Property3<QN> targetMultiplicityAsNode() {
 		return this.parent().getLink(DL.IDENT_IsLinkWithTargetMultiplicity).asTargetProperty(this.node());
 	}
 
@@ -356,7 +356,7 @@ public interface DL extends DE {
 		return this.getSources(target).asNodeSet();
 	}
 
-	default Property2<QN> asSourceProperty(QN target) {
+	default Property3<QN> asSourceProperty(QN target) {
 		Objects.notNull(target);
 		return Properties.propertyFrom(() -> this.getSource(target), source -> this.setSource(target, source));
 	}
@@ -365,7 +365,7 @@ public interface DL extends DE {
 		return this.getTargets(source).asNodeSet();
 	}
 
-	default Property2<QN> asTargetProperty(QN source) throws NullPointerException, IllegalArgumentException {
+	default Property3<QN> asTargetProperty(QN source) throws NullPointerException, IllegalArgumentException {
 		Objects.notNull(source);
 		return Properties.propertyFrom(() -> this.getTarget(source), target -> this.setTarget(source, target));
 	}

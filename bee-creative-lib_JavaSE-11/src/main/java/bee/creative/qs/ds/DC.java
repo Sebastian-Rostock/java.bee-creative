@@ -2,7 +2,7 @@ package bee.creative.qs.ds;
 
 import bee.creative.qs.QESet;
 import bee.creative.qs.QN;
-import bee.creative.util.Property2;
+import bee.creative.util.Property3;
 
 /** Diese Schnittstelle definiert eine Domänenänderung (domain-change).
  *
@@ -27,19 +27,19 @@ public interface DC extends DO {
 		return this.parent().history();
 	}
 
-	default Property2<DC> next() {
+	default Property3<DC> next() {
 		return nextAsNode().translate(history().changeTrans());
 	}
 
-	default Property2<QN> nextAsNode() {
+	default Property3<QN> nextAsNode() {
 		return this.parent().getLink(DC.IDENT_IsChangeWithNextChange).getTargets(this.node()).asNode();
 	}
 
-	default Property2<DC> prev() {
+	default Property3<DC> prev() {
 		return this.prevAsNode().translate(this.history().changeTrans());
 	}
 
-	default Property2<QN> prevAsNode() {
+	default Property3<QN> prevAsNode() {
 		return this.parent().getLink(DC.IDENT_IsChangeWithNextChange).getSources(this.node()).asNode();
 	}
 
@@ -47,7 +47,7 @@ public interface DC extends DO {
 		return this.owner().edges().havingContext(this.putContext().get());
 	}
 
-	default Property2<QN> putContext() {
+	default Property3<QN> putContext() {
 		return this.parent().getLink(DC.IDENT_IsChangeWithPutContext).getTargets(this.node()).asNode();
 	}
 
@@ -55,7 +55,7 @@ public interface DC extends DO {
 		return this.owner().edges().havingContext(this.popContext().get());
 	}
 
-	default Property2<QN> popContext() {
+	default Property3<QN> popContext() {
 		return this.parent().getLink(DC.IDENT_IsChangeWithPopContext).getTargets(this.node()).asNode();
 	}
 

@@ -1,138 +1,65 @@
 package bee.creative.util;
 
-import static bee.creative.util.Getters.neutralGetter;
-import bee.creative.lang.Objects;
+import static bee.creative.lang.Objects.notNull;
+import static bee.creative.util.Getters.emptyGetter;
 
-/** Diese Klasse implementiert grundlegende {@link Producer}.
+/** Diese Klasse implementiert grundlegende {@link Producer3}.
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Producers {
 
-	/** Diese Methode liefert den gegebenen {@link Producer} als {@link Producer3}. Wenn er {@code null} ist, wird der {@link #emptyProducer()} geliefert. */
+	/** Diese Methode liefert den gegebenen {@link Producer3}. */
+	public static <V> Producer3<V> producer(Producer3<V> that) throws NullPointerException {
+		return notNull(that);
+	}
+
+	/** Diese Methode liefert den gegebenen {@link Producer} als {@link Producer3}. */
 	@SuppressWarnings ("unchecked")
-	public static <VALUE> Producer3<VALUE> producerFrom(Producer<? extends VALUE> that) {
-		if (that == null) return emptyProducer();
-		if (that instanceof Producer3<?>) return (Producer3<VALUE>)that;
-		return translatedProducer(that, neutralGetter());
+	public static <V> Producer3<V> producerFrom(Producer<? extends V> that) throws NullPointerException {
+		notNull(that);
+		if (that instanceof Producer2<?>) return ((Producer2<V>)that).asProducer();
+		return () -> that.get();
 	}
 
-	/** Diese Methode ist effektiv eine Abkürzung für {@link ValueProducer new ValueProducer<>(that)}. Wenn {@code that} {@code null} ist, wird der
-	 * {@link #emptyProducer()} geliefert. */
-	public static <VALUE> Producer3<VALUE> producerFromValue(VALUE that) {
-		return that == null ? emptyProducer() : new ValueProducer<>(that);
+	/** Diese Methode liefert einen {@link Producer3}, der beim Lesen den gegebenen Wert liefert. */
+	public static <V> Producer3<V> producerFromValue(V value) {
+		return value == null ? emptyProducer() : () -> value;
 	}
 
-	public static <VALUE> Producer3<VALUE> producerFromGetter(Getter<?, ? extends VALUE> that) {
-		return Objects.notNull(that) == Getters.emptyGetter() ? emptyProducer() : () -> that.get(null);
+	public static <V> Producer3<V> producerFromGetter(Getter<?, ? extends V> that) {
+		return notNull(that) == emptyGetter() ? emptyProducer() : () -> that.get(null);
 	}
 
-	/** Diese Methode liefert den {@link EmptyProducer}. */
+	/** Diese Methode liefert einen {@link Producer3}, der beim Lesen stets {@code null} liefert. */
 	@SuppressWarnings ("unchecked")
-	public static <VALUE> Producer3<VALUE> emptyProducer() {
-		return (Producer3<VALUE>)EmptyProducer.INSTANCE;
+	public static <V> Producer3<V> emptyProducer() {
+		return (Producer3<V>)emptyProducer;
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link TranslatedProducer new TranslatedProducer<>(that, trans)}. */
-	public static <VALUE, VALUE2> Producer3<VALUE2> translatedProducer(Producer<? extends VALUE> that, Getter<? super VALUE, ? extends VALUE2> trans)
-		throws NullPointerException {
-		return new TranslatedProducer<>(that, trans);
+	/** Diese Methode liefert einen übersetzten {@link Producer3}, der beim Lesen einen Wert liefert, der über den gegebenen {@link Getter} {@code trans} aus dem
+	 * Wert des gegebenen {@link Producer} {@code that} ermittelt wird. Das Lesen erfolgt über {@code trans.get(that.get())}. */
+	public static <V, V2> Producer3<V> translatedProducer(Producer<? extends V2> that, Getter<? super V2, ? extends V> trans) throws NullPointerException {
+		notNull(that);
+		notNull(trans);
+		return () -> trans.get(that.get());
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #synchronizedProducer(Producer, Object) synchronizedProducer(that, that)}. */
-	public static <VALUE> Producer3<VALUE> synchronizedProducer(Producer<? extends VALUE> that) throws NullPointerException {
-		return synchronizedProducer(that, that);
-	}
+	/** Diese Methode liefert einen {@link Producer3}, der den gegebenen {@link Producer} {@code that} über {@code synchronized(mutex)} synchronisiert. Wenn
+	 * dieses Synchronisationsobjekt {@code null} ist, wird {@code this} verwendet. */
+	public static <V> Producer3<V> synchronizedProducer(Producer<? extends V> that, Object mutex) throws NullPointerException {
+		notNull(that);
+		return new Producer3<>() {
 
-	/** Diese Methode ist eine Abkürzung für {@link SynchronizedProducer new SynchronizedProducer<>(that, mutex)}. */
-	public static <VALUE> Producer3<VALUE> synchronizedProducer(Producer<? extends VALUE> that, Object mutex) throws NullPointerException {
-		return new SynchronizedProducer<>(that, mutex);
-	}
-
-	/** Diese Klasse implementiert einen {@link Producer3}, der beim {@link #get() Lesen} stets {@code null} liefert. */
-	public static class EmptyProducer extends AbstractProducer<Object> {
-
-		public static final Producer3<?> INSTANCE = new EmptyProducer();
-
-	}
-
-	/** Diese Klasse implementiert einen {@link Producer3}, der beim {@link #get() Lesen} stets einen gegebenen Wert liefert.
-	 *
-	 * @param <VALUE> Typ des Werts. */
-	public static class ValueProducer<VALUE> extends AbstractProducer<VALUE> {
-
-		public ValueProducer(VALUE that) {
-			this.that = that;
-		}
-
-		@Override
-		public VALUE get() {
-			return this.that;
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.that);
-		}
-
-		private final VALUE that;
-
-	}
-
-	/** Diese Klasse implementiert einen übersetzten {@link Producer3}, der beim {@link #get() Lesen} einen Wert liefert, der über einen gegebenen {@link Getter}
-	 * aus dem Wert eines gegebenen {@link Producer} ermittelt wird. Das Lesen erfolgt über {@code this.trans.get(this.that.get())}.
-	 *
-	 * @param <VALUE> Typ des Werts.
-	 * @param <VALUE2> Typ des Werts des gegebenen {@link Producer}. */
-	public static class TranslatedProducer<VALUE, VALUE2> extends AbstractProducer<VALUE> {
-
-		public TranslatedProducer(Producer<? extends VALUE2> that, Getter<? super VALUE2, ? extends VALUE> trans) throws NullPointerException {
-			this.that = Objects.notNull(that);
-			this.trans = Objects.notNull(trans);
-		}
-
-		@Override
-		public VALUE get() {
-			return this.trans.get(this.that.get());
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.that, this.trans);
-		}
-
-		private final Producer<? extends VALUE2> that;
-
-		private final Getter<? super VALUE2, ? extends VALUE> trans;
-
-	}
-
-	/** Diese Klasse implementiert einen {@link Producer3}, der einen gegebenen {@link Producer} über {@code synchronized(this.mutex)} synchronisiert. Wenn dieses
-	 * Synchronisationsobjekt {@code null} ist, wird {@code this} verwendet.
-	 *
-	 * @param <VALUE> Typ des Werts. */
-	public static class SynchronizedProducer<VALUE> extends AbstractProducer<VALUE> {
-
-		public SynchronizedProducer(Producer<? extends VALUE> that, Object mutex) throws NullPointerException {
-			this.that = Objects.notNull(that);
-			this.mutex = Objects.notNull(mutex, this);
-		}
-
-		@Override
-		public VALUE get() {
-			synchronized (this.mutex) {
-				return this.that.get();
+			@Override
+			public V get() {
+				synchronized (notNull(mutex, this)) {
+					return that.get();
+				}
 			}
-		}
 
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.that, this.mutex == this ? null : this.mutex);
-		}
-
-		private final Producer<? extends VALUE> that;
-
-		private final Object mutex;
-
+		};
 	}
+
+	static final Producer3<?> emptyProducer = () -> null;
 
 }

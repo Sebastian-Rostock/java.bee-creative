@@ -31,7 +31,7 @@ import bee.creative.util.Producer;
 import bee.creative.util.Producer3;
 import bee.creative.util.Producers;
 import bee.creative.util.Properties;
-import bee.creative.util.Property2;
+import bee.creative.util.Property3;
 import bee.creative.util.Setter;
 import bee.creative.util.Setter3;
 import bee.creative.util.Setters;
@@ -622,49 +622,49 @@ public class Natives {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #nativePropertyFrom(String, boolean) Properties.fromNative(fieldPath, true)}. */
-	public static <VALUE> Property2<VALUE> nativePropertyFrom(final String fieldPath) throws NullPointerException, IllegalArgumentException {
+	public static <VALUE> Property3<VALUE> nativePropertyFrom(final String fieldPath) throws NullPointerException, IllegalArgumentException {
 		return Natives.nativePropertyFrom(fieldPath, true);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #nativePropertyFrom(java.lang.reflect.Field) Properties.fromNative(Natives.parseField(fieldPath),
 	 * forceAccessible)}. */
-	public static <VALUE> Property2<VALUE> nativePropertyFrom(final String fieldPath, final boolean forceAccessible)
+	public static <VALUE> Property3<VALUE> nativePropertyFrom(final String fieldPath, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
 		return Natives.nativePropertyFrom(parseField(fieldPath), forceAccessible);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #nativePropertyFrom(java.lang.reflect.Field, boolean) Properties.fromNative(field, true)}. */
-	public static <VALUE> Property2<VALUE> nativePropertyFrom(final java.lang.reflect.Field field) throws NullPointerException, IllegalArgumentException {
+	public static <VALUE> Property3<VALUE> nativePropertyFrom(final java.lang.reflect.Field field) throws NullPointerException, IllegalArgumentException {
 		return Natives.nativePropertyFrom(field, true);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link NativeProperty new NativeProperty<>(field, forceAccessible)}. */
-	public static <VALUE> Property2<VALUE> nativePropertyFrom(final java.lang.reflect.Field field, final boolean forceAccessible)
+	public static <VALUE> Property3<VALUE> nativePropertyFrom(final java.lang.reflect.Field field, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
 		return new NativeProperty<>(field, forceAccessible);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #nativePropertyFrom(Method, Method, boolean) Properties.fromNative(get, set, true)}. **/
-	public static <VALUE> Property2<VALUE> nativePropertyFrom(final Method get, final Method set) throws NullPointerException, IllegalArgumentException {
+	public static <VALUE> Property3<VALUE> nativePropertyFrom(final Method get, final Method set) throws NullPointerException, IllegalArgumentException {
 		return Natives.nativePropertyFrom(get, set, true);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #nativeProducerFrom(Class) Properties.from(Producers.fromNative(get, forceAccessible),
 	 * Consumers.fromNative(set, forceAccessible))}. */
-	public static <VALUE> Property2<VALUE> nativePropertyFrom(final Method get, final Method set, final boolean forceAccessible)
+	public static <VALUE> Property3<VALUE> nativePropertyFrom(final Method get, final Method set, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
 		return Properties.propertyFrom(nativeProducerFrom(set, forceAccessible), nativeConsumerFrom(get, forceAccessible));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #nativePropertyFrom(Class, String, boolean) Properties.fromNative(fieldOwner, fieldName, true)}. */
-	public static <VALUE> Property2<VALUE> nativePropertyFrom(final Class<?> fieldOwner, final String fieldName)
+	public static <VALUE> Property3<VALUE> nativePropertyFrom(final Class<?> fieldOwner, final String fieldName)
 		throws NullPointerException, IllegalArgumentException {
 		return Natives.nativePropertyFrom(fieldOwner, fieldName, true);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #nativePropertyFrom(java.lang.reflect.Field, boolean) Properties.fromNative(Natives.parseField(fieldOwner,
 	 * fieldName), forceAccessible)}. */
-	public static <VALUE> Property2<VALUE> nativePropertyFrom(final Class<?> fieldOwner, final String fieldName, final boolean forceAccessible)
+	public static <VALUE> Property3<VALUE> nativePropertyFrom(final Class<?> fieldOwner, final String fieldName, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
 		return Natives.nativePropertyFrom(parseField(fieldOwner, fieldName), forceAccessible);
 	}
@@ -929,7 +929,7 @@ public class Natives {
 
 	}
 
-	/** Diese Klasse implementiert ein {@link Property2}, das das {@link #get() Lesen} und {@link #set(Object) Schreiben} an ein gegebenes
+	/** Diese Klasse implementiert ein {@link Property3}, das das {@link #get() Lesen} und {@link #set(Object) Schreiben} an ein gegebenes
 	 * {@link java.lang.reflect.Field natives statisches Datenfeld} delegiert. *
 	 *
 	 * @param <VALUE> Typ des Werts. */

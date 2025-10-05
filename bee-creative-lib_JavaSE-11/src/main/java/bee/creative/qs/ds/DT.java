@@ -1,7 +1,7 @@
 package bee.creative.qs.ds;
 
 import bee.creative.qs.QN;
-import bee.creative.util.Property2;
+import bee.creative.util.Property3;
 import bee.creative.util.Set2;
 
 /** Diese Schnittstelle definiert einen Datentyp (Domain-Type) als {@link #labelAsNode() beschriftete} und {@link #identsAsNodes() erkennbare} {@link #instancesAsNodes()
@@ -26,7 +26,7 @@ public interface DT extends DE {
 	 *
 	 * @see #IDENT_IsTypeWithLabel */
 	@Override
-	default Property2<QN> labelAsNode() {
+	default Property3<QN> labelAsNode() {
 		return this.parent().getLink(DT.IDENT_IsTypeWithLabel).asTargetProperty(this.node());
 	}
 

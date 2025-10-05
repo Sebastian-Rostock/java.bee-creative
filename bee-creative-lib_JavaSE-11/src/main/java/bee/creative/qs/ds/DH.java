@@ -1,7 +1,7 @@
 package bee.creative.qs.ds;
 
 import bee.creative.qs.QN;
-import bee.creative.util.Property2;
+import bee.creative.util.Property3;
 import bee.creative.util.Set2;
 import bee.creative.util.Translator;
 import bee.creative.util.Translator2;
@@ -64,11 +64,11 @@ public interface DH extends DO {
 		return current != null ? current.popContext().get() : null;
 	}
 
-	default Property2<DC> current() {
+	default Property3<DC> current() {
 		return this.currentAsNode().translate(this.changeTrans());
 	}
 
-	default Property2<QN> currentAsNode() {
+	default Property3<QN> currentAsNode() {
 		var parent = this.parent();
 		return parent.getLink(DH.IDENT_IsModelWithChange).getTargets(parent.context()).asNode();
 	}

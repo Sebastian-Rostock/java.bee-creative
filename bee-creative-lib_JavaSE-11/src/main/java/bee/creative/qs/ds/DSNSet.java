@@ -7,7 +7,7 @@ import bee.creative.qs.QS;
 import bee.creative.util.Iterables;
 import bee.creative.util.Iterator2;
 import bee.creative.util.Properties;
-import bee.creative.util.Property2;
+import bee.creative.util.Property3;
 import bee.creative.util.Set2;
 
 /** Diese Schnittstelle definiert eine veränderbare {@link QNSet Menge} von {@link QN Hyperknoten}.
@@ -69,7 +69,7 @@ public interface DSNSet extends QNSet {
 	 * @see #getNode()
 	 * @see #setNode(QN)
 	 * @return Elementsicht. */
-	default Property2<QN> asNode() {
+	default Property3<QN> asNode() {
 		return Properties.propertyFrom(this::getNode, this::setNode);
 	}
 
@@ -198,7 +198,7 @@ public interface DSNSet extends QNSet {
 	 * @see #asNode()
 	 * @see QS#valueTrans()
 	 * @return Textwert. */
-	default Property2<String> asValue() {
+	default Property3<String> asValue() {
 		return this.asNode().translate(this.owner().valueTrans());
 	}
 

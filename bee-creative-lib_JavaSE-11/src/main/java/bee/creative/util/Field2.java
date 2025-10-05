@@ -7,7 +7,7 @@ import static bee.creative.util.Fields.synchronizedField;
 import static bee.creative.util.Fields.translateField;
 import static bee.creative.util.Getters.emptyGetter;
 import static bee.creative.util.Getters.neutralGetter;
-import static bee.creative.util.Properties.propertyFrom;
+import static bee.creative.util.Properties.propertyFromField;
 
 /** Diese Schnittstelle ergänzt ein {@link Field} insb. um eine Anbindung an Methoden von {@link Fields}.
  *
@@ -77,14 +77,14 @@ public interface Field2<GItem, GValue> extends Field<GItem, GValue>, Getter2<GIt
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #toProperty(Object) this.toProperty(null)}. */
-	default Property2<GValue> toProperty() {
+	default Property3<GValue> toProperty() {
 		return this.toProperty(null);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Properties#propertyFrom(Producer, Consumer) propertyFrom(() -> this.get(item), (value) -> this.set(item,
 	 * value))}. */
-	default Property2<GValue> toProperty(GItem item) {
-		return Properties.propertyFrom(this);
+	default Property3<GValue> toProperty(GItem item) {
+		return Properties.propertyFromField(this);
 	}
 
 }

@@ -3,6 +3,6 @@ package bee.creative.util;
 /** Diese Schnittstelle definiert einen Adapter zum Lesen und Schreiben des Werts einer Eigenschaft, die durch dieses Objekt repräsentiert wird.
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <VALUE> Typ des Werts der Eigenschaft. */
-public interface Property<VALUE> extends Producer<VALUE>, Consumer<VALUE> {
+ * @param <V> Typ des Werts der Eigenschaft. */
+public interface Property<V> extends Producer<V>, Consumer<V> {
 }

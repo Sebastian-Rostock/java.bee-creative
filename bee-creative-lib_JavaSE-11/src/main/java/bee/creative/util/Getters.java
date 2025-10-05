@@ -1,7 +1,6 @@
 package bee.creative.util;
 
 import static bee.creative.lang.Objects.notNull;
-import static bee.creative.util.Producers.emptyProducer;
 import static bee.creative.util.Producers.producerFromValue;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
@@ -24,12 +23,7 @@ public class Getters {
 
 	/** Diese Methode ist eine Abkürzung für {@link Producers#producerFromValue(Producer) getterFromProducer(producerFromValue(that))}. */
 	public static <VALUE> Getter3<Object, VALUE> getterFromValue(VALUE that) {
-		return getterFrom(producerFromValue(that));
-	}
-
-	/** Diese Methode liefert einen {@link Getter3} zu {@link Producer#get()} des gegebenen {@link Producer}. */
-	public static <VALUE> Getter3<Object, VALUE> getterFrom(Producer<? extends VALUE> that) throws NullPointerException {
-		return notNull(that) == emptyProducer() ? emptyGetter() : item -> that.get();
+		return Getters.getterFromProducer(producerFromValue(that));
 	}
 
 	/** Diese Methode liefert den {@link EmptyGetter}. */
@@ -79,6 +73,11 @@ public class Getters {
 	public static <ITEM, VALUE> Getter3<ITEM, VALUE> synchronizedGetter(final Getter<? super ITEM, ? extends VALUE> that, final Object mutex)
 		throws NullPointerException {
 		return new SynchronizedGetter<>(that, mutex);
+	}
+
+	/** Diese Methode liefert einen {@link Getter3} zu {@link Producer#get()} des gegebenen {@link Producer}. */
+	public static <VALUE> Getter3<Object, VALUE> getterFromProducer(Producer<? extends VALUE> that) throws NullPointerException {
+		return notNull(that) == Producers.emptyProducer() ? emptyGetter() : item -> that.get();
 	}
 
 	/** Diese Klasse implementiert den leeren {@link Getter3}, der beim {@link #get(Object) Lesen} stets {@code null} liefert. */

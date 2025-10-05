@@ -8,45 +8,35 @@ import bee.creative.lang.Objects;
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Properties {
 
-	/** Diese Methode liefert das gegebene {@link Property} als {@link Property2}. Wenn es {@code null} ist, wird das {@link EmptyProperty} geliefert. */
-	public static <VALUE> Property2<VALUE> propertyFrom(Property<VALUE> that) {
+	/** Diese Methode liefert das gegebene {@link Property} als {@link Property3}. Wenn es {@code null} ist, wird das {@link EmptyProperty} geliefert. */
+	public static <VALUE> Property3<VALUE> propertyFrom(Property<VALUE> that) {
 		if (that == null) return Properties.emptyProperty();
-		if (that instanceof Property2<?>) return (Property2<VALUE>)that;
+		if (that instanceof Property3<?>) return (Property3<VALUE>)that;
 		return translatedProperty(that, neutralGetter(), neutralGetter());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link CompositeProperty new CompositeProperty<>(get, set)}. */
-	public static <VALUE> Property2<VALUE> propertyFrom(Producer<? extends VALUE> get, Consumer<? super VALUE> set) throws NullPointerException {
+	public static <VALUE> Property3<VALUE> propertyFrom(Producer<? extends VALUE> get, Consumer<? super VALUE> set) throws NullPointerException {
 		return new CompositeProperty<>(get, set);
 	}
 
-	public static <VALUE> Property2<VALUE> propertyFrom(Field<?, VALUE> that) {
+	public static <VALUE> Property3<VALUE> propertyFromField(Field<?, VALUE> that) {
 		return propertyFrom(Producers.producerFromGetter(that), Consumers.consumerFromSetter(that));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #propertyFrom(Producer, Consumer) Properties.from(get, Properties.empty())}. */
-	public static <VALUE> Property2<VALUE> propertyFrom(Producer<? extends VALUE> get) throws NullPointerException {
-		return propertyFrom(get, emptyProperty());
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link #propertyFrom(Producer, Consumer) Properties.from(Properties.empty(), set)}. */
-	public static <VALUE> Property2<VALUE> propertyFrom(Consumer<? super VALUE> set) throws NullPointerException {
-		return propertyFrom(emptyProperty(), set);
-	}
-
 	/** Diese Methode ist eine Abkürzung für {@link ValueProperty new ValueProperty<>(value)}. */
-	public static <VALUE> Property2<VALUE> propertyFromValue(VALUE value) {
+	public static <VALUE> Property3<VALUE> propertyFromValue(VALUE value) {
 		return new ValueProperty<>(value);
 	}
 
 	/** Diese Methode liefert das {@link EmptyProperty}. */
 	@SuppressWarnings ("unchecked")
-	public static <VALUE> Property2<VALUE> emptyProperty() {
-		return (Property2<VALUE>)EmptyProperty.INSTANCE;
+	public static <VALUE> Property3<VALUE> emptyProperty() {
+		return (Property3<VALUE>)EmptyProperty.INSTANCE;
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link SetupProperty new SetupProperty<>(that, setup)}. */
-	public static <VALUE> Property2<VALUE> setupProperty(Property<VALUE> that, Producer<? extends VALUE> setup) throws NullPointerException {
+	public static <VALUE> Property3<VALUE> setupProperty(Property<VALUE> that, Producer<? extends VALUE> setup) throws NullPointerException {
 		return new SetupProperty<>(that, setup);
 	}
 
@@ -55,7 +45,7 @@ public class Properties {
 	 *
 	 * @see Translator#toTarget(Object)
 	 * @see Translator#toSource(Object) */
-	public static <VALUE, VALUE2> Property2<VALUE> translatedProperty(Property<VALUE2> that, Translator<VALUE2, VALUE> trans) throws NullPointerException {
+	public static <VALUE, VALUE2> Property3<VALUE> translatedProperty(Property<VALUE2> that, Translator<VALUE2, VALUE> trans) throws NullPointerException {
 		return Properties.translatedProperty(that, trans::toTarget, trans::toSource);
 	}
 
@@ -64,7 +54,7 @@ public class Properties {
 	 *
 	 * @see Producers#translatedProducer(Producer, Getter)
 	 * @see Consumers#translatedConsumer(Consumer, Getter) */
-	public static <GSource, GTarget> Property2<GTarget> translatedProperty(Property<GSource> that, Getter<? super GSource, ? extends GTarget> transGet,
+	public static <GSource, GTarget> Property3<GTarget> translatedProperty(Property<GSource> that, Getter<? super GSource, ? extends GTarget> transGet,
 		Getter<? super GTarget, ? extends GSource> transSet) throws NullPointerException {
 		return Properties.propertyFrom(Producers.translatedProducer(that, transGet), Consumers.translatedConsumer(that, transSet));
 	}
@@ -73,26 +63,22 @@ public class Properties {
 	public static <VALUE> ObservableProperty<VALUE> observableProperty(Property<VALUE> that) throws NullPointerException {
 		return new ObservableProperty<>(that);
 	}
-
-	/** Diese Methode ist eine Abkürzung für {@link #synchronizedProperty(Property, Object) Properties.synchronize(that, that)}. */
-	public static <VALUE> Property2<VALUE> synchronizedProperty(Property<VALUE> that) throws NullPointerException {
-		return synchronizedProperty(that, that);
-	}
+ 
 
 	/** Diese Methode ist eine Abkürzung für {@link SynchronizedProperty new SynchronizedProperty<>(that, mutex)}. */
-	public static <VALUE> Property2<VALUE> synchronizedProperty(Property<VALUE> that, final Object mutex) throws NullPointerException {
+	public static <VALUE> Property3<VALUE> synchronizedProperty(Property<VALUE> that, final Object mutex) throws NullPointerException {
 		return new SynchronizedProperty<>(that, mutex);
 	}
 
-	/** Diese Klasse implementiert ein {@link Property2}, das das {@link #set(Object) Schreiben} ignoriert und beim {@link #get() Lesen} stets {@code null}
+	/** Diese Klasse implementiert ein {@link Property3}, das das {@link #set(Object) Schreiben} ignoriert und beim {@link #get() Lesen} stets {@code null}
 	 * liefert. */
 	public static class EmptyProperty extends AbstractProperty<Object> {
 
-		public static final Property2<?> INSTANCE = new EmptyProperty();
+		public static final Property3<?> INSTANCE = new EmptyProperty();
 
 	}
 
-	/** Diese Klasse implementiert ein {@link Property2}, das einen {@link #value Wert} verwaltet, der {@link #get() gelesen} und {@link #set(Object) geschrieben}
+	/** Diese Klasse implementiert ein {@link Property3}, das einen {@link #value Wert} verwaltet, der {@link #get() gelesen} und {@link #set(Object) geschrieben}
 	 * werden kann.
 	 *
 	 * @param <VALUE> Typ des Werts. */
@@ -121,7 +107,7 @@ public class Properties {
 
 	}
 
-	/** Diese Klasse implementiert ein initialisierendes {@link Property2}, das das {@link #get() Lesen} und {@link #set(Object) Schreiben} an ein gegebenes
+	/** Diese Klasse implementiert ein initialisierendes {@link Property3}, das das {@link #get() Lesen} und {@link #set(Object) Schreiben} an ein gegebenes
 	 * {@link Property} delegiert. Wenn der gelesene Wert {@code null} ist, wird er initialisiert, d.h. mit Hilfe eines gegebenen {@link Producer} ermittelt und
 	 * über das gegebene {@link Property} geschrieben.
 	 *
@@ -158,7 +144,7 @@ public class Properties {
 
 	}
 
-	/** Diese Klasse implementiert ein zusammengesetztes {@link Property2}, das das {@link #get() Lesen} an einen gegebenen {@link Producer} und das
+	/** Diese Klasse implementiert ein zusammengesetztes {@link Property3}, das das {@link #get() Lesen} an einen gegebenen {@link Producer} und das
 	 * {@link #set(Object) Schreiben} an einen gegebenen {@link Consumer} delegiert.
 	 *
 	 * @param <VALUE> Typ des Werts. */
@@ -190,7 +176,7 @@ public class Properties {
 
 	}
 
-	/** Diese Klasse implementiert eine {@link Observable} {@link Property2}, das das {@link #get() Lesen} und {@link #set(Object) Schreiben} an ein gegebenes
+	/** Diese Klasse implementiert eine {@link Observable} {@link Property3}, das das {@link #get() Lesen} und {@link #set(Object) Schreiben} an ein gegebenes
 	 * {@link Property} delegiert und beim ändernden Schreiben ein {@link UpdatePropertyListener Änderungsereignis} auslöst.
 	 *
 	 * @param <VALUE> Typ des Werts der Eigenschaft. */
@@ -265,7 +251,7 @@ public class Properties {
 
 	}
 
-	/** Diese Klasse implementiert ein {@link Property2}, das ein gegebenes {@link Property} über {@code synchronized(this.mutex)} synchronisiert. Wenn dieses
+	/** Diese Klasse implementiert ein {@link Property3}, das ein gegebenes {@link Property} über {@code synchronized(this.mutex)} synchronisiert. Wenn dieses
 	 * Synchronisationsobjekt {@code null} ist, wird {@code this} verwendet.
 	 *
 	 * @param <VALUE> Typ des Werts. */

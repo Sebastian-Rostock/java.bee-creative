@@ -2,7 +2,7 @@ package bee.creative.qs.ds;
 
 import bee.creative.qs.QN;
 import bee.creative.qs.QS;
-import bee.creative.util.Property2;
+import bee.creative.util.Property3;
 import bee.creative.util.Set2;
 
 /** Diese Schnittstelle definiert ein Domänenkonstante (Domain-Enum) als {@link #node() Hyperknoten} mit Bezug zu einem {@link #parent() Domänenmodell}, einer
@@ -28,7 +28,7 @@ public interface DE extends DO {
 	 *
 	 * @see QS#valueTrans()
 	 * @return Beschriftungstextwert. */
-	default Property2<String> label() {
+	default Property3<String> label() {
 		return this.labelAsNode().translate(this.owner().valueTrans());
 	}
 
@@ -37,7 +37,7 @@ public interface DE extends DO {
 	 *
 	 * @see DL#asTargetProperty(QN)
 	 * @return Beschriftungsknoten. */
-	Property2<QN> labelAsNode();
+	Property3<QN> labelAsNode();
 
 	/** Diese Methode erlaubt Zugriff auf die {@link QN#value() Textwerte} zur {@link #identsAsNodes() Erkennung} dieses Objekts.
 	 *

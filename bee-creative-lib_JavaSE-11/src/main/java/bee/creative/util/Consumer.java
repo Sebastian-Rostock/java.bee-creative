@@ -6,16 +6,13 @@ package bee.creative.util;
  * @see Setter
  * @see Property
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <VALUE> Typ des Werts. */
-public interface Consumer<VALUE> {
+ * @param <V> Typ des Werts. */
+public interface Consumer<V> {
 
 	/** Diese Methode setzt den Werts, der durch dieses Objekt verwaltet, konfiguriert oder anderweitig verwendet wird.
 	 *
 	 * @param value Wert. */
-	void set(VALUE value);
+	void set(V value);
 
-	default Consumer3<VALUE> asConsumer() {
-		return this::set;
-	}
 
 }

@@ -1,7 +1,6 @@
 package bee.creative.util;
 
 import static bee.creative.util.Getters.concatGetter;
-import static bee.creative.util.Getters.getterFrom;
 import static bee.creative.util.Setters.concatSetter;
 import static bee.creative.util.Setters.setterFrom;
 import java.util.Map;
@@ -21,10 +20,10 @@ public final class Fields {
 	/** Diese Methode liefert einen {@link Field2} zu {@link Property#get()} und {@link Property#set(Object)} und ist eine Abkürzung für
 	 * {@link #fieldFrom(Getter, Setter) fieldFrom(getterFrom(that), setterFrom(that))}.
 	 *
-	 * @see Getters#getterFrom(Producer)
+	 * @see Getters#getterFromProducer(Producer)
 	 * @see Setters#setterFrom(Consumer) */
 	public static <VALUE> Field2<Object, VALUE> fieldFrom(Property<VALUE> that) {
-		return fieldFrom(getterFrom(that), setterFrom(that));
+		return fieldFrom(Getters.getterFromProducer(that), setterFrom(that));
 	}
 
 	/** Diese Methode liefert ein {@link Field2} zu {@link Map#get(Object)} und {@link Map#put(Object, Object)} und ist eine Abkürzung für
