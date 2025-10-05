@@ -16,7 +16,7 @@ public interface QOSet<ITEM, THIS> extends QISet<ITEM> {
 	 * @return Kopie dieser Menge oder {@code this}. */
 	THIS copy();
 
-	/** Diese Methode liefert eine temporäre Kopie der Menge der Elemente, die vom gegebenen Filter {@link Filter#accept(Object) akzeptiert} werden.
+	/** Diese Methode liefert eine temporäre Kopie der Menge der Elemente, die vom gegebenen Filter {@link Filter#accepts(Object) akzeptiert} werden.
 	 *
 	 * @param filter Filter.
 	 * @return Gefilterte Menge. */

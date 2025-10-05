@@ -14,4 +14,8 @@ public interface Consumer<VALUE> {
 	 * @param value Wert. */
 	void set(VALUE value);
 
+	default Consumer3<VALUE> asConsumer() {
+		return this::set;
+	}
+
 }

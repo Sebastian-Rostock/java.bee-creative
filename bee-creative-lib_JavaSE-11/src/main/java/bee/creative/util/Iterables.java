@@ -31,7 +31,7 @@ public class Iterables {
 	public static class ArrayIterable<GItem> extends AbstractIterable<GItem> {
 
 		public ArrayIterable(GItem[] items, int fromIndex, int toIndex) throws NullPointerException, IllegalArgumentException {
-			Comparables.check(fromIndex, toIndex);
+			Comparables.checkOrder(fromIndex, toIndex);
 			this.items = Objects.notNull(items);
 			this.fromIndex = fromIndex;
 			this.toIndex = toIndex;

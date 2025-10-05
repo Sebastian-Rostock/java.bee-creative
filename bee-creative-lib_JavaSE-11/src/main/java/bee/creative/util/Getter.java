@@ -14,4 +14,8 @@ public interface Getter<ITEM, VALUE> {
 	 * @return Wert der Eigenschaft. */
 	VALUE get(ITEM item);
 
+	default Getter3<ITEM, VALUE> asGetter() {
+		return this::get;
+	}
+
 }

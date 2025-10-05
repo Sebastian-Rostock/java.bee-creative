@@ -25,6 +25,8 @@ public interface Consumer2<VALUE> extends Consumer<VALUE> {
 		return setterFrom(this);
 	}
 
+ 
+	
 	/** Diese Methode ist eine Abkürzung für {@link Properties#propertyFrom(Producer, Consumer) propertyFrom(get, this)}. */
 	default Property2<VALUE> toProperty(Producer<? extends VALUE> get) {
 		return propertyFrom(get, this);

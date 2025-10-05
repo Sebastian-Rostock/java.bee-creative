@@ -94,7 +94,7 @@ public class Parser {
 		 * @see Comparators#compare(int, int)
 		 * @param index Position.
 		 * @return {@link Comparable} für Endpositionen von Abschnitten. */
-		public static Comparable2<Token> endingAt(final int index) {
+		public static Comparable3<Token> endingAt(final int index) {
 			return new AbstractComparable<>() {
 
 				@Override
@@ -114,7 +114,7 @@ public class Parser {
 		 * @see Comparators#compare(int, int)
 		 * @param index Position.
 		 * @return {@link Comparable} für Startposition von Abschnitten. */
-		public static Comparable2<Token> startingAt(final int index) {
+		public static Comparable3<Token> startingAt(final int index) {
 			return new AbstractComparable<>() {
 
 				@Override
@@ -125,14 +125,14 @@ public class Parser {
 			};
 		}
 
-		/** Diese Methode liefert ein {@link Comparable2}, welches die Grenzen eines {@link Token Abschnitts} mit der gegebenen Position vergleicht und einen
+		/** Diese Methode liefert ein {@link Comparable3}, welches die Grenzen eines {@link Token Abschnitts} mit der gegebenen Position vergleicht und einen
 		 * {@link Comparable#compareTo(Object) Navigationswert} kleiner, größer oder gleich {@code 0} liefert, wenn die gegebene Position kleiner als die
 		 * {@link Token#start() Startposition} des Abschnitts ist, größer oder gleich der {@link Token#end() Endposition} des Abschnitts ist bzw. innerhalb des
 		 * Abschnitts liegt.
 		 *
 		 * @param index Position.
 		 * @return {@link Comparable} für Startposition von Abschnitten. */
-		public static Comparable2<Token> containing(final int index) {
+		public static Comparable3<Token> containing(final int index) {
 			return new AbstractComparable<>() {
 
 				@Override

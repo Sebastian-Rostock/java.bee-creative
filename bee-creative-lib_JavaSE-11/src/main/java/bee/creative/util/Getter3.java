@@ -56,5 +56,11 @@ public interface Getter3<GItem, GValue> extends Getter2<GItem, GValue> {
 	default Field2<GItem, GValue> toField() {
 		return fieldFrom(this, emptyField());
 	}
+	
+	@Override
+	default Getter3<GItem, GValue> asGetter() {
+		return this;
+	}
+	
 
 }

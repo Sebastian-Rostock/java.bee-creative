@@ -349,7 +349,7 @@ class __Parser {
 		 *
 		 * @param index Position.
 		 * @return {@link Comparable} für die Endpositionen von Abschnitten. */
-		public static Comparable2<Token> endingAt(int index) {
+		public static Comparable3<Token> endingAt(int index) {
 			return value -> Comparators.compare(index, value.end());
 		}
 
@@ -359,18 +359,18 @@ class __Parser {
 		 *
 		 * @param index Position.
 		 * @return {@link Comparable} für die Startposition von Abschnitten. */
-		public static Comparable2<Token> startingAt(int index) {
+		public static Comparable3<Token> startingAt(int index) {
 			return value -> Comparators.compare(index, value.start());
 		}
 
-		/** Diese Methode liefert ein {@link Comparable2}, welches die Grenzen eines {@link Token Abschnitts} mit der gegebenen Position vergleicht und einen
+		/** Diese Methode liefert ein {@link Comparable3}, welches die Grenzen eines {@link Token Abschnitts} mit der gegebenen Position vergleicht und einen
 		 * {@link Comparable#compareTo(Object) Navigationswert} kleiner, gleich oder größer {@code 0} liefert, wenn die gegebene Position kleiner als die
 		 * {@link Token#start() Startposition} des Abschnitts ist, innerhalb des Abschnitts liegt bzw. größer oder gleich der {@link Token#end() Endposition} des
 		 * Abschnitts ist.
 		 *
 		 * @param index Position.
 		 * @return {@link Comparable} für den Inhaltsbereich von Abschnitten. */
-		public static Comparable2<Token> containing(int index) {
+		public static Comparable3<Token> containing(int index) {
 			return value -> index < value.start() ? -1 : index < value.end() ? 0 : +1;
 		}
 

@@ -40,14 +40,14 @@ public interface Getter2<ITEM, VALUE> extends Getter<ITEM, VALUE> {
 		return concatSetter(this, that);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Filter2#translate(Getter) that.translate(this)}. */
-	default Filter<ITEM> translate(Filter<? super VALUE> that) {
-		return that.asFilter().translate(this);
+	/** Diese Methode ist eine Abkürzung für {@link Filter3#translate(Getter) that.translate(this)}. */
+	default Filter3<ITEM> translate(Filter<? super VALUE> that) {
+		return Filters.filterFrom(that).translate(this);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Comparables#translate(Comparable, Getter) Comparables.translate(that, this)}. */
-	default Comparable2<ITEM> translate(Comparable<? super VALUE> that) {
-		return Comparables.translate(that, this);
+	/** Diese Methode ist eine Abkürzung für {@link Comparables#translatedComparable(Comparable, Getter) Comparables.translate(that, this)}. */
+	default Comparable3<ITEM> translate(Comparable<? super VALUE> that) {
+		return Comparables.translatedComparable(that, this);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Comparators#translatedComparator(Comparator, Getter) translatedComparator(that, this)}. */

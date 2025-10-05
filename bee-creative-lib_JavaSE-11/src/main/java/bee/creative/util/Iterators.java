@@ -40,7 +40,7 @@ public class Iterators {
 		protected int index;
 
 		public ArrayIterator(final Array<? extends GItem> that, final int fromIndex, final int toIndex) throws NullPointerException, IllegalArgumentException {
-			Comparables.check(fromIndex, toIndex);
+			Comparables.checkOrder(fromIndex, toIndex);
 			this.that = Objects.notNull(that);
 			this.fromIndex = fromIndex;
 			this.toIndex = toIndex;
@@ -285,7 +285,7 @@ public class Iterators {
 		public boolean hasNext() {
 			if (this.has != null) return this.has.booleanValue();
 			while (this.that.hasNext()) {
-				if (this.filter.accept(this.next = this.that.next())) return this.has = Boolean.TRUE;
+				if (this.filter.accepts(this.next = this.that.next())) return this.has = Boolean.TRUE;
 			}
 			return this.has = Boolean.FALSE;
 		}
