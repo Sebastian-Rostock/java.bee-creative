@@ -1,11 +1,11 @@
 package bee.creative.qs;
 
-import static bee.creative.util.Translators.translatorFrom;
+import static bee.creative.util.Translators.translatorFromClass;
 import java.util.Arrays;
 import java.util.List;
 import bee.creative.util.Translator;
-import bee.creative.util.Translator2;
-import bee.creative.util.Translators.OptionalizedTranslator;
+import bee.creative.util.Translator3;
+import bee.creative.util.Translators;
 
 /** Diese Schnittstelle definiert einen Graphspeicher für einen Hypergraphen vierter Ordnung (Quad-Store), dessen {@link QN Hyperknoten} über einen optionalen
  * identifizierenden {@link QN#value() Textwert} verfügen und dessen {@link QE Hyperkanten} jeweils vier Hyperknoten in den Rollen {@link QE#context() Kontext},
@@ -191,10 +191,10 @@ public interface QS {
 	 * @return temporäre Hypertupelmenge. */
 	QTSet2 newTuples(List<String> names, Iterable<? extends QT> tuples) throws NullPointerException, IllegalArgumentException;
 
-	/** Diese Methode liefert den {@link OptionalizedTranslator optionalisierten} {@link QN#value() Textwert}-{@link #newNode(Object)
+	/** Diese Methode liefert den {@link Translators#optionalizedTranslator(Translator) optionalisierten} {@link QN#value() Textwert}-{@link #newNode(Object)
 	 * Hyperknoten}-{@link Translator}. */
-	default Translator2<QN, String> valueTrans() {
-		return translatorFrom(QN.class, String.class, QN::value, this::newNode).optionalize();
+	default Translator3<QN, String> valueTrans() {
+		return translatorFromClass(QN.class, String.class, QN::value, this::newNode).optionalize();
 	}
 
 }

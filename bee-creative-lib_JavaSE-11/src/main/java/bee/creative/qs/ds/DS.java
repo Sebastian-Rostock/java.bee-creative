@@ -5,8 +5,8 @@ import bee.creative.qs.QN;
 import bee.creative.qs.QS;
 import bee.creative.util.Set2;
 import bee.creative.util.Translator;
-import bee.creative.util.Translator2;
-import bee.creative.util.Translators.OptionalizedTranslator;
+import bee.creative.util.Translator3;
+import bee.creative.util.Translators;
 
 /** Diese Schnittstelle definiert einen Domänenspeicher, der seinen Zustand in einem {@link #store() Graphspeicher} speichert.
  *
@@ -42,7 +42,7 @@ public interface DS {
 	 * @return dem externen Hyperknoten zugeordnete interne Hyperknoten. */
 	Set2<QN> installSet(String value) throws NullPointerException;
 
-	/** Diese Methode liefert den {@link OptionalizedTranslator optionalisierten} {@link DM#context() Kontextknoten}-{@link DM Datenmodell}-{@link Translator}. */
-	Translator2<QN, DM> modelTrans();
+	/** Diese Methode liefert den {@link Translators#optionalizedTranslator(Translator) optionalisierten} {@link DM#context() Kontextknoten}-{@link DM Datenmodell}-{@link Translator}. */
+	Translator3<QN, DM> modelTrans();
 
 }

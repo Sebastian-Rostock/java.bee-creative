@@ -4,8 +4,8 @@ import bee.creative.qs.QN;
 import bee.creative.util.Property3;
 import bee.creative.util.Set2;
 import bee.creative.util.Translator;
-import bee.creative.util.Translator2;
-import bee.creative.util.Translators.OptionalizedTranslator;
+import bee.creative.util.Translator3;
+import bee.creative.util.Translators;
 
 // TODO
 // domain-history
@@ -82,8 +82,8 @@ public interface DH extends DO {
 		return parent.getLink(DH.IDENT_IsModelWithHistory).getTargets(parent.context()).asNodeSet();
 	}
 
-	/** Diese Methode liefert den {@link OptionalizedTranslator optionalisierten} {@link DC#node() Änderungsknoten}-{@link DC
+	/** Diese Methode liefert den {@link Translators#optionalizedTranslator(Translator) optionalisierten} {@link DC#node() Änderungsknoten}-{@link DC
 	 * Domänenänderung}-{@link Translator}. */
-	Translator2<QN, DC> changeTrans();
+	Translator3<QN, DC> changeTrans();
 
 }

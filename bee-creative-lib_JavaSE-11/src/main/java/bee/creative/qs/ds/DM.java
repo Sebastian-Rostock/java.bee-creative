@@ -6,8 +6,8 @@ import bee.creative.qs.QN;
 import bee.creative.qs.QO;
 import bee.creative.util.Set2;
 import bee.creative.util.Translator;
-import bee.creative.util.Translator2;
-import bee.creative.util.Translators.OptionalizedTranslator;
+import bee.creative.util.Translator3;
+import bee.creative.util.Translators;
 
 /** Diese Schnittstelle definiert ein Domänenmodell (domain-model), dass auf einem {@link #owner() Graphspeicher} aufbaut und Wissen in Form von {@link QE
  * Hyperkanten} mit einem bestimmten {@link #context() Kontextknoten} beschreibt. Die Prädikatknoten stehen objektrelational gesehen für {@link DL Datenfelder}
@@ -112,10 +112,10 @@ public interface DM extends QO {
 		return DQ.popEdges(this.context(), edges, history != null ? history.putContext() : null, history != null ? history.popContext() : null);
 	}
 
-	/** Diese Methode liefert den {@link OptionalizedTranslator optionalisierten} {@link DL#node() Feldknoten}-{@link DL Datenfeld}-{@link Translator}. */
-	Translator2<QN, DL> linkTrans();
+	/** Diese Methode liefert den {@link Translators#optionalizedTranslator(Translator) optionalisierten} {@link DL#node() Feldknoten}-{@link DL Datenfeld}-{@link Translator}. */
+	Translator3<QN, DL> linkTrans();
 
-	/** Diese Methode liefert den {@link OptionalizedTranslator optionalisierten} {@link DT#node() Typknoten}-{@link DT Datentyp}-{@link Translator}. */
-	Translator2<QN, DT> typeTrans();
+	/** Diese Methode liefert den {@link Translators#optionalizedTranslator(Translator) optionalisierten} {@link DT#node() Typknoten}-{@link DT Datentyp}-{@link Translator}. */
+	Translator3<QN, DT> typeTrans();
 
 }

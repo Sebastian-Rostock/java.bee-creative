@@ -13,9 +13,9 @@ import bee.creative.qs.QS;
 import bee.creative.util.Properties;
 import bee.creative.util.Property3;
 import bee.creative.util.Set2;
-import bee.creative.util.Translator2;
-import bee.creative.util.Translators.EnumTranslator;
-import bee.creative.util.Translators.OptionalizedTranslator;
+import bee.creative.util.Translator;
+import bee.creative.util.Translator3;
+import bee.creative.util.Translators;
 
 /** Diese Schnittstelle definiert ein Datenfeld (Domain-Link) als {@link #labelAsNode() beschriftete} und {@link #identsAsNodes() erkennbarer} {@link #node()
  * Prädikatknoten} mit Festlegungen zur Vielzahl, Handhabung und Typisierung der damit verbundenen Objekt- und Subjektknoten.
@@ -386,12 +386,12 @@ public interface DL extends DE {
 		 * als auch die referenzierten Hyperknoten entfernt bzw. dupliziert werden. */
 		Composition;
 
-		/** Diese Methode liefert den {@link OptionalizedTranslator optionalisierten} {@link Handling}-{@link EnumTranslator}. */
-		public static final Translator2<String, Handling> handlingTrans() {
+		/** Diese Methode liefert den {@link Translators#optionalizedTranslator(Translator) optionalisierten} {@link Handling}-{@link Translator3}. */
+		public static final Translator3<String, Handling> handlingTrans() {
 			return trans == null ? trans = translatorFromEnum(Handling.class).optionalize() : trans;
 		}
 
-		private static Translator2<String, Handling> trans;
+		private static Translator3<String, Handling> trans;
 
 	}
 
@@ -410,12 +410,12 @@ public interface DL extends DE {
 		/** Einem referenzierenden {@link QN Hyperknoten} soll mindestens ein referenzierter Hyperknoten zugeordnet werden können. */
 		Multiplicity1N;
 
-		/** Diese Methode liefert den {@link OptionalizedTranslator optionalisierten} {@link Multiplicity}-{@link EnumTranslator}. */
-		public static final Translator2<String, Multiplicity> multiplicityTrans() {
+		/** Diese Methode liefert den {@link Translators#optionalizedTranslator(Translator) optionalisierten} {@link Multiplicity}-{@link Translator3}. */
+		public static final Translator3<String, Multiplicity> multiplicityTrans() {
 			return trans == null ? trans = translatorFromEnum(Multiplicity.class).optionalize() : trans;
 		}
 
-		private static Translator2<String, Multiplicity> trans;
+		private static Translator3<String, Multiplicity> trans;
 
 	}
 

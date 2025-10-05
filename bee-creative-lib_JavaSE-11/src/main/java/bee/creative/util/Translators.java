@@ -1,372 +1,169 @@
 package bee.creative.util;
 
+import static bee.creative.lang.Objects.notNull;
 import static bee.creative.util.Getters.neutralGetter;
-import java.util.Arrays;
+import static bee.creative.util.Iterables.iterableFromArray;
 import java.util.Map;
-import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert grundlegende {@link Translator}.
  *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Translators {
 
-	/** Diese Methode liefert den gegebenen {@link Translator} als {@link Translator2}. Wenn er {@code null} ist, wird der {@link EmptyTranslator} geliefert. */
-	public static <SOURCE, TARGET> Translator2<SOURCE, TARGET> translatorFrom(Translator<SOURCE, TARGET> that) {
-		if (that == null) return emptyTranslator();
-		if (that instanceof Translator2) return (Translator2<SOURCE, TARGET>)that;
-		return reversedTranslator(reversedTranslator(that));
+	/** Diese Methode liefert den gegebenen {@link Translator} als {@link Translator3}. */
+	public static <S, T> Translator3<S, T> translatorFrom(Translator<S, T> that) {
+		notNull(that);
+		if (that instanceof Translator3) return (Translator3<S, T>)that;
+		return translatorFrom(object -> that.isTarget(object), object -> that.isSource(object), object -> that.toTarget(object), object -> that.toSource(object));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link CompositeTranslator new CompositeTranslator<>(sourceClass, targetClass, sourceTrans, targetTrans)}. */
-	public static <SOURCE, TARGET> Translator2<SOURCE, TARGET> translatorFrom(Class<SOURCE> sourceClass, Class<TARGET> targetClass,
-		Getter<? super SOURCE, ? extends TARGET> sourceTrans, Getter<? super TARGET, ? extends SOURCE> targetTrans) throws NullPointerException {
-		return new CompositeTranslator<>(sourceClass, targetClass, sourceTrans, targetTrans);
+	/** Diese Methode liefert einen {@link Translator3} mit den gegebenen Methoden. */
+	public static <S, T> Translator3<S, T> translatorFrom(Filter<Object> isTarget, Filter<Object> isSource, Getter<Object, ? extends T> toTarget,
+		Getter<Object, ? extends S> toSource) throws NullPointerException {
+		notNull(isTarget);
+		notNull(isSource);
+		notNull(toTarget);
+		notNull(toSource);
+		return new Translator3<>() {
+
+			@Override
+			public boolean isTarget(Object object) {
+				return isTarget.accepts(object);
+			}
+
+			@Override
+			public boolean isSource(Object object) {
+				return isSource.accepts(object);
+			}
+
+			@Override
+			public T toTarget(Object object) throws ClassCastException, IllegalArgumentException {
+				return toTarget.get(object);
+			}
+
+			@Override
+			public S toSource(Object object) throws ClassCastException, IllegalArgumentException {
+				return toSource.get(object);
+			}
+
+		};
 	}
 
-	public static <SOURCE, TARGET> Translator2<SOURCE, TARGET> translatorFromMap(Map<TARGET, ? extends SOURCE> sourceByTarget) throws NullPointerException {
-		return translatorFromEnum(sourceByTarget::get, sourceByTarget.keySet());
+	public static <S, T> Translator3<S, T> translatorFromMap(Map<T, ? extends S> sourceByTarget) throws NullPointerException {
+		notNull(sourceByTarget);
+		return translatorFromEnum(target -> sourceByTarget.get(target), sourceByTarget.keySet());
 	}
 
-	public static <ENUM extends Enum<?>> Translator2<String, ENUM> translatorFromEnum(Class<ENUM> enumClass) throws NullPointerException {
-		return translatorFromEnum(Enum::name, enumClass.getEnumConstants());
+	public static <T extends Enum<?>> Translator3<String, T> translatorFromEnum(Class<T> enumClass) throws NullPointerException {
+		notNull(enumClass);
+		return translatorFromEnum(target -> target.name(), enumClass.getEnumConstants());
 	}
 
 	@SafeVarargs
-	public static <SOURCE, TARGET> Translator2<SOURCE, TARGET> translatorFromEnum(Getter<? super TARGET, ? extends SOURCE> ident, TARGET... targets)
-		throws NullPointerException {
-		return translatorFromEnum(ident, Arrays.asList(targets));
+	public static <S, T> Translator3<S, T> translatorFromEnum(Getter<? super T, ? extends S> ident, T... targets) throws NullPointerException {
+		return translatorFromEnum(ident, iterableFromArray(targets));
 	}
 
-	public static <SOURCE, TARGET> Translator2<SOURCE, TARGET> translatorFromEnum(Getter<? super TARGET, ? extends SOURCE> ident,
-		Iterable<? extends TARGET> targets) throws NullPointerException {
-		return new EnumTranslator<>(ident, targets);
+	public static <S, T> Translator3<S, T> translatorFromEnum(Getter<? super T, ? extends S> ident, Iterable<? extends T> targets) throws NullPointerException {
+		notNull(ident);
+		var toTargetMap = new HashMap<S, T>(100);
+		var toSourceMap = new HashMap<T, S>(100);
+		targets.forEach(target -> {
+			var source = ident.get(target);
+			toTargetMap.put(source, target);
+			toSourceMap.put(target, source);
+		});
+		toTargetMap.compact();
+		toSourceMap.compact();
+		return translatorFrom(object -> toSourceMap.containsKey(object), object -> toTargetMap.containsKey(object), object -> toTargetMap.get(object),
+			object -> toSourceMap.get(object));
 	}
 
-	/** Diese Methode liefert den {@link EmptyTranslator}. */
+	/** Diese Methode liefert einen {@link Translator3}, der Quell- und Zielobjekte an ihren {@link Class Klassen} erkennt und zur Umwandlung dieser ineinander
+	 * die gegebenen {@link Getter} verwendet. */
+	public static <S, T> Translator3<S, T> translatorFromClass(Class<S> sourceClass, Class<T> targetClass, Getter<? super S, ? extends T> sourceTrans,
+		Getter<? super T, ? extends S> targetTrans) throws NullPointerException {
+		return translatorFrom(object -> targetClass.isInstance(object), object -> sourceClass.isInstance(object),
+			object -> sourceTrans.get(sourceClass.cast(object)), object -> targetTrans.get(targetClass.cast(object)));
+	}
+
+	/** Diese Methode liefert einen {@link Translator3}, der alle Quell- und Zielobjekte ablehnt. */
 	@SuppressWarnings ("unchecked")
-	public static <SOURCE, TARGET> Translator2<SOURCE, TARGET> emptyTranslator() {
-		return (Translator2<SOURCE, TARGET>)EmptyTranslator.INSTANCE;
+	public static <S, T> Translator3<S, T> emptyTranslator() {
+		return (Translator3<S, T>)emptyTranslator;
 	}
 
-	/** Diese Methode liefert einen neutralen {@link Translator2} und ist eine Abkürzung für {@link Translators#neutralTranslator(Class)
+	/** Diese Methode liefert einen neutralen {@link Translator3} und ist eine Abkürzung für {@link Translators#neutralTranslator(Class)
 	 * neutralTranslator(Object.class)}. */
 	@SuppressWarnings ("unchecked")
-	public static <VALUE> Translator2<VALUE, VALUE> neutralTranslator() {
-		return (Translator2<VALUE, VALUE>)neutralTranslator(Object.class);
+	public static <V> Translator3<V, V> neutralTranslator() {
+		return (Translator3<V, V>)neutralTranslator(Object.class);
 	}
 
-	/** Diese Methode liefert einen neutralen {@link Translator2} und ist eine Abkürzung für {@link Translators#translatorFrom(Class, Class, Getter, Getter)
+	/** Diese Methode liefert einen neutralen {@link Translator3} und ist eine Abkürzung für {@link Translators#translatorFromClass(Class, Class, Getter, Getter)
 	 * translatorFrom(valueClass, valueClass, neutralGetter(), neutralGetter())}. */
-	public static <VALUE> Translator2<VALUE, VALUE> neutralTranslator(Class<VALUE> valueClass) throws NullPointerException {
-		return translatorFrom(valueClass, valueClass, neutralGetter(), neutralGetter());
+	public static <V> Translator3<V, V> neutralTranslator(Class<V> valueClass) throws NullPointerException {
+		return translatorFromClass(valueClass, valueClass, neutralGetter(), neutralGetter());
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link ConcatTranslator new ConcatTranslator<>(that, trans)}. */
-	public static <SOURCE, CENTER, TARGET> Translator2<SOURCE, TARGET> concatTranslator(Translator<SOURCE, CENTER> that, Translator<CENTER, TARGET> trans)
-		throws NullPointerException {
-		return new ConcatTranslator<>(that, trans);
+	/** Diese Methode liefert einen verketteten {@link Translator3}. */
+	public static <S, C, T> Translator3<S, T> concatTranslator(Translator<S, C> that1, Translator<C, T> that2) throws NullPointerException {
+		notNull(that1);
+		notNull(that2);
+		return translatorFrom(object -> that2.isTarget(object), object -> that1.isSource(object), object -> that2.toTarget(that1.toTarget(object)),
+			object -> that1.toSource(that2.toSource(object)));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link ReversedTranslator new ReversedTranslator<>(that)}. */
-	public static <SOURCE, TARGET> Translator2<SOURCE, TARGET> reversedTranslator(Translator<TARGET, SOURCE> that) throws NullPointerException {
-		return new ReversedTranslator<>(that);
+	/** Diese Methode liefert einen {@link Translator3}, der die Übersetzung des gegebenen {@link Translator} umkehrt. */
+	public static <S, T> Translator3<S, T> reversedTranslator(Translator<T, S> that) throws NullPointerException {
+		notNull(that);
+		return translatorFrom(object -> that.isSource(object), object -> that.isTarget(object), object -> that.toSource(object), object -> that.toTarget(object));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link OptionalizedTranslator new OptionalizedTranslator<>(that, mutex)}. */
-	public static <SOURCE, TARGET> Translator2<SOURCE, TARGET> optionalizedTranslator(Translator<SOURCE, TARGET> that) throws NullPointerException {
-		return new OptionalizedTranslator<>(that);
+	/** Diese Methode liefert einen {@link Translator3}, der den gegebenen {@link Translator} {@code null}-tollerant macht. */
+	public static <S, T> Translator3<S, T> optionalizedTranslator(Translator<S, T> that) throws NullPointerException {
+		return translatorFrom(object -> (object == null) || that.isTarget(object), object -> (object == null) || that.isSource(object),
+			object -> object != null ? that.toTarget(object) : null, object -> object != null ? that.toSource(object) : null);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #synchronizedTranslator(Translator, Object) synchronizedTranslator(that, that)}. */
-	public static <SOURCE, TARGET> Translator2<SOURCE, TARGET> synchronizedTranslator(Translator<SOURCE, TARGET> that) throws NullPointerException {
-		return synchronizedTranslator(that, that);
-	}
+	/** Diese Methode liefert einen synchronisierten {@link Translator3}, der einen gegebenen {@link Translator} über {@code synchronized(mutex)} synchronisiert.
+	 * Wenn dieses Synchronisationsobjekt {@code null} ist, wird der gelieferte {@link Translator} verwendet. */
+	public static <S, T> Translator3<S, T> synchronizedTranslator(Translator<S, T> that, Object mutex) throws NullPointerException {
+		notNull(that);
+		return new Translator3<>() {
 
-	/** Diese Methode ist eine Abkürzung für {@link SynchronizedTranslator new SynchronizedTranslator<>(that, mutex)}. */
-	public static <SOURCE, TARGET> Translator2<SOURCE, TARGET> synchronizedTranslator(Translator<SOURCE, TARGET> that, Object mutex) throws NullPointerException {
-		return new SynchronizedTranslator<>(that, mutex);
-	}
-
-	/** Diese Klasse implementiert einen {@link Translator2}, der alle Quell- und Zielobjekte ablehnt.
-	 *
-	 * @author [cc-by] 2021 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public static class EmptyTranslator extends AbstractTranslator<Object, Object> {
-
-		public static final Translator2<?, ?> INSTANCE = new EmptyTranslator();
-
-	}
-
-	public static class EnumTranslator<SOURCE, TARGET> extends AbstractTranslator<SOURCE, TARGET> {
-
-		public EnumTranslator(Getter<? super TARGET, ? extends SOURCE> ident, Iterable<? extends TARGET> targets) {
-			this.ident = ident;
-			this.targets = targets;
-			this.toTargetMap = new HashMap<>(100);
-			this.toSourceMap = new HashMap<>(100);
-			targets.forEach(target -> {
-				var source = ident.get(target);
-				this.toTargetMap.put(source, target);
-				this.toSourceMap.put(target, source);
-			});
-			this.toTargetMap.compact();
-			this.toSourceMap.compact();
-		}
-
-		@Override
-		public boolean isTarget(Object object) {
-			return this.toSourceMap.containsKey(object);
-		}
-
-		@Override
-		public boolean isSource(Object object) {
-			return this.toTargetMap.containsKey(object);
-		}
-
-		@Override
-		public TARGET toTarget(Object object) throws ClassCastException, IllegalArgumentException {
-			return this.toTargetMap.get(object);
-		}
-
-		@Override
-		public SOURCE toSource(Object object) throws ClassCastException, IllegalArgumentException {
-			return this.toSourceMap.get(object);
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.ident, this.targets);
-		}
-
-		private final Getter<? super TARGET, ? extends SOURCE> ident;
-
-		private final Iterable<? extends TARGET> targets;
-
-		private final HashMap<SOURCE, TARGET> toTargetMap;
-
-		private final HashMap<TARGET, SOURCE> toSourceMap;
-
-	}
-
-	/** Diese Klasse implementiert einen verketteten {@link Translator2}.
-	 *
-	 * @param <SOURCE> Typ der Quellobjekte dieses sowie des ersten {@link Translator}.
-	 * @param <CENTER> Typ der Zielobjekte des ersten sowie der Quellobjekte des zweiten {@link Translator}.
-	 * @param <TARGET> Typ der Zielobjekte dieses sowie des zweiten {@link Translator}. */
-	public static class ConcatTranslator<SOURCE, CENTER, TARGET> extends AbstractTranslator<SOURCE, TARGET> {
-
-		public ConcatTranslator(Translator<SOURCE, CENTER> that1, Translator<CENTER, TARGET> that2) throws NullPointerException {
-			this.that1 = Objects.notNull(that1);
-			this.that2 = Objects.notNull(that2);
-		}
-
-		@Override
-		public boolean isTarget(Object object) {
-			return this.that2.isTarget(object);
-		}
-
-		@Override
-		public boolean isSource(Object object) {
-			return this.that1.isSource(object);
-		}
-
-		@Override
-		public TARGET toTarget(Object object) throws ClassCastException, IllegalArgumentException {
-			return this.that2.toTarget(this.that1.toTarget(object));
-		}
-
-		@Override
-		public SOURCE toSource(Object object) throws ClassCastException, IllegalArgumentException {
-			return this.that1.toSource(this.that2.toSource(object));
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.that1, this.that2);
-		}
-
-		private final Translator<SOURCE, CENTER> that1;
-
-		private final Translator<CENTER, TARGET> that2;
-
-	}
-
-	/** Diese Klasse implementiert einen {@link Translator2}, der die Übersetzung eines gegebenen {@link Translator} umkehrt.
-	 *
-	 * @param <SOURCE> Typ der Quellobjekte dieses sowie der Zielobjekte des gegebenen {@link Translator}.
-	 * @param <TARGET> Typ der Zielobjekte dieses sowie der Quellobjekte des gegebenen {@link Translator}. */
-	public static class ReversedTranslator<SOURCE, TARGET> extends AbstractTranslator<SOURCE, TARGET> {
-
-		public ReversedTranslator(Translator<TARGET, SOURCE> that) throws NullPointerException {
-			this.that = Objects.notNull(that);
-		}
-
-		@Override
-		public boolean isTarget(Object object) {
-			return this.that.isSource(object);
-		}
-
-		@Override
-		public boolean isSource(Object object) {
-			return this.that.isTarget(object);
-		}
-
-		@Override
-		public TARGET toTarget(Object object) throws ClassCastException, IllegalArgumentException {
-			return this.that.toSource(object);
-		}
-
-		@Override
-		public SOURCE toSource(Object object) throws ClassCastException, IllegalArgumentException {
-			return this.that.toTarget(object);
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.that);
-		}
-
-		private final Translator<TARGET, SOURCE> that;
-
-	}
-
-	/** Diese Klasse implementiert einen zusammengesetzten {@link Translator2}, der Quell- und Zielobjekte an ihren {@link Class Klassen} erkennt und zur
-	 * Umwandlung dieser ineinander entsprechende gegebene {@link Getter} verwendet.
-	 *
-	 * @param <SOURCE> Typ der Quellobjekte.
-	 * @param <TARGET> Typ der Zielobjekte. */
-	public static class CompositeTranslator<SOURCE, TARGET> extends AbstractTranslator<SOURCE, TARGET> {
-
-		public CompositeTranslator(Class<SOURCE> sourceClass, Class<TARGET> targetClass, Getter<? super SOURCE, ? extends TARGET> sourceTrans,
-			Getter<? super TARGET, ? extends SOURCE> targetTrans) throws NullPointerException {
-			this.sourceClass = Objects.notNull(sourceClass);
-			this.targetClass = Objects.notNull(targetClass);
-			this.sourceTrans = Objects.notNull(sourceTrans);
-			this.targetTrans = Objects.notNull(targetTrans);
-		}
-
-		@Override
-		public boolean isTarget(Object object) {
-			return this.targetClass.isInstance(object);
-		}
-
-		@Override
-		public boolean isSource(Object object) {
-			return this.sourceClass.isInstance(object);
-		}
-
-		@Override
-		public TARGET toTarget(Object object) throws ClassCastException, IllegalArgumentException {
-			return this.sourceTrans.get(this.sourceClass.cast(object));
-		}
-
-		@Override
-		public SOURCE toSource(Object object) throws ClassCastException, IllegalArgumentException {
-			return this.targetTrans.get(this.targetClass.cast(object));
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.sourceClass, this.targetClass, this.sourceTrans, this.targetTrans);
-		}
-
-		private final Class<SOURCE> sourceClass;
-
-		private final Class<TARGET> targetClass;
-
-		private final Getter<? super SOURCE, ? extends TARGET> sourceTrans;
-
-		private final Getter<? super TARGET, ? extends SOURCE> targetTrans;
-
-	}
-
-	/** Diese Klasse implementiert einen {@link Translator2}, der die Übersetzung eines gegebenen {@link Translator} {@code null}-tollerant macht.
-	 *
-	 * @param <SOURCE> Typ der Quellobjekte.
-	 * @param <TARGET> Typ der Zielobjekte. */
-	public static class OptionalizedTranslator<SOURCE, TARGET> extends AbstractTranslator<SOURCE, TARGET> {
-
-		public OptionalizedTranslator(Translator<SOURCE, TARGET> that) throws NullPointerException {
-			this.that = Objects.notNull(that);
-		}
-
-		@Override
-		public boolean isTarget(Object object) {
-			return (object == null) || this.that.isTarget(object);
-		}
-
-		@Override
-		public boolean isSource(Object object) {
-			return (object == null) || this.that.isSource(object);
-		}
-
-		@Override
-		public TARGET toTarget(Object object) throws ClassCastException, IllegalArgumentException {
-			return object != null ? this.that.toTarget(object) : null;
-		}
-
-		@Override
-		public SOURCE toSource(Object object) throws ClassCastException, IllegalArgumentException {
-			return object != null ? this.that.toSource(object) : null;
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.that);
-		}
-
-		private final Translator<SOURCE, TARGET> that;
-
-	}
-
-	/** Diese Klasse implementiert einen synchronisierten {@link Translator2}, der einen gegebenen {@link Translator} über {@code synchronized(this.mutex)}
-	 * synchronisiert. Wenn dieses Synchronisationsobjekt {@code null} ist, wird {@code this} verwendet.
-	 *
-	 * @param <SOURCE> Typ der Quellobjekte.
-	 * @param <TARGET> Typ der Zielobjekte. */
-	public static class SynchronizedTranslator<SOURCE, TARGET> extends AbstractTranslator<SOURCE, TARGET> {
-
-		public SynchronizedTranslator(Translator<SOURCE, TARGET> that, Object mutex) throws NullPointerException {
-			this.that = Objects.notNull(that);
-			this.mutex = Objects.notNull(mutex, this);
-		}
-
-		@Override
-		public boolean isTarget(Object object) {
-			synchronized (this.mutex) {
-				return this.that.isTarget(object);
+			@Override
+			public boolean isTarget(Object object) {
+				synchronized (notNull(mutex, this)) {
+					return that.isTarget(object);
+				}
 			}
-		}
 
-		@Override
-		public boolean isSource(Object object) {
-			synchronized (this.mutex) {
-				return this.that.isSource(object);
+			@Override
+			public boolean isSource(Object object) {
+				synchronized (notNull(mutex, this)) {
+					return that.isSource(object);
+				}
 			}
-		}
 
-		@Override
-		public TARGET toTarget(Object object) throws ClassCastException, IllegalArgumentException {
-			synchronized (this.mutex) {
-				return this.that.toTarget(object);
+			@Override
+			public T toTarget(Object object) throws ClassCastException, IllegalArgumentException {
+				synchronized (notNull(mutex, this)) {
+					return that.toTarget(object);
+				}
 			}
-		}
 
-		@Override
-		public SOURCE toSource(Object object) throws ClassCastException, IllegalArgumentException {
-			synchronized (this.mutex) {
-				return this.that.toSource(object);
+			@Override
+			public S toSource(Object object) throws ClassCastException, IllegalArgumentException {
+				synchronized (notNull(mutex, this)) {
+					return that.toSource(object);
+				}
 			}
-		}
 
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.that, this.mutex == this ? null : this.mutex);
-		}
-
-		private final Translator<SOURCE, TARGET> that;
-
-		private final Object mutex;
-
+		};
 	}
+
+	static final Translator3<?, ?> emptyTranslator = new Translator3<>() {
+	};
 
 }

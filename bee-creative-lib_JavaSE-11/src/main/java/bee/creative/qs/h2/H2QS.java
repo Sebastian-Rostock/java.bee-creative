@@ -1,6 +1,6 @@
 package bee.creative.qs.h2;
 
-import static bee.creative.util.Translators.translatorFrom;
+import static bee.creative.util.Translators.translatorFromClass;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,7 +15,7 @@ import bee.creative.qs.QT;
 import bee.creative.qs.QTSet;
 import bee.creative.util.HashMap;
 import bee.creative.util.HashSet;
-import bee.creative.util.Translator2;
+import bee.creative.util.Translator3;
 
 /** Diese Klasse implementiert einen {@link QS Graphspeicher}, dessen Hyperkanten und Textwerte in einer Datenbank (embedded H2) gespeichert sind.
  *
@@ -376,7 +376,7 @@ public class H2QS implements QS, AutoCloseable {
 	}
 
 	@Override
-	public Translator2<QN, String> valueTrans() {
+	public Translator3<QN, String> valueTrans() {
 		return this.valueTrans;
 	}
 
@@ -410,7 +410,7 @@ public class H2QS implements QS, AutoCloseable {
 
 	final HashMap<String, H2QIBag<?, ?>.Cache> cacheMap = new HashMap<>();
 
-	final Translator2<QN, String> valueTrans = translatorFrom(QN.class, String.class, QN::value, this::newNode).optionalize();
+	final Translator3<QN, String> valueTrans = translatorFromClass(QN.class, String.class, QN::value, this::newNode).optionalize();
 
 	Object putValueMark;
 

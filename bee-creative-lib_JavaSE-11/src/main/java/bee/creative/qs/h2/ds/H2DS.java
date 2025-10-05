@@ -1,6 +1,6 @@
 package bee.creative.qs.h2.ds;
 
-import static bee.creative.util.Translators.translatorFrom;
+import static bee.creative.util.Translators.translatorFromClass;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collections;
@@ -15,7 +15,7 @@ import bee.creative.qs.h2.H2QQ;
 import bee.creative.qs.h2.H2QS;
 import bee.creative.util.HashMap2;
 import bee.creative.util.Set2;
-import bee.creative.util.Translator2;
+import bee.creative.util.Translator3;
 
 public class H2DS implements DS, AutoCloseable {
 
@@ -49,7 +49,7 @@ public class H2DS implements DS, AutoCloseable {
 	}
 
 	@Override
-	public Translator2<QN, DM> modelTrans() {
+	public Translator3<QN, DM> modelTrans() {
 		return this.modelTrans == null ? this.modelTrans = this.createModelTrans() : this.modelTrans;
 	}
 
@@ -73,7 +73,7 @@ public class H2DS implements DS, AutoCloseable {
 
 	private final H2QN domain;
 
-	private Translator2<QN, DM> modelTrans;
+	private Translator3<QN, DM> modelTrans;
 
 	private HashMap2<String, H2QN> installMap;
 
@@ -96,8 +96,8 @@ public class H2DS implements DS, AutoCloseable {
 		return new HashMap2<>();
 	}
 
-	private Translator2<QN, DM> createModelTrans() {
-		return translatorFrom(QN.class, DM.class, this::asModel, DM::context).optionalize();
+	private Translator3<QN, DM> createModelTrans() {
+		return translatorFromClass(QN.class, DM.class, this::asModel, DM::context).optionalize();
 	}
 
 	private static class Items extends H2DSNSet {

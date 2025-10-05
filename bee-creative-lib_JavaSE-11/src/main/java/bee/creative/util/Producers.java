@@ -45,7 +45,7 @@ public class Producers {
 	}
 
 	/** Diese Methode liefert einen {@link Producer3}, der den gegebenen {@link Producer} {@code that} über {@code synchronized(mutex)} synchronisiert. Wenn
-	 * dieses Synchronisationsobjekt {@code null} ist, wird {@code this} verwendet. */
+	 * dieses Synchronisationsobjekt {@code null} ist, wird der gelieferte {@link Producer} verwendet. */
 	public static <V> Producer3<V> synchronizedProducer(Producer<? extends V> that, Object mutex) throws NullPointerException {
 		notNull(that);
 		return new Producer3<>() {

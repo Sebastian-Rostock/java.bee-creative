@@ -1,6 +1,5 @@
 package bee.creative.util;
 
-import static bee.creative.util.Getters.neutralGetter;
 import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert gundlegende {@link Property}.
@@ -10,9 +9,8 @@ public class Properties {
 
 	/** Diese Methode liefert das gegebene {@link Property} als {@link Property3}. Wenn es {@code null} ist, wird das {@link EmptyProperty} geliefert. */
 	public static <VALUE> Property3<VALUE> propertyFrom(Property<VALUE> that) {
-		if (that == null) return Properties.emptyProperty();
 		if (that instanceof Property3<?>) return (Property3<VALUE>)that;
-		return translatedProperty(that, neutralGetter(), neutralGetter());
+		return propertyFrom(that::get, that::set);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link CompositeProperty new CompositeProperty<>(get, set)}. */
