@@ -56,6 +56,45 @@ public class Comparables {
 		return item2 -> order.compare(value, item2);
 	}
 
+	/** Diese Methode liefert einen {@link Filter}, der nur die Datensätze akzeptiert, deren Ordnung gleiche der des gegebenen {@link Comparable} ist. Die
+	 * Akzeptanz eines Datensatzes {@code item} ist {@code that.compareTo(item) == 0}. */
+	public static <T> Filter3<T> comparableToEqFilter(Comparable<? super T> that) throws NullPointerException {
+		Objects.notNull(that);
+		return (item) -> that.compareTo(item) == 0;
+	}
+
+	/** Diese Klasse liefert einen {@link Filter}, der nur die Datensätze akzeptiert, deren Ordnung kleiner als die des gegebenen {@link Comparable} ist. Die
+	 * Akzeptanz eines Datensatzes {@code item} ist {@code that.compareTo(item) > 0}. */
+	public static <T> Filter3<T> comparableToLtFilter(Comparable<? super T> that) throws NullPointerException {
+		Objects.notNull(that);
+		return (item) -> that.compareTo(item) > 0;
+	}
+
+	/** Diese Klasse liefert einen {@link Filter}, der nur die Datensätze akzeptiert, deren Ordnung kleiner als die oder gleich der des gegebenen
+	 * {@link Comparable} ist. Die Akzeptanz eines Datensatzes {@code item} ist {@code that.compareTo(item) >= 0}. */
+	public static <T> Filter3<T> comparableToLtEqFilter(Comparable<? super T> that) throws NullPointerException {
+		Objects.notNull(that);
+		return (item) -> that.compareTo(item) >= 0;
+	}
+
+	/** Diese Klasse implementiert einen {@link Filter}, der nur die Datensätze akzeptiert, deren Ordnung größer der des gegebenen {@link Comparable} ist. Die
+	 * Akzeptanz eines Datensatzes {@code item} ist {@code that.compareTo(item) < 0}.
+	 *
+	 * @param <T> Typ der Datensätze. */
+	public static <T> Filter3<T> comparableToGtFilter(Comparable<? super T> that) throws NullPointerException {
+		Objects.notNull(that);
+		return (item) -> that.compareTo(item) < 0;
+	}
+
+	/** Diese Klasse implementiert einen {@link Filter}, der nur die Datensätze akzeptiert, deren Ordnung größer als die oder gleich der des gegebenen
+	 * {@link Comparable} ist. Die Akzeptanz eines Datensatzes {@code item} ist {@code that.compareTo(item) <= 0}.
+	 *
+	 * @param <T> Typ der Datensätze. */
+	public static <T> Filter3<T> comparableToGtEqFilter(Comparable<? super T> that) throws NullPointerException {
+		Objects.notNull(that);
+		return (item) -> that.compareTo(item) <= 0;
+	}
+
 	/** Diese Methode liefert ein {@link Comparable3}, welches stets den Navigationswert {@code 0} liefert. */
 	@SuppressWarnings ("unchecked")
 	public static <T> Comparable3<T> neutralComparable() {
@@ -101,13 +140,13 @@ public class Comparables {
 	 *
 	 * @see Comparables
 	 * @see Comparables#binarySearch(Object[], Comparable, int, int)
-	 * @param <GItem> Typ der Elemente.
+	 * @param <T> Typ der Elemente.
 	 * @param items Array als Suchraum.
 	 * @param comparable {@link Comparable}.
 	 * @return Position des ersten Treffers oder <code>(-(<em>Einfügeposition</em>)-1)</code>.
 	 * @throws ClassCastException Wenn der gegebene {@link Comparable} inkompatibel mit den Elementen des gegebenen Arrays ist.
 	 * @throws NullPointerException Wenn {@code items} bzw. {@code comparable} {@code null} ist. */
-	public static <GItem> int binarySearch(GItem[] items, Comparable<? super GItem> comparable) throws ClassCastException, NullPointerException {
+	public static <T> int binarySearch(T[] items, Comparable<? super T> comparable) throws ClassCastException, NullPointerException {
 		return binarySearch(items, comparable, 0, items.length);
 	}
 
@@ -115,7 +154,7 @@ public class Comparables {
 	 * Treffers oder <code>(-(<em>Einfügeposition</em>)-1)</code> zurück.
 	 *
 	 * @see Comparables
-	 * @param <GItem> Typ der Elemente.
+	 * @param <T> Typ der Elemente.
 	 * @param items Array als Suchraum.
 	 * @param fromIndex Anfang des Suchraums (inklusiv).
 	 * @param toIndex Ende des Suchraums (exklusiv).
@@ -125,12 +164,12 @@ public class Comparables {
 	 * @throws ClassCastException Wenn der gegebene {@link Comparable} inkompatibel mit den Elementen des gegebenen Arrays ist.
 	 * @throws IllegalArgumentException Wenn {@code fromIndex > toIndex}.
 	 * @throws IndexOutOfBoundsException Wenn {@code fromIndex < 0} oder {@code toIndex > list.length}. */
-	public static <GItem> int binarySearch(GItem[] items, Comparable<? super GItem> comparable, int fromIndex, int toIndex)
+	public static <T> int binarySearch(T[] items, Comparable<? super T> comparable, int fromIndex, int toIndex)
 		throws NullPointerException, ClassCastException, IllegalArgumentException, IndexOutOfBoundsException {
 		checkItems(items, comparable, fromIndex, toIndex);
 		int from = fromIndex, last = toIndex;
 		while (from < last) {
-			final int next = (from + last) >>> 1, comp = comparable.compareTo(items[next]);
+			int next = (from + last) >>> 1, comp = comparable.compareTo(items[next]);
 			if (comp < 0) {
 				last = next;
 			} else if (comp > 0) {
@@ -145,14 +184,13 @@ public class Comparables {
 	 *
 	 * @see Comparables
 	 * @see Comparables#binarySearch(List, Comparable, int, int)
-	 * @param <GItem> Typ der Elemente.
+	 * @param <T> Typ der Elemente.
 	 * @param items {@link List} als Suchraum.
 	 * @param comparable {@link Comparable}.
 	 * @return Position des ersten Treffers oder <code>(-(<em>Einfügeposition</em>)-1)</code>.
 	 * @throws NullPointerException Wenn {@code items} bzw. {@code comparable} {@code null} ist.
 	 * @throws ClassCastException Wenn der gegebene {@link Comparable} inkompatibel mit den Elementen der gegebenen {@link List} ist. */
-	public static <GItem> int binarySearch(final List<? extends GItem> items, final Comparable<? super GItem> comparable)
-		throws NullPointerException, ClassCastException {
+	public static <T> int binarySearch(List<? extends T> items, Comparable<? super T> comparable) throws NullPointerException, ClassCastException {
 		return binarySearch(items, comparable, 0, items.size());
 	}
 
@@ -160,7 +198,7 @@ public class Comparables {
 	 * ersten Treffers oder <code>(-(<em>Einfügeposition</em>)-1)</code> zurück.
 	 *
 	 * @see Comparables
-	 * @param <GItem> Typ der Elemente.
+	 * @param <T> Typ der Elemente.
 	 * @param items {@link List} als Suchraum.
 	 * @param fromIndex Anfang des Suchraums (inklusiv).
 	 * @param toIndex Ende des Suchraums (exklusiv).
@@ -170,12 +208,12 @@ public class Comparables {
 	 * @throws ClassCastException Wenn der gegebene {@link Comparable} inkompatibel mit den Elementen der gegebenen {@link List} ist.
 	 * @throws IllegalArgumentException Wenn {@code fromIndex > toIndex}.
 	 * @throws IndexOutOfBoundsException Wenn {@code fromIndex < 0} oder {@code toIndex > list.size()}. */
-	public static <GItem> int binarySearch(final List<? extends GItem> items, final Comparable<? super GItem> comparable, final int fromIndex, final int toIndex)
+	public static <T> int binarySearch(List<? extends T> items, Comparable<? super T> comparable, int fromIndex, int toIndex)
 		throws NullPointerException, ClassCastException, IllegalArgumentException, IndexOutOfBoundsException {
 		checkList(items, comparable, fromIndex, toIndex);
 		int from = fromIndex, last = toIndex;
 		while (from < last) {
-			final int next = (from + last) >>> 1, comp = comparable.compareTo(items.get(next));
+			int next = (from + last) >>> 1, comp = comparable.compareTo(items.get(next));
 			if (comp < 0) {
 				last = next;
 			} else if (comp > 0) {
@@ -189,7 +227,7 @@ public class Comparables {
 	 * ersten Treffers oder <code>(-(<em>Einfügeposition</em>)-1)</code> zurück.
 	 *
 	 * @see Comparables
-	 * @param <GItem> Typ der Elemente.
+	 * @param <T> Typ der Elemente.
 	 * @param items {@link Array} als Suchraum.
 	 * @param fromIndex Anfang des Suchraums (inklusiv).
 	 * @param toIndex Ende des Suchraums (exklusiv).
@@ -199,12 +237,12 @@ public class Comparables {
 	 * @throws ClassCastException Wenn der gegebene {@link Comparable} inkompatibel mit den Elementen des gegebenen {@link Array} ist.
 	 * @throws IllegalArgumentException Wenn {@code fromIndex > toIndex}.
 	 * @throws IndexOutOfBoundsException Wenn das gegebene {@link Array} eine {@link IndexOutOfBoundsException} auslöst. */
-	public static <GItem> int binarySearch(final Array<? extends GItem> items, final Comparable<? super GItem> comparable, final int fromIndex, final int toIndex)
+	public static <T> int binarySearch(Array<? extends T> items, Comparable<? super T> comparable, int fromIndex, int toIndex)
 		throws NullPointerException, ClassCastException, IllegalArgumentException, IndexOutOfBoundsException {
 		checkArray(items, comparable, fromIndex, toIndex);
 		int from = fromIndex, last = toIndex;
 		while (from < last) {
-			final int next = (from + last) >>> 1, comp = comparable.compareTo(items.get(next));
+			int next = (from + last) >>> 1, comp = comparable.compareTo(items.get(next));
 			if (comp < 0) {
 				last = next;
 			} else if (comp > 0) {
@@ -219,13 +257,13 @@ public class Comparables {
 	 *
 	 * @see Comparables
 	 * @see Comparables#binarySearchFirst(Object[], Comparable, int, int)
-	 * @param <GItem> Typ der Elemente.
+	 * @param <T> Typ der Elemente.
 	 * @param items Array als Suchraum.
 	 * @param comparable {@link Comparable}.
 	 * @return kleinste Position eines Treffers oder <code>(-(<em>Einfügeposition</em>)-1)</code>.
 	 * @throws NullPointerException Wenn {@code items} bzw. {@code comparable} {@code null} ist.
 	 * @throws ClassCastException Wenn der gegebene {@link Comparable} inkompatibel mit den Elementen des gegebenen Arrays ist. */
-	public static <GItem> int binarySearchFirst(final GItem[] items, final Comparable<? super GItem> comparable) throws NullPointerException, ClassCastException {
+	public static <T> int binarySearchFirst(T[] items, Comparable<? super T> comparable) throws NullPointerException, ClassCastException {
 		return binarySearchFirst(items, comparable, 0, items.length);
 	}
 
@@ -233,7 +271,7 @@ public class Comparables {
 	 * eines Treffers oder <code>(-(<em>Einfügeposition</em>)-1)</code> zurück.
 	 *
 	 * @see Comparables
-	 * @param <GItem> Typ der Elemente.
+	 * @param <T> Typ der Elemente.
 	 * @param items Array als Suchraum.
 	 * @param fromIndex Anfang des Suchraums (inklusiv).
 	 * @param toIndex Ende des Suchraums (exklusiv).
@@ -243,12 +281,12 @@ public class Comparables {
 	 * @throws ClassCastException Wenn der gegebene {@link Comparable} inkompatibel mit den Elementen des gegebenen Arrays ist.
 	 * @throws IllegalArgumentException Wenn {@code fromIndex > toIndex}.
 	 * @throws IndexOutOfBoundsException Wenn {@code fromIndex < 0} oder {@code toIndex > list.length}. */
-	public static <GItem> int binarySearchFirst(final GItem[] items, final Comparable<? super GItem> comparable, final int fromIndex, final int toIndex)
+	public static <T> int binarySearchFirst(T[] items, Comparable<? super T> comparable, int fromIndex, int toIndex)
 		throws NullPointerException, ClassCastException, IllegalArgumentException, IndexOutOfBoundsException {
 		checkItems(items, comparable, fromIndex, toIndex);
 		int from = fromIndex, last = toIndex;
 		while (from < last) {
-			final int next = (from + last) >>> 1, comp = comparable.compareTo(items[next]);
+			int next = (from + last) >>> 1, comp = comparable.compareTo(items[next]);
 			if (comp <= 0) {
 				last = next;
 			} else {
@@ -264,14 +302,13 @@ public class Comparables {
 	 *
 	 * @see Comparables
 	 * @see Comparables#binarySearchFirst(List, Comparable, int, int)
-	 * @param <GItem> Typ der Elemente.
+	 * @param <T> Typ der Elemente.
 	 * @param items {@link List} als Suchraum.
 	 * @param comparable {@link Comparable}.
 	 * @return kleinste Position eines Treffers oder <code>(-(<em>Einfügeposition</em>)-1)</code>.
 	 * @throws NullPointerException Wenn {@code items} bzw. {@code comparable} {@code null} ist.
 	 * @throws ClassCastException Wenn der gegebene {@link Comparable} inkompatibel mit den Elementen der gegebenen {@link List} ist. */
-	public static <GItem> int binarySearchFirst(final List<? extends GItem> items, final Comparable<? super GItem> comparable)
-		throws NullPointerException, ClassCastException {
+	public static <T> int binarySearchFirst(List<? extends T> items, Comparable<? super T> comparable) throws NullPointerException, ClassCastException {
 		return binarySearchFirst(items, comparable, 0, items.size());
 	}
 
@@ -279,7 +316,7 @@ public class Comparables {
 	 * Position eines Treffers oder <code>(-(<em>Einfügeposition</em>)-1)</code> zurück.
 	 *
 	 * @see Comparables
-	 * @param <GItem> Typ der Elemente.
+	 * @param <T> Typ der Elemente.
 	 * @param items {@link List} als Suchraum.
 	 * @param fromIndex Anfang des Suchraums (inklusiv).
 	 * @param toIndex Ende des Suchraums (exklusiv).
@@ -289,12 +326,12 @@ public class Comparables {
 	 * @throws ClassCastException Wenn der gegebene {@link Comparable} inkompatibel mit den Elementen der gegebenen {@link List} ist.
 	 * @throws IllegalArgumentException Wenn {@code fromIndex > toIndex}.
 	 * @throws IndexOutOfBoundsException Wenn {@code fromIndex < 0} oder {@code toIndex > list.size()}. */
-	public static <GItem> int binarySearchFirst(final List<? extends GItem> items, final Comparable<? super GItem> comparable, final int fromIndex,
-		final int toIndex) throws NullPointerException, ClassCastException, IllegalArgumentException, IndexOutOfBoundsException {
+	public static <T> int binarySearchFirst(List<? extends T> items, Comparable<? super T> comparable, int fromIndex, int toIndex)
+		throws NullPointerException, ClassCastException, IllegalArgumentException, IndexOutOfBoundsException {
 		checkList(items, comparable, fromIndex, toIndex);
 		int from = fromIndex, last = toIndex;
 		while (from < last) {
-			final int next = (from + last) >>> 1, comp = comparable.compareTo(items.get(next));
+			int next = (from + last) >>> 1, comp = comparable.compareTo(items.get(next));
 			if (comp <= 0) {
 				last = next;
 			} else {
@@ -309,7 +346,7 @@ public class Comparables {
 	 * Position eines Treffers oder <code>(-(<em>Einfügeposition</em>)-1)</code> zurück.
 	 *
 	 * @see Comparables
-	 * @param <GItem> Typ der Elemente.
+	 * @param <T> Typ der Elemente.
 	 * @param items {@link Array} als Suchraum.
 	 * @param fromIndex Anfang des Suchraums (inklusiv).
 	 * @param toIndex Ende des Suchraums (exklusiv).
@@ -319,12 +356,12 @@ public class Comparables {
 	 * @throws ClassCastException Wenn der gegebene {@link Comparable} inkompatibel mit den Elementen des gegebenen {@link Array} ist.
 	 * @throws IllegalArgumentException Wenn {@code fromIndex > toIndex}.
 	 * @throws IndexOutOfBoundsException Wenn das gegebene {@link Array} eine {@link IndexOutOfBoundsException} auslöst. */
-	public static <GItem> int binarySearchFirst(final Array<? extends GItem> items, final Comparable<? super GItem> comparable, final int fromIndex,
-		final int toIndex) throws NullPointerException, ClassCastException, IllegalArgumentException, IndexOutOfBoundsException {
+	public static <T> int binarySearchFirst(Array<? extends T> items, Comparable<? super T> comparable, int fromIndex, int toIndex)
+		throws NullPointerException, ClassCastException, IllegalArgumentException, IndexOutOfBoundsException {
 		checkArray(items, comparable, fromIndex, toIndex);
 		int from = fromIndex, last = toIndex;
 		while (from < last) {
-			final int next = (from + last) >>> 1, comp = comparable.compareTo(items.get(next));
+			int next = (from + last) >>> 1, comp = comparable.compareTo(items.get(next));
 			if (comp <= 0) {
 				last = next;
 			} else {
@@ -340,13 +377,13 @@ public class Comparables {
 	 *
 	 * @see Comparables
 	 * @see Comparables#binarySearchLast(Object[], Comparable, int, int)
-	 * @param <GItem> Typ der Elemente.
+	 * @param <T> Typ der Elemente.
 	 * @param items Array als Suchraum.
 	 * @param comparable {@link Comparable}.
 	 * @return größte Position eines Treffers oder <code>(-(<em>Einfügeposition</em>)-1)</code>.
 	 * @throws NullPointerException Wenn {@code items} bzw. {@code comparable} {@code null} ist.
 	 * @throws ClassCastException Wenn der gegebene {@link Comparable} inkompatibel mit den Elementen des gegebenen Arrays ist. */
-	public static <GItem> int binarySearchLast(final GItem[] items, final Comparable<? super GItem> comparable) throws NullPointerException, ClassCastException {
+	public static <T> int binarySearchLast(T[] items, Comparable<? super T> comparable) throws NullPointerException, ClassCastException {
 		return binarySearchLast(items, comparable, 0, items.length);
 	}
 
@@ -354,7 +391,7 @@ public class Comparables {
 	 * eines Treffers oder <code>(-(<em>Einfügeposition</em>)-1)</code> zurück.
 	 *
 	 * @see Comparables
-	 * @param <GItem> Typ der Elemente.
+	 * @param <T> Typ der Elemente.
 	 * @param items Array als Suchraum.
 	 * @param fromIndex Anfang des Suchraums (inklusiv).
 	 * @param toIndex Ende des Suchraums (exklusiv).
@@ -364,12 +401,12 @@ public class Comparables {
 	 * @throws ClassCastException Wenn der gegebene {@link Comparable} inkompatibel mit den Elementen des gegebenen Arrays ist.
 	 * @throws IllegalArgumentException Wenn {@code fromIndex > toIndex}.
 	 * @throws IndexOutOfBoundsException Wenn {@code fromIndex < 0} oder {@code toIndex > list.length}. */
-	public static <GItem> int binarySearchLast(final GItem[] items, final Comparable<? super GItem> comparable, final int fromIndex, final int toIndex)
+	public static <T> int binarySearchLast(T[] items, Comparable<? super T> comparable, int fromIndex, int toIndex)
 		throws NullPointerException, ClassCastException, IllegalArgumentException, IndexOutOfBoundsException {
 		checkItems(items, comparable, fromIndex, toIndex);
 		int from = fromIndex, last = toIndex;
 		while (from < last) {
-			final int next = (from + last) >>> 1, comp = comparable.compareTo(items[next]);
+			int next = (from + last) >>> 1, comp = comparable.compareTo(items[next]);
 			if (comp < 0) {
 				last = next;
 			} else {
@@ -386,14 +423,13 @@ public class Comparables {
 	 *
 	 * @see Comparables
 	 * @see Comparables#binarySearchLast(List, Comparable, int, int)
-	 * @param <GItem> Typ der Elemente.
+	 * @param <T> Typ der Elemente.
 	 * @param items {@link List} als Suchraum.
 	 * @param comparable {@link Comparable}.
 	 * @return größte Position eines Treffers oder <code>(-(<em>Einfügeposition</em>)-1)</code>.
 	 * @throws NullPointerException Wenn {@code items} bzw. {@code comparable} {@code null} ist.
 	 * @throws ClassCastException Wenn der gegebene {@link Comparable} inkompatibel mit den Elementen der gegebenen {@link List} ist. */
-	public static <GItem> int binarySearchLast(final List<? extends GItem> items, final Comparable<? super GItem> comparable)
-		throws NullPointerException, ClassCastException {
+	public static <T> int binarySearchLast(List<? extends T> items, Comparable<? super T> comparable) throws NullPointerException, ClassCastException {
 		return binarySearchLast(items, comparable, 0, items.size());
 	}
 
@@ -401,7 +437,7 @@ public class Comparables {
 	 * Position eines Treffers oder <code>(-(<em>Einfügeposition</em>)-1)</code> zurück.
 	 *
 	 * @see Comparables
-	 * @param <GItem> Typ der Elemente.
+	 * @param <T> Typ der Elemente.
 	 * @param items {@link List} als Suchraum.
 	 * @param fromIndex Anfang des Suchraums (inklusiv).
 	 * @param toIndex Ende des Suchraums (exklusiv).
@@ -411,12 +447,12 @@ public class Comparables {
 	 * @throws ClassCastException Wenn der gegebene {@link Comparable} inkompatibel mit den Elementen der gegebenen {@link List} ist.
 	 * @throws IllegalArgumentException Wenn {@code fromIndex > toIndex}.
 	 * @throws IndexOutOfBoundsException Wenn {@code fromIndex < 0} oder {@code toIndex > list.size()}. */
-	public static <GItem> int binarySearchLast(final List<? extends GItem> items, final Comparable<? super GItem> comparable, final int fromIndex,
-		final int toIndex) throws NullPointerException, ClassCastException, IllegalArgumentException, IndexOutOfBoundsException {
+	public static <T> int binarySearchLast(List<? extends T> items, Comparable<? super T> comparable, int fromIndex, int toIndex)
+		throws NullPointerException, ClassCastException, IllegalArgumentException, IndexOutOfBoundsException {
 		checkList(items, comparable, fromIndex, toIndex);
 		int from = fromIndex, last = toIndex;
 		while (from < last) {
-			final int next = (from + last) >>> 1, comp = comparable.compareTo(items.get(next));
+			int next = (from + last) >>> 1, comp = comparable.compareTo(items.get(next));
 			if (comp < 0) {
 				last = next;
 			} else {
@@ -432,7 +468,7 @@ public class Comparables {
 	 * Position eines Treffers oder <code>(-(<em>Einfügeposition</em>)-1)</code> zurück.
 	 *
 	 * @see Comparables
-	 * @param <GItem> Typ der Elemente.
+	 * @param <T> Typ der Elemente.
 	 * @param items {@link Array} als Suchraum.
 	 * @param fromIndex Anfang des Suchraums (inklusiv).
 	 * @param toIndex Ende des Suchraums (exklusiv).
@@ -442,12 +478,12 @@ public class Comparables {
 	 * @throws ClassCastException Wenn der gegebene {@link Comparable} inkompatibel mit den Elementen des gegebenen {@link Array} ist.
 	 * @throws IllegalArgumentException Wenn {@code fromIndex > toIndex}.
 	 * @throws IndexOutOfBoundsException Wenn das gegebene {@link Array} eine {@link IndexOutOfBoundsException} auslöst. */
-	public static <GItem> int binarySearchLast(final Array<? extends GItem> items, final Comparable<? super GItem> comparable, final int fromIndex,
-		final int toIndex) throws NullPointerException, ClassCastException, IllegalArgumentException, IndexOutOfBoundsException {
+	public static <T> int binarySearchLast(Array<? extends T> items, Comparable<? super T> comparable, int fromIndex, int toIndex)
+		throws NullPointerException, ClassCastException, IllegalArgumentException, IndexOutOfBoundsException {
 		checkArray(items, comparable, fromIndex, toIndex);
 		int from = fromIndex, last = toIndex;
 		while (from < last) {
-			final int next = (from + last) >>> 1, comp = comparable.compareTo(items.get(next));
+			int next = (from + last) >>> 1, comp = comparable.compareTo(items.get(next));
 			if (comp < 0) {
 				last = next;
 			} else {
@@ -487,45 +523,6 @@ public class Comparables {
 		throws NullPointerException, IllegalArgumentException, IndexOutOfBoundsException {
 		notNull(comparable);
 		checkRange(items.length, fromIndex, toIndex);
-	}
-
-	/** Diese Methode liefert einen {@link Filter}, der nur die Datensätze akzeptiert, deren Ordnung gleiche der des gegebenen {@link Comparable} ist. Die
-	 * Akzeptanz eines Datensatzes {@code item} ist {@code that.compareTo(item) == 0}. */
-	public static <ITEM> Filter3<ITEM> comparableToEqFilter(Comparable<? super ITEM> that) throws NullPointerException {
-		Objects.notNull(that);
-		return (item) -> that.compareTo(item) == 0;
-	}
-
-	/** Diese Klasse liefert einen {@link Filter}, der nur die Datensätze akzeptiert, deren Ordnung kleiner als die des gegebenen {@link Comparable} ist. Die
-	 * Akzeptanz eines Datensatzes {@code item} ist {@code that.compareTo(item) > 0}. */
-	public static <ITEM> Filter3<ITEM> comparableToLtFilter(Comparable<? super ITEM> that) throws NullPointerException {
-		Objects.notNull(that);
-		return (item) -> that.compareTo(item) > 0;
-	}
-
-	/** Diese Klasse liefert einen {@link Filter}, der nur die Datensätze akzeptiert, deren Ordnung kleiner als die oder gleich der des gegebenen
-	 * {@link Comparable} ist. Die Akzeptanz eines Datensatzes {@code item} ist {@code that.compareTo(item) >= 0}. */
-	public static <ITEM> Filter3<ITEM> comparableToLtEqFilter(Comparable<? super ITEM> that) throws NullPointerException {
-		Objects.notNull(that);
-		return (item) -> that.compareTo(item) >= 0;
-	}
-
-	/** Diese Klasse implementiert einen {@link Filter}, der nur die Datensätze akzeptiert, deren Ordnung größer der des gegebenen {@link Comparable} ist. Die
-	 * Akzeptanz eines Datensatzes {@code item} ist {@code that.compareTo(item) < 0}.
-	 *
-	 * @param <ITEM> Typ der Datensätze. */
-	public static <ITEM> Filter3<ITEM> comparableToGtFilter(Comparable<? super ITEM> that) throws NullPointerException {
-		Objects.notNull(that);
-		return (item) -> that.compareTo(item) < 0;
-	}
-
-	/** Diese Klasse implementiert einen {@link Filter}, der nur die Datensätze akzeptiert, deren Ordnung größer als die oder gleich der des gegebenen
-	 * {@link Comparable} ist. Die Akzeptanz eines Datensatzes {@code item} ist {@code that.compareTo(item) <= 0}.
-	 *
-	 * @param <ITEM> Typ der Datensätze. */
-	public static <ITEM> Filter3<ITEM> comparableToGtEqFilter(Comparable<? super ITEM> that) throws NullPointerException {
-		Objects.notNull(that);
-		return (item) -> that.compareTo(item) <= 0;
 	}
 
 }
