@@ -1,139 +1,63 @@
 package bee.creative.util;
 
+import static bee.creative.lang.Objects.notNull;
 import static bee.creative.util.Producers.emptyProducer;
-import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert grundlegende {@link Consumer}.
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Consumers {
 
-	/** Diese Methode liefert den gegebenen {@link Consumer} als {@link Consumer3}. Wenn er {@code null} ist, wird der {@link #emptyConsumer()} geliefert. */
+	/** Diese Methode liefert den gegebenen {@link Consumer} als {@link Consumer3}. */
 	@SuppressWarnings ("unchecked")
-	public static <VALUE> Consumer3<VALUE> consumerFrom(Consumer<? super VALUE> that) {
-		if (that == null) return emptyConsumer();
-		if (that instanceof Consumer3<?>) return (Consumer3<VALUE>)that;
-		return that::set;
+	public static <V> Consumer3<V> consumerFrom(Consumer<? super V> that) {
+		notNull(that);
+		if (that instanceof Consumer3<?>) return (Consumer3<V>)that;
+		return value -> that.set(value);
 	}
 
-	public static <ITEM, VALUE> Consumer3<VALUE> consumerFromSetter(Setter<? super ITEM, ? super VALUE> that) throws NullPointerException {
+	public static <T, V> Consumer3<V> consumerFromSetter(Setter<? super T, ? super V> that) throws NullPointerException {
 		return consumerFromSetter(that, emptyProducer());
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link SetterConsumer new SetterConsumer<>(that, item)}. */
-	public static <ITEM, VALUE> Consumer3<VALUE> consumerFromSetter(Setter<? super ITEM, ? super VALUE> that, Producer<? extends ITEM> item)
-		throws NullPointerException {
-		return new SetterConsumer<>(that, item);
+	/** Diese Methode ist liefert einen verketteten {@link Consumer3}, der beim Schreiben den gegebenen Wert an den gegebenen {@link Setter} delegiert und dazu
+	 * den vom gegebenen {@link Producer} bereitgestellten Datensatz verwendet. Das Schreiben des Werts {@code value} erfolgt über
+	 * {@code that.set(item.get(), value)}. */
+	public static <T, V> Consumer3<V> consumerFromSetter(Setter<? super T, ? super V> that, Producer<? extends T> item) throws NullPointerException {
+		notNull(that);
+		notNull(item);
+		return value -> that.set(item.get(), value);
 	}
 
-	/** Diese Methode liefert den {@link EmptyConsumer}. */
+	/** Diese Methode liefert einen {@link Consumer3}, der das Schreiben ignoriert. */
 	@SuppressWarnings ("unchecked")
-	public static <VALUE> Consumer3<VALUE> emptyConsumer() {
-		return (Consumer3<VALUE>)EmptyConsumer.INSTANCE;
+	public static <V> Consumer3<V> emptyConsumer() {
+		return (Consumer3<V>)emptyConsumer;
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link TranslatedConsumer new TranslatedConsumer<>(that, trans)}. */
-	public static <VALUE, VALUE2> Consumer3<VALUE2> translatedConsumer(Consumer<? super VALUE> that, Getter<? super VALUE2, ? extends VALUE> trans)
-		throws NullPointerException {
-		return new TranslatedConsumer<>(that, trans);
+	/** Diese Methode liefert einen übersetzten {@link Consumer3}, der den Wert beim Schreiben über den gegebenen {@link Getter} in den Wert eines gegebenen
+	 * {@link Consumer} überführt. Das Schreiben des Werts {@code value} erfolgt über {@code that.set(trans.get(value))}. */
+	public static <V, V2> Consumer3<V> translatedConsumer(Consumer<? super V2> that, Getter<? super V, ? extends V2> trans) throws NullPointerException {
+		notNull(that);
+		notNull(trans);
+		return value -> that.set(trans.get(value));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link SynchronizedConsumer new SynchronizedConsumer<>(that, mutex)}. */
-	public static <VALUE> Consumer3<VALUE> synchronizedConsumer(Consumer<? super VALUE> that, Object mutex) {
-		return new SynchronizedConsumer<>(that, mutex);
-	}
+	/** Diese Methode liefert einen {@link Consumer3}, der einen gegebenen {@link Consumer} über {@code synchronized(mutex)} synchronisiert. Wenn dieses
+	 * Synchronisationsobjekt {@code null} ist, wird der gelieferte {@link Consumer} verwendet. */
+	public static <V> Consumer3<V> synchronizedConsumer(Consumer<? super V> that, Object mutex) {
+		notNull(that);
+		return new Consumer3<>() {
 
-	/** Diese Klasse implementiert einen {@link Consumer3}, der das {@link #set(Object) Schreiben} ignoriert. */
-	public static class EmptyConsumer extends AbstractConsumer<Object> {
-
-		public static final Consumer3<?> INSTANCE = new EmptyConsumer();
-
-	}
-
-	/** Diese Klasse implementiert einen verketteten {@link Consumer3}, der beim {@link #set(Object) Schreiben} den gegebenen Wert an einen gegebenen
-	 * {@link Setter} delegiert und dazu den von einem gegebenen {@link Producer} bereitgestellten Datensatz verwendet. Das Schreiben des Werts {@code value}
-	 * erfolgt über {@code this.that.set(this.item.get(), value)}.
-	 *
-	 * @param <ITEM> Typ des Datensatzes.
-	 * @param <VALUE> Typ des Werts. */
-	public static class SetterConsumer<ITEM, VALUE> extends AbstractConsumer<VALUE> {
-
-		public SetterConsumer(Setter<? super ITEM, ? super VALUE> that, Producer<? extends ITEM> item) {
-			this.that = Objects.notNull(that);
-			this.item = Objects.notNull(item);
-		}
-
-		@Override
-		public void set(VALUE value) {
-			this.that.set(this.item.get(), value);
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.item, this.that);
-		}
-
-		private final Setter<? super ITEM, ? super VALUE> that;
-
-		private final Producer<? extends ITEM> item;
-
-	}
-
-	/** Diese Klasse implementiert übersetzten {@link Consumer3}, der den Wert beim {@link #set(Object) Schreiben} über einen gegebenen {@link Getter} in den Wert
-	 * eines gegebenen {@link Consumer} überführt. Das Schreiben des Werts {@code value} erfolgt über {@code this.that.set(this.trans.get(value))}.
-	 *
-	 * @param <VALUE> Typ des Werts dieses {@link Consumer3}.
-	 * @param <VALUE2> Typ des Werts des gegebenen {@link Consumer}. */
-	public static class TranslatedConsumer<VALUE, VALUE2> extends AbstractConsumer<VALUE> {
-
-		public TranslatedConsumer(Consumer<? super VALUE2> that, Getter<? super VALUE, ? extends VALUE2> trans) {
-			this.that = Objects.notNull(that);
-			this.trans = Objects.notNull(trans);
-		}
-
-		@Override
-		public void set(VALUE value) {
-			this.that.set(this.trans.get(value));
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.that, this.trans);
-		}
-
-		private final Consumer<? super VALUE2> that;
-
-		private final Getter<? super VALUE, ? extends VALUE2> trans;
-
-	}
-
-	/** Diese Klasse implementiert einen {@link Consumer3}, der einen gegebenen {@link Consumer} über {@code synchronized(this.mutex)} synchronisiert. Wenn dieses
-	 * Synchronisationsobjekt {@code null} ist, wird {@code this} verwendet.
-	 *
-	 * @param <VALUE> Typ des Werts. */
-	public static class SynchronizedConsumer<VALUE> extends AbstractConsumer<VALUE> {
-
-		public SynchronizedConsumer(Consumer<? super VALUE> that, Object mutex) throws NullPointerException {
-			this.that = Objects.notNull(that);
-			this.mutex = Objects.notNull(mutex, this);
-		}
-
-		@Override
-		public void set(VALUE value) {
-			synchronized (this.mutex) {
-				this.that.set(value);
+			public void set(V value) {
+				synchronized (notNull(mutex, this)) {
+					that.set(value);
+				}
 			}
-		}
 
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.that, this.mutex == this ? null : this.mutex);
-		}
-
-		private final Consumer<? super VALUE> that;
-
-		private final Object mutex;
-
+		};
 	}
+
+	private static final Consumer3<?> emptyConsumer = value -> {};
 
 }

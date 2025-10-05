@@ -12,7 +12,7 @@ public interface Translator2<S, T> extends Translator<S, T> {
 	/** Diese Methode liefert die {@link Translator3}-Schnittstelle zu {@link #isTarget(Object)}, {@link #isSource(Object)}, {@link #toTarget(Object)} und
 	 * {@link #toSource(Object)}. */
 	default Translator3<S, T> asTranslator() {
-		return translatorFrom(object -> this.isTarget(object), object -> this.isSource(object), object -> this.toTarget(object), object -> this.toSource(object));
+		return translatorFrom(this);
 	}
 
 }

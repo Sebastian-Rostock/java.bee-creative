@@ -57,4 +57,9 @@ public interface Translator3<S, T> extends Translator2<S, T> {
 		return synchronizedTranslator(this, mutex);
 	}
 
+	@Override
+	default Translator3<S, T> asTranslator() {
+		return this;
+	}
+
 }

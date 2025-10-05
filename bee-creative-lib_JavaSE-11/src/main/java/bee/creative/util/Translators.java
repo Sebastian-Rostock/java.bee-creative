@@ -1,6 +1,8 @@
 package bee.creative.util;
 
 import static bee.creative.lang.Objects.notNull;
+import static bee.creative.util.Filters.rejectFilter;
+import static bee.creative.util.Getters.emptyGetter;
 import static bee.creative.util.Getters.neutralGetter;
 import static bee.creative.util.Iterables.iterableFromArray;
 import java.util.Map;
@@ -163,7 +165,6 @@ public class Translators {
 		};
 	}
 
-	static final Translator3<?, ?> emptyTranslator = new Translator3<>() {
-	};
+	private static final Translator3<?, ?> emptyTranslator = translatorFrom(rejectFilter(), rejectFilter(), emptyGetter(), emptyGetter());
 
 }

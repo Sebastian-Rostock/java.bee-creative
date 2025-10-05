@@ -116,10 +116,10 @@ public class Filters {
 		};
 	}
 
-	static final Filter3<?> nullFilter = item -> item != null;
+	private static final Filter3<?> nullFilter = item -> item != null;
 
-	static final Filter3<?> acceptFilter = item -> true;
+	private static final Filter3<?> acceptFilter = item -> true;
 
-	static final Filter3<?> rejectFilter = item -> false;
+	private static final Filter3<?> rejectFilter = item -> false;
 
 }

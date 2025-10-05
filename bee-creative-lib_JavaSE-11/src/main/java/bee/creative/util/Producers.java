@@ -60,6 +60,6 @@ public class Producers {
 		};
 	}
 
-	static final Producer3<?> emptyProducer = () -> null;
+	private static final Producer3<?> emptyProducer = () -> null;
 
 }

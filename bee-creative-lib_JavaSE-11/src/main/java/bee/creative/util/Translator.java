@@ -12,17 +12,13 @@ public interface Translator<S, T> {
 	 *
 	 * @param object Objekt.
 	 * @return {@code true}, wenn {@code object} ein Zielobjekt ist. */
-	default boolean isTarget(Object object) {
-		return false;
-	}
+	boolean isTarget(Object object);
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn das gegebene Objekt ein gültiges Quellobjekt ist.
 	 *
 	 * @param object Objekt.
 	 * @return {@code true}, wenn {@code object} ein Quellobjekt ist. */
-	default boolean isSource(Object object) {
-		return false;
-	}
+	boolean isSource(Object object);
 
 	/** Diese Methode übersetzt das gegebene Quellobjekt in den Zieldatentyp und gibt das so ermittelte Zielobjekt zurück.
 	 *
@@ -30,9 +26,7 @@ public interface Translator<S, T> {
 	 * @return Zielobjekt.
 	 * @throws ClassCastException Wenn {@code object} kein {@link #isSource(Object) Quellobjekt} ist.
 	 * @throws IllegalArgumentException Wenn {@code object} nicht übersetzt werden kann. */
-	default T toTarget(Object object) throws ClassCastException, IllegalArgumentException {
-		throw new IllegalArgumentException();
-	}
+	T toTarget(Object object) throws ClassCastException, IllegalArgumentException;
 
 	/** Diese Methode übersetzt das gegebene Zielobjekt in den Quelldatentyp und gibt das so ermittelte Quellobjekt zurück.
 	 *
@@ -40,8 +34,6 @@ public interface Translator<S, T> {
 	 * @return Quellobjekt.
 	 * @throws ClassCastException Wenn {@code object} kein {@link #isTarget(Object) Zielobjekt} ist.
 	 * @throws IllegalArgumentException Wenn {@code object} nicht übersetzt werden kann. */
-	default S toSource(Object object) throws ClassCastException, IllegalArgumentException {
-		throw new IllegalArgumentException();
-	}
+	S toSource(Object object) throws ClassCastException, IllegalArgumentException;
 
 }

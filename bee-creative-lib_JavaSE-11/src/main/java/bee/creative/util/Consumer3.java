@@ -9,37 +9,37 @@ import static bee.creative.util.Setters.setterFrom;
 /** Diese Schnittstelle ergänzt einen {@link Consumer2} insb. um eine erweiterte Anbindung an Methoden von {@link Consumers}.
  *
  * @author [cc-by] 2021 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <VALUE> Typ des Werts. */
-public interface Consumer3<VALUE> extends Consumer2<VALUE> {
+ * @param <V> Typ des Werts. */
+public interface Consumer3<V> extends Consumer2<V> {
 
 	/** Diese Methode ist eine Abkürzung für {@link Consumers#translatedConsumer(Consumer, Getter) translateConsumer(this, trans)}. */
-	default <VALUE2> Consumer3<VALUE2> translate(Getter<? super VALUE2, ? extends VALUE> trans) {
+	default <V2> Consumer3<V2> translate(Getter<? super V2, ? extends V> trans) {
 		return translatedConsumer(this, trans);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #synchronize(Object) this.synchronize(this)}. */
-	default Consumer2<VALUE> synchronize() {
+	default Consumer2<V> synchronize() {
 		return this.synchronize(this);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Consumers#synchronizedConsumer(Consumer, Object) synchronizedConsumer(this, mutex)}. */
-	default Consumer2<VALUE> synchronize(Object mutex) {
+	default Consumer2<V> synchronize(Object mutex) {
 		return synchronizedConsumer(this, mutex);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Setters#setterFrom(Consumer) setterFromConsumer(this)}. */
-	default Setter3<Object, VALUE> toSetter() {
+	default Setter3<Object, V> toSetter() {
 		return setterFrom(this);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Properties#propertyFrom(Producer, Consumer) propertyFrom(get, this)}. */
-	default Property3<VALUE> toProperty(Producer<? extends VALUE> get) {
-		return propertyFrom(get, this);
+	/** Diese Methode ist eine Abkürzung für {@link #toProperty(Producer) this.toProperty(emptyProperty())}. */
+	default Property3<V> toProperty() {
+		return this.toProperty(emptyProperty());
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Properties#propertyFrom(Producer, Consumer) propertyFrom(emptyProperty(), this)}. */
-	default Property3<VALUE> toProperty() {
-		return propertyFrom(emptyProperty(), this);
+	/** Diese Methode ist eine Abkürzung für {@link Properties#propertyFrom(Producer, Consumer) propertyFrom(get, this)}. */
+	default Property3<V> toProperty(Producer<? extends V> get) {
+		return propertyFrom(get, this);
 	}
 
 }
