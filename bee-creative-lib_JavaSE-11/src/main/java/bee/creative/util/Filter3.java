@@ -1,6 +1,10 @@
 package bee.creative.util;
 
-import static bee.creative.lang.Objects.notNull;
+import static bee.creative.util.Filters.conjoinedFilter;
+import static bee.creative.util.Filters.disjoinedFilter;
+import static bee.creative.util.Filters.negatedFilter;
+import static bee.creative.util.Filters.synchronizedFilter;
+import static bee.creative.util.Filters.translatedFilter;
 import static bee.creative.util.Getters.BufferedGetter.SOFT_REF_MODE;
 import static bee.creative.util.Hashers.naturalHasher;
 
@@ -21,34 +25,24 @@ public interface Filter3<T> extends Filter2<T> {
 		return this.toGetter().buffer(mode, hasher)::get;
 	}
 
-	/** Diese Methode liefert einen {@link Filter3}, der nur die Datensätze akzeptiert, die von diesem {@link Filter3} abgelehnt werden. Die Akzeptanz eines
-	 * Datensatzen {@code item} ist {@code !this.accept(item)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Filters#negatedFilter(Filter) negatedFilter(this)}. */
 	default Filter3<T> negate() {
-		return Filters.negatedFilter(this);
+		return negatedFilter(this);
 	}
 
-	/** Diese Methode liefert einen {@link Filter3}, der nur die Datensätze akzeptiert, die von diesem oder dem gegebenen {@link Filter3} akzeptiert werden. Die
-	 * Akzeptanz eines Datensatzes {@code item} ist {@code this.accept(item) || that.accept(item)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Filters#disjoinedFilter(Filter, Filter) disjoinedFilter(this, that)}. */
 	default Filter3<T> disjoin(Filter3<? super T> that) throws NullPointerException {
-		notNull(that);
-		return item -> this.accepts(item) || that.accepts(item);
+		return disjoinedFilter(this, that);
 	}
 
-	/** Diese Methode liefert einen {@link Filter3}, der nur die Datensätze akzeptiert, die diesem und dem gegebenen {@link Filter3} akzeptiert werden. Die
-	 * Akzeptanz eines Datensatzes {@code item} ist {@code this.accept(item) && that.accept(item)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Filters#conjoinedFilter(Filter, Filter) conjoinedFilter(this, that)}. */
 	default Filter3<T> conjoin(Filter3<? super T> that) throws NullPointerException {
-		notNull(that);
-		return item -> this.accepts(item) && that.accepts(item);
+		return conjoinedFilter(this, that);
 	}
 
-	/** Diese Methode liefert einen übersetzten {@link Filter3}, der nur die Datensätze akzeptiert, die über den gegebenen {@link Getter} umgewandelt von diesem
-	 * {@link Filter3} akzeptiert werden. Die Akzeptanz eines Datensatzes {@code item} ist {@code this.accept(trans.get(item))}.
-	 *
-	 * @param <T2> Typ der Datensätze des gelieferten {@link Filter3}. */
+	/** Diese Methode ist eine Abkürzung für {@link Filters#translatedFilter(Filter, Getter) translatedFilter(this, trans)}. */
 	default <T2> Filter3<T2> translate(Getter<? super T2, ? extends T> trans) throws NullPointerException {
-		notNull(this);
-		notNull(trans);
-		return item -> this.accepts(trans.get(item));
+		return translatedFilter(this, trans);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #synchronize(Object) this.synchronize(this)}. */
@@ -56,19 +50,9 @@ public interface Filter3<T> extends Filter2<T> {
 		return this.synchronize(this);
 	}
 
-	/** Diese Methode liefert einen {@link Filter3}, der diesen {@link Filter3} mit dem gegebenen Synchronisationsobjekt {@code mutex} über
-	 * {@code synchronized(mutex)} synchronisiert. Wenn letzteres {@code null} ist, wird der gelieferte {@link Filter3} verwendet. */
+	/** Diese Methode ist eine Abkürzung für {@link Filters#synchronizedFilter(Filter, Object) synchronizedFilter(this, mutex)}. */
 	default Filter3<T> synchronize(Object mutex) {
-		return new Filter3<>() {
-
-			@Override
-			public boolean accepts(T item) {
-				synchronized (notNull(mutex, this)) {
-					return Filter3.this.accepts(item);
-				}
-			}
-
-		};
+		return synchronizedFilter(this, mutex);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #conjoin(Filter3) conjoin(that)}. */
