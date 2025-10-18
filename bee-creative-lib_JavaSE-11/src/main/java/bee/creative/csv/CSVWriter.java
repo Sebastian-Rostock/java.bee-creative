@@ -15,16 +15,16 @@ import bee.creative.lang.Objects;
 public class CSVWriter implements Closeable, Flushable {
 
 	/** Diese Methode erzeugt aus dem gegebenen Objekt einen {@link CSVWriter} und gibt diesen zurück. Wenn das Objekt ein {@link CSVWriter} ist, wird dieser
-	 * geliefert. Andernfalls wird das Objekt in einen {@link Writer} {@link IO#outputWriterFrom(Object) überführt}.
+	 * geliefert. Andernfalls wird das Objekt in einen {@link Writer} {@link IO#charWriterFrom(Object) überführt}.
 	 *
-	 * @see IO#outputWriterFrom(Object)
+	 * @see IO#charWriterFrom(Object)
 	 * @see CSVWriter#CSVWriter(Writer)
 	 * @param data Objekt.
 	 * @return {@link CSVWriter}.
 	 * @throws IOException Wenn der {@link CSVWriter} nicht erzeugt werden kann. */
 	public static CSVWriter from(Object data) throws IOException {
 		if (data instanceof CSVWriter) return (CSVWriter)data;
-		return new CSVWriter(IO.outputWriterFrom(data));
+		return new CSVWriter(IO.charWriterFrom(data));
 	}
 
 	/** Dieser Konstruktor initialisiert die Ausgabe. Als {@link #getComma() Trennzeichen} wird {@code ';'} und als {@link #getQuote() Maskierungszeichen} wird

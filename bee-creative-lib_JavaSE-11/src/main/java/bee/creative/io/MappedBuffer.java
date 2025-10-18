@@ -32,113 +32,6 @@ import bee.creative.mmi.MMIArrayL;
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class MappedBuffer implements Emuable {
 
-	/** Dieses Feld speichert die Anzahl der niederwertigen Bit einer Adresse, die zur Positionsangabe innerhalb eines {@link MappedByteBuffer} eingesetzt
-	 * werden. */
-	private static final int INDEX_SIZE = 30;
-
-	/** Dieses Feld speichert die Bitmaske zur Auswahl der {@link #INDEX_SIZE niederwertigen Bit einer Adresse}. */
-	private static final int INDEX_MASK = (1 << MappedBuffer.INDEX_SIZE) - 1;
-
-	/** Dieses Feld speichert die Größe des Speicherbereichs, den je zwei in {@link #buffers} auf einander folgende {@link MappedByteBuffer} gleichzeitig
-	 * anbinden. */
-	private static final int BUFFER_GUARD = 1 << 14;
-
-	/** Dieses Feld speichert die Größe der {@link MappedByteBuffer}, die vor dem letzten in {@link #buffers} verwaltet werden. */
-	private static final int BUFFER_LENGTH = MappedBuffer.BUFFER_GUARD + MappedBuffer.INDEX_MASK + 1;
-
-	/** Diese Methode gibt den Index eines {@link MappedByteBuffer} in {@link #buffers} zur gegebenen Adresse zurück. */
-	private static int bufferIndex(final long address) {
-		return (int)(address >> MappedBuffer.INDEX_SIZE);
-	}
-
-	/** Diese Methode gibt den Index eines Werts innerhalb eins {@link MappedByteBuffer} zur gegebenen Adresse zurück. */
-	private static int valueIndex(final long address) {
-		return (int)address & MappedBuffer.INDEX_MASK;
-	}
-
-	private static int valueCount1(final int index, final int length) {
-		return Math.min(length, (MappedBuffer.BUFFER_LENGTH - index) / 1);
-	}
-
-	private static int valueCount2(final int index, final int length) {
-		return Math.min(length, (MappedBuffer.BUFFER_LENGTH - index) / 2);
-	}
-
-	private static int valueCount4(final int index, final int length) {
-		return Math.min(length, (MappedBuffer.BUFFER_LENGTH - index) / 4);
-	}
-
-	private static int valueCount8(final int index, final int length) {
-		return Math.min(length, (MappedBuffer.BUFFER_LENGTH - index) / 8);
-	}
-
-	private static void forceImpl(ByteBuffer buffer, final int minOffset, final int maxOffset) {
-		buffer = buffer.duplicate();
-		buffer.limit(maxOffset);
-		buffer.position(minOffset);
-		buffer = buffer.slice();
-		((MappedByteBuffer)buffer).force();
-	}
-
-	private static void copyImpl(final ByteBuffer[] targetBuffers, long targetAddress, final ByteBuffer[] sourceBuffers, long sourceAddress, long length) {
-		if (length < 0) throw new IllegalArgumentException();
-		if ((targetBuffers == sourceBuffers) && (targetAddress == sourceAddress)) return;
-		if (targetAddress < sourceAddress) {
-			while (length != 0) {
-				final int targetIndex = MappedBuffer.valueIndex(targetAddress);
-				final int sourceIndex = MappedBuffer.valueIndex(sourceAddress);
-				final int count = (int)Math.min(length, MappedBuffer.BUFFER_LENGTH - Math.max(targetIndex, sourceIndex));
-				final ByteBuffer target = targetBuffers[MappedBuffer.bufferIndex(targetAddress)].duplicate();
-				final ByteBuffer source = sourceBuffers[MappedBuffer.bufferIndex(sourceAddress)].duplicate();
-				source.limit(sourceIndex + count);
-				source.position(sourceIndex);
-				target.position(targetIndex);
-				target.put(source);
-				length -= count;
-				targetAddress += count;
-				sourceAddress += count;
-			}
-		} else {
-			targetAddress += length;
-			sourceAddress += length;
-			while (length != 0) {
-				final int count = (int)Math.min(length, Math.min(MappedBuffer.valueIndex(targetAddress - 1), MappedBuffer.valueIndex(sourceAddress - 1)) + 1);
-				length -= count;
-				targetAddress -= count;
-				sourceAddress -= count;
-				final int targetIndex = MappedBuffer.valueIndex(targetAddress);
-				final int sourceIndex = MappedBuffer.valueIndex(sourceAddress);
-				final ByteBuffer target = targetBuffers[MappedBuffer.bufferIndex(targetAddress)].duplicate();
-				final ByteBuffer source = sourceBuffers[MappedBuffer.bufferIndex(sourceAddress)].duplicate();
-				source.limit(sourceIndex + count);
-				source.position(sourceIndex);
-				target.position(targetIndex);
-				target.put(source);
-			}
-		}
-	}
-
-	/** Dieses Feld speichert die gebundene Datei. */
-	private final File file;
-
-	/** Dieses Feld speichert die Puffergröße. */
-	private long size = -1;
-
-	/** Dieses Feld speichert die Bytereihenfolge. */
-	private ByteOrder order = Bytes.NATIVE_ORDER;
-
-	/** Dieses Feld speichert die {@link MappedByteBuffer}, welche jeweils {@link #BUFFER_LENGTH} Byte der Datei anbinden. */
-	private MappedByteBuffer[] buffers;
-
-	/** Dieses Feld speichert {@code true} bei Schreibschutz. */
-	private final boolean isReadonly;
-
-	/** Dieses Feld speichert den Exponent der Wachstumsausrichtung, welche eine Potenz von 2 ist. */
-	private byte growAlign = 16;
-
-	/** Dieses Feld speichert den Wachstumsfaktor als Festkommazahl von 0 bis 64 für die Faktoren 0% bis 200%. */
-	private byte growScale = 16;
-
 	/** Dieser Konstruktor initialisiert den Puffer zum Lesen und Schreiben der gegebenen Datei.
 	 *
 	 * @see #MappedBuffer(File, boolean)
@@ -299,32 +192,6 @@ public class MappedBuffer implements Emuable {
 			this.resizeImpl(newSize);
 		}
 		return this;
-	}
-
-	/** Diese Methode implementiert {@link #resize(long)} ohne {@code synchronized} und ohne Parameterprüfung. */
-	private void resizeImpl(final long newSize) throws IllegalStateException {
-		final MappedByteBuffer[] oldBuffers = this.buffers, newBuffers;
-		final int oldLength = oldBuffers.length, newLength = Math.max(MappedBuffer.bufferIndex(newSize - 1) + 1, 1);
-		if (oldLength != newLength) {
-			newBuffers = new MappedByteBuffer[newLength];
-			System.arraycopy(oldBuffers, 0, newBuffers, 0, Math.min(oldLength, newLength));
-		} else {
-			newBuffers = oldBuffers;
-		}
-		try (final RandomAccessFile file = new RandomAccessFile(this.file, this.isReadonly ? "r" : "rw"); final FileChannel channel = file.getChannel()) {
-			final long scale = MappedBuffer.BUFFER_LENGTH - MappedBuffer.BUFFER_GUARD;
-			final MapMode mode = this.isReadonly ? MapMode.READ_ONLY : MapMode.READ_WRITE;
-			final ByteOrder order = this.order;
-			for (int i = oldLength; i < newLength; i++) {
-				(newBuffers[i - 1] = channel.map(mode, (i - 1) * scale, MappedBuffer.BUFFER_LENGTH)).order(order);
-			}
-			final long offset = (newLength - 1) * scale;
-			(newBuffers[newLength - 1] = channel.map(mode, offset, newSize - offset)).order(order);
-		} catch (final IOException cause) {
-			throw new IllegalStateException(cause);
-		}
-		this.size = newSize;
-		this.buffers = newBuffers;
 	}
 
 	/** Diese Methode setzt die {@link File#length() Größe} der angebundenen {@link #file() Datei} auf {@link #size()}.
@@ -1266,6 +1133,139 @@ public class MappedBuffer implements Emuable {
 	@Override
 	public String toString() {
 		return Objects.toInvokeString(this, this.file().toString(), this.size(), this.isReadonly());
+	}
+
+	/** Dieses Feld speichert die Anzahl der niederwertigen Bit einer Adresse, die zur Positionsangabe innerhalb eines {@link MappedByteBuffer} eingesetzt
+	 * werden. */
+	private static final int INDEX_SIZE = 30;
+
+	/** Dieses Feld speichert die Bitmaske zur Auswahl der {@link #INDEX_SIZE niederwertigen Bit einer Adresse}. */
+	private static final int INDEX_MASK = (1 << MappedBuffer.INDEX_SIZE) - 1;
+
+	/** Dieses Feld speichert die Größe des Speicherbereichs, den je zwei in {@link #buffers} auf einander folgende {@link MappedByteBuffer} gleichzeitig
+	 * anbinden. */
+	private static final int BUFFER_GUARD = 1 << 14;
+
+	/** Dieses Feld speichert die Größe der {@link MappedByteBuffer}, die vor dem letzten in {@link #buffers} verwaltet werden. */
+	private static final int BUFFER_LENGTH = MappedBuffer.BUFFER_GUARD + MappedBuffer.INDEX_MASK + 1;
+
+	/** Diese Methode gibt den Index eines {@link MappedByteBuffer} in {@link #buffers} zur gegebenen Adresse zurück. */
+	private static int bufferIndex(final long address) {
+		return (int)(address >> MappedBuffer.INDEX_SIZE);
+	}
+
+	/** Diese Methode gibt den Index eines Werts innerhalb eins {@link MappedByteBuffer} zur gegebenen Adresse zurück. */
+	private static int valueIndex(final long address) {
+		return (int)address & MappedBuffer.INDEX_MASK;
+	}
+
+	private static int valueCount1(final int index, final int length) {
+		return Math.min(length, (MappedBuffer.BUFFER_LENGTH - index) / 1);
+	}
+
+	private static int valueCount2(final int index, final int length) {
+		return Math.min(length, (MappedBuffer.BUFFER_LENGTH - index) / 2);
+	}
+
+	private static int valueCount4(final int index, final int length) {
+		return Math.min(length, (MappedBuffer.BUFFER_LENGTH - index) / 4);
+	}
+
+	private static int valueCount8(final int index, final int length) {
+		return Math.min(length, (MappedBuffer.BUFFER_LENGTH - index) / 8);
+	}
+
+	private static void forceImpl(ByteBuffer buffer, final int minOffset, final int maxOffset) {
+		buffer = buffer.duplicate();
+		buffer.limit(maxOffset);
+		buffer.position(minOffset);
+		buffer = buffer.slice();
+		((MappedByteBuffer)buffer).force();
+	}
+
+	private static void copyImpl(final ByteBuffer[] targetBuffers, long targetAddress, final ByteBuffer[] sourceBuffers, long sourceAddress, long length) {
+		if (length < 0) throw new IllegalArgumentException();
+		if ((targetBuffers == sourceBuffers) && (targetAddress == sourceAddress)) return;
+		if (targetAddress < sourceAddress) {
+			while (length != 0) {
+				final int targetIndex = MappedBuffer.valueIndex(targetAddress);
+				final int sourceIndex = MappedBuffer.valueIndex(sourceAddress);
+				final int count = (int)Math.min(length, MappedBuffer.BUFFER_LENGTH - Math.max(targetIndex, sourceIndex));
+				final ByteBuffer target = targetBuffers[MappedBuffer.bufferIndex(targetAddress)].duplicate();
+				final ByteBuffer source = sourceBuffers[MappedBuffer.bufferIndex(sourceAddress)].duplicate();
+				source.limit(sourceIndex + count);
+				source.position(sourceIndex);
+				target.position(targetIndex);
+				target.put(source);
+				length -= count;
+				targetAddress += count;
+				sourceAddress += count;
+			}
+		} else {
+			targetAddress += length;
+			sourceAddress += length;
+			while (length != 0) {
+				final int count = (int)Math.min(length, Math.min(MappedBuffer.valueIndex(targetAddress - 1), MappedBuffer.valueIndex(sourceAddress - 1)) + 1);
+				length -= count;
+				targetAddress -= count;
+				sourceAddress -= count;
+				final int targetIndex = MappedBuffer.valueIndex(targetAddress);
+				final int sourceIndex = MappedBuffer.valueIndex(sourceAddress);
+				final ByteBuffer target = targetBuffers[MappedBuffer.bufferIndex(targetAddress)].duplicate();
+				final ByteBuffer source = sourceBuffers[MappedBuffer.bufferIndex(sourceAddress)].duplicate();
+				source.limit(sourceIndex + count);
+				source.position(sourceIndex);
+				target.position(targetIndex);
+				target.put(source);
+			}
+		}
+	}
+
+	/** Dieses Feld speichert die gebundene Datei. */
+	private final File file;
+
+	/** Dieses Feld speichert die Puffergröße. */
+	private long size = -1;
+
+	/** Dieses Feld speichert die Bytereihenfolge. */
+	private ByteOrder order = Bytes.NATIVE_ORDER;
+
+	/** Dieses Feld speichert die {@link MappedByteBuffer}, welche jeweils {@link #BUFFER_LENGTH} Byte der Datei anbinden. */
+	private MappedByteBuffer[] buffers;
+
+	/** Dieses Feld speichert {@code true} bei Schreibschutz. */
+	private final boolean isReadonly;
+
+	/** Dieses Feld speichert den Exponent der Wachstumsausrichtung, welche eine Potenz von 2 ist. */
+	private byte growAlign = 16;
+
+	/** Dieses Feld speichert den Wachstumsfaktor als Festkommazahl von 0 bis 64 für die Faktoren 0% bis 200%. */
+	private byte growScale = 16;
+
+	/** Diese Methode implementiert {@link #resize(long)} ohne {@code synchronized} und ohne Parameterprüfung. */
+	private void resizeImpl(final long newSize) throws IllegalStateException {
+		final MappedByteBuffer[] oldBuffers = this.buffers, newBuffers;
+		final int oldLength = oldBuffers.length, newLength = Math.max(MappedBuffer.bufferIndex(newSize - 1) + 1, 1);
+		if (oldLength != newLength) {
+			newBuffers = new MappedByteBuffer[newLength];
+			System.arraycopy(oldBuffers, 0, newBuffers, 0, Math.min(oldLength, newLength));
+		} else {
+			newBuffers = oldBuffers;
+		}
+		try (final RandomAccessFile file = new RandomAccessFile(this.file, this.isReadonly ? "r" : "rw"); final FileChannel channel = file.getChannel()) {
+			final long scale = MappedBuffer.BUFFER_LENGTH - MappedBuffer.BUFFER_GUARD;
+			final MapMode mode = this.isReadonly ? MapMode.READ_ONLY : MapMode.READ_WRITE;
+			final ByteOrder order = this.order;
+			for (int i = oldLength; i < newLength; i++) {
+				(newBuffers[i - 1] = channel.map(mode, (i - 1) * scale, MappedBuffer.BUFFER_LENGTH)).order(order);
+			}
+			final long offset = (newLength - 1) * scale;
+			(newBuffers[newLength - 1] = channel.map(mode, offset, newSize - offset)).order(order);
+		} catch (final IOException cause) {
+			throw new IllegalStateException(cause);
+		}
+		this.size = newSize;
+		this.buffers = newBuffers;
 	}
 
 }

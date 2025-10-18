@@ -1,5 +1,7 @@
 package bee.creative.array;
 
+import static java.lang.System.arraycopy;
+
 /** Diese Klasse implementiert ein abstraktes Objekt zur Verwaltung dynamischer Arrays.
  * <p>
  * Das Einfügen und Entfernen von Elementen verändern in dieser Implementation nicht nur die Größe des mit den Nutzdaten belegten Bereichs im internen Array,
@@ -99,7 +101,7 @@ public abstract class ArrayData<GArray> {
 		if (length != this.customGetCapacity()) {
 			var array = this.customGetArray();
 			var array2 = this.customNewArray(length);
-			System.arraycopy(array, this.from, array2, from2, size);
+			arraycopy(array, this.from, array2, from2, size);
 			this.customSetArray(array2);
 		}
 		this.from = from2;
@@ -144,38 +146,38 @@ public abstract class ArrayData<GArray> {
 		if (arrayLength != array2Length) {
 			var from2 = this.customNewFrom(array2Length - size2);
 			var array2 = this.customNewArray(array2Length);
-			System.arraycopy(array, from, array2, from2, index2);
-			System.arraycopy(array, index, array2, from2 + index2 + count, size - index2);
+			arraycopy(array, from, array2, from2, index2);
+			arraycopy(array, index, array2, from2 + index2 + count, size - index2);
 			this.from = from2;
 			this.customSetArray(array2);
 			return;
 		}
 		if (index2 > (size / 2)) {
 			if ((from + size2) <= array2Length) {
-				System.arraycopy(array, index, array, index + count, size - index2);
+				arraycopy(array, index, array, index + count, size - index2);
 				return;
 			}
 		} else {
 			if (from >= count) {
 				var from2 = from - count;
 				this.from = from2;
-				System.arraycopy(array, from, array, from2, index2);
+				arraycopy(array, from, array, from2, index2);
 				return;
 			}
 		}
 		var from2 = this.customNewFrom(array2Length - size2);
 		this.from = from2;
 		if (from2 < from) {
-			System.arraycopy(array, from, array, from2, index2);
-			System.arraycopy(array, index, array, from2 + index2 + count, size - index2);
+			arraycopy(array, from, array, from2, index2);
+			arraycopy(array, index, array, from2 + index2 + count, size - index2);
 			var last = from + size;
 			var last2 = from2 + size2;
 			if (last2 < last) {
 				this.customClearArray(last2, last);
 			}
 		} else {
-			System.arraycopy(array, index, array, from2 + index2 + count, size - index2);
-			System.arraycopy(array, from, array, from2, index2);
+			arraycopy(array, index, array, from2 + index2 + count, size - index2);
+			arraycopy(array, from, array, from2, index2);
 			if (from2 > from) {
 				this.customClearArray(from, from2);
 			}
@@ -205,12 +207,12 @@ public abstract class ArrayData<GArray> {
 			this.from = this.customNewFrom(this.customGetCapacity());
 			this.customClearArray(from, from + size);
 		} else if (index2 > (size2 / 2)) {
-			System.arraycopy(array, index + count, array, index, size2 - index2);
+			arraycopy(array, index + count, array, index, size2 - index2);
 			this.customClearArray(from + size2, from + size);
 		} else {
 			var from2 = from + count;
 			this.from = from2;
-			System.arraycopy(array, from, array, from2, index2);
+			arraycopy(array, from, array, from2, index2);
 			this.customClearArray(from, from2);
 		}
 	}

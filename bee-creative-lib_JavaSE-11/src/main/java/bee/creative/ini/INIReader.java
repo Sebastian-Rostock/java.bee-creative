@@ -19,16 +19,16 @@ import bee.creative.lang.Objects;
 public class INIReader implements Closeable {
 
 	/** Diese Methode erzeugt aus dem gegebenen Objekt einen {@link INIReader} und gibt diesen zurück. Wenn das Objekt ein {@link INIReader} ist, wird dieser
-	 * geliefert. Andernfalls wird das Objekt in einen {@link Reader} {@link IO#inputReaderFrom(Object) überführt}.
+	 * geliefert. Andernfalls wird das Objekt in einen {@link Reader} {@link IO#charReaderFrom(Object) überführt}.
 	 *
-	 * @see IO#inputReaderFrom(Object)
+	 * @see IO#charReaderFrom(Object)
 	 * @see INIReader#INIReader(Reader)
 	 * @param data Objekt.
 	 * @return {@link INIReader}.
 	 * @throws IOException Wenn der {@link INIReader} nicht erzeugt werden kann. */
 	public static INIReader from(Object data) throws IOException {
 		if (data instanceof INIReader) return (INIReader)data;
-		return new INIReader(IO.inputReaderFrom(data));
+		return new INIReader(IO.charReaderFrom(data));
 	}
 
 	/** Dieser Konstruktor initialisiert den {@link Reader} mit der {@code INI}-Datenstruktur.

@@ -13,17 +13,6 @@ import bee.creative.lang.Bytes;
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class MappedBuffer2 extends MappedBuffer {
 
-	private static long asAlignedSize(final long size) throws IllegalArgumentException {
-		final long result = (size + 15) & -16;
-		if (result > 0) return result;
-		if (size == 0) return 0;
-		throw new IllegalArgumentException();
-	}
-
-	private static boolean isAlingnedValue(final long value) {
-		return (value & 15) == 0;
-	}
-
 	/** Dieser Konstruktor initialisiert den Puffer zum Zugriff auf die gegebene Datei in nativer Bytereihenfolge.
 	 *
 	 * @param file Datei.
@@ -54,72 +43,6 @@ public class MappedBuffer2 extends MappedBuffer {
 		}
 	}
 
-	/** Diese Methode gibt die Größe des gegebenen Speicherbereichs zurück. */
-	private long getNodeSize(final long node) {
-		return this.getLong(node - 8);
-	}
-
-	private long getNodePrev(final long node) {
-		return this.getLong(node + 0);
-	}
-
-	private long getNodeNext(final long node) {
-		return this.getLong(node + 8);
-	}
-
-	private void setNodePrev(final long node, final long prev) {
-		this.putLong(node + 0, prev);
-	}
-
-	private void setNodeNext(final long node, final long next) {
-		this.putLong(node + 8, next);
-	}
-
-	/** Diese Methode setzt die Größe des gegebenen unbenutzten Speicherbereichs. */
-	private void setNodeFreeSize(final long node, final long size) {
-		this.putLong(node - 8, -size);
-		this.putLong(node + size, -size);
-	}
-
-	/** Diese Methode setzt die Größe des gegebenen benutzten Speicherbereichs. */
-	private void setNodeUsedSize(final long node, final long size) {
-		this.putLong(node - 8, size);
-		this.putLong(node + size, size);
-	}
-
-	/** Diese Methode fügt den gegebenen neuen Knoten vor dem gegebenen Nachfolger ein.
-	 *
-	 * @param node neuer Knoten.
-	 * @param next Nachfolger. */
-	private void insertNode(final long node, final long next) {
-		final long prev = this.getNodePrev(next);
-		this.setNodePrev(next, node);
-		this.setNodeNext(prev, node);
-		this.setNodePrev(node, prev);
-		this.setNodeNext(node, next);
-	}
-
-	/** Diese Methode entfernt den gegebenen Knoten aus der doppelt verketteten Liste. Sein Vorgänger zeigt danach auf seinen Nachfolger und umgekehrt.
-	 *
-	 * @param node Knoten. */
-	private void deleteNode(final long node) {
-		final long prev = this.getNodePrev(node), next = this.getNodeNext(node);
-		this.setNodeNext(prev, next);
-		this.setNodePrev(next, prev);
-	}
-
-	/** Diese Methode ersetzt den gegebenen alten Knoten durch den gegebenen neuen.
-	 *
-	 * @param oldNode alter Knoten.
-	 * @param newNode neuer Knoten */
-	private void replaceNode(final long oldNode, final long newNode) {
-		final long prev = this.getNodePrev(oldNode), next = this.getNodeNext(oldNode);
-		this.setNodePrev(newNode, prev);
-		this.setNodeNext(newNode, next);
-		this.setNodeNext(prev, newNode);
-		this.setNodePrev(next, newNode);
-	}
-
 	/** Diese Methode gibt die Adresse des Wurzelspeicherbereichs zurück, welcher als Inhaltsverzeichnis der in den übrigen Speicherbereichen abgelegten
 	 * Datenstrukturen verwendet werden sollte.
 	 *
@@ -146,13 +69,6 @@ public class MappedBuffer2 extends MappedBuffer {
 		synchronized (this) {
 			return this.regionSizeImpl(address);
 		}
-	}
-
-	private long regionSizeImpl(final long node) throws IllegalArgumentException {
-		if ((node < 48) || !MappedBuffer2.isAlingnedValue(node)) throw new IllegalArgumentException();
-		final long size = this.getNodeSize(node);
-		if ((size < 0) || !MappedBuffer2.isAlingnedValue(size) || (this.getLong(node + size) != size)) throw new IllegalArgumentException();
-		return size;
 	}
 
 	/** Diese Methode {@link #insertRegion(long) reserviert} einen neuen Speicherbereich mit der gegebenen Größe, kopiert die Daten des an der gegebenen Adresse
@@ -187,39 +103,6 @@ public class MappedBuffer2 extends MappedBuffer {
 		}
 	}
 
-	private long reuseRegionImpl(long newSize) {
-		for (long node = this.getNodeNext(16); node != 16; node = this.getNodeNext(node)) {
-			final long left = -this.getNodeSize(node) - newSize;
-			if (left >= 0) {
-				if (left < 32) {
-					newSize += left;
-					this.deleteNode(node);
-				} else {
-					final long free = node + newSize + 16;
-					this.replaceNode(node, free);
-					this.setNodeFreeSize(free, left - 16);
-				}
-				this.setNodeUsedSize(node, newSize);
-				return node;
-			}
-		}
-		return 0;
-	}
-
-	private long insertRegionImpl(final long newSize) throws IllegalStateException {
-		final long result = this.reuseRegionImpl(newSize);
-		return result != 0 ? result : this.createRegionImpl(newSize);
-	}
-
-	private long createRegionImpl(final long newSize) throws IllegalStateException {
-		final long node = this.getLong(32), free = node + newSize + 16;
-		this.grow(free);
-		this.putLong(32, free);
-		this.putLong(free - 8, 0);
-		this.setNodeUsedSize(node, newSize);
-		return node;
-	}
-
 	/** Diese Methode gibt nur dann den an der gegebenen Adresse beginnenden Speicherbereich zur Wiederverwendung frei, wenn diese Adresse gültig und nicht
 	 * {@code 0} ist.
 	 *
@@ -229,34 +112,6 @@ public class MappedBuffer2 extends MappedBuffer {
 		if (address == 0) return;
 		synchronized (this) {
 			this.deleteRegionImpl(address, this.regionSizeImpl(address));
-		}
-	}
-
-	private void deleteRegionImpl(final long node, final long oldSize) {
-		final long prevSize = this.getLong(node - 16), nextSize = this.getLong(node + oldSize + 8);
-		if (prevSize < 0) {
-			final long prev = node - -prevSize - 16;
-			if (nextSize == 0) { // davor LEER, danach ENDE
-				this.deleteNode(prev);
-				this.putLong(prev - 8, 0);
-				this.putLong(32, prev);
-			} else if (nextSize < 0) { // davor LEER, danach LEER
-				this.deleteNode(node + oldSize + 16);
-				this.setNodeFreeSize(prev, -prevSize + oldSize + -nextSize + 32);
-			} else { // davor LEER, danach VOLL
-				this.setNodeFreeSize(prev, -prevSize + oldSize + 16);
-			}
-		} else {
-			if (nextSize == 0) { // davor VOLL, danach ENDE
-				this.putLong(node - 8, 0);
-				this.putLong(32, node);
-			} else if (nextSize < 0) { // davor VOLL, danach LEER
-				this.replaceNode(node + oldSize + 16, node);
-				this.setNodeFreeSize(node, oldSize + -nextSize + 16);
-			} else { // davor VOLL, danach VOLL
-				this.setNodeFreeSize(node, oldSize);
-				this.insertNode(node, 16);
-			}
 		}
 	}
 
@@ -338,6 +193,151 @@ public class MappedBuffer2 extends MappedBuffer {
 			limit--;
 		}
 		return result;
+	}
+
+	private static long asAlignedSize(final long size) throws IllegalArgumentException {
+		final long result = (size + 15) & -16;
+		if (result > 0) return result;
+		if (size == 0) return 0;
+		throw new IllegalArgumentException();
+	}
+
+	private static boolean isAlingnedValue(final long value) {
+		return (value & 15) == 0;
+	}
+
+	/** Diese Methode gibt die Größe des gegebenen Speicherbereichs zurück. */
+	private long getNodeSize(final long node) {
+		return this.getLong(node - 8);
+	}
+
+	private long getNodePrev(final long node) {
+		return this.getLong(node + 0);
+	}
+
+	private long getNodeNext(final long node) {
+		return this.getLong(node + 8);
+	}
+
+	private void setNodePrev(final long node, final long prev) {
+		this.putLong(node + 0, prev);
+	}
+
+	private void setNodeNext(final long node, final long next) {
+		this.putLong(node + 8, next);
+	}
+
+	/** Diese Methode setzt die Größe des gegebenen unbenutzten Speicherbereichs. */
+	private void setNodeFreeSize(final long node, final long size) {
+		this.putLong(node - 8, -size);
+		this.putLong(node + size, -size);
+	}
+
+	/** Diese Methode setzt die Größe des gegebenen benutzten Speicherbereichs. */
+	private void setNodeUsedSize(final long node, final long size) {
+		this.putLong(node - 8, size);
+		this.putLong(node + size, size);
+	}
+
+	/** Diese Methode fügt den gegebenen neuen Knoten vor dem gegebenen Nachfolger ein.
+	 *
+	 * @param node neuer Knoten.
+	 * @param next Nachfolger. */
+	private void insertNode(final long node, final long next) {
+		final long prev = this.getNodePrev(next);
+		this.setNodePrev(next, node);
+		this.setNodeNext(prev, node);
+		this.setNodePrev(node, prev);
+		this.setNodeNext(node, next);
+	}
+
+	/** Diese Methode entfernt den gegebenen Knoten aus der doppelt verketteten Liste. Sein Vorgänger zeigt danach auf seinen Nachfolger und umgekehrt.
+	 *
+	 * @param node Knoten. */
+	private void deleteNode(final long node) {
+		final long prev = this.getNodePrev(node), next = this.getNodeNext(node);
+		this.setNodeNext(prev, next);
+		this.setNodePrev(next, prev);
+	}
+
+	/** Diese Methode ersetzt den gegebenen alten Knoten durch den gegebenen neuen.
+	 *
+	 * @param oldNode alter Knoten.
+	 * @param newNode neuer Knoten */
+	private void replaceNode(final long oldNode, final long newNode) {
+		final long prev = this.getNodePrev(oldNode), next = this.getNodeNext(oldNode);
+		this.setNodePrev(newNode, prev);
+		this.setNodeNext(newNode, next);
+		this.setNodeNext(prev, newNode);
+		this.setNodePrev(next, newNode);
+	}
+
+	private long regionSizeImpl(final long node) throws IllegalArgumentException {
+		if ((node < 48) || !MappedBuffer2.isAlingnedValue(node)) throw new IllegalArgumentException();
+		final long size = this.getNodeSize(node);
+		if ((size < 0) || !MappedBuffer2.isAlingnedValue(size) || (this.getLong(node + size) != size)) throw new IllegalArgumentException();
+		return size;
+	}
+
+	private long reuseRegionImpl(long newSize) {
+		for (long node = this.getNodeNext(16); node != 16; node = this.getNodeNext(node)) {
+			final long left = -this.getNodeSize(node) - newSize;
+			if (left >= 0) {
+				if (left < 32) {
+					newSize += left;
+					this.deleteNode(node);
+				} else {
+					final long free = node + newSize + 16;
+					this.replaceNode(node, free);
+					this.setNodeFreeSize(free, left - 16);
+				}
+				this.setNodeUsedSize(node, newSize);
+				return node;
+			}
+		}
+		return 0;
+	}
+
+	private long insertRegionImpl(final long newSize) throws IllegalStateException {
+		final long result = this.reuseRegionImpl(newSize);
+		return result != 0 ? result : this.createRegionImpl(newSize);
+	}
+
+	private long createRegionImpl(final long newSize) throws IllegalStateException {
+		final long node = this.getLong(32), free = node + newSize + 16;
+		this.grow(free);
+		this.putLong(32, free);
+		this.putLong(free - 8, 0);
+		this.setNodeUsedSize(node, newSize);
+		return node;
+	}
+
+	private void deleteRegionImpl(final long node, final long oldSize) {
+		final long prevSize = this.getLong(node - 16), nextSize = this.getLong(node + oldSize + 8);
+		if (prevSize < 0) {
+			final long prev = node - -prevSize - 16;
+			if (nextSize == 0) { // davor LEER, danach ENDE
+				this.deleteNode(prev);
+				this.putLong(prev - 8, 0);
+				this.putLong(32, prev);
+			} else if (nextSize < 0) { // davor LEER, danach LEER
+				this.deleteNode(node + oldSize + 16);
+				this.setNodeFreeSize(prev, -prevSize + oldSize + -nextSize + 32);
+			} else { // davor LEER, danach VOLL
+				this.setNodeFreeSize(prev, -prevSize + oldSize + 16);
+			}
+		} else {
+			if (nextSize == 0) { // davor VOLL, danach ENDE
+				this.putLong(node - 8, 0);
+				this.putLong(32, node);
+			} else if (nextSize < 0) { // davor VOLL, danach LEER
+				this.replaceNode(node + oldSize + 16, node);
+				this.setNodeFreeSize(node, oldSize + -nextSize + 16);
+			} else { // davor VOLL, danach VOLL
+				this.setNodeFreeSize(node, oldSize);
+				this.insertNode(node, 16);
+			}
+		}
 	}
 
 }

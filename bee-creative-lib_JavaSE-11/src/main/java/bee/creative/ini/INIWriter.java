@@ -12,16 +12,16 @@ import bee.creative.lang.Objects;
 public class INIWriter implements Closeable {
 
 	/** Diese Methode erzeugt aus dem gegebenen Objekt einen {@link INIWriter} und gibt diesen zurück. Wenn das Objekt ein {@link INIWriter} ist, wird dieser
-	 * geliefert. Andernfalls wird das Objekt in einen {@link Writer} {@link IO#outputWriterFrom(Object) überführt}.
+	 * geliefert. Andernfalls wird das Objekt in einen {@link Writer} {@link IO#charWriterFrom(Object) überführt}.
 	 *
-	 * @see IO#outputWriterFrom(Object)
+	 * @see IO#charWriterFrom(Object)
 	 * @see INIWriter#INIWriter(Writer)
 	 * @param object Objekt.
 	 * @return {@link INIWriter}.
 	 * @throws IOException Wenn der {@link INIWriter} nicht erzeugt werden kann. */
 	public static INIWriter from(Object object) throws IOException {
 		if (object instanceof INIWriter) return (INIWriter)object;
-		return new INIWriter(IO.outputWriterFrom(object));
+		return new INIWriter(IO.charWriterFrom(object));
 	}
 
 	/** Dieser Konstruktor initialisiert den {@link Writer} für die {@code INI}-Datenstruktur.

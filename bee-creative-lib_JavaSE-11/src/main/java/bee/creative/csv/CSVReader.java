@@ -16,16 +16,16 @@ import bee.creative.lang.Objects;
 public class CSVReader implements Closeable {
 
 	/** Diese Methode erzeugt aus dem gegebenen Objekt einen {@link CSVReader} und gibt diesen zurück. Wenn das Objekt ein {@link CSVReader} ist, wird dieser
-	 * geliefert. Andernfalls wird das Objekt in einen {@link Reader} {@link IO#inputReaderFrom(Object) überführt}.
+	 * geliefert. Andernfalls wird das Objekt in einen {@link Reader} {@link IO#charReaderFrom(Object) überführt}.
 	 *
-	 * @see IO#inputReaderFrom(Object)
+	 * @see IO#charReaderFrom(Object)
 	 * @see CSVReader#CSVReader(Reader)
 	 * @param data Objekt.
 	 * @return {@link CSVReader}.
 	 * @throws IOException Wenn der {@link CSVReader} nicht erzeugt werden kann. */
 	public static CSVReader from(Object data) throws IOException {
 		if (data instanceof CSVReader) return (CSVReader)data;
-		return new CSVReader(IO.inputReaderFrom(data));
+		return new CSVReader(IO.charReaderFrom(data));
 	}
 
 	/** Dieser Konstruktor initialisiert die Eingabe. Als {@link #getComma() Trennzeichen} wird {@code ';'} und als {@link #getQuote() Maskierungszeichen} wird
