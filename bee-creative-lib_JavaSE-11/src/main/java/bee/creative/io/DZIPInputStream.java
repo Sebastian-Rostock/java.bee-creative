@@ -1,6 +1,8 @@
-package bee.creative.kb;
+package bee.creative.io;
 
-import java.io.ByteArrayInputStream;
+import static java.lang.Math.min;
+import static java.nio.ByteBuffer.allocateDirect;
+import static java.nio.ByteOrder.nativeOrder;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,27 +23,17 @@ import bee.creative.fem.FEMString.CompactStringUTF8;
 /** Diese Klasse implementiert einen {@link InflaterInputStream}, der primitive Werte über einen {@link ByteBuffer} mit gegebener {@link ByteOrder} liest.
  *
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public class ZIPDIS extends InflaterInputStream {
-
-	public static <T> T inflate(byte[] source, RESTORE<T> task) throws IOException {
-		return ZIPDIS.inflate(source, ByteOrder.nativeOrder(), task);
-	}
-
-	public static <T> T inflate(byte[] source, ByteOrder order, RESTORE<T> task) throws IOException {
-		try (var zipdis = new ZIPDIS(new ByteArrayInputStream(source), order)) {
-			return task.restore(zipdis);
-		}
-	}
+public class DZIPInputStream extends InflaterInputStream {
 
 	/** Dieser Konstruktor initialisiert den gegebenen {@link InputStream} mit {@code source} und die Bytereihenfolge mit der nativen. */
-	public ZIPDIS(InputStream source) throws IOException {
-		this(source, ByteOrder.nativeOrder());
+	public DZIPInputStream(InputStream source) throws IOException {
+		this(source, nativeOrder());
 	}
 
 	/** Dieser Konstruktor initialisiert den gegebenen {@link InputStream} mit {@code source} und die Bytereihenfolge mit {@code order}. */
-	public ZIPDIS(InputStream source, ByteOrder order) throws IOException {
-		super(source, new Inflater(true), ZIPDIS.BUFFER_SIZE);
-		this.bufferAsByte = ByteBuffer.allocateDirect(ZIPDIS.BUFFER_SIZE).order(order);
+	public DZIPInputStream(InputStream source, ByteOrder order) throws IOException {
+		super(source, new Inflater(true), BUFFER_SIZE);
+		this.bufferAsByte = allocateDirect(BUFFER_SIZE).order(order);
 		this.bufferAsInt = this.bufferAsByte.asIntBuffer();
 		this.bufferAsChar = this.bufferAsByte.asCharBuffer();
 		this.bufferAsLong = this.bufferAsByte.asLongBuffer();
@@ -50,13 +42,22 @@ public class ZIPDIS extends InflaterInputStream {
 		this.bufferAsDouble = this.bufferAsByte.asDoubleBuffer();
 	}
 
+	public ByteOrder getOrder() {
+		return this.bufferAsByte.order();
+	}
+
+	public DZIPInputStream useOrder(ByteOrder order) {
+		this.bufferAsByte.order(order);
+		return this;
+	}
+
 	public int[] readInt(int length) throws IOException {
 		return this.readInt(new int[length], 0, length);
 	}
 
 	public int[] readInt(int[] values, int offset, int length) throws IOException {
 		while (length > 0) {
-			var count = Math.min(length, ZIPDIS.BUFFER_SIZE / 4);
+			var count = min(length, BUFFER_SIZE / 4);
 			this.readBuffer(count * 4);
 			this.bufferAsInt.rewind().get(values, offset, count);
 			offset += count;
@@ -70,9 +71,9 @@ public class ZIPDIS extends InflaterInputStream {
 	}
 
 	public byte[] readByte(byte[] values, int offset, int length) throws IOException {
-		this.bufferAsByte.limit(ZIPDIS.BUFFER_SIZE);
+		this.bufferAsByte.limit(BUFFER_SIZE);
 		while (length > 0) {
-			var count = Math.min(length, ZIPDIS.BUFFER_SIZE);
+			var count = min(length, BUFFER_SIZE);
 			this.readBuffer(count);
 			this.bufferAsByte.rewind().get(values, offset, count);
 			offset += count;
@@ -87,7 +88,7 @@ public class ZIPDIS extends InflaterInputStream {
 
 	public char[] readChar(char[] values, int offset, int length) throws IOException {
 		while (length > 0) {
-			var count = Math.min(length, ZIPDIS.BUFFER_SIZE / 2);
+			var count = min(length, BUFFER_SIZE / 2);
 			this.readBuffer(count * 2);
 			this.bufferAsChar.rewind().get(values, offset, count);
 			offset += count;
@@ -102,7 +103,7 @@ public class ZIPDIS extends InflaterInputStream {
 
 	public long[] readLong(long[] values, int offset, int length) throws IOException {
 		while (length > 0) {
-			var count = Math.min(length, ZIPDIS.BUFFER_SIZE / 8);
+			var count = min(length, BUFFER_SIZE / 8);
 			this.readBuffer(count * 8);
 			this.bufferAsLong.rewind().get(values, offset, count);
 			offset += count;
@@ -117,7 +118,7 @@ public class ZIPDIS extends InflaterInputStream {
 
 	public short[] readShort(short[] values, int offset, int length) throws IOException {
 		while (length > 0) {
-			var count = Math.min(length, ZIPDIS.BUFFER_SIZE / 2);
+			var count = min(length, BUFFER_SIZE / 2);
 			this.readBuffer(count * 2);
 			this.bufferAsShort.rewind().get(values, offset, count);
 			offset += count;
@@ -132,7 +133,7 @@ public class ZIPDIS extends InflaterInputStream {
 
 	public float[] readFloat(float[] values, int offset, int length) throws IOException {
 		while (length > 0) {
-			var count = Math.min(length, ZIPDIS.BUFFER_SIZE / 4);
+			var count = min(length, BUFFER_SIZE / 4);
 			this.readBuffer(count * 4);
 			this.bufferAsFloat.rewind().get(values, offset, count);
 			offset += count;
@@ -147,7 +148,7 @@ public class ZIPDIS extends InflaterInputStream {
 
 	public double[] readDouble(double[] values, int offset, int length) throws IOException {
 		while (length > 0) {
-			var count = Math.min(length, ZIPDIS.BUFFER_SIZE / 8);
+			var count = min(length, BUFFER_SIZE / 8);
 			this.readBuffer(count * 8);
 			this.bufferAsDouble.rewind().get(values, offset, count);
 			offset += count;
@@ -180,12 +181,6 @@ public class ZIPDIS extends InflaterInputStream {
 			values[i + offset] = this.readByte(sizeArray[i]);
 		}
 		return values;
-	}
-
-	public interface RESTORE<T> {
-
-		T restore(ZIPDIS source) throws IOException;
-
 	}
 
 	private static final int BUFFER_SIZE = 1 << 19;

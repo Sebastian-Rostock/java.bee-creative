@@ -1,6 +1,7 @@
-package bee.creative.kb;
+package bee.creative.io;
 
-import java.io.ByteArrayOutputStream;
+import static java.nio.ByteOrder.nativeOrder;
+import static java.util.zip.Deflater.DEFAULT_COMPRESSION;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
@@ -18,50 +19,26 @@ import bee.creative.fem.FEMString;
 /** Diese Klasse implementiert einen {@link DeflaterOutputStream}, der primitive Werte über einen {@link ByteBuffer} mit gegebener {@link ByteOrder} schreibt.
  *
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public class ZIPDOS extends DeflaterOutputStream {
-
-	/** Diese Methode ist eine Abkürzung für {@link #deflate(int, ByteOrder, PERSIST) deflate(Deflater.DEFAULT_COMPRESSION, ByteOrder.nativeOrder(), task)}. */
-	public static byte[] deflate(PERSIST task) throws IOException {
-		return ZIPDOS.deflate(Deflater.DEFAULT_COMPRESSION, ByteOrder.nativeOrder(), task);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link #deflate(int, ByteOrder, PERSIST) deflate(level, ByteOrder.nativeOrder(), task)}. */
-	public static byte[] deflate(int level, PERSIST task) throws IOException {
-		return ZIPDOS.deflate(level, ByteOrder.nativeOrder(), task);
-	}
-
-	/** Diese Methode erzeugt einen neuen {@link ZIPDOS} mit der gegebenen Kompressionsstufe {@code level} ({@link Deflater#DEFAULT_COMPRESSION},
-	 * {@link Deflater#NO_COMPRESSION}..{@link Deflater#BEST_COMPRESSION}) und der gegebenen Bytereihenfolge mit {@code order} auf Basis eines
-	 * {@link ByteArrayOutputStream}, ruft damit die gegebene Funktion {@code task} auf und liefert schließlich die dadurch erzeugte Bytefolge.
-	 *
-	 * @see PERSIST#persist(ZIPDOS)
-	 * @see ZIPDOS#ZIPDOS(OutputStream, int, ByteOrder)
-	 * @see ByteArrayOutputStream#toByteArray() */
-	public static byte[] deflate(int level, ByteOrder order, PERSIST task) throws IOException {
-		try (var result = new ByteArrayOutputStream(ZIPDOS.BUFFER_SIZE); var target = new ZIPDOS(result, level, order)) {
-			task.persist(target);
-			target.flush();
-			return result.toByteArray();
-		}
-	}
+public class DZIPOutputStream extends DeflaterOutputStream {
 
 	/** Dieser Konstruktor initialisiert den {@link OutputStream} mit {@code target}, die Kompressionsstufe des {@link Deflater} mit
 	 * {@link Deflater#DEFAULT_COMPRESSION} und die Bytereihenfolge mit der nativen. */
-	public ZIPDOS(OutputStream target) throws IOException {
-		this(target, Deflater.DEFAULT_COMPRESSION);
+	public DZIPOutputStream(OutputStream target) throws IOException {
+		this(target, DEFAULT_COMPRESSION);
 	}
 
 	/** Dieser Konstruktor initialisiert den {@link OutputStream} mit {@code target}, die Kompressionsstufe des {@link Deflater} mit {@code level}
 	 * ({@link Deflater#DEFAULT_COMPRESSION}, {@link Deflater#NO_COMPRESSION}..{@link Deflater#BEST_COMPRESSION}) und die Bytereihenfolge mit der nativen. */
-	public ZIPDOS(OutputStream target, int level) throws IOException {
-		this(target, level, ByteOrder.nativeOrder());
+	public DZIPOutputStream(OutputStream target, int level) throws IOException {
+		this(target, level, nativeOrder());
 	}
 
 	/** Dieser Konstruktor initialisiert den {@link OutputStream} mit {@code target}, die Kompressionsstufe des {@link Deflater} mit {@code level}
 	 * ({@link Deflater#DEFAULT_COMPRESSION}, {@link Deflater#NO_COMPRESSION}..{@link Deflater#BEST_COMPRESSION}) und die Bytereihenfolge mit {@code order}. */
-	public ZIPDOS(OutputStream target, int level, ByteOrder order) throws IOException {
-		super(target, new Deflater(level, true), ZIPDOS.BUFFER_SIZE, true);
-		this.bufferAsByte = ByteBuffer.allocateDirect(ZIPDOS.BUFFER_SIZE).order(order);
+	public DZIPOutputStream(OutputStream target, int level, ByteOrder order) throws IOException {
+		super(target, new Deflater(level, true), BUFFER_SIZE, true);
+		this.level = level;
+		this.bufferAsByte = ByteBuffer.allocateDirect(BUFFER_SIZE).order(order);
 		this.bufferAsInt = this.bufferAsByte.asIntBuffer();
 		this.bufferAsChar = this.bufferAsByte.asCharBuffer();
 		this.bufferAsLong = this.bufferAsByte.asLongBuffer();
@@ -70,13 +47,32 @@ public class ZIPDOS extends DeflaterOutputStream {
 		this.bufferAsDouble = this.bufferAsByte.asDoubleBuffer();
 	}
 
+	public int getLevel() {
+		return this.level;
+	}
+
+	public DZIPOutputStream useLevel(int level) {
+		this.def.setLevel(level);
+		this.level = level;
+		return this;
+	}
+
+	public ByteOrder getOrder() {
+		return this.bufferAsByte.order();
+	}
+
+	public DZIPOutputStream useOrder(ByteOrder order) {
+		this.bufferAsByte.order(order);
+		return this;
+	}
+
 	public void writeInt(int... values) throws IOException {
 		this.writeInt(values, 0, values.length);
 	}
 
 	public void writeInt(int[] values, int offset, int length) throws IOException {
 		while (length > 0) {
-			var count = Math.min(length, ZIPDOS.BUFFER_SIZE / 4);
+			var count = Math.min(length, BUFFER_SIZE / 4);
 			this.bufferAsInt.rewind().put(values, offset, count);
 			this.writeBuffer(count * 4);
 			offset += count;
@@ -98,7 +94,7 @@ public class ZIPDOS extends DeflaterOutputStream {
 
 	public void writeChar(char[] values, int offset, int length) throws IOException {
 		while (length > 0) {
-			var count = Math.min(length, ZIPDOS.BUFFER_SIZE / 2);
+			var count = Math.min(length, BUFFER_SIZE / 2);
 			this.bufferAsChar.rewind().put(values, offset, count);
 			this.writeBuffer(count * 2);
 			offset += count;
@@ -112,7 +108,7 @@ public class ZIPDOS extends DeflaterOutputStream {
 
 	public void writeLong(long[] values, int offset, int length) throws IOException {
 		while (length > 0) {
-			var count = Math.min(length, ZIPDOS.BUFFER_SIZE / 8);
+			var count = Math.min(length, BUFFER_SIZE / 8);
 			this.bufferAsLong.rewind().put(values, offset, count);
 			this.writeBuffer(count * 8);
 			offset += count;
@@ -126,7 +122,7 @@ public class ZIPDOS extends DeflaterOutputStream {
 
 	public void writeShort(short[] values, int offset, int length) throws IOException {
 		while (length > 0) {
-			var count = Math.min(length, ZIPDOS.BUFFER_SIZE / 2);
+			var count = Math.min(length, BUFFER_SIZE / 2);
 			this.bufferAsShort.rewind().put(values, offset, count);
 			this.writeBuffer(count * 2);
 			offset += count;
@@ -140,7 +136,7 @@ public class ZIPDOS extends DeflaterOutputStream {
 
 	public void writeFloat(float[] values, int offset, int length) throws IOException {
 		while (length > 0) {
-			var count = Math.min(length, ZIPDOS.BUFFER_SIZE / 4);
+			var count = Math.min(length, BUFFER_SIZE / 4);
 			this.bufferAsFloat.rewind().put(values, offset, count);
 			this.writeBuffer(count * 4);
 			offset += count;
@@ -154,7 +150,7 @@ public class ZIPDOS extends DeflaterOutputStream {
 
 	public void writeDouble(double[] values, int offset, int length) throws IOException {
 		while (length > 0) {
-			var count = Math.min(length, ZIPDOS.BUFFER_SIZE / 8);
+			var count = Math.min(length, BUFFER_SIZE / 8);
 			this.bufferAsDouble.rewind().put(values, offset, count);
 			this.writeBuffer(count * 8);
 			offset += count;
@@ -200,13 +196,9 @@ public class ZIPDOS extends DeflaterOutputStream {
 		}
 	}
 
-	public interface PERSIST {
-
-		void persist(ZIPDOS target) throws IOException;
-
-	}
-
 	private static final int BUFFER_SIZE = 1 << 19;
+
+	private int level;
 
 	private final ByteBuffer bufferAsByte;
 

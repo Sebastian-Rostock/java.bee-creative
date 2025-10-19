@@ -102,7 +102,7 @@ public class IO {
 	 * <dt>{@link ByteArray}</dt>
 	 * <dd>=> {@link ByteArraySection} => {@link ByteArrayInputStream} => {@link ByteReader}</dd>
 	 * <dt>{@code byte[]}</dt>
-	 * <dd>=> {@link ByteArraySection} => {@link ByteArrayInputStream} => {@link ByteReader}</dd>
+	 * <dd>=> {@link ByteArrayInputStream} => {@link ByteReader}</dd>
 	 * </dl>
 	 */
 	public static ByteReader byteReaderFrom(Object source) throws IOException {
@@ -285,7 +285,7 @@ public class IO {
 	}
 
 	private static ByteReader byteReaderFrom(byte[] source) throws IOException {
-		return byteReaderFrom(ByteArraySection.from(source));
+		return byteReaderFrom(new ByteArrayInputStream(source));
 	}
 
 	private static ByteWriter byteWriterFrom(OutputStream target) throws IOException {

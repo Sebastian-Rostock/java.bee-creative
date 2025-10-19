@@ -1,8 +1,5 @@
 package bee.creative.array;
 
-import java.io.IOException;
-import java.io.OutputStream;
-
 /** Diese Schnittstelle definiert ein modifizierbares {@code byte}-{@link Array}.
  *
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */

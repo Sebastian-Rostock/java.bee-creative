@@ -1,5 +1,7 @@
 package bee.creative.ini;
 
+import static bee.creative.io.IO.charReaderFrom;
+import static bee.creative.lang.Objects.notNull;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.Reader;
@@ -18,17 +20,13 @@ import bee.creative.lang.Objects;
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class INIReader implements Closeable {
 
-	/** Diese Methode erzeugt aus dem gegebenen Objekt einen {@link INIReader} und gibt diesen zurück. Wenn das Objekt ein {@link INIReader} ist, wird dieser
-	 * geliefert. Andernfalls wird das Objekt in einen {@link Reader} {@link IO#charReaderFrom(Object) überführt}.
-	 *
-	 * @see IO#charReaderFrom(Object)
-	 * @see INIReader#INIReader(Reader)
-	 * @param data Objekt.
-	 * @return {@link INIReader}.
-	 * @throws IOException Wenn der {@link INIReader} nicht erzeugt werden kann. */
-	public static INIReader from(Object data) throws IOException {
-		if (data instanceof INIReader) return (INIReader)data;
-		return new INIReader(IO.charReaderFrom(data));
+	/** Diese Methode liefert den zu {@code source} erzeugten {@link INIReader}.
+	 * 
+	 * @see #INIReader(Reader)
+	 * @see IO#charReaderFrom(Object) */
+	public static INIReader iniReaderFrom(Object source) throws IOException {
+		if (source instanceof INIReader) return (INIReader)source;
+		return new INIReader(charReaderFrom(source));
 	}
 
 	/** Dieser Konstruktor initialisiert den {@link Reader} mit der {@code INI}-Datenstruktur.
@@ -36,7 +34,7 @@ public class INIReader implements Closeable {
 	 * @param reader {@link Reader}.
 	 * @throws NullPointerException Wenn {@code reader} {@code null} ist. */
 	public INIReader(Reader reader) throws NullPointerException {
-		this.reader = Objects.notNull(reader);
+		this.reader = notNull(reader);
 		this.builder = new StringBuilder();
 	}
 
@@ -79,14 +77,14 @@ public class INIReader implements Closeable {
 					return null;
 				case '[':
 					var section = this.readSectionImpl();
-					return INIToken.fromSection(section);
+					return INIToken.iniSectionFrom(section);
 				case ';':
 					var comment = this.readCommentImpl();
-					return INIToken.fromComment(comment);
+					return INIToken.iniCommentFrom(comment);
 				default:
 					var key = this.readKeyImpl(symbol);
 					var value = this.readValueImpl();
-					return INIToken.fromProperty(key, value);
+					return INIToken.iniPropertyProm(key, value);
 				case '\r':
 				case '\n':
 			}

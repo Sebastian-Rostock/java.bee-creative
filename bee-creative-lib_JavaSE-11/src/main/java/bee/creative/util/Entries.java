@@ -176,7 +176,7 @@ public class Entries {
 		return new ReverseEntry<>(that);
 	}
 
-	public static <GKey, GValue> Consumer2<Entry2<GKey, GValue>> consumer(Setter<? super GKey, ? super GValue> that) {
+	public static <GKey, GValue> Consumer3<Entry2<GKey, GValue>> consumer(Setter<? super GKey, ? super GValue> that) {
 		return new EntryConsumer<>(that);
 	}
 

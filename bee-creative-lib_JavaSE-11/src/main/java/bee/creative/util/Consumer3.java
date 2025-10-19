@@ -10,7 +10,7 @@ import static bee.creative.util.Setters.setterFrom;
  *
  * @author [cc-by] 2021 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <V> Typ des Werts. */
-public interface Consumer3<V> extends Consumer2<V> {
+public interface Consumer3<V> extends Consumer<V> {
 
 	/** Diese Methode ist eine Abkürzung für {@link Consumers#translatedConsumer(Consumer, Getter) translateConsumer(this, trans)}. */
 	default <V2> Consumer3<V2> translate(Getter<? super V2, ? extends V> trans) {
@@ -18,27 +18,27 @@ public interface Consumer3<V> extends Consumer2<V> {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #synchronize(Object) this.synchronize(this)}. */
-	default Consumer2<V> synchronize() {
+	default Consumer3<V> synchronize() {
 		return this.synchronize(this);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Consumers#synchronizedConsumer(Consumer, Object) synchronizedConsumer(this, mutex)}. */
-	default Consumer2<V> synchronize(Object mutex) {
+	default Consumer3<V> synchronize(Object mutex) {
 		return synchronizedConsumer(this, mutex);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Setters#setterFrom(Consumer) setterFromConsumer(this)}. */
-	default Setter3<Object, V> toSetter() {
+	default Setter3<Object, V> asSetter() {
 		return setterFrom(this);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #toProperty(Producer) this.toProperty(emptyProperty())}. */
-	default Property3<V> toProperty() {
-		return this.toProperty(emptyProperty());
+	/** Diese Methode ist eine Abkürzung für {@link #asProperty(Producer) this.asProperty(emptyProperty())}. */
+	default Property3<V> asProperty() {
+		return this.asProperty(emptyProperty());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Properties#propertyFrom(Producer, Consumer) propertyFrom(get, this)}. */
-	default Property3<V> toProperty(Producer<? extends V> get) {
+	default Property3<V> asProperty(Producer<? extends V> get) {
 		return propertyFrom(get, this);
 	}
 

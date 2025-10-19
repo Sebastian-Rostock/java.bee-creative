@@ -11,20 +11,20 @@ public final class INIToken {
 	/** Dieses Feld speichert die Typkennung eines Abschnitts.
 	 *
 	 * @see #section()
-	 * @see #fromSection(String) */
+	 * @see #iniSectionFrom(String) */
 	public static final int SECTION = 1;
 
 	/** Dieses Feld speichert die Typkennung einer Eigenschaft.
 	 *
 	 * @see #key()
 	 * @see #value()
-	 * @see #fromProperty(String, String) */
+	 * @see #iniPropertyProm(String, String) */
 	public static final int PROPERTY = 2;
 
 	/** Dieses Feld speichert die Typkennung eines Kommentars.
 	 *
 	 * @see #comment()
-	 * @see #fromComment(String) */
+	 * @see #iniCommentFrom(String) */
 	public static final int COMMENT = 4;
 
 	/** Diese Methode gibt einen Abschnitt mit dem gegebenen Namen als {@link INIToken} zurück.
@@ -33,7 +33,7 @@ public final class INIToken {
 	 * @param section Name des Abschnitts.
 	 * @return Abschnitt.
 	 * @throws NullPointerException Wenn {@code section} {@code null} ist. */
-	public static INIToken fromSection(String section) throws NullPointerException {
+	public static INIToken iniSectionFrom(String section) throws NullPointerException {
 		return new INIToken(section.toString(), null);
 	}
 
@@ -45,7 +45,7 @@ public final class INIToken {
 	 * @param value Wert der Eigenschaft.
 	 * @return Eigenschaft
 	 * @throws NullPointerException Wenn {@code key} bzw. {@code value} {@code null} ist. */
-	public static INIToken fromProperty(String key, String value) throws NullPointerException {
+	public static INIToken iniPropertyProm(String key, String value) throws NullPointerException {
 		return new INIToken(key.toString(), value.toString());
 	}
 
@@ -55,7 +55,7 @@ public final class INIToken {
 	 * @param comment Text des Kommentar.
 	 * @return Kommentar.
 	 * @throws NullPointerException Wenn {@code comment} {@code null} ist. */
-	public static INIToken fromComment(String comment) throws NullPointerException {
+	public static INIToken iniCommentFrom(String comment) throws NullPointerException {
 		return new INIToken(null, comment.toString());
 	}
 
@@ -73,7 +73,7 @@ public final class INIToken {
 
 	/** Diese Methode gibt den Schlüssel der Eigenschaft zurück, wenn dieses Element ein {@link #PROPERTY} ist. Andernfalls wird {@code null} geliefert.
 	 *
-	 * @see #fromProperty(String, String)
+	 * @see #iniPropertyProm(String, String)
 	 * @return Schlüssel der Eigenschaft oder {@code null}. */
 	public String key() {
 		return this.string2 != null ? this.string1 : null;
@@ -81,7 +81,7 @@ public final class INIToken {
 
 	/** Diese Methode gibt den Wert der Eigenschaft zurück, wenn dieses Element ein {@link #PROPERTY} ist. Andernfalls wird {@code null} geliefert.
 	 *
-	 * @see #fromProperty(String, String)
+	 * @see #iniPropertyProm(String, String)
 	 * @return Wert der Eigenschaft oder {@code null}. */
 	public String value() {
 		return this.string1 != null ? this.string2 : null;
@@ -89,7 +89,7 @@ public final class INIToken {
 
 	/** Diese Methode gibt den Namen des Abschnitts zurück, wenn dieses Element eine {@link #SECTION} ist. Andernfalls wird {@code null} geliefert.
 	 *
-	 * @see #fromSection(String)
+	 * @see #iniSectionFrom(String)
 	 * @return Namen des Abschnitts oder {@code null}. */
 	public String section() {
 		return this.string2 == null ? this.string1 : null;
@@ -97,7 +97,7 @@ public final class INIToken {
 
 	/** Diese Methode gibt den Text des Kommentars zurück, wenn dieses Element ein {@link #COMMENT} ist. Andernfalls wird {@code null} geliefert.
 	 *
-	 * @see #fromComment(String)
+	 * @see #iniCommentFrom(String)
 	 * @return Text des Kommentars oder {@code null}. */
 	public String comment() {
 		return this.string1 == null ? this.string2 : null;

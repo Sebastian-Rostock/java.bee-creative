@@ -12,7 +12,7 @@ import bee.creative.util.Properties.ObservableProperty;
  *
  * @author [cc-by] 2021 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <V> Typ des Werts. */
-public interface Property3<V> extends Property2<V> {
+public interface Property3<V> extends Property<V> {
 
 	/** Diese Methode ist eine Abkürzung für {@link Properties#setupProperty(Property, Producer) setupProperty(this, setup)}. */
 	default Property3<V> setup(Producer<? extends V> setup) {
@@ -25,12 +25,12 @@ public interface Property3<V> extends Property2<V> {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Properties#translatedProperty(Property, Getter, Getter) translatedProperty(this, transGet, transSet)}. */
-	default <VALUE2> Property3<VALUE2> translate(Getter<? super V, ? extends VALUE2> transGet, Getter<? super VALUE2, ? extends V> transSet) {
+	default <V2> Property3<V2> translate(Getter<? super V, ? extends V2> transGet, Getter<? super V2, ? extends V> transSet) {
 		return translatedProperty(this, transGet, transSet);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Properties#translatedProperty(Property, Translator) translatedProperty(this, trans)}. */
-	default <VALUE2> Property3<VALUE2> translate(Translator<V, VALUE2> trans) {
+	default <V2> Property3<V2> translate(Translator<V, V2> trans) {
 		return translatedProperty(this, trans);
 	}
 
@@ -44,10 +44,8 @@ public interface Property3<V> extends Property2<V> {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Fields#fieldFrom(Property) fieldFrom(this)}. */
-	default Field2<Object, V> toField() {
+	default Field2<Object, V> asField() {
 		return fieldFrom(this);
 	}
-
- 
 
 }

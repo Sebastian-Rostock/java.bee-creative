@@ -1,5 +1,7 @@
 package bee.creative.ini;
 
+import static bee.creative.io.IO.charWriterFrom;
+import static bee.creative.lang.Objects.notNull;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.Writer;
@@ -11,17 +13,13 @@ import bee.creative.lang.Objects;
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class INIWriter implements Closeable {
 
-	/** Diese Methode erzeugt aus dem gegebenen Objekt einen {@link INIWriter} und gibt diesen zurück. Wenn das Objekt ein {@link INIWriter} ist, wird dieser
-	 * geliefert. Andernfalls wird das Objekt in einen {@link Writer} {@link IO#charWriterFrom(Object) überführt}.
-	 *
-	 * @see IO#charWriterFrom(Object)
-	 * @see INIWriter#INIWriter(Writer)
-	 * @param object Objekt.
-	 * @return {@link INIWriter}.
-	 * @throws IOException Wenn der {@link INIWriter} nicht erzeugt werden kann. */
-	public static INIWriter from(Object object) throws IOException {
-		if (object instanceof INIWriter) return (INIWriter)object;
-		return new INIWriter(IO.charWriterFrom(object));
+	/** Diese Methode liefert den zu {@code target} erzeugten {@link INIWriter}.
+	 * 
+	 * @see #INIWriter(Writer)
+	 * @see IO#charWriterFrom(Object) */
+	public static INIWriter iniWriterFrom(Object target) throws IOException {
+		if (target instanceof INIWriter) return (INIWriter)target;
+		return new INIWriter(charWriterFrom(target));
 	}
 
 	/** Dieser Konstruktor initialisiert den {@link Writer} für die {@code INI}-Datenstruktur.
@@ -29,7 +27,7 @@ public class INIWriter implements Closeable {
 	 * @param writer {@link Writer}.
 	 * @throws NullPointerException Wenn {@code writer} {@code null} ist. */
 	public INIWriter(Writer writer) throws NullPointerException {
-		this.writer = Objects.notNull(writer);
+		this.writer = notNull(writer);
 	}
 
 	/** Diese Methode schreibt das gegebene Element und gibt {@code this} zurück.

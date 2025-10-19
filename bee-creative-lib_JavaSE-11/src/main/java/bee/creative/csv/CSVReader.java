@@ -15,17 +15,13 @@ import bee.creative.lang.Objects;
  * @author Sebastian Rostock 2014. */
 public class CSVReader implements Closeable {
 
-	/** Diese Methode erzeugt aus dem gegebenen Objekt einen {@link CSVReader} und gibt diesen zurück. Wenn das Objekt ein {@link CSVReader} ist, wird dieser
-	 * geliefert. Andernfalls wird das Objekt in einen {@link Reader} {@link IO#charReaderFrom(Object) überführt}.
+	/** Diese Methode liefert den zu {@code source} erzeugten {@link CSVReader}.
 	 *
-	 * @see IO#charReaderFrom(Object)
-	 * @see CSVReader#CSVReader(Reader)
-	 * @param data Objekt.
-	 * @return {@link CSVReader}.
-	 * @throws IOException Wenn der {@link CSVReader} nicht erzeugt werden kann. */
-	public static CSVReader from(Object data) throws IOException {
-		if (data instanceof CSVReader) return (CSVReader)data;
-		return new CSVReader(IO.charReaderFrom(data));
+	 * @see #CSVReader(Reader)
+	 * @see IO#charReaderFrom(Object) */
+	public static CSVReader csvReaderFrom(Object source) throws IOException {
+		if (source instanceof CSVReader) return (CSVReader)source;
+		return new CSVReader(IO.charReaderFrom(source));
 	}
 
 	/** Dieser Konstruktor initialisiert die Eingabe. Als {@link #getComma() Trennzeichen} wird {@code ';'} und als {@link #getQuote() Maskierungszeichen} wird
@@ -37,11 +33,8 @@ public class CSVReader implements Closeable {
 	 * @throws NullPointerException Wenn {@code reader} {@code null} ist. */
 	public CSVReader(Reader reader) throws IOException, NullPointerException {
 		this.reader = reader;
-		this.value = new StringBuilder();
-		this.entry = new ArrayList<>();
-		// Leere Zeilen zu Beginn ignorieren.
 		var symbol = reader.read();
-		while ((symbol == '\r') || (symbol == '\n')) {
+		while ((symbol == '\r') || (symbol == '\n')) { // Leere Zeilen zu Beginn ignorieren.
 			symbol = reader.read();
 		}
 		this.symbol = symbol;
@@ -160,10 +153,10 @@ public class CSVReader implements Closeable {
 	}
 
 	/** Dieses Feld speichert den Puffer für die Werte. */
-	private final StringBuilder value;
+	private final StringBuilder value = new StringBuilder();
 
 	/** Dieses Feld speichert den Puffer für die Einträge. */
-	private final ArrayList<String> entry;
+	private final ArrayList<String> entry = new ArrayList<>();
 
 	/** Dieses Feld speichert das Maskierungszeichen. */
 	private char quote = '"';

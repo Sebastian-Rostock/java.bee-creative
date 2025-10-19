@@ -1,5 +1,6 @@
 package bee.creative.csv;
 
+import static bee.creative.io.IO.charWriterFrom;
 import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
@@ -14,17 +15,13 @@ import bee.creative.lang.Objects;
  * @author Sebastian Rostock 2014. */
 public class CSVWriter implements Closeable, Flushable {
 
-	/** Diese Methode erzeugt aus dem gegebenen Objekt einen {@link CSVWriter} und gibt diesen zurück. Wenn das Objekt ein {@link CSVWriter} ist, wird dieser
-	 * geliefert. Andernfalls wird das Objekt in einen {@link Writer} {@link IO#charWriterFrom(Object) überführt}.
-	 *
-	 * @see IO#charWriterFrom(Object)
-	 * @see CSVWriter#CSVWriter(Writer)
-	 * @param data Objekt.
-	 * @return {@link CSVWriter}.
-	 * @throws IOException Wenn der {@link CSVWriter} nicht erzeugt werden kann. */
-	public static CSVWriter from(Object data) throws IOException {
-		if (data instanceof CSVWriter) return (CSVWriter)data;
-		return new CSVWriter(IO.charWriterFrom(data));
+	/** Diese Methode liefert den zu {@code target} erzeugten {@link CSVWriter}
+	 * 
+	 * @see #CSVWriter(Writer)
+	 * @see IO#charWriterFrom(Object) */
+	public static CSVWriter csvWriterFrom(Object target) throws IOException {
+		if (target instanceof CSVWriter) return (CSVWriter)target;
+		return new CSVWriter(charWriterFrom(target));
 	}
 
 	/** Dieser Konstruktor initialisiert die Ausgabe. Als {@link #getComma() Trennzeichen} wird {@code ';'} und als {@link #getQuote() Maskierungszeichen} wird

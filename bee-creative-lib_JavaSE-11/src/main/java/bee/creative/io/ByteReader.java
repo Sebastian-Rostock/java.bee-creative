@@ -5,6 +5,7 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.util.zip.GZIPInputStream;
@@ -25,6 +26,14 @@ public class ByteReader extends FilterInputStream {
 
 	public ByteReader asGzipReader(int bufferSize) throws IOException {
 		return new ByteReader(new GZIPInputStream(this.wrappedSource(), bufferSize));
+	}
+
+	public DZIPInputStream asDzipReader() throws IOException {
+		return new DZIPInputStream(this.wrappedSource());
+	}
+
+	public DZIPInputStream asDzipReader(ByteOrder order) throws IOException {
+		return new DZIPInputStream(this.wrappedSource(), order);
 	}
 
 	public CharReader asCharReader() throws IOException {

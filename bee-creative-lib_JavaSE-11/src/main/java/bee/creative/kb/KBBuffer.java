@@ -4,6 +4,8 @@ import java.io.IOError;
 import java.io.IOException;
 import java.util.Arrays;
 import bee.creative.fem.FEMString;
+import bee.creative.io.DZIPInputStream;
+import bee.creative.io.DZIPOutputStream;
 import bee.creative.util.AbstractList2;
 import bee.creative.util.HashMapOI;
 import bee.creative.util.List2;
@@ -273,11 +275,11 @@ public class KBBuffer extends KBState {
 		this.reset();
 	}
 
-	public void persist(ZIPDOS target) throws IOException {
+	public void persist(DZIPOutputStream target) throws IOException {
 		KBCodec.persistBuffer(target, this);
 	}
 
-	public void restore(ZIPDIS source) throws IOException, IllegalStateException {
+	public void restore(DZIPInputStream source) throws IOException, IllegalStateException {
 		KBCodec.restoreBuffer(source, this);
 	}
 
@@ -520,7 +522,7 @@ public class KBBuffer extends KBState {
 	}
 
 	private void insertAll(byte[] insertData) throws IOException {
-		ZIPDIS.inflate(insertData, zipdis -> {
+		KBCodec.inflate(insertData, zipdis -> {
 			var inserts = new KBState();
 			KBCodec.restoreState(zipdis, inserts, this::insertEdge, this::insertValue);
 			this.indexRef = inserts.indexRef;
@@ -531,7 +533,7 @@ public class KBBuffer extends KBState {
 	}
 
 	private void deleteAll(byte[] insertData) throws IOException {
-		ZIPDIS.inflate(insertData, zipdis -> {
+		KBCodec.inflate(insertData, zipdis -> {
 			var deletes = new KBState();
 			KBCodec.restoreState(zipdis, deletes, this::deleteEdge, this::deleteValue);
 			return deletes;

@@ -8,6 +8,8 @@ import java.io.FileOutputStream;
 import bee.creative.csv.CSVReader;
 import bee.creative.csv.CSVWriter;
 import bee.creative.fem.FEMString;
+import bee.creative.io.DZIPInputStream;
+import bee.creative.io.DZIPOutputStream;
 import bee.creative.lang.Integers;
 import bee.creative.util.HashMapOI;
 
@@ -26,9 +28,9 @@ public class TEST_RES_SETUP {
 
 	public TEST_RES_SETUP() throws Exception {
 		var root = new File("res\\DT");
-		try (var csv = CSVReader.from(new File(root, "SRC.csv"))) {
-			try (var edge = CSVWriter.from(new File(root, "EDGE.csv"))) {
-				try (var textFile = this.textFile = CSVWriter.from(new File(root, "TEXT.csv"))) {
+		try (var csv = CSVReader.csvReaderFrom(new File(root, "SRC.csv"))) {
+			try (var edge = CSVWriter.csvWriterFrom(new File(root, "EDGE.csv"))) {
+				try (var textFile = this.textFile = CSVWriter.csvWriterFrom(new File(root, "TEXT.csv"))) {
 					for (var e = csv.readEntry(); e != null; e = csv.readEntry()) {
 						var sourceRef = this.putNode(e[0]);
 						var relationRef = this.putNode(e[1]);
@@ -39,13 +41,13 @@ public class TEST_RES_SETUP {
 					this.printState(this.buffer);
 					System.err.print("persist: ");
 					testRun(() -> {
-						try (var zipdos = new ZIPDOS(new FileOutputStream(new File(root, "RES.kbf")))) {
+						try (var zipdos = new DZIPOutputStream(new FileOutputStream(new File(root, "RES.kbf")))) {
 							KBCodec.persistState(zipdos,buffer);
 						}
 					});
 					System.err.print("restore: ");
 					var r = testCall(() -> {
-						try (var zipdis = new ZIPDIS(new FileInputStream(new File(root, "RES.kbf")))) {
+						try (var zipdis = new DZIPInputStream(new FileInputStream(new File(root, "RES.kbf")))) {
 							return KBCodec.restoreState(zipdis);
 						}
 					});

@@ -1,16 +1,24 @@
 package bee.creative.kb;
 
+import static bee.creative.io.IO.byteReaderFrom;
+import static java.nio.ByteOrder.nativeOrder;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.ByteOrder;
+import java.util.zip.Deflater;
 import bee.creative.fem.FEMString;
+import bee.creative.io.DZIPInputStream;
+import bee.creative.io.DZIPOutputStream;
 import bee.creative.kb.KBBuffer.History;
 
 class KBCodec {
 
 	public static byte[] persistState(KBState source) throws IOException {
-		return ZIPDOS.deflate(target -> KBCodec.persistState(target, source));
+		return deflate(target -> KBCodec.persistState(target, source));
 	}
 
-	public static void persistState(ZIPDOS target, KBState source) throws IOException {
+	public static void persistState(DZIPOutputStream target, KBState source) throws IOException {
 		synchronized (source) {
 			target.writeInt(KBCodec.STATE_MAGIC);
 			KBCodec.persistRefs(target, source);
@@ -19,7 +27,7 @@ class KBCodec {
 		}
 	}
 
-	public static void persistBuffer(ZIPDOS target, KBBuffer source) throws IOException {
+	public static void persistBuffer(DZIPOutputStream target, KBBuffer source) throws IOException {
 		var that = new KBBuffer();
 		synchronized (source) {
 			that.reset(source.getBackup());
@@ -34,7 +42,7 @@ class KBCodec {
 		KBCodec.persistHistory(target, that.redoHistory);
 	}
 
-	public static KBBuffer restoreBuffer(ZIPDIS source) throws IOException {
+	public static KBBuffer restoreBuffer(DZIPInputStream source) throws IOException {
 		var header = source.readInt(1);
 		if (header[0] != KBCodec.BUFFER_MAGIC) throw new IOException();
 		var result = new KBBuffer();
@@ -46,7 +54,7 @@ class KBCodec {
 		return result;
 	}
 
-	public static void restoreBuffer(ZIPDIS source, KBBuffer target) throws IOException {
+	public static void restoreBuffer(DZIPInputStream source, KBBuffer target) throws IOException {
 		var result = restoreBuffer(source);
 		synchronized (target) {
 			if (target.hasBackup()) throw new IllegalStateException();
@@ -57,11 +65,11 @@ class KBCodec {
 	}
 
 	public static KBState restoreState(byte[] source) throws IOException {
-		return ZIPDIS.inflate(source, KBCodec::restoreState);
+		return inflate(source, KBCodec::restoreState);
 	}
 
-	/** Diese Methode liefert einen neuen {@link KBState Wissensstand} zur gegebenen {@link #persistState(ZIPDOS, KBState) Wissensabschrift}. */
-	public static KBState restoreState(ZIPDIS source) throws IOException {
+	/** Diese Methode liefert einen neuen {@link KBState Wissensstand} zur gegebenen {@link #persistState(DZIPOutputStream, KBState) Wissensabschrift}. */
+	public static KBState restoreState(DZIPInputStream source) throws IOException {
 		var header = source.readInt(1);
 		if (header[0] != KBCodec.STATE_MAGIC) throw new IOException();
 		var result = new KBState();
@@ -71,7 +79,7 @@ class KBCodec {
 		return result;
 	}
 
-	static void restoreState(ZIPDIS source, KBState target, KBEdgesTask edgeTask, KBValuesTask valueTask) throws IOException {
+	static void restoreState(DZIPInputStream source, KBState target, KBEdgesTask edgeTask, KBValuesTask valueTask) throws IOException {
 		KBCodec.restoreRefs(source, target);
 		KBCodec.restoreEdges(source, edgeTask);
 		KBCodec.restoreValues(source, valueTask);
@@ -81,11 +89,11 @@ class KBCodec {
 
 	private static final int BUFFER_MAGIC = 0xCBFFB001;
 
-	private static void persistRefs(ZIPDOS target, KBState source) throws IOException {
+	private static void persistRefs(DZIPOutputStream target, KBState source) throws IOException {
 		target.writeInt(source.indexRef, source.internalRef, source.externalRef);
 	}
 
-	private static void persistEdges(ZIPDOS target, KBState source) throws IOException {
+	private static void persistEdges(DZIPOutputStream target, KBState source) throws IOException {
 		var LIMIT = 1024 * 1024;
 		var cursor = new int[]{LIMIT};
 		var sourceMap = new Object[][]{REFMAP.EMPTY};
@@ -114,7 +122,7 @@ class KBCodec {
 	 * {@code (count: int, sourceCount: int, (sourceRef: int, targetRefCount: int, targetSetCount: int, (targetRef: int, relationRef: int)[targetRefCount], (relationRef: int, targetCount: int, targetRef: int[targetCount])[targetSetCount])[sourceCount])}
 	 *
 	 * @return */
-	private static boolean persistEdgesBlock(ZIPDOS target, Object[] sourceMap) throws IOException {
+	private static boolean persistEdgesBlock(DZIPOutputStream target, Object[] sourceMap) throws IOException {
 		var count = 1;
 		var sourceCount = 0;
 		for (var sourceIdx = sourceMap.length - 1; 0 < sourceIdx; sourceIdx--) {
@@ -206,7 +214,7 @@ class KBCodec {
 		return sourceCount != 0;
 	}
 
-	private static void persistValues(ZIPDOS target, KBState source) throws IOException {
+	private static void persistValues(DZIPOutputStream target, KBState source) throws IOException {
 		var LIMIT = 256;
 		var cursor = new int[]{LIMIT};
 		var buffer = new KBValue[LIMIT];
@@ -231,7 +239,7 @@ class KBCodec {
 	}
 
 	/** Diese Methode persistiert die Textwete ab der gegebenen Position bis zum Listenende und liefert nur dann {@code true}, wenn dies nicht {@code 0} sind. */
-	private static boolean persistValuesBlock(ZIPDOS result, KBValue[] source, int offset) throws IOException {
+	private static boolean persistValuesBlock(DZIPOutputStream result, KBValue[] source, int offset) throws IOException {
 		var count = source.length - offset;
 		result.writeInt(count);
 		if (count == 0) return false;
@@ -247,7 +255,7 @@ class KBCodec {
 		return true;
 	}
 
-	static void persistHistory(ZIPDOS target, History source) throws IOException {
+	static void persistHistory(DZIPOutputStream target, History source) throws IOException {
 		var limit = source.getLimit();
 		target.writeInt(limit);
 		if (limit == 0) return;
@@ -260,22 +268,22 @@ class KBCodec {
 		}
 	}
 
-	private static void restoreRefs(ZIPDIS source, KBState target) throws IOException {
+	private static void restoreRefs(DZIPInputStream source, KBState target) throws IOException {
 		var refs = source.readInt(3);
 		target.indexRef = refs[0];
 		target.internalRef = refs[1];
 		target.externalRef = refs[2];
 	}
 
-	private static void restoreEdges(ZIPDIS source, KBState result) throws IOException {
+	private static void restoreEdges(DZIPInputStream source, KBState result) throws IOException {
 		KBCodec.restoreEdges(source, result::insertEdgeNow);
 	}
 
-	private static void restoreEdges(ZIPDIS source, KBEdgesTask task) throws IOException {
+	private static void restoreEdges(DZIPInputStream source, KBEdgesTask task) throws IOException {
 		while (KBCodec.restoreEdgesBlock(source, task)) {}
 	}
 
-	private static boolean restoreEdgesBlock(ZIPDIS source, KBEdgesTask task) throws IOException {
+	private static boolean restoreEdgesBlock(DZIPInputStream source, KBEdgesTask task) throws IOException {
 		var count = source.readInt(1)[0];
 		var index = 0;
 		var array = source.readInt(count);
@@ -302,7 +310,7 @@ class KBCodec {
 		return true;
 	}
 
-	private static void restoreValues(ZIPDIS source, KBState target) throws IOException {
+	private static void restoreValues(DZIPInputStream source, KBState target) throws IOException {
 		target.valueRefMap.allocate(65536);
 		target.valueStrMap.allocate(65536);
 		KBCodec.restoreValues(source, (valueRef, valueStr) -> {
@@ -313,11 +321,11 @@ class KBCodec {
 		target.valueStrMap.pack();
 	}
 
-	private static void restoreValues(ZIPDIS source, KBValuesTask task) throws IOException {
+	private static void restoreValues(DZIPInputStream source, KBValuesTask task) throws IOException {
 		while (KBCodec.restoreValuesBlock(source, task)) {}
 	}
 
-	private static boolean restoreValuesBlock(ZIPDIS source, KBValuesTask task) throws IOException {
+	private static boolean restoreValuesBlock(DZIPInputStream source, KBValuesTask task) throws IOException {
 		var count = source.readInt(1)[0];
 		if (count == 0) return false;
 		var refArray = source.readInt(count);
@@ -328,8 +336,55 @@ class KBCodec {
 		return true;
 	}
 
-	static void restoreHistory(ZIPDIS source, History target) throws IOException {
+	static void restoreHistory(DZIPInputStream source, History target) throws IOException {
 		// TODO
+	}
+
+	public static <T> T inflate(byte[] source, RESTORE<T> task) throws IOException {
+		return inflate(source, nativeOrder(), task);
+	}
+
+	public static <T> T inflate(byte[] source, ByteOrder order, RESTORE<T> task) throws IOException {
+		try (var dzipReader = byteReaderFrom(source).asDzipReader(order)) {
+			return task.restore(dzipReader);
+		}
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #deflate(int, ByteOrder, PERSIST) deflate(Deflater.DEFAULT_COMPRESSION, ByteOrder.nativeOrder(), task)}. */
+	public static byte[] deflate(PERSIST task) throws IOException {
+		return deflate(Deflater.DEFAULT_COMPRESSION, ByteOrder.nativeOrder(), task);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #deflate(int, ByteOrder, PERSIST) deflate(level, ByteOrder.nativeOrder(), task)}. */
+	public static byte[] deflate(int level, PERSIST task) throws IOException {
+		return deflate(level, ByteOrder.nativeOrder(), task);
+	}
+
+	/** Diese Methode erzeugt einen neuen {@link DZIPOutputStream} mit der gegebenen Kompressionsstufe {@code level} ({@link Deflater#DEFAULT_COMPRESSION},
+	 * {@link Deflater#NO_COMPRESSION}..{@link Deflater#BEST_COMPRESSION}) und der gegebenen Bytereihenfolge mit {@code order} auf Basis eines
+	 * {@link ByteArrayOutputStream}, ruft damit die gegebene Funktion {@code task} auf und liefert schließlich die dadurch erzeugte Bytefolge.
+	 *
+	 * @see PERSIST#persist(DZIPOutputStream)
+	 * @see DZIPOutputStream#DZIPOutputStream(OutputStream, int, ByteOrder)
+	 * @see ByteArrayOutputStream#toByteArray() */
+	public static byte[] deflate(int level, ByteOrder order, PERSIST task) throws IOException {
+		try (var result = new ByteArrayOutputStream(1 << 16); var target = new DZIPOutputStream(result, level, order)) {
+			task.persist(target);
+			target.flush();
+			return result.toByteArray();
+		}
+	}
+
+	public interface RESTORE<T> {
+
+		T restore(DZIPInputStream source) throws IOException;
+
+	}
+
+	public interface PERSIST {
+
+		void persist(DZIPOutputStream target) throws IOException;
+
 	}
 
 }
