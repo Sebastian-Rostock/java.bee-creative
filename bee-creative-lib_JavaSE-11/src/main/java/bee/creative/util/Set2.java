@@ -11,30 +11,30 @@ public interface Set2<E> extends Set<E>, Collection2<E> {
 	@Override
 	Iterator2<E> iterator();
 
-	/** Diese Methode ist eine Abkürzung für {@link Collections#union(Set, Set) Collections.union(this, that)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Collections#unionSet(Set, Set) Collections.union(this, that)}. */
 	default Set2<E> union(Set<? extends E> that) throws NullPointerException {
-		return Collections.union(this, that);
+		return Collections.unionSet(this, that);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Collections#except(Set, Set) Collections.except(this, that)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Collections#exceptSet(Set, Set) Collections.except(this, that)}. */
 	default Set2<E> except(Set<? extends E> that) throws NullPointerException {
-		return Collections.except(this, that);
+		return Collections.exceptSet(this, that);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Collections#intersect(Set, Set) Collections.intersect(this, that)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Collections#intersectSet(Set, Set) Collections.intersect(this, that)}. */
 	default Set2<E> intersect(Set<? extends E> that) throws NullPointerException {
-		return Collections.intersect(this, that);
+		return Collections.intersectSet(this, that);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Collections#cartesian(Set, Set) Collections.cartesian(this, that)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Collections#cartesianSet(Set, Set) Collections.cartesian(this, that)}. */
 	default <E2> Set2<Entry<E, E2>> cartesian(Set<? extends E2> that) throws NullPointerException {
-		return Collections.cartesian(this, that);
+		return Collections.cartesianSet(this, that);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Collections#translate(Set, Translator) Collections.translate(this, trans)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Collections#translatedSet(Set, Translator) Collections.translate(this, trans)}. */
 	@Override
 	default <E2> Set2<E2> translate(Translator<E, E2> trans) throws NullPointerException {
-		return Collections.translate(this, trans);
+		return Collections.translatedSet(this, trans);
 	}
 
 }

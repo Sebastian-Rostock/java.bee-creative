@@ -10,25 +10,25 @@ public interface List2<E> extends List<E>, Collection2<E> {
 	@Override
 	Iterator2<E> iterator();
 
-	/** Diese Methode ist eine Abkürzung für {@link Collections#reverse(List) Collections.reverse(this)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Collections#reversedList(List) Collections.reverse(this)}. */
 	default List2<E> reverse() throws NullPointerException {
-		return Collections.reverse(this);
+		return Collections.reversedList(this);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Collections#concat(List, List, boolean) Collections.concat(this, that, true)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Collections#concatList(List, List, boolean) Collections.concat(this, that, true)}. */
 	default List2<E> concat(List<E> that) throws NullPointerException {
-		return Collections.concat(this, that, true);
+		return Collections.concatList(this, that, true);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Collections#concat(List, List, boolean) Collections.concat(this, that, extendMode)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Collections#concatList(List, List, boolean) Collections.concat(this, that, extendMode)}. */
 	default List2<E> concat(List<E> that, boolean extendMode) throws NullPointerException {
-		return Collections.concat(this, that, extendMode);
+		return Collections.concatList(this, that, extendMode);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Collections#translate(List, Translator) Collections#translate(this, trans)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Collections#translatedList(List, Translator) Collections#translate(this, trans)}. */
 	@Override
 	default <E2> List2<E2> translate(Translator<E, E2> trans) throws NullPointerException {
-		return Collections.translate(this, trans);
+		return Collections.translatedList(this, trans);
 	}
 
 }

@@ -488,7 +488,7 @@ public class Builders {
 		 * @param items zweite Menge.
 		 * @return neuer {@link SetBuilder} zum {@link UnionSet}. */
 		public ItemSetBuilder<GItem> toUnited(Set<? extends GItem> items) {
-			return SetBuilder.from(bee.creative.util.Collections.<GItem>union(this.get(), items));
+			return SetBuilder.from(bee.creative.util.Collections.<GItem>unionSet(this.get(), items));
 		}
 
 		/** Diese Methode gibt einen neuen {@link SetBuilder} für das Kartesische Produkt dieser {@link #get() Menge} und der gegebenen Menge zurück.
@@ -497,7 +497,7 @@ public class Builders {
 		 * @param items zweite Menge.
 		 * @return neuer {@link SetBuilder} zum {@link CartesianSet}. */
 		public <GItem2> ItemSetBuilder<Entry<GItem, GItem2>> toCrossed(Set<? extends GItem2> items) {
-			return SetBuilder.from(bee.creative.util.Collections.cartesian(this.get(), items));
+			return SetBuilder.from(bee.creative.util.Collections.cartesianSet(this.get(), items));
 		}
 
 		/** Diese Methode gibt einen neuen {@link SetBuilder} für die Schnittmenge dieser {@link #get() Menge} und der gegebenen Menge zurück.
@@ -505,7 +505,7 @@ public class Builders {
 		 * @param items zweite Menge.
 		 * @return neuer {@link SetBuilder} zum {@link IntersectSet}. */
 		public ItemSetBuilder<GItem> toIntersected(Set<? extends GItem> items) {
-			return SetBuilder.from(bee.creative.util.Collections.intersect(this.get(), items));
+			return SetBuilder.from(bee.creative.util.Collections.intersectSet(this.get(), items));
 		}
 
 		/** Diese Methode gibt einen neuen {@link SetBuilder} für die datentypsichere {@link #get() Menge} zurück.
@@ -523,7 +523,7 @@ public class Builders {
 		 * @param itemTranslator {@link Translator} zur Übersetzung der Elemente.
 		 * @return neuer {@link SetBuilder} zum {@link TranslatedSet}. */
 		public <GItem2> ItemSetBuilder<GItem2> toTranslated(Translator<GItem, GItem2> itemTranslator) {
-			return SetBuilder.from(bee.creative.util.Collections.translate(this.get(), itemTranslator));
+			return SetBuilder.from(bee.creative.util.Collections.translatedSet(this.get(), itemTranslator));
 		}
 
 		/** Diese Methode gibt einen neuen {@link SetBuilder} für die threadsichere {@link #get() Menge} zurück.
@@ -656,7 +656,7 @@ public class Builders {
 		 *
 		 * @return neuer {@link ListBuilder} zur {@link ReverseList}. */
 		public ItemListBuilder<GItem> toReverse() {
-			return ListBuilder.from(bee.creative.util.Collections.reverse(this.get()));
+			return ListBuilder.from(bee.creative.util.Collections.reversedList(this.get()));
 		}
 
 		/** Diese Methode gibt einen neuen {@link ListBuilder} für die Verkettung dieser {@link #get() Liste} mit der gegebenen zurück.
@@ -664,7 +664,7 @@ public class Builders {
 		 * @param items zweite Liste.
 		 * @return neuer {@link ListBuilder} zur {@link ConcatList}. */
 		public ItemListBuilder<GItem> toChained(List<GItem> items) {
-			return ListBuilder.from(bee.creative.util.Collections.concat(this.get(), items));
+			return ListBuilder.from(bee.creative.util.Collections.concatList(this.get(), items));
 		}
 
 		/** Diese Methode gibt einen neuen {@link ListBuilder} für die Verkettung dieser {@link #get() Liste} mit der gegebenen zurück.
@@ -673,7 +673,7 @@ public class Builders {
 		 * @param extendMode Erweiterungsmodus.
 		 * @return neuer {@link ListBuilder} zur {@link ConcatList}. */
 		public ItemListBuilder<GItem> toChained(List<GItem> items, boolean extendMode) {
-			return ListBuilder.from(bee.creative.util.Collections.concat(this.get(), items, extendMode));
+			return ListBuilder.from(bee.creative.util.Collections.concatList(this.get(), items, extendMode));
 		}
 
 		/** Diese Methode gibt einen neuen {@link ListBuilder} für die datentypsichere {@link #get() Liste} zurück.
@@ -691,7 +691,7 @@ public class Builders {
 		 * @param itemTranslator {@link Translator} zur Übersetzung der Elemente.
 		 * @return neuer {@link ListBuilder} zur {@link TranslatedList}. */
 		public <GItem2> ItemListBuilder<GItem2> toTranslated(Translator<GItem, GItem2> itemTranslator) {
-			return ListBuilder.from(bee.creative.util.Collections.translate(this.get(), itemTranslator));
+			return ListBuilder.from(bee.creative.util.Collections.translatedList(this.get(), itemTranslator));
 		}
 
 		/** Diese Methode gibt einen neuen {@link ListBuilder} für die threadsichere {@link #get() Liste} zurück.
@@ -855,14 +855,14 @@ public class Builders {
 
 		/** Diese Methode gibt einen neuen {@link MapBuilder} zur übersetzten {@link #get() Abbildung} zurück.
 		 *
-		 * @see bee.creative.util.Collections#translate(Map, Translator, Translator)
+		 * @see bee.creative.util.Collections#translatedMap(Map, Translator, Translator)
 		 * @param <GKey2> Typ der übersetzten Schlüssel.
 		 * @param <GValue2> Typ der übersetzten Werte.
 		 * @param keyTranslator {@link Translator} zur Übersetzung der Schlüssel.
 		 * @param valueTranslator {@link Translator} zur Übersetzung der Werte.
 		 * @return neuer {@link MapBuilder} zur {@code translatedMap}. */
 		public <GKey2, GValue2> ItemMapBuilder<GKey2, GValue2> toTranslated(Translator<GKey, GKey2> keyTranslator, Translator<GValue, GValue2> valueTranslator) {
-			return MapBuilder.from(bee.creative.util.Collections.translate(this.get(), keyTranslator, valueTranslator));
+			return MapBuilder.from(bee.creative.util.Collections.translatedMap(this.get(), keyTranslator, valueTranslator));
 		}
 
 		/** Diese Methode gibt einen neuen {@link MapBuilder} zur threadsicheren {@link #get() Abbildung} zurück.

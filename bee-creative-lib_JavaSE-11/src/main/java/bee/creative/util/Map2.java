@@ -30,9 +30,9 @@ public interface Map2<K, V> extends Map<K, V>, Getter<Object, V>, Setter<K, V> {
 		items.forEach(item -> this.put(asKey.get(item), asValue.get(item)));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Collections#translate(Map, Translator, Translator) Collections#translate(this, keyTrans, valueTrans)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Collections#translatedMap(Map, Translator, Translator) Collections#translate(this, keyTrans, valueTrans)}. */
 	default <K2, V2> Map3<K2, V2> translate(Translator<K, K2> keyTrans, Translator<V, V2> valueTrans) throws NullPointerException {
-		return Collections.translate(this, keyTrans, valueTrans);
+		return Collections.translatedMap(this, keyTrans, valueTrans);
 	}
 
 }
