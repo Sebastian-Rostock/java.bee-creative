@@ -21,10 +21,10 @@ import bee.creative.lang.Runnable2;
 public class Tester {
 
 	/** Dieses Feld speichert den {@link Comparator} zu {@link #usedTime}. */
-	public static final Comparator2<Tester> USED_TIME_ORDER = (tester1, tester2) -> compare(tester1.usedTime, tester2.usedTime);
+	public static final Comparator3<Tester> USED_TIME_ORDER = (tester1, tester2) -> compare(tester1.usedTime, tester2.usedTime);
 
 	/** Dieses Feld speichert den {@link Comparator} zu {@link #usedMemory}. */
-	public static final Comparator2<Tester> USED_MEMORY_ORDER = (tester1, tester2) -> compare(tester1.usedMemory, tester2.usedMemory);
+	public static final Comparator3<Tester> USED_MEMORY_ORDER = (tester1, tester2) -> compare(tester1.usedMemory, tester2.usedMemory);
 
 	/** Diese Methode erzeugt den {@link Tester} zu {@code task.run()} und gibt ihn über {@link System#err} aus. Wenn sein {@link #cause} nicht {@code null} ist,
 	 * wird diese ebenfalls darüber ausgegeben.

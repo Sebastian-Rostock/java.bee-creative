@@ -1192,7 +1192,7 @@ public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable<FE
 
 	@Override
 	public Iterator2<FEMValue> iterator() {
-		return Iterators.fromArray(this, 0, this.length);
+		return Iterators.iteratorFromArray(this, 0, this.length);
 	}
 
 	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn die lexikographische Ordnung dieser Wertliste kleiner, gleich oder größer als die

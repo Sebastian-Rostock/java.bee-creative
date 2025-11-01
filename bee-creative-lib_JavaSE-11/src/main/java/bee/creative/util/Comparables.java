@@ -45,7 +45,7 @@ public class Comparables {
 	@SuppressWarnings ("unchecked")
 	public static <T> Comparable3<T> comparableFrom(Comparable<? super T> that) {
 		notNull(that);
-		if (that instanceof Comparable2<?>) return ((Comparable2<T>)that).asComparable();
+		if (that instanceof Comparable3<?>) return (Comparable3<T>)that;
 		return item -> that.compareTo(item);
 	}
 
@@ -58,21 +58,21 @@ public class Comparables {
 
 	/** Diese Methode liefert einen {@link Filter}, der nur die Datensätze akzeptiert, deren Ordnung gleiche der des gegebenen {@link Comparable} ist. Die
 	 * Akzeptanz eines Datensatzes {@code item} ist {@code that.compareTo(item) == 0}. */
-	public static <T> Filter3<T> comparableToEqFilter(Comparable<? super T> that) throws NullPointerException {
+	public static <T> Filter3<T> comparableAsEqFilter(Comparable<? super T> that) throws NullPointerException {
 		Objects.notNull(that);
 		return (item) -> that.compareTo(item) == 0;
 	}
 
 	/** Diese Klasse liefert einen {@link Filter}, der nur die Datensätze akzeptiert, deren Ordnung kleiner als die des gegebenen {@link Comparable} ist. Die
 	 * Akzeptanz eines Datensatzes {@code item} ist {@code that.compareTo(item) > 0}. */
-	public static <T> Filter3<T> comparableToLtFilter(Comparable<? super T> that) throws NullPointerException {
+	public static <T> Filter3<T> comparableAsLtFilter(Comparable<? super T> that) throws NullPointerException {
 		Objects.notNull(that);
 		return (item) -> that.compareTo(item) > 0;
 	}
 
 	/** Diese Klasse liefert einen {@link Filter}, der nur die Datensätze akzeptiert, deren Ordnung kleiner als die oder gleich der des gegebenen
 	 * {@link Comparable} ist. Die Akzeptanz eines Datensatzes {@code item} ist {@code that.compareTo(item) >= 0}. */
-	public static <T> Filter3<T> comparableToLtEqFilter(Comparable<? super T> that) throws NullPointerException {
+	public static <T> Filter3<T> comparableAsLtEqFilter(Comparable<? super T> that) throws NullPointerException {
 		Objects.notNull(that);
 		return (item) -> that.compareTo(item) >= 0;
 	}
@@ -81,7 +81,7 @@ public class Comparables {
 	 * Akzeptanz eines Datensatzes {@code item} ist {@code that.compareTo(item) < 0}.
 	 *
 	 * @param <T> Typ der Datensätze. */
-	public static <T> Filter3<T> comparableToGtFilter(Comparable<? super T> that) throws NullPointerException {
+	public static <T> Filter3<T> comparableAsGtFilter(Comparable<? super T> that) throws NullPointerException {
 		Objects.notNull(that);
 		return (item) -> that.compareTo(item) < 0;
 	}
@@ -90,7 +90,7 @@ public class Comparables {
 	 * {@link Comparable} ist. Die Akzeptanz eines Datensatzes {@code item} ist {@code that.compareTo(item) <= 0}.
 	 *
 	 * @param <T> Typ der Datensätze. */
-	public static <T> Filter3<T> comparableToGtEqFilter(Comparable<? super T> that) throws NullPointerException {
+	public static <T> Filter3<T> comparableAsGtEqFilter(Comparable<? super T> that) throws NullPointerException {
 		Objects.notNull(that);
 		return (item) -> that.compareTo(item) <= 0;
 	}
@@ -107,8 +107,8 @@ public class Comparables {
 		notNull(that1);
 		notNull(that2);
 		return item -> {
-			var order = that1.compareTo(item);
-			if (order != 0) return order;
+			var result = that1.compareTo(item);
+			if (result != 0) return result;
 			return that2.compareTo(item);
 		};
 	}
@@ -128,11 +128,17 @@ public class Comparables {
 		return item -> that.compareTo(trans.get(item));
 	}
 
-	/** Diese Methode liefert ein {@link Comparable3}, welches {@code null}-Eingaben als minimal betrachtet und alle anderen Eingaben an das gegebene
-	 * {@link Comparable} delegiert. Der Navigationswert für eine Eingaben {@code item} ist {@code ((item == null) ? 1 : that.compareTo(item))}. */
+	/** Diese Methode ist eine Abkürzung für {@link #optionalizedComparable(Comparable, boolean) optionalizedComparable(that, true)}. */
 	public static <T> Comparable3<T> optionalizedComparable(Comparable<? super T> that) throws NullPointerException {
+		return optionalizedComparable(that, true);
+	}
+
+	/** Diese Methode liefert ein {@link Comparable3}, das den {@link Comparable3#compareTo(Object) Navigationswert} des gegebenen {@link Comparable} liefert,
+	 * sofern das abzugleichende Objekt nicht {@code null} ist. Andernfalls wird {@code null} abhängig von {@code first} als kleinster ({@code true}) bzw. größter
+	 * ({@code false}) Wert erkannt. */
+	public static <T> Comparable3<T> optionalizedComparable(Comparable<? super T> that, boolean first) throws NullPointerException {
 		notNull(that);
-		return item -> item == null ? 1 : that.compareTo(item);
+		return first ? (item -> item == null ? 1 : that.compareTo(item)) : (item -> item == null ? -1 : that.compareTo(item));
 	}
 
 	/** Diese Methode führt auf dem gegebenen Array eine binäre Suche mit dem gegebenen {@link Comparable} als Suchkriterium aus und gibt die Position des ersten
@@ -495,31 +501,31 @@ public class Comparables {
 		return -from - 2;
 	}
 
-	static final Comparable3<?> neutralComparable = item -> 0;
+	private static final Comparable3<?> neutralComparable = item -> 0;
 
-	static void checkOrder(int fromIndex, int toIndex) throws IllegalArgumentException {
+	private static void checkOrder(int fromIndex, int toIndex) throws IllegalArgumentException {
 		if (fromIndex > toIndex) throw new IllegalArgumentException("fromIndex > toIndex");
 	}
 
-	static void checkRange(int length, int fromIndex, int toIndex) throws IllegalArgumentException, IndexOutOfBoundsException {
+	private static void checkRange(int length, int fromIndex, int toIndex) throws IllegalArgumentException, IndexOutOfBoundsException {
 		checkOrder(fromIndex, toIndex);
 		if (fromIndex < 0) throw new IndexOutOfBoundsException("fromIndex < 0");
 		if (toIndex > length) throw new IndexOutOfBoundsException("toIndex > length");
 	}
 
-	static void checkArray(Array<?> items, Comparable<?> comparable, int fromIndex, int toIndex) throws NullPointerException, IllegalArgumentException {
-		notNull(items);
-		notNull(comparable);
-		checkOrder(fromIndex, toIndex);
-	}
-
-	static void checkList(List<?> items, Comparable<?> comparable, int fromIndex, int toIndex)
+	private static void checkList(List<?> items, Comparable<?> comparable, int fromIndex, int toIndex)
 		throws NullPointerException, IllegalArgumentException, IndexOutOfBoundsException {
 		notNull(comparable);
 		checkRange(items.size(), fromIndex, toIndex);
 	}
 
-	static void checkItems(Object[] items, Comparable<?> comparable, int fromIndex, int toIndex)
+	private static void checkArray(Array<?> items, Comparable<?> comparable, int fromIndex, int toIndex) throws NullPointerException, IllegalArgumentException {
+		notNull(items);
+		notNull(comparable);
+		checkOrder(fromIndex, toIndex);
+	}
+
+	private static void checkItems(Object[] items, Comparable<?> comparable, int fromIndex, int toIndex)
 		throws NullPointerException, IllegalArgumentException, IndexOutOfBoundsException {
 		notNull(comparable);
 		checkRange(items.length, fromIndex, toIndex);

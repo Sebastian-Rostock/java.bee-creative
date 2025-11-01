@@ -10,27 +10,7 @@ import static bee.creative.util.Translators.synchronizedTranslator;
  * @author [cc-by] 2021 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <S> Typ der Quellobjekte.
  * @param <T> Typ der Zielobjekte. */
-public interface Translator3<S, T> extends Translator2<S, T> {
-
-	/** Diese Methode liefert den {@link Filter3} zu {@link #isTarget(Object)}. */
-	default Filter3<Object> isTarget() {
-		return item -> this.isTarget(item);
-	}
-
-	/** Diese Methode liefert den {@link Filter3} zu {@link #isSource(Object)}. */
-	default Filter3<Object> isSource() {
-		return item -> this.isSource(item);
-	}
-
-	/** Diese Methode liefert den {@link Getter3} zu {@link #toTarget(Object)}. */
-	default Getter3<Object, T> toTarget() {
-		return item -> this.toTarget(item);
-	}
-
-	/** Diese Methode liefert den {@link Getter3} zu {@link #toSource(Object)}. */
-	default Getter3<Object, S> toSource() {
-		return item -> this.toSource(item);
-	}
+public interface Translator3<S, T> extends Translator<S, T> {
 
 	/** Diese Methode ist eine Abkürzung für {@link Translators#concatTranslator(Translator, Translator) concatTranslator(this, trans)}. */
 	default <GTarget2> Translator3<S, GTarget2> concat(Translator<T, GTarget2> trans) throws NullPointerException {
@@ -57,9 +37,24 @@ public interface Translator3<S, T> extends Translator2<S, T> {
 		return synchronizedTranslator(this, mutex);
 	}
 
-	@Override
-	default Translator3<S, T> asTranslator() {
-		return this;
+	/** Diese Methode liefert den {@link Filter3} zu {@link #isTarget(Object)}. */
+	default Filter3<Object> asTargetFilter() {
+		return item -> this.isTarget(item);
+	}
+
+	/** Diese Methode liefert den {@link Filter3} zu {@link #isSource(Object)}. */
+	default Filter3<Object> asSourceFilter() {
+		return item -> this.isSource(item);
+	}
+
+	/** Diese Methode liefert den {@link Getter3} zu {@link #toTarget(Object)}. */
+	default Getter3<Object, T> asTargetGetter() {
+		return item -> this.toTarget(item);
+	}
+
+	/** Diese Methode liefert den {@link Getter3} zu {@link #toSource(Object)}. */
+	default Getter3<Object, S> asSourceGetter() {
+		return item -> this.toSource(item);
 	}
 
 }

@@ -30,17 +30,17 @@ public interface DS {
 	/** Diese Methode liefert den zum gegebenen {@link QN#value() externen Textwert} hintelegten internen {@link QN Hyperknoten}. Dieser wird bei Bedarf erzeugt
 	 * und über die {@link QE Hyperkante} {@code ("", value, "", result)} registriert.
 	 *
-	 * @param value Textwert eines externen Hyperknoten.
+	 * @param ident Textwert eines externen Hyperknoten.
 	 * @return dem externen Hyperknoten zugeordneter interne Hyperknoten. */
-	QN install(String value) throws NullPointerException;
+	QN install(String ident) throws NullPointerException;
 
 	/** Diese Methode liefert die zum gegebenen {@link QN#value() externen Textwert} hintelegte änderbare Menge von {@link QN Hyperknoten}. Diese wird bei Bedarf
-	 * erzeugt. Die Menge wird über die {@link QE Hyperkanten} {@code ("", "", install(value), items)} registriert.
+	 * erzeugt. Die Menge wird über die {@link QE Hyperkanten} {@code ("", "", install(value), item)} registriert.
 	 *
 	 * @see #install(String)
-	 * @param value Textwert eines externen Hyperknoten.
+	 * @param ident Textwert eines externen Hyperknoten.
 	 * @return dem externen Hyperknoten zugeordnete interne Hyperknoten. */
-	Set2<QN> installSet(String value) throws NullPointerException;
+	Set2<QN> installSet(String ident) throws NullPointerException;
 
 	/** Diese Methode liefert den {@link Translators#optionalizedTranslator(Translator) optionalisierten} {@link DM#context() Kontextknoten}-{@link DM Datenmodell}-{@link Translator}. */
 	Translator3<QN, DM> modelTrans();

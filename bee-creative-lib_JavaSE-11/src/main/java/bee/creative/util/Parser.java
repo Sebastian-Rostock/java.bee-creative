@@ -1,7 +1,6 @@
 package bee.creative.util;
 
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import bee.creative.array.CompactIntegerArray;
@@ -95,14 +94,7 @@ public class Parser {
 		 * @param index Position.
 		 * @return {@link Comparable} für Endpositionen von Abschnitten. */
 		public static Comparable3<Token> endingAt(final int index) {
-			return new AbstractComparable<>() {
-
-				@Override
-				public int compareTo(final Token value) {
-					return Comparators.compare(index, value.end());
-				}
-
-			};
+			return value -> Comparators.compare(index, value.end());
 		}
 
 		/** Diese Methode gibt ein {@link Comparable} für Abschnitte zurück, welches deren {@link Token#start() Startposition} mit der gegebenen Position
@@ -115,14 +107,7 @@ public class Parser {
 		 * @param index Position.
 		 * @return {@link Comparable} für Startposition von Abschnitten. */
 		public static Comparable3<Token> startingAt(final int index) {
-			return new AbstractComparable<>() {
-
-				@Override
-				public int compareTo(final Token value) {
-					return Comparators.compare(index, value.start());
-				}
-
-			};
+			return value -> Comparators.compare(index, value.start());
 		}
 
 		/** Diese Methode liefert ein {@link Comparable3}, welches die Grenzen eines {@link Token Abschnitts} mit der gegebenen Position vergleicht und einen
@@ -133,14 +118,7 @@ public class Parser {
 		 * @param index Position.
 		 * @return {@link Comparable} für Startposition von Abschnitten. */
 		public static Comparable3<Token> containing(final int index) {
-			return new AbstractComparable<>() {
-
-				@Override
-				public int compareTo(final Token value) {
-					return index < value.start() ? -1 : index < value.end() ? 0 : +1;
-				}
-
-			};
+			return value -> index < value.start() ? -1 : index < value.end() ? 0 : +1;
 		}
 
 		/** Dieses Feld speichert die Eingabe. */

@@ -51,7 +51,7 @@ public interface Getter2<ITEM, VALUE> extends Getter<ITEM, VALUE> {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Comparators#translatedComparator(Comparator, Getter) translatedComparator(that, this)}. */
-	default Comparator2<ITEM> translate(Comparator<? super VALUE> that) {
+	default Comparator3<ITEM> translate(Comparator<? super VALUE> that) {
 		return translatedComparator(that, this);
 	}
 

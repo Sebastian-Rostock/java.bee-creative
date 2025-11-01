@@ -262,7 +262,7 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 
 		@Override
 		public Iterator2<FEMFunction> iterator() {
-			return Iterators.fromArray(this, 0, this.size());
+			return Iterators.iteratorFromArray(this, 0, this.size());
 		}
 
 		@Override

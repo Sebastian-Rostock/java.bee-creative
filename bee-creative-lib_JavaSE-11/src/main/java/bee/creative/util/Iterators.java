@@ -40,7 +40,7 @@ public class Iterators {
 		protected int index;
 
 		public ArrayIterator(final Array<? extends GItem> that, final int fromIndex, final int toIndex) throws NullPointerException, IllegalArgumentException {
-			Comparables.checkOrder(fromIndex, toIndex);
+			if (fromIndex > toIndex) throw new IllegalArgumentException("fromIndex > toIndex");
 			this.that = Objects.notNull(that);
 			this.fromIndex = fromIndex;
 			this.toIndex = toIndex;
@@ -616,8 +616,9 @@ public class Iterators {
 		return Iterables.iterableFromArray(items, fromIndex, toIndex).iterator();
 	}
 
+	
 	/** Diese Methode ist eine Abkürzung für {@link ArrayIterator new ArrayIterator<>(items, fromIndex, toIndex)}. */
-	public static <GItem> Iterator2<GItem> fromArray(final Array<? extends GItem> items, final int fromIndex, final int toIndex)
+	public static <GItem> Iterator2<GItem> iteratorFromArray(Array<? extends GItem> items, int fromIndex, int toIndex)
 		throws NullPointerException, IllegalArgumentException {
 		return new ArrayIterator<>(items, fromIndex, toIndex);
 	}

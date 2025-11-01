@@ -1,7 +1,7 @@
 package bee.creative.lang;
 
+import static bee.creative.util.Iterators.iteratorFromArray;
 import bee.creative.util.Iterator2;
-import bee.creative.util.Iterators;
 
 /** Diese Schnittstelle definiert ein {@link #iterator() iterierbares} und nur lesbares Array mit {@link #size() Längenangabe}.
  *
@@ -16,7 +16,7 @@ public interface Array2<T> extends Array<T>, Iterable<T> {
 
 	@Override
 	default Iterator2<T> iterator() {
-		return Iterators.fromArray(this, 0, this.size());
+		return iteratorFromArray(this, 0, this.size());
 	}
 
 }

@@ -39,7 +39,7 @@ public final class H2QT implements QT, UseToString {
 
 	@Override
 	public Iterator2<QN> iterator() {
-		return Iterators.fromArray(this, 0, this.size());
+		return Iterators.iteratorFromArray(this, 0, this.size());
 	}
 
 	@Override
