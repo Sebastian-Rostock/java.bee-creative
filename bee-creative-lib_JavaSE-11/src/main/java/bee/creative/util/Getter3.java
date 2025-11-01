@@ -13,7 +13,7 @@ import static bee.creative.util.Getters.emptyGetter;
 import static bee.creative.util.Getters.neutralGetter;
 import static bee.creative.util.Getters.optionalizedGetter;
 import static bee.creative.util.Getters.synchronizedGetter;
-import static bee.creative.util.Getters.RefMode.SOFT_REF_MODE;
+import static bee.creative.util.Getters.RefMode.SOFT_REF;
 import static bee.creative.util.Hashers.naturalHasher;
 import static bee.creative.util.Iterables.translatedIterable;
 import static bee.creative.util.Iterators.translatedIterator;
@@ -72,7 +72,7 @@ public interface Getter3<T, V> extends Getter<T, V> {
 
 	/** Diese Methode ist eine Abkürzung für {@link #buffer(RefMode, Hasher) this.buffer(SOFT_REF_MODE, naturalHasher())}. */
 	default Getter3<T, V> buffer() {
-		return this.buffer(SOFT_REF_MODE, naturalHasher());
+		return this.buffer(SOFT_REF, naturalHasher());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Getters#bufferedGetter(Getter, RefMode, Hasher) bufferedGetter(this, mode, hasher)}. */

@@ -84,15 +84,6 @@ public final class Fields {
 		return translateField(that, trans::toTarget, trans::toSource);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #fieldFrom(Getter, Setter) Fields.from(Getters.aggregate(that, getTrans), Setters.aggregate(that, setTrans))}.
-	 *
-	 * @see Getters#aggregatedGetter(Getter, Getter)
-	 * @see Setters#aggregatedSetter(Setter, Getter) */
-	public static <GEntry, GSource, GTarget> Field3<Iterable<? extends GEntry>, GTarget> aggregateField(final Field<? super GEntry, GSource> that,
-		final Getter<? super GSource, ? extends GTarget> getTrans, final Getter<? super GTarget, ? extends GSource> setTrans) throws NullPointerException {
-		return Fields.<Iterable<? extends GEntry>, GTarget>fieldFrom(Getters.aggregatedGetter(that, getTrans), Setters.aggregatedSetter(that, setTrans));
-	}
-
 	/** Diese Methode ist eine Abkürzung für {@link #fieldFrom(Getter, Setter) Fields.from(Getters.aggregate(that, getTrans, empty, mixed),
 	 * Setters.aggregate(that, setTrans))}.
 	 *

@@ -3,7 +3,7 @@ package bee.creative.util;
 import static bee.creative.util.Consumers.concatConsumer;
 import static bee.creative.util.Consumers.emptyConsumer;
 import static bee.creative.util.Getters.getterFromProducer;
-import static bee.creative.util.Getters.RefMode.SOFT_REF_MODE;
+import static bee.creative.util.Getters.RefMode.SOFT_REF;
 import static bee.creative.util.Hashers.naturalHasher;
 import static bee.creative.util.Producers.concatProducer;
 import static bee.creative.util.Producers.synchronizedProducer;
@@ -35,7 +35,7 @@ public interface Producer3<V> extends Producer<V> {
 
 	/** Diese Methode ist eine Abkürzung für {@link #buffer(RefMode, Hasher) this.buffer(SOFT_REF, naturalHasher())}. */
 	default Producer3<V> buffer() {
-		return this.buffer(SOFT_REF_MODE, naturalHasher());
+		return this.buffer(SOFT_REF, naturalHasher());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Getters#bufferedGetter(Getter, RefMode, Hasher) this.asGetter().buffer(mode, hasher).asProducer()}. */

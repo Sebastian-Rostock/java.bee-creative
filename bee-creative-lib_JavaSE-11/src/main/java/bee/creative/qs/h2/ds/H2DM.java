@@ -196,7 +196,7 @@ public class H2DM implements DM {
 		});
 		var identByNodeMap = new HashMap2<QN, String>(itemNodeByIdentNodeMap.size());
 		identLink.owner().newNodes(itemNodeByIdentNodeMap.keySet()).values(identByNodeMap::put);
-		var itemByNodeMap = HashMap2.from(Hashers.naturalHasher(), asItem);
+		var itemByNodeMap = HashMap2.hashMapFrom(Hashers.naturalHasher(), asItem);
 		itemNodeByIdentNodeMap.forEach((identNode, itemNode) -> itemByIdentMap.put(identByNodeMap.get(identNode), itemByNodeMap.install(itemNode)));
 	}
 

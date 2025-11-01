@@ -7,7 +7,6 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Map;
 import bee.creative.emu.EMU;
-import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert eine auf {@link AbstractHashMap} aufbauende {@link Map} mit beliebigen Schlüsselobjekten, Wertobjekten und geringem
  * {@link AbstractHashData Speicherverbrauch}. Das {@link #get(Object) Finden} von Einträgen benötigt ca. 75 % der Rechenzeit, die eine
@@ -18,77 +17,6 @@ import bee.creative.lang.Objects;
  * @param <GKey> Typ der Schlüssel.
  * @param <GValue> Typ der Werte. */
 public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> implements Serializable, Cloneable {
-
-	private static final long serialVersionUID = -8792297171308603896L;
-
-	/** Diese Methode ist eine Abkürzung für {@link #from(Hasher, Getter, Getter, Setter) HashMap.from(hasher, Getters.neutral(), Getters.empty(), null)}. */
-	public static <GKey, GValue> HashMap<GKey, GValue> from(final Hasher hasher) throws NullPointerException {
-		return HashMap.from(hasher, Getters.<GKey>neutralGetter(), Getters.<GKey, GValue>emptyGetter(), null);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link #from(Hasher, Getter, Getter, Setter) HashMap.from(hasher, Getters.neutral(), installValue, null)}. */
-	public static <GKey, GValue> HashMap<GKey, GValue> from(final Hasher hasher, final Getter<? super GKey, ? extends GValue> installValue)
-		throws NullPointerException {
-		return HashMap.from(hasher, Getters.<GKey>neutralGetter(), installValue, null);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link #from(Hasher, Getter, Getter, Setter) HashMap.from(hasher, Getters.neutral(), installAndReuseValue,
-	 * installAndReuseValue)}. */
-	public static <GKey, GValue> HashMap<GKey, GValue> from(final Hasher hasher, final Field<? super GKey, GValue> installAndReuseValue)
-		throws NullPointerException {
-		return HashMap.from(hasher, Getters.<GKey>neutralGetter(), installAndReuseValue, installAndReuseValue);
-	}
-
-	/** Diese Methode liefert eine neue {@link HashMap}, welche Streuwert, Äquivalenz, Installation und Wiederverwendung von Schlüsseln, Werten bzw. Einträgen an
-	 * die gegebenen Methoden delegiert.
-	 *
-	 * @param hasher Methoden zur Berechnung von {@link #customHash(Object) Streuwert} und {@link #customEqualsKey(int, Object) Äquivalenz} der Schlüssel.
-	 * @param installKey Methode zur {@link #customInstallKey(Object) Installation} des Schlüssels.
-	 * @param installValue Methode zur {@link #customInstallValue(Object) Installation} des Werts.
-	 * @param reuseValue Methode zur Anzeige der {@link #customReuseEntry(int) Wiederverwendung} des Eintrags oder {@code null}. */
-	public static <GKey, GValue> HashMap<GKey, GValue> from(final Hasher hasher, final Getter<? super GKey, ? extends GKey> installKey,
-		final Getter<? super GKey, ? extends GValue> installValue, final Setter<? super GKey, ? super GValue> reuseValue) throws NullPointerException {
-		Objects.notNull(hasher);
-		Objects.notNull(installKey);
-		Objects.notNull(installValue);
-		return new HashMap<>() {
-
-			private static final long serialVersionUID = 3593309667398085167L;
-
-			@Override
-			protected int customHash(final Object key) {
-				return hasher.hash(key);
-			}
-
-			@Override
-			protected boolean customEqualsKey(final int entryIndex, final Object key) {
-				return hasher.equals(this.customGetKey(entryIndex), key);
-			}
-
-			@Override
-			protected GKey customInstallKey(final GKey key) {
-				return installKey.get(key);
-			}
-
-			@Override
-			protected GValue customInstallValue(final GKey key) {
-				return installValue.get(key);
-			}
-
-			@Override
-			protected void customReuseEntry(final int entryIndex) {
-				if (reuseValue == null) return;
-				reuseValue.set(this.customGetKey(entryIndex), this.customGetValue(entryIndex));
-			}
-
-		};
-	}
-
-	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Schlüssel ab. Für alle anderen Indizes bildet es auf {@code null} ab. */
-	transient Object[] keys = AbstractHashData.EMPTY_OBJECTS;
-
-	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Wert ab. Für alle anderen Indizes bildet es auf {@code null} ab. */
-	transient Object[] values = AbstractHashData.EMPTY_OBJECTS;
 
 	/** Dieser Konstruktor initialisiert die Kapazität mit {@code 0}. */
 	public HashMap() {
@@ -109,23 +37,18 @@ public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> impleme
 		this.putAll(source);
 	}
 
-	@SuppressWarnings ("unchecked")
-	private void readObject(final ObjectInputStream stream) throws IOException, ClassNotFoundException {
-		final int count = stream.readInt();
-		this.allocateImpl(count);
-		for (int i = 0; i < count; i++) {
-			final Object key = stream.readObject();
-			final Object value = stream.readObject();
-			this.putImpl((GKey)key, (GValue)value);
-		}
+	@Override
+	public long emu() {
+		return super.emu() + EMU.fromArray(this.keys) + EMU.fromArray(this.values);
 	}
 
-	private void writeObject(final ObjectOutputStream stream) throws IOException {
-		stream.writeInt(this.countImpl());
-		for (final Entry<GKey, GValue> entry: this.newEntriesImpl()) {
-			stream.writeObject(entry.getKey());
-			stream.writeObject(entry.getValue());
-		}
+	@Override
+	public HashMap<GKey, GValue> clone() {
+		final HashMap<GKey, GValue> result = (HashMap<GKey, GValue>)super.clone();
+		if (this.capacityImpl() == 0) return result;
+		result.keys = this.keys.clone();
+		result.values = this.values.clone();
+		return result;
 	}
 
 	@Override
@@ -198,18 +121,31 @@ public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> impleme
 		};
 	}
 
-	@Override
-	public long emu() {
-		return super.emu() + EMU.fromArray(this.keys) + EMU.fromArray(this.values);
+	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Schlüssel ab. Für alle anderen Indizes bildet es auf {@code null} ab. */
+	transient Object[] keys = AbstractHashData.EMPTY_OBJECTS;
+
+	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Wert ab. Für alle anderen Indizes bildet es auf {@code null} ab. */
+	transient Object[] values = AbstractHashData.EMPTY_OBJECTS;
+
+	private static final long serialVersionUID = -8792297171308603896L;
+
+	@SuppressWarnings ("unchecked")
+	private void readObject(final ObjectInputStream stream) throws IOException, ClassNotFoundException {
+		final int count = stream.readInt();
+		this.allocateImpl(count);
+		for (int i = 0; i < count; i++) {
+			final Object key = stream.readObject();
+			final Object value = stream.readObject();
+			this.putImpl((GKey)key, (GValue)value);
+		}
 	}
 
-	@Override
-	public HashMap<GKey, GValue> clone() {
-		final HashMap<GKey, GValue> result = (HashMap<GKey, GValue>)super.clone();
-		if (this.capacityImpl() == 0) return result;
-		result.keys = this.keys.clone();
-		result.values = this.values.clone();
-		return result;
+	private void writeObject(final ObjectOutputStream stream) throws IOException {
+		stream.writeInt(this.countImpl());
+		for (final Entry<GKey, GValue> entry: this.newEntriesImpl()) {
+			stream.writeObject(entry.getKey());
+			stream.writeObject(entry.getValue());
+		}
 	}
 
 }

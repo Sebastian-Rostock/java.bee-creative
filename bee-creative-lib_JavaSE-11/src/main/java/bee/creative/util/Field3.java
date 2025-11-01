@@ -31,17 +31,16 @@ public interface Field3<GItem, GValue> extends Field<GItem, GValue> {
 		return translateField(this, trans);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Fields#aggregatedField(Field, Getter, Getter, Getter, Getter) aggregatedField(this, neutralGetter(),
-	 * neutralGetter(), emptyGetter(), emptyGetter())}. */
+	/** Diese Methode ist eine Abkürzung für {@link #aggregate(Getter, Getter) this.}. */
 	default Field3<Iterable<? extends GItem>, GValue> aggregate() {
-		return aggregatedField(this, neutralGetter(), neutralGetter(), emptyGetter(), emptyGetter());
+		return this.aggregate(neutralGetter(), neutralGetter());
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Fields#aggregatedField(Field, Getter, Getter, Getter, Getter) aggregatedField(this, getTrans, setTrans,
-	 * emptyGetter(), emptyGetter())}. */
+	/** Diese Methode ist eine Abkürzung für {@link #aggregate(Getter, Getter, Getter, Getter) this.aggregate(getTrans, setTrans, emptyGetter(),
+	 * emptyGetter())}. */
 	default <GValue2> Field3<Iterable<? extends GItem>, GValue2> aggregate(Getter<? super GValue, ? extends GValue2> getTrans,
 		Getter<? super GValue2, ? extends GValue> setTrans) {
-		return aggregatedField(this, getTrans, setTrans, emptyGetter(), emptyGetter());
+		return this.aggregate(getTrans, setTrans, emptyGetter(), emptyGetter());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Fields#aggregatedField(Field, Getter, Getter, Getter, Getter) aggregatedField(this, getTrans, setTrans, empty,
@@ -71,15 +70,15 @@ public interface Field3<GItem, GValue> extends Field<GItem, GValue> {
 		return synchronizedField(this, mutex);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #toProperty(Object) this.toProperty(null)}. */
-	default Property3<GValue> toProperty() {
-		return this.toProperty(null);
+	/** Diese Methode ist eine Abkürzung für {@link #asProperty(Object) this.asProperty(null)}. */
+	default Property3<GValue> asProperty() {
+		return this.asProperty(null);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Properties#propertyFrom(Producer, Consumer) propertyFrom(() -> this.get(item), (value) -> this.set(item,
 	 * value))}. */
-	default Property3<GValue> toProperty(GItem item) {
-		return Properties.propertyFromField(this);
+	default Property3<GValue> asProperty(GItem item) {
+		return propertyFromField(this);
 	}
 
 }

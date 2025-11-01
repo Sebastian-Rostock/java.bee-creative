@@ -1,5 +1,8 @@
 package bee.creative.util;
 
+import static bee.creative.util.Getters.emptyGetter;
+import static bee.creative.util.Getters.neutralGetter;
+import static bee.creative.util.Hashers.naturalHasher;
 import java.util.Map;
 import bee.creative.emu.EMU;
 import bee.creative.lang.Objects;
@@ -9,26 +12,55 @@ import bee.creative.lang.Objects;
  * {@link java.util.HashMap} benötigen würde.
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GKey> Typ der Schlüssel.
- * @param <GValue> Typ der Werte. */
-public class HashMap2<GKey, GValue> extends HashMap<GKey, GValue> {
+ * @param <K> Typ der Schlüssel.
+ * @param <V> Typ der Werte. */
+public class HashMap2<K, V> extends HashMap<K, V> {
 
-	private static final long serialVersionUID = -8419791227943208230L;
-
-	/** Diese Methode ist eine Abkürzung für {@link #from(Hasher, Getter, Getter, Setter) HashMap2.from(hasher, Getters.neutral(), Getters.empty(), null)}. */
-	public static <GKey, GValue> HashMap2<GKey, GValue> from(Hasher hasher) throws NullPointerException {
-		return HashMap2.from(hasher, Getters.neutralGetter(), Getters.emptyGetter(), null);
+	/** Diese Methode ist eine Abkürzung für {@link #hashMapFrom(Hasher, Getter, Getter, Setter) HashMap2.from(hasher, Getters.neutral(), installValue, null)}. */
+	public static <K, V> HashMap2<K, V> hashMapFrom(Getter<? super K, ? extends V> installValue) throws NullPointerException {
+		return hashMapFrom(naturalHasher(), neutralGetter(), installValue, null);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(Hasher, Getter, Getter, Setter) HashMap2.from(hasher, Getters.neutral(), installValue, null)}. */
-	public static <GKey, GValue> HashMap2<GKey, GValue> from(Hasher hasher, Getter<? super GKey, ? extends GValue> installValue) throws NullPointerException {
-		return HashMap2.from(hasher, Getters.neutralGetter(), installValue, null);
+	public static <K, V> HashMap2<K, V> hashMapFrom(Getter<? super K, ? extends V> installValue, Setter<? super K, ? super V> reuseEntry)
+		throws NullPointerException {
+		return hashMapFrom(naturalHasher(), neutralGetter(), installValue, reuseEntry);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(Hasher, Getter, Getter, Setter) HashMap2.from(hasher, Getters.neutral(), installAndReuseValue,
+	public static <K, V> HashMap2<K, V> hashMapFrom(Getter<? super K, ? extends K> installKey, Getter<? super K, ? extends V> installValue)
+		throws NullPointerException {
+		return hashMapFrom(naturalHasher(), installKey, installValue, null);
+	}
+
+	public static <K, V> HashMap2<K, V> hashMapFrom(Getter<? super K, ? extends K> installKey, Getter<? super K, ? extends V> installValue,
+		Setter<? super K, ? super V> reuseEntry) throws NullPointerException {
+		return hashMapFrom(naturalHasher(), installKey, installValue, reuseEntry);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #hashMapFrom(Hasher, Getter, Getter, Setter) HashMap2.from(hasher, Getters.neutral(), Getters.empty(),
+	 * null)}. */
+	public static <K, V> HashMap2<K, V> hashMapFrom(Hasher hasher) throws NullPointerException {
+		return HashMap2.hashMapFrom(hasher, neutralGetter(), emptyGetter(), null);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #hashMapFrom(Hasher, Getter, Getter, Setter) HashMap2.from(hasher, Getters.neutral(), installValue, null)}. */
+	public static <K, V> HashMap2<K, V> hashMapFrom(Hasher hasher, Getter<? super K, ? extends V> installValue) throws NullPointerException {
+		return HashMap2.hashMapFrom(hasher, neutralGetter(), installValue, null);
+	}
+
+	public static <K, V> HashMap2<K, V> hashMapFrom(Hasher hasher, Getter<? super K, ? extends V> installValue, Setter<? super K, ? super V> reuseEntry)
+		throws NullPointerException {
+		return hashMapFrom(hasher, neutralGetter(), installValue, reuseEntry);
+	}
+
+	public static <K, V> HashMap2<K, V> hashMapFrom(Hasher hasher, Getter<? super K, ? extends K> installKey, Getter<? super K, ? extends V> installValue)
+		throws NullPointerException {
+		return hashMapFrom(hasher, installKey, installValue, null);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #hashMapFrom(Hasher, Getter, Getter, Setter) HashMap2.from(hasher, Getters.neutral(), installAndReuseValue,
 	 * installAndReuseValue)}. */
-	public static <GKey, GValue> HashMap2<GKey, GValue> from(Hasher hasher, Field<? super GKey, GValue> installAndReuseValue) throws NullPointerException {
-		return HashMap2.from(hasher, Getters.neutralGetter(), installAndReuseValue, installAndReuseValue);
+	public static <K, V> HashMap2<K, V> hashMapFrom(Hasher hasher, Field<? super K, V> installAndReuseValue) throws NullPointerException {
+		return HashMap2.hashMapFrom(hasher, neutralGetter(), installAndReuseValue, installAndReuseValue);
 	}
 
 	/** Diese Methode liefert eine neue {@link HashMap2}, welche Streuwert, Äquivalenz, Installation und Wiederverwendung von Schlüsseln, Werten bzw. Einträgen an
@@ -38,8 +70,8 @@ public class HashMap2<GKey, GValue> extends HashMap<GKey, GValue> {
 	 * @param installKey Methode zur {@link #customInstallKey(Object) Installation} des Schlüssels.
 	 * @param installValue Methode zur {@link #customInstallValue(Object) Installation} des Werts.
 	 * @param reuseEntry Methode zur Anzeige der {@link #customReuseEntry(int) Wiederverwendung} des Eintrags oder {@code null}. */
-	public static <GKey, GValue> HashMap2<GKey, GValue> from(Hasher hasher, Getter<? super GKey, ? extends GKey> installKey,
-		Getter<? super GKey, ? extends GValue> installValue, Setter<? super GKey, ? super GValue> reuseEntry) throws NullPointerException {
+	public static <K, V> HashMap2<K, V> hashMapFrom(Hasher hasher, Getter<? super K, ? extends K> installKey, Getter<? super K, ? extends V> installValue,
+		Setter<? super K, ? super V> reuseEntry) throws NullPointerException {
 		Objects.notNull(hasher);
 		Objects.notNull(installKey);
 		Objects.notNull(installValue);
@@ -58,12 +90,12 @@ public class HashMap2<GKey, GValue> extends HashMap<GKey, GValue> {
 			}
 
 			@Override
-			protected GKey customInstallKey(GKey key) {
+			protected K customInstallKey(K key) {
 				return installKey.get(key);
 			}
 
 			@Override
-			protected GValue customInstallValue(GKey key) {
+			protected V customInstallValue(K key) {
 				return installValue.get(key);
 			}
 
@@ -75,9 +107,6 @@ public class HashMap2<GKey, GValue> extends HashMap<GKey, GValue> {
 
 		};
 	}
-
-	/** Dieses Feld bildet vom Index eines Eintrags auf den Streuwert seines Schlüssels ab. */
-	transient int[] hashes = AbstractHashData.EMPTY_INTS;
 
 	/** Dieser Konstruktor initialisiert die Kapazität mit {@code 0}. */
 	public HashMap2() {
@@ -93,13 +122,26 @@ public class HashMap2<GKey, GValue> extends HashMap<GKey, GValue> {
 	/** Dieser Konstruktor initialisiert die {@link HashMap2} mit dem Inhalt der gegebenen {@link Map}.
 	 *
 	 * @param source gegebene Einträge. */
-	public HashMap2(Map<? extends GKey, ? extends GValue> source) {
+	public HashMap2(Map<? extends K, ? extends V> source) {
 		this.allocateImpl(source.size());
 		this.putAll(source);
 	}
 
 	@Override
-	protected void customSetKey(int entryIndex, GKey key, int keyHash) {
+	public long emu() {
+		return super.emu() + EMU.fromArray(this.hashes);
+	}
+
+	@Override
+	public HashMap2<K, V> clone() {
+		var result = (HashMap2<K, V>)super.clone();
+		if (this.capacityImpl() == 0) return result;
+		result.hashes = this.hashes.clone();
+		return result;
+	}
+
+	@Override
+	protected void customSetKey(int entryIndex, K key, int keyHash) {
 		this.customSetKey(entryIndex, key);
 		this.hashes[entryIndex] = keyHash;
 	}
@@ -116,9 +158,9 @@ public class HashMap2<GKey, GValue> extends HashMap<GKey, GValue> {
 
 	@Override
 	protected HashAllocator customAllocator(int capacity) {
-		final Object[] keys2;
-		final Object[] values2;
-		final int[] hashes2;
+		Object[] keys2;
+		Object[] values2;
+		int[] hashes2;
 		if (capacity == 0) {
 			keys2 = AbstractHashData.EMPTY_OBJECTS;
 			values2 = AbstractHashData.EMPTY_OBJECTS;
@@ -147,17 +189,9 @@ public class HashMap2<GKey, GValue> extends HashMap<GKey, GValue> {
 		};
 	}
 
-	@Override
-	public long emu() {
-		return super.emu() + EMU.fromArray(this.hashes);
-	}
+	/** Dieses Feld bildet vom Index eines Eintrags auf den Streuwert seines Schlüssels ab. */
+	transient int[] hashes = AbstractHashData.EMPTY_INTS;
 
-	@Override
-	public HashMap2<GKey, GValue> clone() {
-		var result = (HashMap2<GKey, GValue>)super.clone();
-		if (this.capacityImpl() == 0) return result;
-		result.hashes = this.hashes.clone();
-		return result;
-	}
+	private static final long serialVersionUID = -8419791227943208230L;
 
 }
