@@ -2,7 +2,7 @@ package bee.creative.util;
 
 import static bee.creative.util.Comparators.compare;
 import static bee.creative.util.Iterables.iterableFromArray;
-import static bee.creative.util.Properties.propertyFromValue;
+import static bee.creative.util.Properties.propertyWithValue;
 import static java.lang.Long.MAX_VALUE;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
@@ -42,7 +42,7 @@ public class Tester {
 	 *
 	 * @param task Testmethode. */
 	public static <T> T testCall(Callable2<T> task) {
-		var res = propertyFromValue((T)null);
+		var res = propertyWithValue((T)null);
 		testRun(() -> res.set(task.call()));
 		return res.get();
 	}

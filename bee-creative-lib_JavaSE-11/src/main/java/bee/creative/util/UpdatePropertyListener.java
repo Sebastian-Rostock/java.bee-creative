@@ -1,7 +1,5 @@
 package bee.creative.util;
 
-import bee.creative.util.Properties.ObservableProperty;
-
 /** Diese Schnittstelle definiert den Empfänger des {@link UpdatePropertyEvent}. */
 public interface UpdatePropertyListener {
 

@@ -2,7 +2,7 @@ package bee.creative.util;
 
 import static bee.creative.util.Getters.concatGetter;
 import static bee.creative.util.Setters.concatSetter;
-import static bee.creative.util.Setters.setterFrom;
+import static bee.creative.util.Setters.setterFromConsumer;
 import java.util.Map;
 import bee.creative.lang.Objects;
 
@@ -21,9 +21,9 @@ public final class Fields {
 	 * {@link #fieldFrom(Getter, Setter) fieldFrom(getterFrom(that), setterFrom(that))}.
 	 *
 	 * @see Getters#getterFromProducer(Producer)
-	 * @see Setters#setterFrom(Consumer) */
-	public static <VALUE> Field2<Object, VALUE> fieldFrom(Property<VALUE> that) {
-		return fieldFrom(Getters.getterFromProducer(that), setterFrom(that));
+	 * @see Setters#setterFromConsumer(Consumer) */
+	public static <VALUE> Field2<Object, VALUE> fieldFromProperty(Property<VALUE> that) {
+		return fieldFrom(Getters.getterFromProducer(that), setterFromConsumer(that));
 	}
 
 	/** Diese Methode liefert ein {@link Field2} zu {@link Map#get(Object)} und {@link Map#put(Object, Object)} und ist eine Abkürzung für

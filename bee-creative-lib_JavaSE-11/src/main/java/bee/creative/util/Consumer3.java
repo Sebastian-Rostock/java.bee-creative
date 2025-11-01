@@ -4,7 +4,7 @@ import static bee.creative.util.Consumers.synchronizedConsumer;
 import static bee.creative.util.Consumers.translatedConsumer;
 import static bee.creative.util.Properties.emptyProperty;
 import static bee.creative.util.Properties.propertyFrom;
-import static bee.creative.util.Setters.setterFrom;
+import static bee.creative.util.Setters.setterFromConsumer;
 
 /** Diese Schnittstelle ergänzt einen {@link Consumer2} insb. um eine erweiterte Anbindung an Methoden von {@link Consumers}.
  *
@@ -27,9 +27,9 @@ public interface Consumer3<V> extends Consumer<V> {
 		return synchronizedConsumer(this, mutex);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Setters#setterFrom(Consumer) setterFromConsumer(this)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Setters#setterFromConsumer(Consumer) setterFromConsumer(this)}. */
 	default Setter3<Object, V> asSetter() {
-		return setterFrom(this);
+		return setterFromConsumer(this);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #asProperty(Producer) this.asProperty(emptyProperty())}. */

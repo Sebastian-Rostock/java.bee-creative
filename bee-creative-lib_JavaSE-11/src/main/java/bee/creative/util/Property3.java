@@ -1,11 +1,9 @@
 package bee.creative.util;
 
-import static bee.creative.util.Fields.fieldFrom;
-import static bee.creative.util.Properties.observableProperty;
+import static bee.creative.util.Fields.fieldFromProperty;
 import static bee.creative.util.Properties.setupProperty;
 import static bee.creative.util.Properties.synchronizedProperty;
 import static bee.creative.util.Properties.translatedProperty;
-import bee.creative.util.Properties.ObservableProperty;
 
 /** Diese Schnittstelle ergänzt ein {@link Property} um eine Anbindung an die Methoden von {@link Properties}, {@link Producers}, {@link Consumers} und
  * {@link Fields}.
@@ -19,11 +17,6 @@ public interface Property3<V> extends Property<V> {
 		return setupProperty(this, setup);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Properties#observableProperty(Property) observableProperty(this)}. */
-	default ObservableProperty<V> observe() {
-		return observableProperty(this);
-	}
-
 	/** Diese Methode ist eine Abkürzung für {@link Properties#translatedProperty(Property, Getter, Getter) translatedProperty(this, transGet, transSet)}. */
 	default <V2> Property3<V2> translate(Getter<? super V, ? extends V2> transGet, Getter<? super V2, ? extends V> transSet) {
 		return translatedProperty(this, transGet, transSet);
@@ -34,6 +27,7 @@ public interface Property3<V> extends Property<V> {
 		return translatedProperty(this, trans);
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@link #synchronize(Object) this.synchronize(this)}. */
 	default Property3<V> synchronize() {
 		return this.synchronize(this);
 	}
@@ -43,9 +37,9 @@ public interface Property3<V> extends Property<V> {
 		return synchronizedProperty(this, mutex);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Fields#fieldFrom(Property) fieldFrom(this)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Fields#fieldFromProperty(Property) fieldFrom(this)}. */
 	default Field2<Object, V> asField() {
-		return fieldFrom(this);
+		return fieldFromProperty(this);
 	}
 
 }

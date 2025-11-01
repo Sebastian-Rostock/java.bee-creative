@@ -17,15 +17,16 @@ public class Producers {
 	@SuppressWarnings ("unchecked")
 	public static <V> Producer3<V> producerFrom(Producer<? extends V> that) throws NullPointerException {
 		notNull(that);
-		if (that instanceof Producer2<?>) return ((Producer2<V>)that).asProducer();
+		if (that instanceof Producer3<?>) return (Producer3<V>)that;
 		return () -> that.get();
 	}
 
-	/** Diese Methode liefert einen {@link Producer3}, der beim Lesen den gegebenen Wert liefert. */
+	/** Diese Methode liefert einen {@link Producer3}, der beim Lesen den gegebenen {@code value} liefert. */
 	public static <V> Producer3<V> producerFromValue(V value) {
 		return value == null ? emptyProducer() : () -> value;
 	}
 
+	/** Diese Methode liefert einen {@link Producer3}, der beim Lesen den das Ergebnis von {@code that.get(null)} liefert. */
 	public static <V> Producer3<V> producerFromGetter(Getter<?, ? extends V> that) {
 		return notNull(that) == emptyGetter() ? emptyProducer() : () -> that.get(null);
 	}

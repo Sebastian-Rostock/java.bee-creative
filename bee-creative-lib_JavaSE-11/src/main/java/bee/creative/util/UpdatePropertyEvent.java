@@ -1,7 +1,6 @@
 package bee.creative.util;
 
 import bee.creative.lang.Objects;
-import bee.creative.util.Properties.ObservableProperty;
 
 /** Diese Klasse implementiert die von einem {@link UpdatePropertyListener} empfangene Nachricht zur Aktualisierung des Werts eines
  * {@link ObservableProperty}. */

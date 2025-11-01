@@ -45,7 +45,7 @@ public class Getters {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link BufferedGetter new BufferedGetter<>(that, mode, hasher)}. */
-	public static <ITEM, VALUE> Getter3<ITEM, VALUE> bufferedGetter(Getter<? super ITEM, ? extends VALUE> that, int mode, Hasher hasher)
+	public static <ITEM, VALUE> Getter3<ITEM, VALUE> bufferedGetter(Getter<? super ITEM, ? extends VALUE> that, RefMode mode, Hasher hasher)
 		throws NullPointerException, IllegalArgumentException {
 		return new BufferedGetter<>(that, mode, hasher);
 	}
@@ -128,31 +128,36 @@ public class Getters {
 
 	}
 
+	public static enum RefMode {
+		
+		/** Dieses Feld identifiziert die direkte Referenz. */
+		HARD_REF_MODE,
+
+		/** Dieses Feld identifiziert die {@link WeakReference}. */
+		WEAK_REF_MODE,
+
+		/** Dieses Feld identifiziert die {@link SoftReference}. */
+		SOFT_REF_MODE ;
+
+	}
+	
 	/** Diese Klasse implementiert einen gepufferten {@link Getter3}, der das {@link #get(Object) Lesen} an einen {@link #that gegebenen} {@link Getter} delegiert
 	 * und den ermittelten Wert zur Wiederverwendung in einem {@link #buffer Puffer} ablegt, sofern der Puffer den Wert zum Datensatz noch nicht enthält, und
 	 * sonst den im Puffer abgelegte Wert liefert. Der Abgleich der Datensätze erfolgt über einen gegebenen {@link Hasher}. Die Ablage der Werte zu den
-	 * Datensätzen erfolgt über {@link Reference Verweise} der {@lonk #mode gegebenen} Stärke ({@link BufferedGetter#HARD_REF_MODE},
-	 * {@link BufferedGetter#SOFT_REF_MODE}, {@link BufferedGetter#WEAK_REF_MODE}).
+	 * Datensätzen erfolgt über {@link Reference Verweise} der {@lonk #mode gegebenen} Stärke ({@link RefMode#HARD_REF_MODE},
+	 * {@link RefMode#SOFT_REF_MODE}, {@link RefMode#WEAK_REF_MODE}).
 	 *
 	 * @param <ITEM> Typ des Datensatzes.
 	 * @param <VALUE> Typ des Werts der Eigenschaft. */
 	public static class BufferedGetter<ITEM, VALUE> extends AbstractGetter<ITEM, VALUE> {
 
-		/** Dieses Feld identifiziert die direkte Referenz. */
-		public static final int HARD_REF_MODE = 0;
-
-		/** Dieses Feld identifiziert die {@link WeakReference}. */
-		public static final int WEAK_REF_MODE = 1;
-
-		/** Dieses Feld identifiziert die {@link SoftReference}. */
-		public static final int SOFT_REF_MODE = 2;
-
-		public BufferedGetter(final Getter<? super ITEM, ? extends VALUE> that, final int mode, final Hasher hasher)
+		
+		public BufferedGetter(final Getter<? super ITEM, ? extends VALUE> that, RefMode mode, final Hasher hasher)
 			throws NullPointerException, IllegalArgumentException {
 			this.that = notNull(that);
 			this.mode = mode;
 			this.hasher = notNull(hasher);
-			if (mode == BufferedGetter.HARD_REF_MODE) {
+			if (mode == RefMode.HARD_REF_MODE) {
 				this.queue = null;
 				this.buffer = HashMap.from(hasher, new Field<ITEM, VALUE>() {
 
@@ -167,7 +172,7 @@ public class Getters {
 					}
 
 				});
-			} else if (mode == BufferedGetter.SOFT_REF_MODE) {
+			} else if (mode == RefMode.SOFT_REF_MODE) {
 				this.queue = new ReferenceQueue<>();
 				this.buffer = HashMap.from(hasher, new Field<ITEM, SoftRef>() {
 
@@ -184,7 +189,7 @@ public class Getters {
 					}
 
 				});
-			} else if (mode == BufferedGetter.WEAK_REF_MODE) {
+			} else if (mode == RefMode.WEAK_REF_MODE) {
 				this.queue = new ReferenceQueue<>();
 				this.buffer = HashMap.from(hasher, new Field<ITEM, WeakRef>() {
 
@@ -265,7 +270,7 @@ public class Getters {
 
 		public final Getter<? super ITEM, ? extends VALUE> that;
 
-		public final int mode;
+		public final RefMode mode;
 
 		public final Hasher hasher;
 

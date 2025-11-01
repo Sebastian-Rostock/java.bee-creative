@@ -9,7 +9,7 @@ import static bee.creative.util.Getters.emptyGetter;
 import static bee.creative.util.Getters.neutralGetter;
 import static bee.creative.util.Getters.optionalizedGetter;
 import static bee.creative.util.Getters.synchronizedGetter;
-import static bee.creative.util.Getters.BufferedGetter.SOFT_REF_MODE;
+import static bee.creative.util.Getters.RefMode.SOFT_REF_MODE;
 import static bee.creative.util.Hashers.naturalHasher;
 import static bee.creative.util.Iterables.translatedIterable;
 import static bee.creative.util.Iterators.translatedIterator;
@@ -17,6 +17,7 @@ import static bee.creative.util.Producers.producerFromValue;
 import static bee.creative.util.Setters.concatSetter;
 import java.util.Comparator;
 import java.util.Iterator;
+import bee.creative.util.Getters.RefMode;
 
 /** Diese Schnittstelle ergänzt einen {@link Getter} insb. um eine Anbindung an Methoden von {@link Getters}.
  *
@@ -65,13 +66,13 @@ public interface Getter2<ITEM, VALUE> extends Getter<ITEM, VALUE> {
 		return translatedIterator(that, this);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #buffer(int, Hasher) this.buffer(SOFT_REF_MODE, naturalHasher())}. */
+	/** Diese Methode ist eine Abkürzung für {@link #buffer(RefMode, Hasher) this.buffer(SOFT_REF_MODE, naturalHasher())}. */
 	default Getter3<ITEM, VALUE> buffer() {
 		return this.buffer(SOFT_REF_MODE, naturalHasher());
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Getters#bufferedGetter(Getter, int, Hasher) bufferedGetter(this, mode, hasher)}. */
-	default Getter3<ITEM, VALUE> buffer(int mode, Hasher hasher) {
+	/** Diese Methode ist eine Abkürzung für {@link Getters#bufferedGetter(Getter, RefMode, Hasher) bufferedGetter(this, mode, hasher)}. */
+	default Getter3<ITEM, VALUE> buffer(RefMode mode, Hasher hasher) {
 		return bufferedGetter(this, mode, hasher);
 	}
 
@@ -102,7 +103,7 @@ public interface Getter2<ITEM, VALUE> extends Getter<ITEM, VALUE> {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #toProducer(Object) toProducer(null)}. */
-	default Producer3<VALUE> toProducer() {
+	default Producer3<VALUE> asProducer() {
 		return this.toProducer(null);
 	}
 

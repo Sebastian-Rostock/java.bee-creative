@@ -36,6 +36,11 @@ public interface Comparable3<T> extends Comparable<T> {
 		return optionalizedComparable(this);
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@link Comparables#optionalizedComparable(Comparable, boolean) reversedComparable(this, first)}. */
+	default Comparable3<T> optionalize(boolean first) {
+		return optionalizedComparable(this, first);
+	}
+
 	/** Diese Methode ist eine Abkürzung für {@link Comparables#comparableAsEqFilter(Comparable) comparableAsEqFilter(this)}. */
 	default Filter3<T> asEqFilter() throws NullPointerException {
 		return comparableAsEqFilter(this);

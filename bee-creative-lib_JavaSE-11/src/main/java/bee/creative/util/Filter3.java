@@ -5,8 +5,9 @@ import static bee.creative.util.Filters.disjoinedFilter;
 import static bee.creative.util.Filters.negatedFilter;
 import static bee.creative.util.Filters.synchronizedFilter;
 import static bee.creative.util.Filters.translatedFilter;
-import static bee.creative.util.Getters.BufferedGetter.SOFT_REF_MODE;
+import static bee.creative.util.Getters.RefMode.SOFT_REF_MODE;
 import static bee.creative.util.Hashers.naturalHasher;
+import bee.creative.util.Getters.RefMode;
 
 /** Diese Schnittstelle definiert eine Filtermethode, die gegebene Datensätze über {@link Filter3#accepts(Object)} akzeptieren oder ablehnen kann.
  *
@@ -15,13 +16,13 @@ import static bee.creative.util.Hashers.naturalHasher;
  * @param <T> Typ der Datensätze. */
 public interface Filter3<T> extends Filter2<T> {
 
-	/** Diese Methode ist eine Abkürzung für {@link #buffer(int, Hasher) this.buffer(SOFT_REF_MODE, naturalHasher())}. */
+	/** Diese Methode ist eine Abkürzung für {@link #buffer(RefMode, Hasher) this.buffer(SOFT_REF_MODE, naturalHasher())}. */
 	default Filter3<T> buffer() {
 		return this.buffer(SOFT_REF_MODE, naturalHasher());
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Getters#bufferedGetter(Getter, int, Hasher) this.toGetter().buffer(mode, hasher)::get}. */
-	default Filter3<T> buffer(int mode, Hasher hasher) throws IllegalArgumentException {
+	/** Diese Methode ist eine Abkürzung für {@link Getters#bufferedGetter(Getter, RefMode, Hasher) this.toGetter().buffer(mode, hasher)::get}. */
+	default Filter3<T> buffer(RefMode mode, Hasher hasher) throws IllegalArgumentException {
 		return this.toGetter().buffer(mode, hasher)::get;
 	}
 

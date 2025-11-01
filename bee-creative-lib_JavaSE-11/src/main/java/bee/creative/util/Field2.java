@@ -14,7 +14,7 @@ import static bee.creative.util.Properties.propertyFromField;
  * @author [cc-by] 2021 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GItem> Typ des Datensatzes.
  * @param <GValue> Typ des Werts der Eigenschaft. */
-public interface Field2<GItem, GValue> extends Field<GItem, GValue>, Getter2<GItem, GValue>, Setter2<GItem, GValue> {
+public interface Field2<GItem, GValue> extends Field<GItem, GValue>, Getter2<GItem, GValue> {
 
 	/** Diese Methode ist eine Abkürzung für {@link Fields#setupField(Field, Getter) setupField(this, setup)}. */
 	default Field2<GItem, GValue> setup(Getter<? super GItem, ? extends GValue> setup) {
