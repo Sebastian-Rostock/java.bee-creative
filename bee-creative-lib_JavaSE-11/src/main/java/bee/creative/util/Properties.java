@@ -1,9 +1,11 @@
 package bee.creative.util;
 
 import static bee.creative.lang.Objects.notNull;
+import static bee.creative.util.Consumers.concatConsumer;
 import static bee.creative.util.Consumers.consumerFromSetter;
 import static bee.creative.util.Consumers.emptyConsumer;
 import static bee.creative.util.Consumers.translatedConsumer;
+import static bee.creative.util.Producers.concatProducer;
 import static bee.creative.util.Producers.emptyProducer;
 import static bee.creative.util.Producers.producerFromGetter;
 import static bee.creative.util.Producers.translatedProducer;
@@ -15,6 +17,7 @@ public class Properties {
 
 	/** Diese Methode liefert das gegebene {@link Property} als {@link Property3}. */
 	public static <V> Property3<V> propertyFrom(Property<V> that) {
+		notNull(that);
 		if (that instanceof Property3<?>) return (Property3<V>)that;
 		return propertyFrom(that::get, that::set);
 	}
@@ -87,6 +90,10 @@ public class Properties {
 			that.set(result);
 			return result;
 		}, that);
+	}
+
+	public static <T, V> Property3<V> concatProperty(Producer<? extends T> item, Field<? super T, V> that) {
+		return propertyFrom(concatProducer(item, that), concatConsumer(item, that));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #translatedProperty(Property, Getter, Getter) Properties.translate(that, Getters.fromTarget(trans),

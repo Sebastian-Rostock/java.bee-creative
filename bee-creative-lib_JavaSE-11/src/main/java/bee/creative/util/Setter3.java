@@ -1,6 +1,6 @@
 package bee.creative.util;
 
-import static bee.creative.util.Consumers.consumerFromSetter;
+import static bee.creative.util.Consumers.concatConsumer;
 import static bee.creative.util.Fields.fieldFrom;
 import static bee.creative.util.Getters.emptyGetter;
 import static bee.creative.util.Getters.neutralGetter;
@@ -48,12 +48,12 @@ public interface Setter3<T, V> extends Setter<T, V> {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #asField(Getter) this.asField(emptyGetter())}. */
-	default Field2<T, V> asField() {
+	default Field3<T, V> asField() {
 		return this.asField(emptyGetter());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Fields#fieldFrom(Getter, Setter) fieldFrom(get, this)}. */
-	default Field2<T, V> asField(Getter<? super T, ? extends V> get) {
+	default Field3<T, V> asField(Getter<? super T, ? extends V> get) {
 		return fieldFrom(get, this);
 	}
 
@@ -62,9 +62,9 @@ public interface Setter3<T, V> extends Setter<T, V> {
 		return this.asConsumer(null);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Consumers#consumerFromSetter(Setter, Producer) consumerFromSetter(this, producerFromValue(item))}. */
+	/** Diese Methode ist eine Abkürzung für {@link Consumers#concatConsumer(Producer, Setter) consumerFromSetter(this, producerFromValue(item))}. */
 	default Consumer3<V> asConsumer(T item) {
-		return consumerFromSetter(this, producerFromValue(item));
+		return concatConsumer(producerFromValue(item), this);
 	}
 
 }

@@ -17,13 +17,13 @@ public class Consumers {
 	}
 
 	public static <T, V> Consumer3<V> consumerFromSetter(Setter<? super T, ? super V> that) throws NullPointerException {
-		return consumerFromSetter(that, emptyProducer());
+		return concatConsumer(emptyProducer(), that);
 	}
 
 	/** Diese Methode ist liefert einen verketteten {@link Consumer3}, der beim Schreiben den gegebenen Wert an den gegebenen {@link Setter} delegiert und dazu
 	 * den vom gegebenen {@link Producer} bereitgestellten Datensatz verwendet. Das Schreiben des Werts {@code value} erfolgt über
 	 * {@code that.set(item.get(), value)}. */
-	public static <T, V> Consumer3<V> consumerFromSetter(Setter<? super T, ? super V> that, Producer<? extends T> item) throws NullPointerException {
+	public static <T, V> Consumer3<V> concatConsumer(Producer<? extends T> item, Setter<? super T, ? super V> that) throws NullPointerException {
 		notNull(that);
 		notNull(item);
 		return value -> that.set(item.get(), value);

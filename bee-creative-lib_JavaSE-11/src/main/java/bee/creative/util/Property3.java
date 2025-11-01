@@ -38,7 +38,7 @@ public interface Property3<V> extends Property<V> {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Fields#fieldFromProperty(Property) fieldFrom(this)}. */
-	default Field2<Object, V> asField() {
+	default Field3<Object, V> asField() {
 		return fieldFromProperty(this);
 	}
 

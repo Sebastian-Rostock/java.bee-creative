@@ -37,6 +37,10 @@ public class Producers {
 		return (Producer3<V>)emptyProducer;
 	}
 
+	public static <T, V> Producer3<V> concatProducer(Producer<? extends T> item, Getter<? super T, ? extends V> that) throws NullPointerException {
+		return translatedProducer(item, that);
+	}
+
 	/** Diese Methode liefert einen übersetzten {@link Producer3}, der beim Lesen einen Wert liefert, der über den gegebenen {@link Getter} {@code trans} aus dem
 	 * Wert des gegebenen {@link Producer} {@code that} ermittelt wird. Das Lesen erfolgt über {@code trans.get(that.get())}. */
 	public static <V, V2> Producer3<V> translatedProducer(Producer<? extends V2> that, Getter<? super V2, ? extends V> trans) throws NullPointerException {

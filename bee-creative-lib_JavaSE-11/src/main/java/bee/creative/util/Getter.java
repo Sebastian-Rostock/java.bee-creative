@@ -4,18 +4,14 @@ package bee.creative.util;
  * Navigation verstanden werden.
  *
  * @author [cc-by] 2017 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <ITEM> Typ des Datensatzes.
- * @param <VALUE> Typ des Werts der Eigenschaft. */
-public interface Getter<ITEM, VALUE> {
+ * @param <T> Typ des Datensatzes.
+ * @param <V> Typ des Werts der Eigenschaft. */
+public interface Getter<T, V> {
 
 	/** Diese Methode gibt den Wert der Eigenschaft des gegebenen Datensatzes zurück.
 	 *
 	 * @param item Datensatz.
 	 * @return Wert der Eigenschaft. */
-	VALUE get(ITEM item);
-
-	default Getter3<ITEM, VALUE> asGetter() {
-		return this::get;
-	}
+	V get(T item);
 
 }

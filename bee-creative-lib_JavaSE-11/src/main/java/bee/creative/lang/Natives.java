@@ -14,20 +14,18 @@ import bee.creative.util.AbstractConsumer;
 import bee.creative.util.AbstractField;
 import bee.creative.util.AbstractGetter;
 import bee.creative.util.AbstractProducer;
-import bee.creative.util.AbstractProperty;
 import bee.creative.util.AbstractSetter;
 import bee.creative.util.Builders.MapBuilder;
 import bee.creative.util.Consumer;
 import bee.creative.util.Consumer3;
 import bee.creative.util.Consumers;
-import bee.creative.util.Field2;
+import bee.creative.util.Field3;
 import bee.creative.util.Fields;
 import bee.creative.util.Getter;
 import bee.creative.util.Getter3;
 import bee.creative.util.Getters;
 import bee.creative.util.HashMap;
 import bee.creative.util.Iterables;
-import bee.creative.util.Producer;
 import bee.creative.util.Producer3;
 import bee.creative.util.Producers;
 import bee.creative.util.Properties;
@@ -377,18 +375,18 @@ public class Natives {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Natives#nativeField(java.lang.reflect.Field, boolean) Fields.fromNative(that, true)}. */
-	public static <GItem, GValue> Field2<GItem, GValue> nativeField(final java.lang.reflect.Field that) throws NullPointerException, IllegalArgumentException {
+	public static <GItem, GValue> Field3<GItem, GValue> nativeField(final java.lang.reflect.Field that) throws NullPointerException, IllegalArgumentException {
 		return Natives.nativeField(that, true);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link NativeField new NativeField<>(that, forceAccessible)}. */
-	public static <GItem, GValue> Field2<GItem, GValue> nativeField(final java.lang.reflect.Field that, final boolean forceAccessible)
+	public static <GItem, GValue> Field3<GItem, GValue> nativeField(final java.lang.reflect.Field that, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
 		return new NativeField<>(that, forceAccessible);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Natives#nativeField(Method, Method, boolean) Fields.fromNative(getMethod, setMethod, true)}. */
-	public static <GItem, GValue> Field2<GItem, GValue> nativeField(final Method get, final Method set) throws NullPointerException, IllegalArgumentException {
+	public static <GItem, GValue> Field3<GItem, GValue> nativeField(final Method get, final Method set) throws NullPointerException, IllegalArgumentException {
 		return Natives.nativeField(get, set, true);
 	}
 
@@ -397,13 +395,13 @@ public class Natives {
 	 *
 	 * @see Natives#nativeGetter(Method, boolean)
 	 * @see #nativeSetter */
-	public static <GItem, GValue> Field2<GItem, GValue> nativeField(final Method get, final Method set, final boolean forceAccessible)
+	public static <GItem, GValue> Field3<GItem, GValue> nativeField(final Method get, final Method set, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
 		return Fields.fieldFrom(Natives.<GItem, GValue>nativeGetter(get, forceAccessible), nativeSetter(set, forceAccessible));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Natives#nativeField(Class, String, boolean) Fields.fromNative(fieldOwner, fieldName, true)}. */
-	public static <GItem, GValue> Field2<GItem, GValue> nativeField(final Class<? extends GItem> fieldOwner, final String fieldName)
+	public static <GItem, GValue> Field3<GItem, GValue> nativeField(final Class<? extends GItem> fieldOwner, final String fieldName)
 		throws NullPointerException, IllegalArgumentException {
 		return Natives.nativeField(fieldOwner, fieldName, true);
 	}
@@ -412,7 +410,7 @@ public class Natives {
 	 * forceAccessible)}.
 	 *
 	 * @see #parseField */
-	public static <GItem, GValue> Field2<GItem, GValue> nativeField(final Class<? extends GItem> fieldOwner, final String fieldName,
+	public static <GItem, GValue> Field3<GItem, GValue> nativeField(final Class<? extends GItem> fieldOwner, final String fieldName,
 		final boolean forceAccessible) throws NullPointerException, IllegalArgumentException {
 		return Natives.nativeField(parseField(fieldOwner, fieldName), forceAccessible);
 	}
@@ -708,7 +706,7 @@ public class Natives {
 
 	}
 
-	/** Diese Klasse implementiert {@link Field2}, das das {@link #get(Object) Lesen} und {@link #set(Object, Object) Schreiben} an ein gegebenes
+	/** Diese Klasse implementiert {@link Field3}, das das {@link #get(Object) Lesen} und {@link #set(Object, Object) Schreiben} an ein gegebenes
 	 * {@link java.lang.reflect.Field natives Datenfeld} delegiert. Bei einem statischen nativen Datenfeld wird der Datensatz ignoriert.
 	 *
 	 * @see java.lang.reflect.Field#get(Object)
@@ -933,7 +931,7 @@ public class Natives {
 	 * {@link java.lang.reflect.Field natives statisches Datenfeld} delegiert. *
 	 *
 	 * @param <VALUE> Typ des Werts. */
-	public static class NativeProperty<VALUE> extends AbstractProperty<VALUE> {
+	public static class NativeProperty<VALUE> implements Property3<VALUE> {
 
 		public final java.lang.reflect.Field that;
 

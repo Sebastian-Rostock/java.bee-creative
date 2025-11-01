@@ -2,7 +2,7 @@ package bee.creative.util;
 
 import static bee.creative.util.Setters.setterFrom;
 
-/** Diese Schnittstelle ergänzt einen {@link Setter} insb. um eine Anbindung an Methoden von {@link Setters}.
+/** Diese Schnittstelle definiert einen {@link Setter} mit {@link Setter3}-Schnittstelle.
  *
  * @author [cc-by] 2021 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <T> Typ des Datensatzes.

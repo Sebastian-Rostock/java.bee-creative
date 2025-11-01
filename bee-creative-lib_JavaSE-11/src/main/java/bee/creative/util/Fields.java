@@ -1,5 +1,6 @@
 package bee.creative.util;
 
+import static bee.creative.lang.Objects.notNull;
 import static bee.creative.util.Getters.concatGetter;
 import static bee.creative.util.Setters.concatSetter;
 import static bee.creative.util.Setters.setterFromConsumer;
@@ -11,35 +12,42 @@ import bee.creative.lang.Objects;
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class Fields {
 
+	/** Diese Methode liefert das gegebene {@link Field} als {@link Field3}. */
+	public static <T, V> Field3<T, V> fieldFrom(Field<T, V> that) {
+		notNull(that);
+		if (that instanceof Field3<?, ?>) return (Field3<T, V>)that;
+		return fieldFrom(item -> that.get(item), (item, value) -> that.set(item, value));
+	}
+
 	/** Diese Methode ist eine Abkürzung für {@link CompositeField new CompositeField<>(get, set)}. */
-	public static <ITEM, VALUE> Field2<ITEM, VALUE> fieldFrom(Getter<? super ITEM, ? extends VALUE> get, Setter<? super ITEM, ? super VALUE> set)
+	public static <ITEM, VALUE> Field3<ITEM, VALUE> fieldFrom(Getter<? super ITEM, ? extends VALUE> get, Setter<? super ITEM, ? super VALUE> set)
 		throws NullPointerException {
 		return new CompositeField<>(get, set);
 	}
 
-	/** Diese Methode liefert einen {@link Field2} zu {@link Property#get()} und {@link Property#set(Object)} und ist eine Abkürzung für
+	/** Diese Methode liefert einen {@link Field3} zu {@link Property#get()} und {@link Property#set(Object)} und ist eine Abkürzung für
 	 * {@link #fieldFrom(Getter, Setter) fieldFrom(getterFrom(that), setterFrom(that))}.
 	 *
 	 * @see Getters#getterFromProducer(Producer)
 	 * @see Setters#setterFromConsumer(Consumer) */
-	public static <VALUE> Field2<Object, VALUE> fieldFromProperty(Property<VALUE> that) {
+	public static <VALUE> Field3<Object, VALUE> fieldFromProperty(Property<VALUE> that) {
 		return fieldFrom(Getters.getterFromProducer(that), setterFromConsumer(that));
 	}
 
-	/** Diese Methode liefert ein {@link Field2} zu {@link Map#get(Object)} und {@link Map#put(Object, Object)} und ist eine Abkürzung für
+	/** Diese Methode liefert ein {@link Field3} zu {@link Map#get(Object)} und {@link Map#put(Object, Object)} und ist eine Abkürzung für
 	 * {@link #fieldFrom(Getter, Setter) fieldFrom(that::get, that::put)}. */
-	public static <ITEM, VALUE> Field2<ITEM, VALUE> fieldFromMap(Map<ITEM, VALUE> that) throws NullPointerException {
+	public static <ITEM, VALUE> Field3<ITEM, VALUE> fieldFromMap(Map<ITEM, VALUE> that) throws NullPointerException {
 		return fieldFrom(that::get, that::put);
 	}
 
 	/** Diese Methode liefert das {@link EmptyField}. */
 	@SuppressWarnings ("unchecked")
-	public static <ITEM, VALUE> Field2<ITEM, VALUE> emptyField() {
-		return (Field2<ITEM, VALUE>)EmptyField;
+	public static <ITEM, VALUE> Field3<ITEM, VALUE> emptyField() {
+		return (Field3<ITEM, VALUE>)EmptyField;
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link SetupField new SetupField<>(that, setup)}. */
-	public static <ITEM, VALUE> Field2<ITEM, VALUE> setupField(final Field<? super ITEM, VALUE> that, final Getter<? super ITEM, ? extends VALUE> setup)
+	public static <ITEM, VALUE> Field3<ITEM, VALUE> setupField(final Field<? super ITEM, VALUE> that, final Getter<? super ITEM, ? extends VALUE> setup)
 		throws NullPointerException {
 		return new SetupField<>(that, setup);
 	}
@@ -48,7 +56,7 @@ public final class Fields {
 	 *
 	 * @see Getters#concatGetter(Getter, Getter)
 	 * @see Setters#concatSetter(Getter, Setter) */
-	public static <ITEM, ITEM2, VALUE> Field2<ITEM, VALUE> concatField(Getter<? super ITEM, ? extends ITEM2> trans, Field<? super ITEM2, VALUE> that)
+	public static <ITEM, ITEM2, VALUE> Field3<ITEM, VALUE> concatField(Getter<? super ITEM, ? extends ITEM2> trans, Field<? super ITEM2, VALUE> that)
 		throws NullPointerException {
 		return fieldFrom(concatGetter(trans, that), concatSetter(trans, that));
 	}
@@ -62,7 +70,7 @@ public final class Fields {
 	 *
 	 * @see Getters#concatGetter(Getter, Getter)
 	 * @see Setters#translatedSetter(Setter, Getter) */
-	public static <ITEM, GSource, GTarget> Field2<ITEM, GTarget> translateField(final Field<? super ITEM, GSource> that,
+	public static <ITEM, GSource, GTarget> Field3<ITEM, GTarget> translateField(final Field<? super ITEM, GSource> that,
 		final Getter<? super GSource, ? extends GTarget> getTrans, final Getter<? super GTarget, ? extends GSource> setTrans) throws NullPointerException {
 		return Fields.fieldFrom(concatGetter(that, getTrans), Setters.translatedSetter(that, setTrans));
 	}
@@ -71,7 +79,7 @@ public final class Fields {
 	 *
 	 * @see Translator#toTarget(Object)
 	 * @see Translator#toSource(Object) */
-	public static <ITEM, GSource, GTarget> Field2<ITEM, GTarget> translateField(final Field<? super ITEM, GSource> that, final Translator<GSource, GTarget> trans)
+	public static <ITEM, GSource, GTarget> Field3<ITEM, GTarget> translateField(final Field<? super ITEM, GSource> that, final Translator<GSource, GTarget> trans)
 		throws NullPointerException {
 		return translateField(that, trans::toTarget, trans::toSource);
 	}
@@ -80,7 +88,7 @@ public final class Fields {
 	 *
 	 * @see Getters#aggregatedGetter(Getter, Getter)
 	 * @see Setters#aggregatedSetter(Setter, Getter) */
-	public static <GEntry, GSource, GTarget> Field2<Iterable<? extends GEntry>, GTarget> aggregateField(final Field<? super GEntry, GSource> that,
+	public static <GEntry, GSource, GTarget> Field3<Iterable<? extends GEntry>, GTarget> aggregateField(final Field<? super GEntry, GSource> that,
 		final Getter<? super GSource, ? extends GTarget> getTrans, final Getter<? super GTarget, ? extends GSource> setTrans) throws NullPointerException {
 		return Fields.<Iterable<? extends GEntry>, GTarget>fieldFrom(Getters.aggregatedGetter(that, getTrans), Setters.aggregatedSetter(that, setTrans));
 	}
@@ -90,7 +98,7 @@ public final class Fields {
 	 *
 	 * @see Getters#aggregatedGetter(Getter, Getter, Getter, Getter)
 	 * @see Setters#aggregatedSetter(Setter, Getter) */
-	public static <ITEM extends Iterable<? extends ITEM2>, VALUE, ITEM2, VALUE2> Field2<ITEM, VALUE> aggregatedField(final Field<? super ITEM2, VALUE2> that,
+	public static <ITEM extends Iterable<? extends ITEM2>, VALUE, ITEM2, VALUE2> Field3<ITEM, VALUE> aggregatedField(final Field<? super ITEM2, VALUE2> that,
 		final Getter<? super VALUE2, ? extends VALUE> getTrans, final Getter<? super VALUE, ? extends VALUE2> setTrans,
 		final Getter<? super ITEM, ? extends VALUE> empty, final Getter<? super ITEM, ? extends VALUE> mixed) throws NullPointerException {
 		return Fields.fieldFrom(Getters.<ITEM, VALUE, ITEM2, VALUE2>aggregatedGetter(that, getTrans, empty, mixed), Setters.aggregatedSetter(that, setTrans));
@@ -100,24 +108,24 @@ public final class Fields {
 	 *
 	 * @see Getters#optionalizedGetter(Getter, Object)
 	 * @see Setters#optionalizedSetter(Setter) */
-	public static <ITEM, VALUE> Field2<ITEM, VALUE> optionalizedField(final Field<? super ITEM, VALUE> that, final VALUE value) throws NullPointerException {
+	public static <ITEM, VALUE> Field3<ITEM, VALUE> optionalizedField(final Field<? super ITEM, VALUE> that, final VALUE value) throws NullPointerException {
 		return Fields.fieldFrom(Getters.optionalizedGetter(that, value), Setters.optionalizedSetter(that));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link SynchronizedField new SynchronizedField<>(that, mutex)}. */
-	public static <ITEM, VALUE> Field2<ITEM, VALUE> synchronizedField(final Field<? super ITEM, VALUE> that, final Object mutex) throws NullPointerException {
+	public static <ITEM, VALUE> Field3<ITEM, VALUE> synchronizedField(final Field<? super ITEM, VALUE> that, final Object mutex) throws NullPointerException {
 		return new SynchronizedField<>(that, mutex);
 	}
 
-	public static final Field2<?, ?> EmptyField = new EmptyField();
+	public static final Field3<?, ?> EmptyField = new EmptyField();
 
-	/** Diese Klasse implementiert ein {@link Field2}, das beim {@link #get(Object) Lesen} stets {@code null} liefert und das {@link #set(Object, Object)
+	/** Diese Klasse implementiert ein {@link Field3}, das beim {@link #get(Object) Lesen} stets {@code null} liefert und das {@link #set(Object, Object)
 	 * Schreiben} ignoriert. */
 	public static class EmptyField extends AbstractField<Object, Object> {
 
 	}
 
-	/** Diese Klasse implementiert ein initialisierendes {@link Field2}, das das {@link #set(Object, Object) Schreiben} an ein gegebenes {@link Field} delegiert
+	/** Diese Klasse implementiert ein initialisierendes {@link Field3}, das das {@link #set(Object, Object) Schreiben} an ein gegebenes {@link Field} delegiert
 	 * und beim {@link #get(Object) Lesen} den Wert des gegebenen {@link Field} nur dann liefert, wenn dieser nicht {@code null} ist. Andernfalls wird der über
 	 * einen gegebenen {@link Getter} ermittelte Wert geliefert und zuvor über das gegebene {@link Field} geschrieben.
 	 *
@@ -156,7 +164,7 @@ public final class Fields {
 
 	}
 
-	/** Diese Klasse implementiert ein zusammengesetztes {@link Field2}, das das {@link #get(Object) Lesen} an einen gegebenen {@link Getter} und das
+	/** Diese Klasse implementiert ein zusammengesetztes {@link Field3}, das das {@link #get(Object) Lesen} an einen gegebenen {@link Getter} und das
 	 * {@link #set(Object, Object) Schreiben} an einen gegebenen {@link Setter} delegiert.
 	 *
 	 * @param <ITEM> Typ der Eingabe.
@@ -265,7 +273,7 @@ public final class Fields {
 
 	}
 
-	/** Diese Klasse implementiert ein {@link Field2}, das einen gegebenes {@link Field} über {@code synchronized(this.mutex)} synchronisiert. Wenn dieses
+	/** Diese Klasse implementiert ein {@link Field3}, das einen gegebenes {@link Field} über {@code synchronized(this.mutex)} synchronisiert. Wenn dieses
 	 * Synchronisationsobjekt {@code null} ist, wird {@code this} verwendet.
 	 *
 	 * @param <ITEM> Typ des Datensatzes.
