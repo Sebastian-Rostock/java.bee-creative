@@ -13,7 +13,7 @@ import java.util.Map;
 public class Translators {
 
 	/** Diese Methode liefert den gegebenen {@link Translator} als {@link Translator3}. */
-	public static <S, T> Translator3<S, T> translatorFrom(Translator<S, T> that) {
+	public static <S, T> Translator3<S, T> translatorFrom(Translator<S, T> that) throws NullPointerException {
 		notNull(that);
 		if (that instanceof Translator3) return (Translator3<S, T>)that;
 		return translatorFrom(object -> that.isTarget(object), object -> that.isSource(object), object -> that.toTarget(object), object -> that.toSource(object));

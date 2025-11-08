@@ -19,7 +19,7 @@ public final class Fields {
 		return fieldFrom(item -> that.get(item), (item, value) -> that.set(item, value));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link CompositeField new CompositeField<>(get, set)}. */
+	/** Diese Methode liefert ein {@link Field3} mit den gegebenen Methoden. */
 	public static <ITEM, VALUE> Field3<ITEM, VALUE> fieldFrom(Getter<? super ITEM, ? extends VALUE> get, Setter<? super ITEM, ? super VALUE> set)
 		throws NullPointerException {
 		return new CompositeField<>(get, set);

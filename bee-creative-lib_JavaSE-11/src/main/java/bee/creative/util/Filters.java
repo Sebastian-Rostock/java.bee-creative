@@ -4,7 +4,6 @@ import static bee.creative.lang.Objects.notNull;
 import static bee.creative.util.Iterables.iterableFromArray;
 import static bee.creative.util.Iterables.iterableToSet;
 import java.util.Collection;
-import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert grundlegende {@link Filter}.
  *

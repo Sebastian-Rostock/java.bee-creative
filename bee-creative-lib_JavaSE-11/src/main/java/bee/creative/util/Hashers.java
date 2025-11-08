@@ -1,37 +1,63 @@
 package bee.creative.util;
 
+import static bee.creative.lang.Objects.notNull;
 import bee.creative.lang.Objects;
 
-/** Diese Klasse implementiert grundlegende {@link Hasher}.
+/** Diese Klasse implementiert grundlegende {@link Hasher3}.
  *
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Hashers {
 
-	/** Diese Methode liefert den {@link DeepHasher}. */
-	public static Hasher2 deepHasher() {
-		return DeepHasher.INSTANCE;
+	/** Diese Methode liefert das gegebene {@link Hasher} als {@link Hasher3}. */
+	public static Hasher3 hasherFrom(Hasher that) throws NullPointerException {
+		notNull(that);
+		if (that instanceof Hasher3) return (Hasher3)that;
+		return hasherFrom(that, that);
 	}
 
-	/** Diese Methode liefert den {@link NaturalHasher}. */
-	public static Hasher2 naturalHasher() {
-		return NaturalHasher.INSTANCE;
+	/** Diese Methode liefert einen {@link Hasher3} mit den gegebenen Methoden. */
+	public static Hasher3 hasherFrom(HasherHash hash, HasherEquals equals) throws NullPointerException {
+		notNull(hash);
+		notNull(equals);
+		return new Hasher3() {
+
+			@Override
+			public int hash(Object input) {
+				return hash.hash(input);
+			}
+
+			@Override
+			public boolean equals(Object input1, Object input2) {
+				return equals.equals(input1, input2);
+			}
+
+		};
 	}
 
-	/** Diese Methode liefert den {@link IdentityHasher}. */
-	public static Hasher2 identityHasher() {
-		return IdentityHasher.INSTANCE;
+	/** Diese Methode liefert einen {@link Hasher3}, der an {@link Objects#deepHash(Object)} und {@link Objects#deepEquals(Object, Object)} delegiert. */
+	public static Hasher3 deepHasher() {
+		return deepHasher;
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link TranslatedHasher new TranslatedHasher(that, trans)}. */
-	public static Hasher2 translatedHasher(Hasher that, Getter<? super Object, ?> trans) throws NullPointerException {
-		return new TranslatedHasher(that, trans);
+	/** Diese Methode liefert einen {@link Hasher3}, der an {@link Objects#hash(Object)} und {@link Objects#equals(Object, Object)} delegiert. */
+	public static Hasher3 naturalHasher() {
+		return naturalHasher;
 	}
 
-	/** Diese Klasse implementiert einen {@link Hasher}, der an {@link Objects#deepHash(Object)} und {@link Objects#deepEquals(Object, Object)} delegiert. */
+	/** Diese Methode liefert einen {@link Hasher3}, der an {@link Objects#identityHash(Object)} und {@link Objects#identityEquals(Object, Object)} delegiert. */
+	public static Hasher3 identityHasher() {
+		return identityHasher;
+	}
 
-	public static class DeepHasher extends AbstractHasher {
+	/** Diese Methode liefert einen übersetzten {@link Hasher3}, der Streuwert und Äquivalenz über einen gegebenen {@link Hasher} zu den über einen gegebenen
+	 * {@link Getter} umgewandelten Objekten ermittelt. */
+	public static Hasher3 translatedHasher(Hasher that, Getter<? super Object, ?> trans) throws NullPointerException {
+		notNull(that);
+		notNull(trans);
+		return hasherFrom(input -> that.hash(trans.get(input)), (input1, input2) -> that.equals(trans.get(input1), trans.get(input2)));
+	}
 
-		public static final Hasher2 INSTANCE = new DeepHasher();
+	private static final Hasher3 deepHasher = new Hasher3() {
 
 		@Override
 		public int hash(Object input) {
@@ -43,22 +69,23 @@ public class Hashers {
 			return Objects.deepEquals(input1, input2);
 		}
 
-	}
+	};
 
-	/** Diese Klasse implementiert einen {@link Hasher}, der an {@link Objects#hash(Object)} und {@link Objects#equals(Object, Object)} delegiert. */
+	private static final Hasher3 naturalHasher = new Hasher3() {
 
-	public static class NaturalHasher extends AbstractHasher {
+		@Override
+		public int hash(Object input) {
+			return Objects.hash(input);
+		}
 
-		public static final Hasher2 INSTANCE = new NaturalHasher();
+		@Override
+		public boolean equals(Object input1, Object input2) {
+			return Objects.equals(input1, input2);
+		}
 
-	}
+	};
 
-	/** Diese Klasse implementiert einen {@link Hasher}, der an {@link Objects#identityHash(Object)} und {@link Objects#identityEquals(Object, Object)}
-	 * delegiert. */
-
-	public static class IdentityHasher extends AbstractHasher {
-
-		public static final Hasher2 INSTANCE = new IdentityHasher();
+	private static final Hasher3 identityHasher = new Hasher3() {
 
 		@Override
 		public int hash(Object input) {
@@ -70,37 +97,6 @@ public class Hashers {
 			return Objects.identityEquals(input1, input2);
 		}
 
-	}
-
-	/** Diese Klasse implementiert einen übersetzten {@link Hasher}, der Streuwert und Äquivalenz über einen gegebenen {@link Hasher} zu den über einen gegebenen
-	 * {@link Getter} umgewandelten Objekten ermittelt. */
-
-	public static class TranslatedHasher extends AbstractHasher {
-
-		public TranslatedHasher(Hasher that, Getter<? super Object, ?> trans) throws NullPointerException {
-			this.that = Objects.notNull(that);
-			this.trans = Objects.notNull(trans);
-		}
-
-		@Override
-		public int hash(Object input) {
-			return this.that.hash(this.trans.get(input));
-		}
-
-		@Override
-		public boolean equals(Object input1, Object input2) {
-			return this.that.equals(this.trans.get(input1), this.trans.get(input2));
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.that, this.trans);
-		}
-
-		private final Hasher that;
-
-		private final Getter<? super Object, ?> trans;
-
-	}
+	};
 
 }
