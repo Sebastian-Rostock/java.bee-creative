@@ -12,7 +12,6 @@ import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.ShortBuffer;
-import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
 import bee.creative.emu.EMU;
 import bee.creative.emu.Emuable;
@@ -78,42 +77,42 @@ public class MappedBuffer implements Emuable {
 	/** Diese Methode gibt die Datei zurück, an die dieser Puffer gebunden ist.
 	 *
 	 * @return gebundene Datei. */
-	public File file() {
+	public final File file() {
 		return this.file;
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn die {@link #order() Bytereihenfolge} der nativen entspricht.
 	 *
 	 * @return {@code true} bei nativer Bytereihenfolge. */
-	public boolean isNE() {
+	public final boolean isNE() {
 		return this.order == Bytes.NATIVE_ORDER;
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn die {@link #order() Bytereihenfolge} {@link ByteOrder#LITTLE_ENDIAN} ist.
 	 *
 	 * @return {@code true} bei Bytereihenfolge {@link ByteOrder#LITTLE_ENDIAN}. */
-	public boolean isLE() {
+	public final boolean isLE() {
 		return this.order == ByteOrder.LITTLE_ENDIAN;
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn die {@link #order() Bytereihenfolge} {@link ByteOrder#BIG_ENDIAN} ist.
 	 *
 	 * @return {@code true} bei Bytereihenfolge {@link ByteOrder#BIG_ENDIAN}. */
-	public boolean isBE() {
+	public final boolean isBE() {
 		return this.order == ByteOrder.BIG_ENDIAN;
 	}
 
 	/** Diese Methode gibt gibt nur dann {@code true} zurück, wenn dieser Puffer die {@link #file() Datei} nur für den Lesezugriff angebunden hat.
 	 *
 	 * @return Zugriffsmodus. */
-	public boolean isReadonly() {
+	public final boolean isReadonly() {
 		return this.isReadonly;
 	}
 
 	/** Diese Methode gibt die Größe des Puffers zurück.
 	 *
 	 * @return Puffergröße. */
-	public long size() {
+	public final long size() {
 		return this.size;
 	}
 
@@ -128,8 +127,9 @@ public class MappedBuffer implements Emuable {
 		if (minSize < 0) throw new IllegalArgumentException();
 		synchronized (this) {
 			if (minSize <= this.size) return false;
-			long scale = this.growScale, align = this.growAlign() - 1;
-			long newSize = ((minSize + ((minSize * scale) / 32)) + align) & ~align;
+			var scale = this.growScale;
+			var align = this.growAlign() - 1L;
+			var newSize = ((minSize + ((minSize * scale) / 32)) + align) & ~align;
 			this.resizeImpl(newSize < 0 ? Long.MAX_VALUE - 7 : newSize);
 			return true;
 		}
@@ -138,7 +138,7 @@ public class MappedBuffer implements Emuable {
 	/** Diese Methode gibt die Wachstumsausrichtung zurück, die in {@link #grow(long)} zur Berechnung der neuen Puffergröße verwendet wird.
 	 *
 	 * @return Wachstumsausrichtung in Byte (8..1073741824). */
-	public int growAlign() {
+	public final int growAlign() {
 		return 1 << this.growAlign;
 	}
 
@@ -157,7 +157,7 @@ public class MappedBuffer implements Emuable {
 	/** Diese Methode gibt den Wachstumsfaktor zurück, der in {@link #grow(long)} zur Berechnung der neuen Puffergröße verwendet wird.
 	 *
 	 * @return Wachstumsfaktor in Prozent (0..200 Prozent). */
-	public int growScale() {
+	public final int growScale() {
 		return (this.growScale * 100) / 32;
 	}
 
@@ -202,7 +202,7 @@ public class MappedBuffer implements Emuable {
 	public MappedBuffer truncate() throws IOException {
 		if (this.isReadonly) throw new IOException();
 		synchronized (this) {
-			try (RandomAccessFile file = new RandomAccessFile(this.file, "rw")) {
+			try (var file = new RandomAccessFile(this.file, "rw")) {
 				file.setLength(this.size);
 			}
 		}
@@ -213,7 +213,7 @@ public class MappedBuffer implements Emuable {
 	 *
 	 * @see MappedByteBuffer#force() */
 	public void force() {
-		for (MappedByteBuffer buffer: this.buffers) {
+		for (var buffer: this.buffers) {
 			buffer.force();
 		}
 	}
@@ -226,16 +226,16 @@ public class MappedBuffer implements Emuable {
 	public void force(long address, long length) {
 		if (length == 0) return;
 		if (length < 0) throw new IllegalArgumentException();
-		long address2 = address + length;
-		int minIndex = bufferIndex(address);
-		int minValue = valueIndex(address);
-		int maxIndex = bufferIndex(address2);
-		int maxValue = valueIndex(address2);
+		var address2 = address + length;
+		var minIndex = bufferIndex(address);
+		var minValue = valueIndex(address);
+		var maxIndex = bufferIndex(address2);
+		var maxValue = valueIndex(address2);
 		if (minIndex == maxIndex) {
 			forceImpl(this.buffers[minIndex], minValue, maxValue + 1);
 		} else {
 			forceImpl(this.buffers[minIndex], minValue, BUFFER_LENGTH - BUFFER_GUARD);
-			for (int i = minIndex + 1; i < maxIndex; i++) {
+			for (var i = minIndex + 1; i < maxIndex; i++) {
 				forceImpl(this.buffers[i], 0, BUFFER_LENGTH - BUFFER_GUARD);
 			}
 			forceImpl(this.buffers[maxIndex], 0, maxValue + 1);
@@ -246,7 +246,7 @@ public class MappedBuffer implements Emuable {
 	 *
 	 * @see ByteBuffer#order()
 	 * @return Bytereihenfolge. */
-	public ByteOrder order() {
+	public final ByteOrder order() {
 		return this.order;
 	}
 
@@ -260,7 +260,7 @@ public class MappedBuffer implements Emuable {
 		synchronized (this) {
 			if (this.order == order) return this;
 			this.order = order;
-			for (MappedByteBuffer buffer: this.buffers) {
+			for (var buffer: this.buffers) {
 				buffer.order(order);
 			}
 		}
@@ -271,7 +271,7 @@ public class MappedBuffer implements Emuable {
 	 *
 	 * @param address Adresse, ab welcher der Speicherbereich beginnt. */
 	public ByteBuffer buffer(long address) {
-		ByteBuffer source = this.buffers[bufferIndex(address)].duplicate();
+		var source = this.buffers[bufferIndex(address)].duplicate();
 		source.position(valueIndex(address));
 		return source;
 	}
@@ -303,9 +303,9 @@ public class MappedBuffer implements Emuable {
 	 * @param length Länge des Abschnitts. */
 	public void get(long address, byte[] target, int offset, int length) {
 		while (length != 0) {
-			ByteBuffer source = this.buffers[bufferIndex(address)].duplicate();
-			int index = valueIndex(address);
-			int count = valueCount1(index, length);
+			var source = this.buffers[bufferIndex(address)].duplicate();
+			var index = valueIndex(address);
+			var count = valueCount1(index, length);
 			source.position(index);
 			source.get(target, offset, count);
 			length -= count;
@@ -319,11 +319,11 @@ public class MappedBuffer implements Emuable {
 	 * @param address Adresse.
 	 * @param target {@code byte}-Puffer. */
 	public void get(long address, ByteBuffer target) {
-		int length = target.remaining();
+		var length = target.remaining();
 		while (length != 0) {
-			ByteBuffer source = this.buffers[bufferIndex(address)].duplicate();
-			int index = valueIndex(address);
-			int count = valueCount1(index, length);
+			var source = this.buffers[bufferIndex(address)].duplicate();
+			var index = valueIndex(address);
+			var count = valueCount1(index, length);
 			source.limit(index + count);
 			source.position(index);
 			target.put(source);
@@ -369,9 +369,9 @@ public class MappedBuffer implements Emuable {
 	 * @param length Länge des Abschnitts. */
 	public void put(long address, byte[] source, int offset, int length) {
 		while (length != 0) {
-			ByteBuffer target = this.buffers[bufferIndex(address)].duplicate();
-			int index = valueIndex(address);
-			int count = valueCount1(index, length);
+			var target = this.buffers[bufferIndex(address)].duplicate();
+			var index = valueIndex(address);
+			var count = valueCount1(index, length);
 			target.position(index);
 			target.put(source, offset, count);
 			length -= count;
@@ -385,11 +385,11 @@ public class MappedBuffer implements Emuable {
 	 * @param address Adresse.
 	 * @param source {@code byte}-Puffer. */
 	public void put(long address, ByteBuffer source) {
-		int length = source.remaining();
+		var length = source.remaining();
 		while (length != 0) {
-			ByteBuffer target = this.buffers[bufferIndex(address)].duplicate();
-			int index = valueIndex(address);
-			int count = valueCount1(index, length);
+			var target = this.buffers[bufferIndex(address)].duplicate();
+			var index = valueIndex(address);
+			var count = valueCount1(index, length);
 			source.limit(index + count);
 			target.position(index);
 			target.put(source);
@@ -435,9 +435,9 @@ public class MappedBuffer implements Emuable {
 	 * @param length Länge des Abschnitts. */
 	public void getChar(long address, char[] target, int offset, int length) {
 		while (length != 0) {
-			ByteBuffer source = this.buffers[bufferIndex(address)].duplicate().order(this.order);
-			int index = valueIndex(address);
-			int count = valueCount2(index, length);
+			var source = this.buffers[bufferIndex(address)].duplicate().order(this.order);
+			var index = valueIndex(address);
+			var count = valueCount2(index, length);
 			source.position(index);
 			source.asCharBuffer().get(target, offset, count);
 			length -= count;
@@ -451,11 +451,11 @@ public class MappedBuffer implements Emuable {
 	 * @param address Adresse.
 	 * @param target {@code char}-Puffer. */
 	public void getChar(long address, CharBuffer target) {
-		int length = target.remaining();
+		var length = target.remaining();
 		while (length != 0) {
-			ByteBuffer source = this.buffers[bufferIndex(address)].duplicate().order(this.order);
-			int index = valueIndex(address);
-			int count = valueCount2(index, length);
+			var source = this.buffers[bufferIndex(address)].duplicate().order(this.order);
+			var index = valueIndex(address);
+			var count = valueCount2(index, length);
 			source.limit(index + count);
 			source.position(index);
 			target.put(source.asCharBuffer());
@@ -491,9 +491,9 @@ public class MappedBuffer implements Emuable {
 	 * @param length Länge des Abschnitts. */
 	public void putChar(long address, char[] source, int offset, int length) {
 		while (length != 0) {
-			ByteBuffer target = this.buffers[bufferIndex(address)].duplicate().order(this.order);
-			int index = valueIndex(address);
-			int count = valueCount2(index, length);
+			var target = this.buffers[bufferIndex(address)].duplicate().order(this.order);
+			var index = valueIndex(address);
+			var count = valueCount2(index, length);
 			target.position(index);
 			target.asCharBuffer().put(source, offset, count);
 			length -= count;
@@ -507,11 +507,11 @@ public class MappedBuffer implements Emuable {
 	 * @param address Adresse.
 	 * @param source {@code char}-Puffer. */
 	public void putChar(long address, CharBuffer source) {
-		int length = source.remaining();
+		var length = source.remaining();
 		while (length != 0) {
-			ByteBuffer target = this.buffers[bufferIndex(address)].duplicate().order(this.order);
-			int index = valueIndex(address);
-			int count = valueCount2(index, length);
+			var target = this.buffers[bufferIndex(address)].duplicate().order(this.order);
+			var index = valueIndex(address);
+			var count = valueCount2(index, length);
 			source.limit(index + count);
 			target.position(index);
 			target.asCharBuffer().put(source);
@@ -547,9 +547,9 @@ public class MappedBuffer implements Emuable {
 	 * @param length Länge des Abschnitts. */
 	public void getShort(long address, short[] target, int offset, int length) {
 		while (length != 0) {
-			ByteBuffer source = this.buffers[bufferIndex(address)].duplicate().order(this.order);
-			int index = valueIndex(address);
-			int count = valueCount2(index, length);
+			var source = this.buffers[bufferIndex(address)].duplicate().order(this.order);
+			var index = valueIndex(address);
+			var count = valueCount2(index, length);
 			source.position(index);
 			source.asShortBuffer().get(target, offset, count);
 			length -= count;
@@ -563,11 +563,11 @@ public class MappedBuffer implements Emuable {
 	 * @param address Adresse.
 	 * @param target {@code short}-Puffer. */
 	public void getShort(long address, ShortBuffer target) {
-		int length = target.remaining();
+		var length = target.remaining();
 		while (length != 0) {
-			ByteBuffer source = this.buffers[bufferIndex(address)].duplicate().order(this.order);
-			int index = valueIndex(address);
-			int count = valueCount2(index, length);
+			var source = this.buffers[bufferIndex(address)].duplicate().order(this.order);
+			var index = valueIndex(address);
+			var count = valueCount2(index, length);
 			source.limit(index + count);
 			source.position(index);
 			target.put(source.asShortBuffer());
@@ -603,9 +603,9 @@ public class MappedBuffer implements Emuable {
 	 * @param length Länge des Abschnitts. */
 	public void putShort(long address, short[] source, int offset, int length) {
 		while (length != 0) {
-			ByteBuffer target = this.buffers[bufferIndex(address)].duplicate().order(this.order);
-			int index = valueIndex(address);
-			int count = valueCount2(index, length);
+			var target = this.buffers[bufferIndex(address)].duplicate().order(this.order);
+			var index = valueIndex(address);
+			var count = valueCount2(index, length);
 			target.position(index);
 			target.asShortBuffer().put(source, offset, count);
 			length -= count;
@@ -619,11 +619,11 @@ public class MappedBuffer implements Emuable {
 	 * @param address Adresse.
 	 * @param source {@code short}-Puffer. */
 	public void putShort(long address, ShortBuffer source) {
-		int length = source.remaining();
+		var length = source.remaining();
 		while (length != 0) {
-			ByteBuffer target = this.buffers[bufferIndex(address)].duplicate().order(this.order);
-			int index = valueIndex(address);
-			int count = valueCount2(index, length);
+			var target = this.buffers[bufferIndex(address)].duplicate().order(this.order);
+			var index = valueIndex(address);
+			var count = valueCount2(index, length);
 			source.limit(index + count);
 			target.position(index);
 			target.asShortBuffer().put(source);
@@ -659,9 +659,9 @@ public class MappedBuffer implements Emuable {
 	 * @param length Länge des Abschnitts. */
 	public void getInt(long address, int[] target, int offset, int length) {
 		while (length != 0) {
-			ByteBuffer source = this.buffers[bufferIndex(address)].duplicate().order(this.order);
-			int index = valueIndex(address);
-			int count = valueCount4(index, length);
+			var source = this.buffers[bufferIndex(address)].duplicate().order(this.order);
+			var index = valueIndex(address);
+			var count = valueCount4(index, length);
 			source.position(index);
 			source.asIntBuffer().get(target, offset, count);
 			length -= count;
@@ -675,11 +675,11 @@ public class MappedBuffer implements Emuable {
 	 * @param address Adresse.
 	 * @param target {@code int}-Puffer. */
 	public void getInt(long address, IntBuffer target) {
-		int length = target.remaining();
+		var length = target.remaining();
 		while (length != 0) {
-			ByteBuffer source = this.buffers[bufferIndex(address)].duplicate().order(this.order);
-			int index = valueIndex(address);
-			int count = valueCount4(index, length);
+			var source = this.buffers[bufferIndex(address)].duplicate().order(this.order);
+			var index = valueIndex(address);
+			var count = valueCount4(index, length);
 			source.limit(index + count);
 			source.position(index);
 			target.put(source.asIntBuffer());
@@ -715,9 +715,9 @@ public class MappedBuffer implements Emuable {
 	 * @param length Länge des Abschnitts. */
 	public void putInt(long address, int[] source, int offset, int length) {
 		while (length != 0) {
-			ByteBuffer target = this.buffers[bufferIndex(address)].duplicate().order(this.order);
-			int index = valueIndex(address);
-			int count = valueCount4(index, length);
+			var target = this.buffers[bufferIndex(address)].duplicate().order(this.order);
+			var index = valueIndex(address);
+			var count = valueCount4(index, length);
 			target.position(index);
 			target.asIntBuffer().put(source, offset, count);
 			length -= count;
@@ -731,11 +731,11 @@ public class MappedBuffer implements Emuable {
 	 * @param address Adresse.
 	 * @param source {@code int}-Puffer. */
 	public void putInt(long address, IntBuffer source) {
-		int length = source.remaining();
+		var length = source.remaining();
 		while (length != 0) {
-			ByteBuffer target = this.buffers[bufferIndex(address)].duplicate().order(this.order);
-			int index = valueIndex(address);
-			int count = valueCount4(index, length);
+			var target = this.buffers[bufferIndex(address)].duplicate().order(this.order);
+			var index = valueIndex(address);
+			var count = valueCount4(index, length);
 			source.limit(index + count);
 			target.position(index);
 			target.asIntBuffer().put(source);
@@ -771,9 +771,9 @@ public class MappedBuffer implements Emuable {
 	 * @param length Länge des Abschnitts. */
 	public void getLong(long address, long[] target, int offset, int length) {
 		while (length != 0) {
-			ByteBuffer source = this.buffers[bufferIndex(address)].duplicate().order(this.order);
-			int index = valueIndex(address);
-			int count = valueCount8(index, length);
+			var source = this.buffers[bufferIndex(address)].duplicate().order(this.order);
+			var index = valueIndex(address);
+			var count = valueCount8(index, length);
 			source.position(index);
 			source.asLongBuffer().get(target, offset, count);
 			length -= count;
@@ -787,11 +787,11 @@ public class MappedBuffer implements Emuable {
 	 * @param address Adresse.
 	 * @param target {@code long}-Puffer. */
 	public void getLong(long address, LongBuffer target) {
-		int length = target.remaining();
+		var length = target.remaining();
 		while (length != 0) {
-			ByteBuffer source = this.buffers[bufferIndex(address)].duplicate().order(this.order);
-			int index = valueIndex(address);
-			int count = valueCount8(index, length);
+			var source = this.buffers[bufferIndex(address)].duplicate().order(this.order);
+			var index = valueIndex(address);
+			var count = valueCount8(index, length);
 			source.limit(index + count);
 			source.position(index);
 			target.put(source.asLongBuffer());
@@ -827,9 +827,9 @@ public class MappedBuffer implements Emuable {
 	 * @param length Länge des Abschnitts. */
 	public void putLong(long address, long[] source, int offset, int length) {
 		while (length != 0) {
-			ByteBuffer target = this.buffers[bufferIndex(address)].duplicate().order(this.order);
-			int index = valueIndex(address);
-			int count = valueCount8(index, length);
+			var target = this.buffers[bufferIndex(address)].duplicate().order(this.order);
+			var index = valueIndex(address);
+			var count = valueCount8(index, length);
 			target.position(index);
 			target.asLongBuffer().put(source, offset, count);
 			length -= count;
@@ -843,11 +843,11 @@ public class MappedBuffer implements Emuable {
 	 * @param address Adresse.
 	 * @param source {@code long}-Puffer. */
 	public void putLong(long address, LongBuffer source) {
-		int length = source.remaining();
+		var length = source.remaining();
 		while (length != 0) {
-			ByteBuffer target = this.buffers[bufferIndex(address)].duplicate().order(this.order);
-			int index = valueIndex(address);
-			int count = valueCount8(index, length);
+			var target = this.buffers[bufferIndex(address)].duplicate().order(this.order);
+			var index = valueIndex(address);
+			var count = valueCount8(index, length);
 			source.limit(index + count);
 			target.position(index);
 			target.asLongBuffer().put(source);
@@ -883,9 +883,9 @@ public class MappedBuffer implements Emuable {
 	 * @param length Länge des Abschnitts. */
 	public void getFloat(long address, float[] target, int offset, int length) {
 		while (length != 0) {
-			ByteBuffer source = this.buffers[bufferIndex(address)].duplicate().order(this.order);
-			int index = valueIndex(address);
-			int count = valueCount4(index, length);
+			var source = this.buffers[bufferIndex(address)].duplicate().order(this.order);
+			var index = valueIndex(address);
+			var count = valueCount4(index, length);
 			source.position(index);
 			source.asFloatBuffer().get(target, offset, count);
 			length -= count;
@@ -899,11 +899,11 @@ public class MappedBuffer implements Emuable {
 	 * @param address Adresse.
 	 * @param target {@code float}-Puffer. */
 	public void getFloat(long address, FloatBuffer target) {
-		int length = target.remaining();
+		var length = target.remaining();
 		while (length != 0) {
-			ByteBuffer source = this.buffers[bufferIndex(address)].duplicate().order(this.order);
-			int index = valueIndex(address);
-			int count = valueCount4(index, length);
+			var source = this.buffers[bufferIndex(address)].duplicate().order(this.order);
+			var index = valueIndex(address);
+			var count = valueCount4(index, length);
 			source.limit(index + count);
 			source.position(index);
 			target.put(source.asFloatBuffer());
@@ -939,9 +939,9 @@ public class MappedBuffer implements Emuable {
 	 * @param length Länge des Abschnitts. */
 	public void putFloat(long address, float[] source, int offset, int length) {
 		while (length != 0) {
-			ByteBuffer target = this.buffers[bufferIndex(address)].duplicate().order(this.order);
-			int index = valueIndex(address);
-			int count = valueCount4(index, length);
+			var target = this.buffers[bufferIndex(address)].duplicate().order(this.order);
+			var index = valueIndex(address);
+			var count = valueCount4(index, length);
 			target.position(index);
 			target.asFloatBuffer().put(source, offset, count);
 			length -= count;
@@ -955,11 +955,11 @@ public class MappedBuffer implements Emuable {
 	 * @param address Adresse.
 	 * @param source {@code float}-Puffer. */
 	public void putFloat(long address, FloatBuffer source) {
-		int length = source.remaining();
+		var length = source.remaining();
 		while (length != 0) {
-			ByteBuffer target = this.buffers[bufferIndex(address)].duplicate().order(this.order);
-			int index = valueIndex(address);
-			int count = valueCount4(index, length);
+			var target = this.buffers[bufferIndex(address)].duplicate().order(this.order);
+			var index = valueIndex(address);
+			var count = valueCount4(index, length);
 			source.limit(index + count);
 			target.position(index);
 			target.asFloatBuffer().put(source);
@@ -995,9 +995,9 @@ public class MappedBuffer implements Emuable {
 	 * @param length Länge des Abschnitts. */
 	public void getDouble(long address, double[] target, int offset, int length) {
 		while (length != 0) {
-			ByteBuffer source = this.buffers[bufferIndex(address)].duplicate().order(this.order);
-			int index = valueIndex(address);
-			int count = valueCount8(index, length);
+			var source = this.buffers[bufferIndex(address)].duplicate().order(this.order);
+			var index = valueIndex(address);
+			var count = valueCount8(index, length);
 			source.position(index);
 			source.asDoubleBuffer().get(target, offset, count);
 			length -= count;
@@ -1011,11 +1011,11 @@ public class MappedBuffer implements Emuable {
 	 * @param address Adresse.
 	 * @param target {@code double}-Puffer. */
 	public void getDouble(long address, DoubleBuffer target) {
-		int length = target.remaining();
+		var length = target.remaining();
 		while (length != 0) {
-			ByteBuffer source = this.buffers[bufferIndex(address)].duplicate().order(this.order);
-			int index = valueIndex(address);
-			int count = valueCount4(index, length);
+			var source = this.buffers[bufferIndex(address)].duplicate().order(this.order);
+			var index = valueIndex(address);
+			var count = valueCount4(index, length);
 			source.limit(index + count);
 			source.position(index);
 			target.put(source.asDoubleBuffer());
@@ -1051,9 +1051,9 @@ public class MappedBuffer implements Emuable {
 	 * @param length Länge des Abschnitts. */
 	public void putDouble(long address, double[] source, int offset, int length) {
 		while (length != 0) {
-			ByteBuffer target = this.buffers[bufferIndex(address)].duplicate().order(this.order);
-			int index = valueIndex(address);
-			int count = valueCount8(index, length);
+			var target = this.buffers[bufferIndex(address)].duplicate().order(this.order);
+			var index = valueIndex(address);
+			var count = valueCount8(index, length);
 			target.position(index);
 			target.asDoubleBuffer().put(source, offset, count);
 			length -= count;
@@ -1067,11 +1067,11 @@ public class MappedBuffer implements Emuable {
 	 * @param address Adresse.
 	 * @param source {@code double}-Puffer. */
 	public void putDouble(long address, DoubleBuffer source) {
-		int length = source.remaining();
+		var length = source.remaining();
 		while (length != 0) {
-			ByteBuffer target = this.buffers[bufferIndex(address)].duplicate().order(this.order);
-			int index = valueIndex(address);
-			int count = valueCount8(index, length);
+			var target = this.buffers[bufferIndex(address)].duplicate().order(this.order);
+			var index = valueIndex(address);
+			var count = valueCount8(index, length);
 			source.limit(index + count);
 			target.position(index);
 			target.asDoubleBuffer().put(source);
@@ -1106,7 +1106,7 @@ public class MappedBuffer implements Emuable {
 	 * @param address Adresse.
 	 * @param source Zahlenfolge. */
 	public void putArray(long address, IAMArray source) {
-		int mode = source.mode();
+		var mode = source.mode();
 		if ((mode == IAMArray.MODE_INT8) || (mode == IAMArray.MODE_UINT8)) {
 			this.put(address, source.toBytes());
 		} else if ((mode == IAMArray.MODE_INT16) || (mode == IAMArray.MODE_UINT16)) {
@@ -1132,7 +1132,7 @@ public class MappedBuffer implements Emuable {
 
 	@Override
 	public String toString() {
-		return Objects.toInvokeString(this, this.file().toString(), this.size(), this.isReadonly());
+		return Objects.toInvokeString(this, this.file.toString(), this.size, this.isReadonly);
 	}
 
 	/** Dieses Feld speichert die Anzahl der niederwertigen Bit einer Adresse, die zur Positionsangabe innerhalb eines {@link MappedByteBuffer} eingesetzt
@@ -1140,7 +1140,7 @@ public class MappedBuffer implements Emuable {
 	private static final int INDEX_SIZE = 30;
 
 	/** Dieses Feld speichert die Bitmaske zur Auswahl der {@link #INDEX_SIZE niederwertigen Bit einer Adresse}. */
-	private static final int INDEX_MASK = (1 << INDEX_SIZE) - 1;
+	private static final int INDEX_MASK = ~(-1 << INDEX_SIZE);
 
 	/** Dieses Feld speichert die Größe des Speicherbereichs, den je zwei in {@link #buffers} auf einander folgende {@link MappedByteBuffer} gleichzeitig
 	 * anbinden. */
@@ -1188,11 +1188,11 @@ public class MappedBuffer implements Emuable {
 		if ((targetBuffers == sourceBuffers) && (targetAddress == sourceAddress)) return;
 		if (targetAddress < sourceAddress) {
 			while (length != 0) {
-				int targetIndex = valueIndex(targetAddress);
-				int sourceIndex = valueIndex(sourceAddress);
-				int count = (int)Math.min(length, BUFFER_LENGTH - Math.max(targetIndex, sourceIndex));
-				ByteBuffer target = targetBuffers[bufferIndex(targetAddress)].duplicate();
-				ByteBuffer source = sourceBuffers[bufferIndex(sourceAddress)].duplicate();
+				var targetIndex = valueIndex(targetAddress);
+				var sourceIndex = valueIndex(sourceAddress);
+				var count = (int)Math.min(length, BUFFER_LENGTH - Math.max(targetIndex, sourceIndex));
+				var target = targetBuffers[bufferIndex(targetAddress)].duplicate();
+				var source = sourceBuffers[bufferIndex(sourceAddress)].duplicate();
 				source.limit(sourceIndex + count);
 				source.position(sourceIndex);
 				target.position(targetIndex);
@@ -1205,14 +1205,14 @@ public class MappedBuffer implements Emuable {
 			targetAddress += length;
 			sourceAddress += length;
 			while (length != 0) {
-				int count = (int)Math.min(length, Math.min(valueIndex(targetAddress - 1), valueIndex(sourceAddress - 1)) + 1);
+				var count = (int)Math.min(length, Math.min(valueIndex(targetAddress - 1), valueIndex(sourceAddress - 1)) + 1);
 				length -= count;
 				targetAddress -= count;
 				sourceAddress -= count;
-				int targetIndex = valueIndex(targetAddress);
-				int sourceIndex = valueIndex(sourceAddress);
-				ByteBuffer target = targetBuffers[bufferIndex(targetAddress)].duplicate();
-				ByteBuffer source = sourceBuffers[bufferIndex(sourceAddress)].duplicate();
+				var targetIndex = valueIndex(targetAddress);
+				var sourceIndex = valueIndex(sourceAddress);
+				var target = targetBuffers[bufferIndex(targetAddress)].duplicate();
+				var source = sourceBuffers[bufferIndex(sourceAddress)].duplicate();
 				source.limit(sourceIndex + count);
 				source.position(sourceIndex);
 				target.position(targetIndex);
@@ -1244,22 +1244,22 @@ public class MappedBuffer implements Emuable {
 
 	/** Diese Methode implementiert {@link #resize(long)} ohne {@code synchronized} und ohne Parameterprüfung. */
 	private void resizeImpl(long newSize) throws IllegalStateException {
-		MappedByteBuffer[] oldBuffers = this.buffers, newBuffers;
-		int oldLength = oldBuffers.length, newLength = Math.max(bufferIndex(newSize - 1) + 1, 1);
+		var oldBuffers = this.buffers;
+		var oldLength = oldBuffers.length;
+		var newBuffers = oldBuffers;
+		var newLength = Math.max(bufferIndex(newSize - 1) + 1, 1);
 		if (oldLength != newLength) {
 			newBuffers = new MappedByteBuffer[newLength];
 			System.arraycopy(oldBuffers, 0, newBuffers, 0, Math.min(oldLength, newLength));
-		} else {
-			newBuffers = oldBuffers;
 		}
-		try (RandomAccessFile file = new RandomAccessFile(this.file, this.isReadonly ? "r" : "rw"); FileChannel channel = file.getChannel()) {
-			long scale = BUFFER_LENGTH - BUFFER_GUARD;
-			MapMode mode = this.isReadonly ? MapMode.READ_ONLY : MapMode.READ_WRITE;
-			ByteOrder order = this.order;
-			for (int i = oldLength; i < newLength; i++) {
+		try (var file = new RandomAccessFile(this.file, this.isReadonly ? "r" : "rw"); var channel = file.getChannel()) {
+			var scale = INDEX_MASK + 1L;
+			var mode = this.isReadonly ? MapMode.READ_ONLY : MapMode.READ_WRITE;
+			var order = this.order;
+			for (var i = oldLength; i < newLength; i++) {
 				(newBuffers[i - 1] = channel.map(mode, (i - 1) * scale, BUFFER_LENGTH)).order(order);
 			}
-			long offset = (newLength - 1) * scale;
+			var offset = (newLength - 1) * scale;
 			(newBuffers[newLength - 1] = channel.map(mode, offset, newSize - offset)).order(order);
 		} catch (IOException cause) {
 			throw new IllegalStateException(cause);
