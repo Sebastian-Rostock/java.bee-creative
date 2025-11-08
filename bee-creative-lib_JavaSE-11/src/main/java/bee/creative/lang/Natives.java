@@ -10,7 +10,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
-import bee.creative.util.AbstractField;
 import bee.creative.util.AbstractGetter;
 import bee.creative.util.AbstractProducer;
 import bee.creative.util.AbstractSetter;
@@ -712,7 +711,7 @@ public class Natives {
 	 * @see java.lang.reflect.Field#set(Object, Object)
 	 * @param <GItem> Typ des Datensatzes.
 	 * @param <GValue> Typ des Werts der Eigenschaft. */
-	public static class NativeField<GItem, GValue> extends AbstractField<GItem, GValue> {
+	public static class NativeField<GItem, GValue> implements Field3<GItem, GValue> {
 
 		public final java.lang.reflect.Field that;
 

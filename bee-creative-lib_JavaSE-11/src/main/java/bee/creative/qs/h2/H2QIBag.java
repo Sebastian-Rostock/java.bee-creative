@@ -123,7 +123,7 @@ public abstract class H2QIBag<GI, GIBag> extends H2QISet<GI> implements QIBag<GI
 
 		@Override
 		protected Entry<Long, String> customItem(ResultSet next) throws SQLException {
-			return Entries.from((Long)next.getObject(1), next.getString(2));
+			return Entries.entryWith((Long)next.getObject(1), next.getString(2));
 		}
 
 		InsertSet(H2QS owner, String index) {

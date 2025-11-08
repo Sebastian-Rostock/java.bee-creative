@@ -218,7 +218,7 @@ public class Collections {
 			@Override
 			public Entry<GKey, GValue> next() {
 				var nextValue = this.valueIter.next();
-				return Entries.from(this.nextKey, nextValue);
+				return Entries.entryWith(this.nextKey, nextValue);
 			}
 
 		}
@@ -551,7 +551,7 @@ public class Collections {
 			}
 
 			@Override
-			public Entry2<GKey2, GValue2> useValue(GValue2 value) throws UnsupportedOperationException {
+			public Entry3<GKey2, GValue2> useValue(GValue2 value) throws UnsupportedOperationException {
 				this.that.setValue(TranslatedMap.this.valueTrans.toTarget(value));
 				return this;
 			}
@@ -577,7 +577,7 @@ public class Collections {
 			}
 
 			@Override
-			public Entry2<GKey, GValue> useValue(GValue value) throws UnsupportedOperationException {
+			public Entry3<GKey, GValue> useValue(GValue value) throws UnsupportedOperationException {
 				this.that.setValue(TranslatedMap.this.valueTrans.toSource(value));
 				return this;
 			}
@@ -603,7 +603,7 @@ public class Collections {
 			@Override
 			@SuppressWarnings ("unchecked")
 			public Entry<GKey2, GValue2> toSource(Object object) throws ClassCastException, IllegalArgumentException {
-				return new SourceEntry((Entry<GKey, GValue>)object);
+				return   new SourceEntry((Entry<GKey, GValue>)object);
 			}
 
 			@Override

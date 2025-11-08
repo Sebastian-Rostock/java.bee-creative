@@ -1,9 +1,9 @@
 package bee.creative.kb;
 
 import bee.creative.fem.FEMString;
-import bee.creative.util.AbstractEntry2;
+import bee.creative.util.Entry3;
 
-public class KBValue extends AbstractEntry2<Integer, FEMString> {
+public class KBValue implements Entry3<Integer, FEMString> {
 
 	public static KBValue from(int valueRef, FEMString valueStr) {
 		if ((valueRef == 0) || (valueStr == null)) return null;
@@ -25,7 +25,7 @@ public class KBValue extends AbstractEntry2<Integer, FEMString> {
 
 	@Override
 	public FEMString getValue() {
-		return super.getValue();
+		return this.valueStr;
 	}
 
 	final int valueRef;

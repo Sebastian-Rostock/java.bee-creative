@@ -762,7 +762,7 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 			final var ref = this.put(proxy);
 			if (this.getHead(ref) != FEMBuffer.TYPE_PROXY_ADDR) throw new IllegalStateException();
 			final var addr = this.getBody(ref);
-			this.proxyPutList.addLast(Entries.from(addr, target));
+			this.proxyPutList.addLast(Entries.entryWith(addr, target));
 			this.runProxyPutList();
 		}
 	}
@@ -1216,7 +1216,7 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 		this.buffer.putLong(addr + 8, nameRef);
 		this.buffer.putLong(addr + 16, 0);
 		this.proxyGetMap.put(addr2, proxy2);
-		this.proxyPutList.addLast(Entries.from(addr2, src.get()));
+		this.proxyPutList.addLast(Entries.entryWith(addr2, src.get()));
 		this.runProxyPutList();
 		return this.putRef(FEMBuffer.TYPE_PROXY_ADDR, addr);
 	}

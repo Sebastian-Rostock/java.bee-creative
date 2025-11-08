@@ -174,7 +174,7 @@ public final class REFMAP {
 		@Override
 		public Entry<Integer, Object> next() {
 			var nextVal = this.nextVal;
-			return Entries.from(this.nextRef(), nextVal);
+			return Entries.entryWith(this.nextRef(), nextVal);
 		}
 
 		/** Diese Methode liefert die nächsten Referenz. */

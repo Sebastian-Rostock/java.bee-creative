@@ -1,195 +1,142 @@
 package bee.creative.util;
 
+import static bee.creative.lang.Objects.notNull;
+import static bee.creative.util.Properties.emptyProperty;
+import static bee.creative.util.Properties.propertyFrom;
+import static bee.creative.util.Properties.propertyWithValue;
 import java.util.Map.Entry;
-import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert grundlegende {@link Entry}.
  *
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Entries {
 
-	/** Diese Klasse implementiert ein unveränderliches {@link Entry2} mit {@code null} als Schlüssel und Wert. */
-	public static class EmptyEntry extends AbstractEntry2<Object, Object> {
-
-		public static final Entry2<?, ?> INSTANCE = new EmptyEntry();
-
-		@Override
-		public Entry2<Object, Object> reverse() {
-			return this;
-		}
-
+	/** Diese Methode liefert das gegebene {@link Entry} als {@link Entry3}. */
+	public static <K, V> Entry3<K, V> entryFrom(Entry<K, V> that) throws NullPointerException {
+		notNull(that);
+		if (that instanceof Entry3<?, ?>) return (Entry3<K, V>)that;
+		return entryFrom(that::getKey, propertyFrom(that::getValue, that::setValue));
 	}
 
-	/** Diese Klasse implementiert ein {@link Entry2} mit veränderlichem Schlüssel und Wert.
-	 *
-	 * @param <GKey> Typ des Schlüssels.
-	 * @param <GValue> Typ des Werts. */
-	public static class ValueEnrty<GKey, GValue> extends AbstractEntry2<GKey, GValue> {
+	/** Diese Methode liefert ein {@link Entry3} mit dem gegebenen Schlüssel und Wert. */
+	public static <K, V> Entry3<K, V> entryFrom(Property<K> keyProp, Property<V> valueProp) {
+		notNull(keyProp);
+		notNull(valueProp);
+		return new Entry3<>() {
 
-		public GKey key;
+			@Override
+			public Property3<K> key() {
+				return propertyFrom(keyProp);
+			}
 
-		public GValue value;
+			@Override
+			public Property3<V> value() {
+				return propertyFrom(valueProp);
+			}
 
-		public ValueEnrty(final GKey key, final GValue value) {
-			this.key = key;
-			this.value = value;
-		}
+			@Override
+			public K getKey() {
+				return keyProp.get();
+			}
 
-		@Override
-		public GKey getKey() {
-			return this.key;
-		}
+			@Override
+			public V getValue() {
+				return valueProp.get();
+			}
 
-		@Override
-		public GValue getValue() {
-			return this.value;
-		}
+			@Override
+			public Entry3<K, V> useKey(K key) throws UnsupportedOperationException {
+				keyProp.set(key);
+				return this;
+			}
 
-		@Override
-		public Entry2<GKey, GValue> useKey(final GKey key) {
-			this.key = key;
-			return this;
-		}
+			@Override
+			public Entry3<K, V> useValue(V value) throws UnsupportedOperationException {
+				valueProp.set(value);
+				return this;
+			}
 
-		@Override
-		public Entry2<GKey, GValue> useValue(final GValue value) {
-			this.value = value;
-			return this;
-		}
-
+		};
 	}
 
-	/** Diese Klasse implementiert ein umkehrendes {@link Entry2}, welches Schlüssel und Wert eines gegebenen {@link Entry} miteinander tauscht.
-	 *
-	 * @param <GKey> Typ des Schlüssels.
-	 * @param <GValue> Typ des Werts dieses sowie des Schlüssels des gegebenen {@link Entry}. */
-	public static class ReverseEntry<GKey, GValue> extends AbstractEntry2<GKey, GValue> {
+	/** Diese Methode liefert ein {@link Entry3} mit dem gegebenen Schlüssel und Wert. */
+	public static <K, V> Entry3<K, V> entryFrom(Producer<? extends K> keyVal, Property<V> valueProp) {
+		notNull(keyVal);
+		notNull(valueProp);
+		return new Entry3<>() {
 
-		public final Entry<GValue, GKey> that;
+			@Override
+			public Property3<V> value() {
+				return propertyFrom(valueProp);
+			}
 
-		final Entry2<GValue, GKey> that2;
+			@Override
+			public K getKey() {
+				return keyVal.get();
+			}
 
-		public ReverseEntry(final Entry<GValue, GKey> that) throws NullPointerException {
-			this.that = Objects.notNull(that);
-			this.that2 = that instanceof Entry2<?, ?> ? (Entry2<GValue, GKey>)that : null;
-		}
+			@Override
+			public V getValue() {
+				return valueProp.get();
+			}
 
-		@Override
-		public GKey getKey() {
-			return this.that.getValue();
-		}
+			@Override
+			public Entry3<K, V> useValue(V value) throws UnsupportedOperationException {
+				valueProp.set(value);
+				return this;
+			}
 
-		@Override
-		public GValue getValue() {
-			return this.that.getKey();
-		}
-
-		@Override
-		public Entry2<GKey, GValue> useKey(final GKey key) throws UnsupportedOperationException {
-			this.that.setValue(key);
-			return this;
-		}
-
-		@Override
-		public Entry2<GKey, GValue> useValue(final GValue value) throws UnsupportedOperationException {
-			if (this.that2 == null) throw new UnsupportedOperationException();
-			this.that2.setKey(value);
-			return this;
-		}
-
-		@Override
-		public Entry2<GValue, GKey> reverse() {
-			if (this.that2 != null) return this.that2;
-			return new ReverseEntry<>(this);
-		}
-
+		};
 	}
 
-	static class KeyGetter extends AbstractGetter<Entry<?, ?>, Object> {
-
-		static final Getter3<?, ?> INSTANCE = new KeyGetter();
-
-		@Override
-		public Object get(final Entry<?, ?> input) {
-			return input.getKey();
-		}
-
+	/** Diese Methode liefert ein {@link Entry3} mit veränderlichem Schlüssel und Wert. */
+	public static <K, V> Entry3<K, V> entryWith(K key, V value) {
+		return entryFrom(propertyWithValue(key), propertyWithValue(value));
 	}
 
-	static class ValueField extends AbstractGetter<Entry<?, ?>, Object> {
-
-		static final Getter3<?, ?> INSTANCE = new ValueField();
-
-		@Override
-		public Object get(final Entry<?, ?> item) {
-			return item.getValue();
-		}
-
+	/** Diese Methode ist eine Abkürzung für {@link #entryWith(Object, Object) entryWith(key, value.get(key))}. */
+	public static <K, V> Entry3<K, V> entryWithKey(K key, Getter<? super K, ? extends V> value) throws NullPointerException {
+		return entryWith(key, value.get(key));
 	}
 
-	static class EntryConsumer<GKey, GValue> implements Consumer3<Entry2<GKey, GValue>> {
-
-		public final Setter<? super GKey, ? super GValue> that;
-
-		public EntryConsumer(Setter<? super GKey, ? super GValue> that) {
-			this.that = Objects.notNull(that);
-		}
-
-		@Override
-		public void set(Entry2<GKey, GValue> entry) {
-			this.that.set(entry.getKey(), entry.getValue());
-		}
-
+	/** Diese Methode ist eine Abkürzung für {@link #entryWith(Object, Object) entryWith(key.get(value), value)}. */
+	public static <K, V> Entry3<K, V> entryWithValue(V value, Getter<? super V, ? extends K> key) throws NullPointerException {
+		return entryWith(key.get(value), value);
 	}
 
-	/** Diese Methode liefert das {@link EmptyEntry}. */
+	/** Diese Methode liefert ein unveränderliches {@link Entry3} mit {@code null} als Schlüssel und Wert. */
 	@SuppressWarnings ("unchecked")
-	public static <GKey, GValue> Entry2<GKey, GValue> empty() {
-		return (Entry2<GKey, GValue>)EmptyEntry.INSTANCE;
+	public static <GKey, GValue> Entry3<GKey, GValue> emptyEntry() {
+		return (Entry3<GKey, GValue>)emptyEntry;
 	}
 
-	/** Diese Methode liefert das gegebene {@link Entry} als {@link Entry2}. Wenn es {@code null} ist, wird das {@link EmptyEntry} geliefert. */
-	public static <GKey, GValue> Entry2<GKey, GValue> from(final Entry<GKey, GValue> that) throws NullPointerException {
-		if (that == null) return Entries.empty();
-		if (that instanceof Entry2<?, ?>) return (Entry2<GKey, GValue>)that;
-		return Entries.reverseEntry(that).reverse();
+	/** Diese Methode ist eine Abkürzung für {@link Entry3#reverse() entryFrom(that).reverse()}. */
+	public static <GKey, GValue> Entry3<GKey, GValue> reverseEntry(Entry<GValue, GKey> that) throws NullPointerException {
+		return entryFrom(that).reverse();
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link ValueEnrty new ValueEnrty<>(key, value)}. */
-	public static <GKey, GValue> Entry2<GKey, GValue> from(final GKey key, final GValue value) {
-		return new ValueEnrty<>(key, value);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link #from(Object, Object) Entries.from(key, value.get(key))}. */
-	public static <GKey, GValue> Entry2<GKey, GValue> fromKey(final GKey key, final Getter<? super GKey, ? extends GValue> value) throws NullPointerException {
-		return Entries.<GKey, GValue>from(key, value.get(key));
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link #from(Object, Object) Entries.from(key.get(value), value)}. */
-	public static <GKey, GValue> Entry2<GKey, GValue> fromValue(final GValue value, final Getter<? super GValue, ? extends GKey> key)
+	/** Diese Methode ist eine Abkürzung für {@link Entry3#translate(Translator, Translator) entryFrom(that).translate(keyTrans, valueTrans)}. */
+	public static <K, V, K2, V2> Entry3<K, V> translatedEntry(Entry<K2, V2> that, Translator<K2, K> keyTrans, Translator<V2, V> valueTrans)
 		throws NullPointerException {
-		return Entries.<GKey, GValue>from(key.get(value), value);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link ReverseEntry new ReverseEntry<>(that)}. */
-	public static <GKey, GValue> Entry2<GKey, GValue> reverseEntry(final Entry<GValue, GKey> that) {
-		return new ReverseEntry<>(that);
-	}
-
-	public static <GKey, GValue> Consumer3<Entry2<GKey, GValue>> consumer(Setter<? super GKey, ? super GValue> that) {
-		return new EntryConsumer<>(that);
+		return entryFrom(that).translate(keyTrans, valueTrans);
 	}
 
 	/** Diese Methode liefert den {@link Getter3} zu {@link Entry#getKey()}. */
 	@SuppressWarnings ("unchecked")
-	public static <GKey> Getter3<Entry<? extends GKey, ?>, GKey> key() {
-		return (Getter3<Entry<? extends GKey, ?>, GKey>)KeyGetter.INSTANCE;
+	public static <K> Getter3<Entry<? extends K, ?>, K> entryKey() {
+		return (Getter3<Entry<? extends K, ?>, K>)entryKey;
 	}
 
 	/** Diese Methode liefert den {@link Getter3} zu {@link Entry#getValue()}. */
 	@SuppressWarnings ("unchecked")
-	public static <GValue> Getter3<Entry<?, ? extends GValue>, GValue> value() {
-		return (Getter3<Entry<?, ? extends GValue>, GValue>)ValueField.INSTANCE;
+	public static <V> Getter3<Entry<?, ? extends V>, V> entryValue() {
+		return (Getter3<Entry<?, ? extends V>, V>)entryValue;
 	}
+
+	private static final Getter3<? extends Entry<?, ?>, ?> entryKey = Entry::getKey;
+
+	private static final Getter3<? extends Entry<?, ?>, ?> entryValue = Entry::getValue;
+
+	private static final Entry3<?, ?> emptyEntry = entryFrom(emptyProperty(), emptyProperty());
 
 }

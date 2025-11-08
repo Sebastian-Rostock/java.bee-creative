@@ -3,11 +3,11 @@ package bee.creative.util;
 import java.util.Map.Entry;
 import bee.creative.lang.Objects;
 
-/** Diese Klasse implementiert ein abstraktes {@link Entry2}.
+/** Diese Klasse implementiert ein abstraktes {@link Entry3}.
  *
  * @param <K> Typ des Schlüssels.
  * @param <V> Typ des Werts. */
-public abstract class AbstractEntry2<K, V> implements Entry2<K, V> {
+public abstract class AbstractEntry2<K, V> implements Entry3<K, V> {
 
 	@Override
 	public K getKey() {

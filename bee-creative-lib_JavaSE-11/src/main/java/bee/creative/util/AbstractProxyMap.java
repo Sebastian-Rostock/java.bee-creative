@@ -112,7 +112,7 @@ public abstract class AbstractProxyMap<GKey, GValue, GData extends Map<GKey, GVa
 				}
 
 				@Override
-				public Entry2<GKey, GValue> useValue(GValue value) {
+				public Entry3<GKey, GValue> useValue(GValue value) {
 					this.entry.setValue(value);
 					AbstractProxyMap.this.setData(Iter.this.data.data);
 					return this;
