@@ -19,7 +19,7 @@ public class MappedBuffer2 extends MappedBuffer {
 	 * @param readonly {@code true}, wenn die Datei nur mit Lesezugriff angebunden werden soll.
 	 * @throws IOException Wenn die Anbindung nicht möglich ist.
 	 * @throws IllegalArgumentException Wenn die Kopfdaten ungültig sind. */
-	public MappedBuffer2(final File file, final boolean readonly) throws IOException, IllegalArgumentException {
+	public MappedBuffer2(File file, boolean readonly) throws IOException, IllegalArgumentException {
 		this(file, readonly, Bytes.NATIVE_ORDER);
 	}
 
@@ -30,14 +30,14 @@ public class MappedBuffer2 extends MappedBuffer {
 	 * @param order Bytereihenfolge.
 	 * @throws IOException Wenn die Anbindung nicht möglich ist.
 	 * @throws IllegalArgumentException Wenn die Kopfdaten ungültig sind. */
-	public MappedBuffer2(final File file, final boolean readonly, final ByteOrder order) throws IOException, IllegalArgumentException {
+	public MappedBuffer2(File file, boolean readonly, ByteOrder order) throws IOException, IllegalArgumentException {
 		super(file, readonly);
 		this.order(order);
-		final long MAGIC = 0x474F4F44464F4F44L;
-		final long size = this.size();
+		var MAGIC = 0x474F4F44464F4F44L;
+		var size = this.size();
 		if (!readonly && (size == 0)) {
 			this.grow(48);
-			this.putLong(0, new long[]{MAGIC, 0, 16, 16, 48, 0});
+			this.putLong(0, MAGIC, 0, 16, 16, 48, 0);
 		} else {
 			if ((size < 48) || (this.getLong(0) != MAGIC)) throw new IllegalArgumentException();
 		}
@@ -55,7 +55,7 @@ public class MappedBuffer2 extends MappedBuffer {
 	 *
 	 * @param address Adresse oder {@code 0}.
 	 * @throws IllegalArgumentException Wenn die Adresse negativ ist. */
-	public void putRoot(final long address) throws IllegalArgumentException {
+	public void putRoot(long address) throws IllegalArgumentException {
 		if (address < 0) throw new IllegalArgumentException();
 		this.putLong(8, address);
 	}
@@ -65,26 +65,22 @@ public class MappedBuffer2 extends MappedBuffer {
 	 * @param address Adresse, an welcher der Speicherbereich beginnt.
 	 * @return Größe des Speicherbereichs in Byte.
 	 * @throws IllegalArgumentException Wenn die gegebene Adresse ungültig ist. */
-	public long regionSize(final long address) throws IllegalArgumentException {
-		synchronized (this) {
-			return this.regionSizeImpl(address);
-		}
+	public synchronized long regionSize(long address) throws IllegalArgumentException {
+		return this.regionSizeImpl(address);
 	}
 
 	/** Diese Methode {@link #insertRegion(long) reserviert} einen neuen Speicherbereich mit der gegebenen Größe, kopiert die Daten des an der gegebenen Adresse
-	 * beginnenden Speicherbereichs dort hin und gibt die Adresse auf den Beginn des neuen Speicherbereichs zurück.
+	 * beginnenden Speicherbereichs dort hin und gibt die Adresse des Beginns des neuen Speicherbereichs zurück.
 	 *
 	 * @param address Adresse, an welcher der alte Speicherbereich beginnt.
 	 * @param size Größe des neuen Speicherbereichs.
 	 * @return Adresse, an welcher der neue Speicherbereich beginnt.
 	 * @throws IllegalStateException Wenn die Datei nicht ausreichend vergrößert werden kann.
 	 * @throws IllegalArgumentException Wenn {@code address} bzw. {@code size} ungültig ist. */
-	public long cloneRegion(final long address, final long size) throws IllegalStateException, IllegalArgumentException {
-		final long result, oldSize, newSize = MappedBuffer2.asAlignedSize(size);
-		synchronized (this) {
-			oldSize = this.regionSizeImpl(address);
-			result = this.insertRegionImpl(newSize);
-		}
+	public synchronized long cloneRegion(long address, long size) throws IllegalStateException, IllegalArgumentException {
+		var newSize = asAlignedSize(size);
+		var oldSize = this.regionSizeImpl(address);
+		var result = this.insertRegionImpl(newSize);
 		this.copy(result, address, Math.min(oldSize, newSize));
 		return result;
 	}
@@ -96,11 +92,9 @@ public class MappedBuffer2 extends MappedBuffer {
 	 * @return Adresse, an welcher der Speicherbereich beginnt.
 	 * @throws IllegalStateException Wenn die Datei nicht ausreichend vergrößert werden kann.
 	 * @throws IllegalArgumentException Wenn die gegebene Größe ungültig ist. */
-	public long insertRegion(final long size) throws IllegalStateException, IllegalArgumentException {
-		final long newSize = MappedBuffer2.asAlignedSize(size);
-		synchronized (this) {
-			return this.insertRegionImpl(newSize);
-		}
+	public synchronized long insertRegion(long size) throws IllegalStateException, IllegalArgumentException {
+		var newSize = asAlignedSize(size);
+		return this.insertRegionImpl(newSize);
 	}
 
 	/** Diese Methode gibt nur dann den an der gegebenen Adresse beginnenden Speicherbereich zur Wiederverwendung frei, wenn diese Adresse gültig und nicht
@@ -108,11 +102,8 @@ public class MappedBuffer2 extends MappedBuffer {
 	 *
 	 * @param address Adresse, an welcher der Speicherbereich beginnt oder {@code 0}.
 	 * @throws IllegalArgumentException Wenn {@code address} ungültig ist. */
-	public void deleteRegion(final long address) throws IllegalArgumentException {
-		if (address == 0) return;
-		synchronized (this) {
-			this.deleteRegionImpl(address, this.regionSizeImpl(address));
-		}
+	public synchronized void deleteRegion(long address) throws IllegalArgumentException {
+		this.deleteRegionImpl(address, this.regionSizeImpl(address));
 	}
 
 	/** Diese Methode ändert die Größe des an der gegebenen Adresse beginnenden Speicherbereichs und gibt seine neue Adresse zurück. Wenn die Adresse {@code 0}
@@ -125,37 +116,28 @@ public class MappedBuffer2 extends MappedBuffer {
 	 * @return neue Adresse.
 	 * @throws IllegalStateException Wenn die Datei nicht ausreichend vergrößert werden kann.
 	 * @throws IllegalArgumentException Wenn {@code address} bzw. {@code size} ungültig ist. */
-	public long updateRegion(final long address, final long size) throws IllegalStateException, IllegalArgumentException {
-		final long reuse1, reuse2, result, oldSize, newSize = MappedBuffer2.asAlignedSize(size);
-		final boolean reusing;
-		synchronized (this) {
-			if (address == 0) return this.insertRegionImpl(newSize);
-			oldSize = this.regionSizeImpl(address);
-			if (newSize == 0) {
-				this.deleteRegionImpl(address, oldSize);
-				return 0;
-			}
-			reuse1 = this.reuseRegionImpl(newSize);
-			if (reuse1 == 0) {
-				result = this.createRegionImpl(newSize);
-				reusing = false;
-			} else {
-				result = reuse1;
-				reusing = true;
-			}
-		}
-		this.copy(result, address, Math.min(oldSize, newSize));
-		synchronized (this) {
+	public synchronized long updateRegion(long address, long size) throws IllegalStateException, IllegalArgumentException {
+		var newSize = asAlignedSize(size);
+		if (address == 0) return this.insertRegionImpl(newSize);
+		var oldSize = this.regionSizeImpl(address);
+		if (newSize == 0) {
 			this.deleteRegionImpl(address, oldSize);
-			if (reusing) return result;
-			reuse2 = this.reuseRegionImpl(newSize);
+			return 0;
 		}
-		if (reuse2 == 0) return result;
-		this.copy(reuse2, result, Math.min(oldSize, newSize));
-		synchronized (this) {
-			this.deleteRegionImpl(result, newSize);
+		var result = this.reuseRegionImpl(newSize);
+		if (result != 0) {
+			this.copy(result, address, Math.min(oldSize, newSize));
+			this.deleteRegionImpl(address, oldSize);
+			return result;
 		}
-		return reuse2;
+		result = this.createRegionImpl(newSize);
+		this.copy(result, address, Math.min(oldSize, newSize));
+		this.deleteRegionImpl(address, oldSize);
+		var reuse = this.reuseRegionImpl(newSize);
+		if (reuse == 0) return result;
+		this.copy(reuse, result, Math.min(oldSize, newSize));
+		this.deleteRegionImpl(result, newSize);
+		return reuse;
 	}
 
 	/** Diese Methode gibt die Liste der Größen der wiederverwendbaren Speicherbereiche zurück. Diese werden bei der {@link #insertRegion(long) Reservierung}
@@ -195,46 +177,46 @@ public class MappedBuffer2 extends MappedBuffer {
 		return result;
 	}
 
-	private static long asAlignedSize(final long size) throws IllegalArgumentException {
-		final long result = (size + 15) & -16;
+	private static long asAlignedSize(long size) throws IllegalArgumentException {
+		var result = (size + 15) & -16;
 		if (result > 0) return result;
 		if (size == 0) return 0;
 		throw new IllegalArgumentException();
 	}
 
-	private static boolean isAlingnedValue(final long value) {
+	private static boolean isAlingnedValue(long value) {
 		return (value & 15) == 0;
 	}
 
 	/** Diese Methode gibt die Größe des gegebenen Speicherbereichs zurück. */
-	private long getNodeSize(final long node) {
+	private long getNodeSize(long node) {
 		return this.getLong(node - 8);
 	}
 
-	private long getNodePrev(final long node) {
+	private long getNodePrev(long node) {
 		return this.getLong(node + 0);
 	}
 
-	private long getNodeNext(final long node) {
+	private long getNodeNext(long node) {
 		return this.getLong(node + 8);
 	}
 
-	private void setNodePrev(final long node, final long prev) {
+	private void setNodePrev(long node, long prev) {
 		this.putLong(node + 0, prev);
 	}
 
-	private void setNodeNext(final long node, final long next) {
+	private void setNodeNext(long node, long next) {
 		this.putLong(node + 8, next);
 	}
 
 	/** Diese Methode setzt die Größe des gegebenen unbenutzten Speicherbereichs. */
-	private void setNodeFreeSize(final long node, final long size) {
+	private void setNodeFreeSize(long node, long size) {
 		this.putLong(node - 8, -size);
 		this.putLong(node + size, -size);
 	}
 
 	/** Diese Methode setzt die Größe des gegebenen benutzten Speicherbereichs. */
-	private void setNodeUsedSize(final long node, final long size) {
+	private void setNodeUsedSize(long node, long size) {
 		this.putLong(node - 8, size);
 		this.putLong(node + size, size);
 	}
@@ -243,8 +225,8 @@ public class MappedBuffer2 extends MappedBuffer {
 	 *
 	 * @param node neuer Knoten.
 	 * @param next Nachfolger. */
-	private void insertNode(final long node, final long next) {
-		final long prev = this.getNodePrev(next);
+	private void insertNode(long node, long next) {
+		var prev = this.getNodePrev(next);
 		this.setNodePrev(next, node);
 		this.setNodeNext(prev, node);
 		this.setNodePrev(node, prev);
@@ -254,8 +236,9 @@ public class MappedBuffer2 extends MappedBuffer {
 	/** Diese Methode entfernt den gegebenen Knoten aus der doppelt verketteten Liste. Sein Vorgänger zeigt danach auf seinen Nachfolger und umgekehrt.
 	 *
 	 * @param node Knoten. */
-	private void deleteNode(final long node) {
-		final long prev = this.getNodePrev(node), next = this.getNodeNext(node);
+	private void deleteNode(long node) {
+		var prev = this.getNodePrev(node);
+		var next = this.getNodeNext(node);
 		this.setNodeNext(prev, next);
 		this.setNodePrev(next, prev);
 	}
@@ -264,30 +247,31 @@ public class MappedBuffer2 extends MappedBuffer {
 	 *
 	 * @param oldNode alter Knoten.
 	 * @param newNode neuer Knoten */
-	private void replaceNode(final long oldNode, final long newNode) {
-		final long prev = this.getNodePrev(oldNode), next = this.getNodeNext(oldNode);
+	private void replaceNode(long oldNode, long newNode) {
+		var prev = this.getNodePrev(oldNode);
+		var next = this.getNodeNext(oldNode);
 		this.setNodePrev(newNode, prev);
 		this.setNodeNext(newNode, next);
 		this.setNodeNext(prev, newNode);
 		this.setNodePrev(next, newNode);
 	}
 
-	private long regionSizeImpl(final long node) throws IllegalArgumentException {
-		if ((node < 48) || !MappedBuffer2.isAlingnedValue(node)) throw new IllegalArgumentException();
-		final long size = this.getNodeSize(node);
-		if ((size < 0) || !MappedBuffer2.isAlingnedValue(size) || (this.getLong(node + size) != size)) throw new IllegalArgumentException();
+	private long regionSizeImpl(long node) throws IllegalArgumentException {
+		if ((node < 48) || !isAlingnedValue(node)) throw new IllegalArgumentException();
+		var size = this.getNodeSize(node);
+		if ((size < 0) || !isAlingnedValue(size) || (this.getLong(node + size) != size)) throw new IllegalArgumentException();
 		return size;
 	}
 
 	private long reuseRegionImpl(long newSize) {
-		for (long node = this.getNodeNext(16); node != 16; node = this.getNodeNext(node)) {
-			final long left = -this.getNodeSize(node) - newSize;
+		for (var node = this.getNodeNext(16); node != 16; node = this.getNodeNext(node)) {
+			var left = -this.getNodeSize(node) - newSize;
 			if (left >= 0) {
 				if (left < 32) {
 					newSize += left;
 					this.deleteNode(node);
 				} else {
-					final long free = node + newSize + 16;
+					var free = node + newSize + 16;
 					this.replaceNode(node, free);
 					this.setNodeFreeSize(free, left - 16);
 				}
@@ -298,13 +282,14 @@ public class MappedBuffer2 extends MappedBuffer {
 		return 0;
 	}
 
-	private long insertRegionImpl(final long newSize) throws IllegalStateException {
-		final long result = this.reuseRegionImpl(newSize);
+	private long insertRegionImpl(long newSize) throws IllegalStateException {
+		var result = this.reuseRegionImpl(newSize);
 		return result != 0 ? result : this.createRegionImpl(newSize);
 	}
 
-	private long createRegionImpl(final long newSize) throws IllegalStateException {
-		final long node = this.getLong(32), free = node + newSize + 16;
+	private long createRegionImpl(long newSize) throws IllegalStateException {
+		var node = this.getLong(32);
+		var free = node + newSize + 16;
 		this.grow(free);
 		this.putLong(32, free);
 		this.putLong(free - 8, 0);
@@ -312,10 +297,11 @@ public class MappedBuffer2 extends MappedBuffer {
 		return node;
 	}
 
-	private void deleteRegionImpl(final long node, final long oldSize) {
-		final long prevSize = this.getLong(node - 16), nextSize = this.getLong(node + oldSize + 8);
+	private void deleteRegionImpl(long node, long oldSize) {
+		var prevSize = this.getLong(node - 16);
+		var nextSize = this.getLong(node + oldSize + 8);
 		if (prevSize < 0) {
-			final long prev = node - -prevSize - 16;
+			var prev = node - -prevSize - 16;
 			if (nextSize == 0) { // davor LEER, danach ENDE
 				this.deleteNode(prev);
 				this.putLong(prev - 8, 0);
