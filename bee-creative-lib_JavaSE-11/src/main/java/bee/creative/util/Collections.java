@@ -1,6 +1,10 @@
 package bee.creative.util;
 
+import static bee.creative.util.Entries.translatedEntry;
+import static bee.creative.util.Filters.filterFrom;
+import static bee.creative.util.Getters.getterFrom;
 import static bee.creative.util.Translators.reversedTranslator;
+import static bee.creative.util.Translators.translatorFrom;
 import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.Iterator;
@@ -56,7 +60,8 @@ public class Collections {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ConcatCollection new ConcatCollection<>(items1, items2, extendMode)}. */
-	public static <GItem> Collection2<GItem> concatCollection(Collection<GItem> items1, Collection<GItem> items2, boolean extendMode) throws NullPointerException {
+	public static <GItem> Collection2<GItem> concatCollection(Collection<GItem> items1, Collection<GItem> items2, boolean extendMode)
+		throws NullPointerException {
 		return new ConcatCollection<>(items1, items2, extendMode);
 	}
 
@@ -526,104 +531,45 @@ public class Collections {
 
 	/** Diese Klasse implementiert eine {@link Map} als {@link Translator übersetzte} Sicht auf eine gegebene {@link Map}.
 	 *
-	 * @param <GKey> Typ der Schlüssel.
-	 * @param <GKey2> Typ der Schlüssel der gegebenen {@link Map}.
-	 * @param <GValue> Typ der Werte.
-	 * @param <GValue2> Typ der Werte der gegebenen {@link Map}. */
-	public static class TranslatedMap<GKey, GValue, GKey2, GValue2> extends AbstractMap<GKey, GValue> implements Map3<GKey, GValue> {
+	 * @param <K> Typ der Schlüssel.
+	 * @param <K2> Typ der Schlüssel der gegebenen {@link Map}.
+	 * @param <V> Typ der Werte.
+	 * @param <V2> Typ der Werte der gegebenen {@link Map}. */
+	public static class TranslatedMap<K, V, K2, V2> extends AbstractMap<K, V> implements Map3<K, V> {
 
-		class SourceEntry extends AbstractEntry2<GKey2, GValue2> {
+		private final Map<K2, V2> that;
 
-			public final Entry<GKey, GValue> that;
+		private final Translator3<K2, K> keyTrans;
 
-			SourceEntry(Entry<GKey, GValue> that) {
-				this.that = that;
-			}
+		private final Translator3<K, K2> reverseKeyTrans;
 
-			@Override
-			public GKey2 getKey() {
-				return TranslatedMap.this.keyTrans.toSource(this.that.getKey());
-			}
+		private final Translator3<V2, V> valueTrans;
 
-			@Override
-			public GValue2 getValue() {
-				return TranslatedMap.this.valueTrans.toSource(this.that.getValue());
-			}
+		private final Translator3<V, V2> reverseValueTrans;
 
-			@Override
-			public Entry3<GKey2, GValue2> useValue(GValue2 value) throws UnsupportedOperationException {
-				this.that.setValue(TranslatedMap.this.valueTrans.toTarget(value));
-				return this;
-			}
+		private final Translator3<Entry<K2, V2>, Entry<K, V>> enT;
 
-		}
-
-		class TargetEntry extends AbstractEntry2<GKey, GValue> {
-
-			final Entry<GKey2, GValue2> that;
-
-			TargetEntry(Entry<GKey2, GValue2> that) {
-				this.that = that;
-			}
-
-			@Override
-			public GKey getKey() {
-				return TranslatedMap.this.keyTrans.toTarget(this.that.getKey());
-			}
-
-			@Override
-			public GValue getValue() {
-				return TranslatedMap.this.valueTrans.toTarget(this.that.getValue());
-			}
-
-			@Override
-			public Entry3<GKey, GValue> useValue(GValue value) throws UnsupportedOperationException {
-				this.that.setValue(TranslatedMap.this.valueTrans.toSource(value));
-				return this;
-			}
-
-		}
-
-		class EntryTranslator implements Translator<Entry<GKey2, GValue2>, Entry<GKey, GValue>> {
-
-			@Override
-			public boolean isSource(Object object) {
-				if (!(object instanceof Entry)) return false;
-				var entry = (Entry<?, ?>)object;
-				return TranslatedMap.this.keyTrans.isSource(entry.getKey()) && TranslatedMap.this.valueTrans.isSource(entry.getValue());
-			}
-
-			@Override
-			public boolean isTarget(Object object) {
-				if (!(object instanceof Entry)) return false;
-				var entry = (Entry<?, ?>)object;
-				return TranslatedMap.this.keyTrans.isTarget(entry.getKey()) && TranslatedMap.this.valueTrans.isTarget(entry.getValue());
-			}
-
-			@Override
-			@SuppressWarnings ("unchecked")
-			public Entry<GKey2, GValue2> toSource(Object object) throws ClassCastException, IllegalArgumentException {
-				return   new SourceEntry((Entry<GKey, GValue>)object);
-			}
-
-			@Override
-			@SuppressWarnings ("unchecked")
-			public Entry<GKey, GValue> toTarget(Object object) throws ClassCastException, IllegalArgumentException {
-				return new TargetEntry((Entry<GKey2, GValue2>)object);
-			}
-
-		}
-
-		public final Map<GKey2, GValue2> that;
-
-		public final Translator<GKey2, GKey> keyTrans;
-
-		public final Translator<GValue2, GValue> valueTrans;
-
-		public TranslatedMap(Map<GKey2, GValue2> that, Translator<GKey2, GKey> keyTrans, Translator<GValue2, GValue> valueTrans) throws NullPointerException {
+		public TranslatedMap(Map<K2, V2> that, Translator<K2, K> keyTrans, Translator<V2, V> valueTrans) throws NullPointerException {
 			this.that = Objects.notNull(that);
-			this.keyTrans = Objects.notNull(keyTrans);
-			this.valueTrans = Objects.notNull(valueTrans);
+			this.keyTrans = translatorFrom(keyTrans);
+			this.valueTrans = translatorFrom(valueTrans);
+			this.reverseKeyTrans = this.keyTrans.reverse();
+			this.reverseValueTrans = this.valueTrans.reverse();
+			this.enT = translatorFrom(filterFrom(object -> {
+				if (!(object instanceof Entry)) return false;
+				var that_ = (Entry<?, ?>)object;
+				return this.keyTrans.isTarget(that_.getKey()) && this.valueTrans.isTarget(that_.getValue());
+			}), filterFrom(object -> {
+				if (!(object instanceof Entry)) return false;
+				var that_ = (Entry<?, ?>)object;
+				return this.keyTrans.isSource(that_.getKey()) && this.valueTrans.isSource(that_.getValue());
+			}), getterFrom(object -> {
+				var that_ = (Entry<K2, V2>)object;
+				return translatedEntry(that_, this.keyTrans, this.valueTrans);
+			}), getterFrom(object -> {
+				var that_ = (Entry<K, V>)object;
+				return translatedEntry(that_, this.reverseKeyTrans, this.reverseValueTrans);
+			}));
 		}
 
 		@Override
@@ -644,7 +590,7 @@ public class Collections {
 		}
 
 		@Override
-		public GValue get(Object key2) {
+		public V get(Object key2) {
 			if (!this.keyTrans.isTarget(key2)) return null;
 			return this.valueTrans.toTarget(this.that.get(this.keyTrans.toSource(key2)));
 		}
@@ -655,23 +601,23 @@ public class Collections {
 		}
 
 		@Override
-		public Set2<GKey> keySet() {
+		public Set2<K> keySet() {
 			return Collections.translatedSet(this.that.keySet(), this.keyTrans);
 		}
 
 		@Override
-		public GValue put(GKey key2, GValue value2) {
+		public V put(K key2, V value2) {
 			return this.valueTrans.toTarget(this.that.put(this.keyTrans.toSource(key2), this.valueTrans.toSource(value2)));
 		}
 
 		@Override
 		@SuppressWarnings ("unchecked")
-		public void putAll(Map<? extends GKey, ? extends GValue> entries2) {
-			this.that.putAll(Collections.translatedMap((Map<GKey, GValue>)entries2, reversedTranslator(this.keyTrans), reversedTranslator(this.valueTrans)));
+		public void putAll(Map<? extends K, ? extends V> entries2) {
+			this.that.putAll(Collections.translatedMap((Map<K, V>)entries2, reversedTranslator(this.keyTrans), reversedTranslator(this.valueTrans)));
 		}
 
 		@Override
-		public GValue remove(final Object key2) {
+		public V remove(final Object key2) {
 			if (!this.keyTrans.isTarget(key2)) return null;
 			return this.valueTrans.toTarget(this.that.remove(this.keyTrans.toSource(key2)));
 		}
@@ -682,13 +628,13 @@ public class Collections {
 		}
 
 		@Override
-		public Collection2<GValue> values() {
-			return Collections.translatedCollection(this.that.values(), this.valueTrans);
+		public Collection2<V> values() {
+			return translatedCollection(this.that.values(), this.valueTrans);
 		}
 
 		@Override
-		public Set2<Entry<GKey, GValue>> entrySet() {
-			return Collections.translatedSet(this.that.entrySet(), new EntryTranslator());
+		public Set2<Entry<K, V>> entrySet() {
+			return translatedSet(this.that.entrySet(), this.enT);
 		}
 
 	}
@@ -946,7 +892,7 @@ public class Collections {
 
 		@Override
 		public Iterator2<GItem> iterator() {
-			return Iterators.translatedIterator(this.that.iterator(),  this.trans::toTarget);
+			return Iterators.translatedIterator(this.that.iterator(), this.trans::toTarget);
 		}
 
 	}

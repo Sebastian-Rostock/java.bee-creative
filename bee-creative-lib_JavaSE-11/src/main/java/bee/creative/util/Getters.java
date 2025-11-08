@@ -12,9 +12,15 @@ import bee.creative.lang.Objects;
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Getters {
 
+	/** Diese Methode liefert den gegebenen {@link Getter3}. */
+	@SuppressWarnings ("unchecked")
+	public static <T, V> Getter3<T, V> getterFrom(Getter3<? super T, ? extends V> that) throws NullPointerException {
+		return (Getter3<T, V>)notNull(that);
+	}
+
 	/** Diese Methode liefert den gegebenen {@link Getter} als {@link Getter3}. */
 	@SuppressWarnings ("unchecked")
-	public static <T, V> Getter3<T, V> getterFrom(Getter<? super T, ? extends V> that) {
+	public static <T, V> Getter3<T, V> getterFrom(Getter<? super T, ? extends V> that) throws NullPointerException {
 		notNull(that);
 		if (that instanceof Getter3) return (Getter3<T, V>)that;
 		return item -> that.get(item);

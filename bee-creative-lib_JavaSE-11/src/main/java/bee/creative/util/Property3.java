@@ -10,7 +10,7 @@ import static bee.creative.util.Properties.translatedProperty;
  *
  * @author [cc-by] 2021 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <V> Typ des Werts. */
-public interface Property3<V> extends Property<V> {
+public interface Property3<V> extends Property<V>, Producer2<V>, Consumer2<V> {
 
 	/** Diese Methode ist eine Abkürzung für {@link Properties#setupProperty(Property, Producer) setupProperty(this, setup)}. */
 	default Property3<V> setup(Producer<? extends V> setup) {

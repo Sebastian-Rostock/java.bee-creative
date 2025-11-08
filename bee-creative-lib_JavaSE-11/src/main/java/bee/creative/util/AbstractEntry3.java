@@ -7,17 +7,7 @@ import bee.creative.lang.Objects;
  *
  * @param <K> Typ des Schlüssels.
  * @param <V> Typ des Werts. */
-public abstract class AbstractEntry2<K, V> implements Entry3<K, V> {
-
-	@Override
-	public K getKey() {
-		return null;
-	}
-
-	@Override
-	public V getValue() {
-		return null;
-	}
+public abstract class AbstractEntry3<K, V> implements Entry3<K, V> {
 
 	@Override
 	public int hashCode() {

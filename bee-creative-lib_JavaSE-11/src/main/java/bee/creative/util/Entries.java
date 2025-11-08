@@ -22,7 +22,7 @@ public class Entries {
 	public static <K, V> Entry3<K, V> entryFrom(Property<K> keyProp, Property<V> valueProp) {
 		notNull(keyProp);
 		notNull(valueProp);
-		return new Entry3<>() {
+		return new AbstractEntry3<>() {
 
 			@Override
 			public Property3<K> key() {
@@ -63,7 +63,7 @@ public class Entries {
 	public static <K, V> Entry3<K, V> entryFrom(Producer<? extends K> keyVal, Property<V> valueProp) {
 		notNull(keyVal);
 		notNull(valueProp);
-		return new Entry3<>() {
+		return new AbstractEntry3<>() {
 
 			@Override
 			public Property3<V> value() {

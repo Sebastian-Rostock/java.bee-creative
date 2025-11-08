@@ -7,6 +7,12 @@ import static bee.creative.lang.Objects.notNull;
  * @author [cc-by] 2017 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Setters {
 
+	/** Diese Methode liefert den gegebenen {@link Setter3}. */
+	@SuppressWarnings ("unchecked")
+	public static <T, V> Setter3<T, V> setterFrom(Setter3<? super T, ? super V> that) throws NullPointerException {
+		return (Setter3<T, V>)notNull(that);
+	}
+
 	/** Diese Methode liefert den gegebenen {@link Setter} als {@link Setter3}. */
 	@SuppressWarnings ("unchecked")
 	public static <T, V> Setter3<T, V> setterFrom(Setter<? super T, ? super V> that) throws NullPointerException {

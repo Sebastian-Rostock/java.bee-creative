@@ -93,7 +93,7 @@ public abstract class AbstractProxyMap<GKey, GValue, GData extends Map<GKey, GVa
 
 		final class Iter extends AbstractIterator<Entry<GKey, GValue>> {
 
-			final class Next extends AbstractEntry2<GKey, GValue> {
+			final class Next extends AbstractEntry3<GKey, GValue> {
 
 				final Entry<GKey, GValue> entry;
 

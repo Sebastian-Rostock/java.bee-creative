@@ -10,12 +10,10 @@ import java.util.Collection;
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Filters {
 
-	/** Diese Methode ist eine Abkürzung für {@code value ? acceptFilter() : rejectFilter()}.
-	 *
-	 * @see #acceptFilter()
-	 * @see #rejectFilter() */
-	public static <T> Filter3<T> filterFrom(boolean value) {
-		return value ? acceptFilter() : rejectFilter();
+	/** Diese Methode liefert den gegebenen {@link Filter3}. */
+	@SuppressWarnings ("unchecked")
+	public static <T> Filter3<T> filterFrom(Filter3<? super T> that) throws NullPointerException {
+		return (Filter3<T>)notNull(that);
 	}
 
 	/** Diese Methode liefert den gegebenen {@link Filter} als {@link Filter3}. */
@@ -45,6 +43,14 @@ public class Filters {
 	public static Filter3<Object> filterFromItems(Collection<?> that) throws NullPointerException {
 		notNull(that);
 		return item -> that.contains(item);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@code value ? acceptFilter() : rejectFilter()}.
+	 *
+	 * @see #acceptFilter()
+	 * @see #rejectFilter() */
+	public static <T> Filter3<T> filterFromValue(boolean value) {
+		return value ? acceptFilter() : rejectFilter();
 	}
 
 	/** Diese Methode liefert einen {@link Filter}, der alle Datensätze akzeptiert, die nicht {@code null} sind. Die Akzeptanz eines Datensatzes {@code item} ist

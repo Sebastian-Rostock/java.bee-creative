@@ -4,5 +4,5 @@ package bee.creative.util;
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <V> Typ des Werts der Eigenschaft. */
-public interface Property<V> extends Producer2<V>, Consumer2<V> {
+public interface Property<V> extends Producer<V>, Consumer<V> {
 }

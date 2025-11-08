@@ -1,8 +1,10 @@
 package bee.creative.util;
 
 import static bee.creative.lang.Objects.notNull;
+import static bee.creative.util.Filters.filterFrom;
 import static bee.creative.util.Filters.rejectFilter;
 import static bee.creative.util.Getters.emptyGetter;
+import static bee.creative.util.Getters.getterFrom;
 import static bee.creative.util.Getters.neutralGetter;
 import static bee.creative.util.Iterables.iterableFromArray;
 import java.util.Map;
@@ -16,36 +18,36 @@ public class Translators {
 	public static <S, T> Translator3<S, T> translatorFrom(Translator<S, T> that) throws NullPointerException {
 		notNull(that);
 		if (that instanceof Translator3) return (Translator3<S, T>)that;
-		return translatorFrom(object -> that.isTarget(object), object -> that.isSource(object), object -> that.toTarget(object), object -> that.toSource(object));
+		return translatorFrom(filterFrom(that::isTarget), filterFrom(that::isSource), getterFrom(that::toTarget), getterFrom(that::toSource));
 	}
 
 	/** Diese Methode liefert einen {@link Translator3} mit den gegebenen Methoden. */
 	public static <S, T> Translator3<S, T> translatorFrom(Filter<Object> isTarget, Filter<Object> isSource, Getter<Object, ? extends T> toTarget,
 		Getter<Object, ? extends S> toSource) throws NullPointerException {
-		notNull(isTarget);
-		notNull(isSource);
-		notNull(toTarget);
-		notNull(toSource);
+		var targetFilter = filterFrom(isTarget);
+		var sourceFilter = filterFrom(isSource);
+		var targetGetter = Getters.<Object, T>getterFrom(toTarget);
+		var sourceGetter = Getters.<Object, S>getterFrom(toSource);
 		return new Translator3<>() {
 
 			@Override
-			public boolean isTarget(Object object) {
-				return isTarget.accepts(object);
+			public Filter3<Object> asTargetFilter() {
+				return targetFilter;
 			}
 
 			@Override
-			public boolean isSource(Object object) {
-				return isSource.accepts(object);
+			public Filter3<Object> asSourceFilter() {
+				return sourceFilter;
 			}
 
 			@Override
-			public T toTarget(Object object) throws ClassCastException, IllegalArgumentException {
-				return toTarget.get(object);
+			public Getter3<Object, T> asTargetGetter() {
+				return targetGetter;
 			}
 
 			@Override
-			public S toSource(Object object) throws ClassCastException, IllegalArgumentException {
-				return toSource.get(object);
+			public Getter3<Object, S> asSourceGetter() {
+				return sourceGetter;
 			}
 
 		};
@@ -53,12 +55,12 @@ public class Translators {
 
 	public static <S, T> Translator3<S, T> translatorFromMap(Map<T, ? extends S> sourceByTarget) throws NullPointerException {
 		notNull(sourceByTarget);
-		return translatorFromEnum(target -> sourceByTarget.get(target), sourceByTarget.keySet());
+		return translatorFromEnum(sourceByTarget::get, sourceByTarget.keySet());
 	}
 
 	public static <T extends Enum<?>> Translator3<String, T> translatorFromEnum(Class<T> enumClass) throws NullPointerException {
 		notNull(enumClass);
-		return translatorFromEnum(target -> target.name(), enumClass.getEnumConstants());
+		return translatorFromEnum(Enum::name, enumClass.getEnumConstants());
 	}
 
 	@SafeVarargs
@@ -77,16 +79,15 @@ public class Translators {
 		});
 		toTargetMap.compact();
 		toSourceMap.compact();
-		return translatorFrom(object -> toSourceMap.containsKey(object), object -> toTargetMap.containsKey(object), object -> toTargetMap.get(object),
-			object -> toSourceMap.get(object));
+		return translatorFrom(toSourceMap.asFilter(), toTargetMap.asFilter(), toTargetMap.asGetter(), toSourceMap.asGetter());
 	}
 
 	/** Diese Methode liefert einen {@link Translator3}, der Quell- und Zielobjekte an ihren {@link Class Klassen} erkennt und zur Umwandlung dieser ineinander
 	 * die gegebenen {@link Getter} verwendet. */
 	public static <S, T> Translator3<S, T> translatorFromClass(Class<S> sourceClass, Class<T> targetClass, Getter<? super S, ? extends T> sourceTrans,
 		Getter<? super T, ? extends S> targetTrans) throws NullPointerException {
-		return translatorFrom(object -> targetClass.isInstance(object), object -> sourceClass.isInstance(object),
-			object -> sourceTrans.get(sourceClass.cast(object)), object -> targetTrans.get(targetClass.cast(object)));
+		return translatorFrom(filterFrom(targetClass::isInstance), filterFrom(sourceClass::isInstance),
+			getterFrom(object -> sourceTrans.get(sourceClass.cast(object))), getterFrom(object -> targetTrans.get(targetClass.cast(object))));
 	}
 
 	/** Diese Methode liefert einen {@link Translator3}, der alle Quell- und Zielobjekte ablehnt. */
@@ -110,21 +111,20 @@ public class Translators {
 
 	/** Diese Methode liefert einen verketteten {@link Translator3}. */
 	public static <S, C, T> Translator3<S, T> concatTranslator(Translator<S, C> that1, Translator<C, T> that2) throws NullPointerException {
-		notNull(that1);
-		notNull(that2);
-		return translatorFrom(object -> that2.isTarget(object), object -> that1.isSource(object), object -> that2.toTarget(that1.toTarget(object)),
-			object -> that1.toSource(that2.toSource(object)));
+		var trans1 = translatorFrom(that1);
+		var trans2 = translatorFrom(that2);
+		return translatorFrom(trans2.asTargetFilter(), trans1.asSourceFilter(), trans1.asTargetGetter().concat(trans2.asTargetGetter()),
+			trans2.asSourceGetter().concat(trans1.asSourceGetter()));
 	}
 
 	/** Diese Methode liefert einen {@link Translator3}, der die Übersetzung des gegebenen {@link Translator} umkehrt. */
 	public static <S, T> Translator3<S, T> reversedTranslator(Translator<T, S> that) throws NullPointerException {
-		notNull(that);
-		return translatorFrom(object -> that.isSource(object), object -> that.isTarget(object), object -> that.toSource(object), object -> that.toTarget(object));
+		return translatorFrom(that).reverse();
 	}
 
 	/** Diese Methode liefert einen {@link Translator3}, der den gegebenen {@link Translator} {@code null}-tollerant macht. */
 	public static <S, T> Translator3<S, T> optionalizedTranslator(Translator<S, T> that) throws NullPointerException {
-		return translatorFrom(object -> (object == null) || that.isTarget(object), object -> (object == null) || that.isSource(object),
+		return translatorFrom(filterFrom(object -> (object == null) || that.isTarget(object)), filterFrom(object -> (object == null) || that.isSource(object)),
 			object -> object != null ? that.toTarget(object) : null, object -> object != null ? that.toSource(object) : null);
 	}
 

@@ -5,7 +5,7 @@ import bee.creative.util.Filters;
 public class FilterTestMain {
 
 	public static void main(String[] args) throws Exception {
-		var f = Filters.filterFrom(true);
+		var f = Filters.filterFromValue(true);
 		var g = f.synchronize();
 		var h = f.synchronize(null);
 		var a = f.accepts(null);
