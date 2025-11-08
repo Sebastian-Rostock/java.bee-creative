@@ -37,7 +37,7 @@ public class MappedBuffer implements Emuable {
 	 * @see #MappedBuffer(File, boolean)
 	 * @param file Datei.
 	 * @throws IOException Wenn die Anbindung nicht möglich ist. */
-	public MappedBuffer(final File file) throws IOException {
+	public MappedBuffer(File file) throws IOException {
 		this(file, false);
 	}
 
@@ -47,7 +47,7 @@ public class MappedBuffer implements Emuable {
 	 * @param file Datei.
 	 * @param readonly {@code true}, wenn die Datei nur mit Lesezugriff angebunden werden soll.
 	 * @throws IOException Wenn die Anbindung nicht möglich ist. */
-	public MappedBuffer(final File file, final boolean readonly) throws IOException {
+	public MappedBuffer(File file, boolean readonly) throws IOException {
 		this(file, -1, readonly);
 	}
 
@@ -57,7 +57,7 @@ public class MappedBuffer implements Emuable {
 	 * @param file Datei.
 	 * @param size Größe des anzubindenden Speicherbereiches zu Beginn der Datei.
 	 * @throws IOException Wenn die Anbindung nicht möglich ist. */
-	public MappedBuffer(final File file, final long size) throws IOException {
+	public MappedBuffer(File file, long size) throws IOException {
 		this(file, size, false);
 	}
 
@@ -68,7 +68,7 @@ public class MappedBuffer implements Emuable {
 	 * @param size Größe des anzubindenden Speicherbereiches zu Beginn der Datei. Wenn sie negativ ist, wird die gesamte Datei angebunden.
 	 * @param readonly {@code true}, wenn die Datei nur zum Lesezugriff angebunden werden soll.
 	 * @throws IOException Wenn die Anbindung nicht möglich ist. */
-	public MappedBuffer(final File file, final long size, final boolean readonly) throws IOException {
+	public MappedBuffer(File file, long size, boolean readonly) throws IOException {
 		this.file = file.getAbsoluteFile();
 		this.buffers = new MappedByteBuffer[1];
 		this.isReadonly = readonly;
@@ -124,12 +124,12 @@ public class MappedBuffer implements Emuable {
 	 * @param minSize minimale Puffergröße.
 	 * @return {@code true}, nur wenn die Puffergröße geändert wurde; sonst {@code false}.
 	 * @throws IllegalArgumentException Wenn die Puffergröße ungültig ist. */
-	public boolean grow(final long minSize) throws IllegalArgumentException, IllegalStateException {
+	public boolean grow(long minSize) throws IllegalArgumentException, IllegalStateException {
 		if (minSize < 0) throw new IllegalArgumentException();
 		synchronized (this) {
 			if (minSize <= this.size) return false;
-			final long scale = this.growScale, align = this.growAlign() - 1;
-			final long newSize = ((minSize + ((minSize * scale) / 32)) + align) & ~align;
+			long scale = this.growScale, align = this.growAlign() - 1;
+			long newSize = ((minSize + ((minSize * scale) / 32)) + align) & ~align;
 			this.resizeImpl(newSize < 0 ? Long.MAX_VALUE - 7 : newSize);
 			return true;
 		}
@@ -148,7 +148,7 @@ public class MappedBuffer implements Emuable {
 	 * @param align Wachstumsausrichtung in Byte (8..1073741824).
 	 * @return {@code this}.
 	 * @throws IllegalArgumentException Wenn {@code scale} ungültig ist. */
-	public MappedBuffer growAlign(final int align) {
+	public MappedBuffer growAlign(int align) {
 		if ((align < 8) || (align > 1073741824)) throw new IllegalArgumentException();
 		this.growAlign = (byte)(31 - Integer.numberOfLeadingZeros(align));
 		return this;
@@ -166,7 +166,7 @@ public class MappedBuffer implements Emuable {
 	 * @param scale Wachstumsfaktor in Prozent (0..200).
 	 * @return {@code this}.
 	 * @throws IllegalArgumentException Wenn {@code scale} ungültig ist. */
-	public MappedBuffer growScale(final int scale) throws IllegalArgumentException {
+	public MappedBuffer growScale(int scale) throws IllegalArgumentException {
 		if ((scale < 0) || (scale > 200)) throw new IllegalArgumentException();
 		this.growScale = (byte)((scale * 32) / 100);
 		return this;
@@ -185,7 +185,7 @@ public class MappedBuffer implements Emuable {
 	 * @param newSize neue Puffergröße.
 	 * @return {@code this}.
 	 * @throws IllegalArgumentException Wenn die Puffergröße ungültig ist. */
-	public MappedBuffer resize(final long newSize) throws IllegalArgumentException, IllegalStateException {
+	public MappedBuffer resize(long newSize) throws IllegalArgumentException, IllegalStateException {
 		if (newSize < 0) throw new IllegalArgumentException();
 		synchronized (this) {
 			if (this.size == newSize) return this;
@@ -202,7 +202,7 @@ public class MappedBuffer implements Emuable {
 	public MappedBuffer truncate() throws IOException {
 		if (this.isReadonly) throw new IOException();
 		synchronized (this) {
-			try (final RandomAccessFile file = new RandomAccessFile(this.file, "rw")) {
+			try (RandomAccessFile file = new RandomAccessFile(this.file, "rw")) {
 				file.setLength(this.size);
 			}
 		}
@@ -213,7 +213,7 @@ public class MappedBuffer implements Emuable {
 	 *
 	 * @see MappedByteBuffer#force() */
 	public void force() {
-		for (final MappedByteBuffer buffer: this.buffers) {
+		for (MappedByteBuffer buffer: this.buffers) {
 			buffer.force();
 		}
 	}
@@ -223,22 +223,22 @@ public class MappedBuffer implements Emuable {
 	 * @see MappedByteBuffer#force()
 	 * @param address Adresse, ab welcher der Speicherbereich beginnt.
 	 * @param length Größe des Speicherbereichs. */
-	public void force(final long address, final long length) {
+	public void force(long address, long length) {
 		if (length == 0) return;
 		if (length < 0) throw new IllegalArgumentException();
-		final long address2 = address + length;
-		final int minIndex = MappedBuffer.bufferIndex(address);
-		final int minValue = MappedBuffer.valueIndex(address);
-		final int maxIndex = MappedBuffer.bufferIndex(address2);
-		final int maxValue = MappedBuffer.valueIndex(address2);
+		long address2 = address + length;
+		int minIndex = bufferIndex(address);
+		int minValue = valueIndex(address);
+		int maxIndex = bufferIndex(address2);
+		int maxValue = valueIndex(address2);
 		if (minIndex == maxIndex) {
-			MappedBuffer.forceImpl(this.buffers[minIndex], minValue, maxValue + 1);
+			forceImpl(this.buffers[minIndex], minValue, maxValue + 1);
 		} else {
-			MappedBuffer.forceImpl(this.buffers[minIndex], minValue, MappedBuffer.BUFFER_LENGTH - MappedBuffer.BUFFER_GUARD);
+			forceImpl(this.buffers[minIndex], minValue, BUFFER_LENGTH - BUFFER_GUARD);
 			for (int i = minIndex + 1; i < maxIndex; i++) {
-				MappedBuffer.forceImpl(this.buffers[i], 0, MappedBuffer.BUFFER_LENGTH - MappedBuffer.BUFFER_GUARD);
+				forceImpl(this.buffers[i], 0, BUFFER_LENGTH - BUFFER_GUARD);
 			}
-			MappedBuffer.forceImpl(this.buffers[maxIndex], 0, maxValue + 1);
+			forceImpl(this.buffers[maxIndex], 0, maxValue + 1);
 		}
 	}
 
@@ -260,7 +260,7 @@ public class MappedBuffer implements Emuable {
 		synchronized (this) {
 			if (this.order == order) return this;
 			this.order = order;
-			for (final MappedByteBuffer buffer: this.buffers) {
+			for (MappedByteBuffer buffer: this.buffers) {
 				buffer.order(order);
 			}
 		}
@@ -270,9 +270,9 @@ public class MappedBuffer implements Emuable {
 	/** Diese Methode gibt den größtmöglichen Speicherbereich (16KB..1GB) ab der gegebenen Adresse als {@link ByteBuffer} zurück.
 	 *
 	 * @param address Adresse, ab welcher der Speicherbereich beginnt. */
-	public ByteBuffer buffer(final long address) {
-		final ByteBuffer source = this.buffers[MappedBuffer.bufferIndex(address)].duplicate();
-		source.position(MappedBuffer.valueIndex(address));
+	public ByteBuffer buffer(long address) {
+		ByteBuffer source = this.buffers[bufferIndex(address)].duplicate();
+		source.position(valueIndex(address));
 		return source;
 	}
 
@@ -281,8 +281,8 @@ public class MappedBuffer implements Emuable {
 	 * @see ByteBuffer#get(int)
 	 * @param address Adresse.
 	 * @return {@code byte}-Wert. */
-	public byte get(final long address) {
-		return this.buffers[MappedBuffer.bufferIndex(address)].get(MappedBuffer.valueIndex(address));
+	public byte get(long address) {
+		return this.buffers[bufferIndex(address)].get(valueIndex(address));
 	}
 
 	/** Diese Methode füllt das gegebene Array mit den {@code byte}-Werten ab der gegebenen Adresse.
@@ -290,7 +290,7 @@ public class MappedBuffer implements Emuable {
 	 * @see ByteBuffer#get(byte[])
 	 * @param address Adresse.
 	 * @param target {@code byte}-Array. */
-	public void get(final long address, final byte[] target) {
+	public void get(long address, byte[] target) {
 		this.get(address, target, 0, target.length);
 	}
 
@@ -301,11 +301,11 @@ public class MappedBuffer implements Emuable {
 	 * @param target {@code byte}-Array.
 	 * @param offset Beginn des Abschnitts.
 	 * @param length Länge des Abschnitts. */
-	public void get(long address, final byte[] target, int offset, int length) {
+	public void get(long address, byte[] target, int offset, int length) {
 		while (length != 0) {
-			final ByteBuffer source = this.buffers[MappedBuffer.bufferIndex(address)].duplicate();
-			final int index = MappedBuffer.valueIndex(address);
-			final int count = MappedBuffer.valueCount1(index, length);
+			ByteBuffer source = this.buffers[bufferIndex(address)].duplicate();
+			int index = valueIndex(address);
+			int count = valueCount1(index, length);
 			source.position(index);
 			source.get(target, offset, count);
 			length -= count;
@@ -318,12 +318,12 @@ public class MappedBuffer implements Emuable {
 	 *
 	 * @param address Adresse.
 	 * @param target {@code byte}-Puffer. */
-	public void get(long address, final ByteBuffer target) {
+	public void get(long address, ByteBuffer target) {
 		int length = target.remaining();
 		while (length != 0) {
-			final ByteBuffer source = this.buffers[MappedBuffer.bufferIndex(address)].duplicate();
-			final int index = MappedBuffer.valueIndex(address);
-			final int count = MappedBuffer.valueCount1(index, length);
+			ByteBuffer source = this.buffers[bufferIndex(address)].duplicate();
+			int index = valueIndex(address);
+			int count = valueCount1(index, length);
 			source.limit(index + count);
 			source.position(index);
 			target.put(source);
@@ -338,8 +338,8 @@ public class MappedBuffer implements Emuable {
 	 * @param target Puffer.
 	 * @param offset Beginn des Abschnitts.
 	 * @param length Länge des Abschnitts. */
-	public void get(final long address, final MappedBuffer target, final long offset, final long length) {
-		MappedBuffer.copyImpl(target.buffers, offset, this.buffers, address, length);
+	public void get(long address, MappedBuffer target, long offset, long length) {
+		copyImpl(target.buffers, offset, this.buffers, address, length);
 	}
 
 	/** Diese Methode schreibt den gegebenen {@code byte}-Wert an die gegebene Adresse.
@@ -347,8 +347,8 @@ public class MappedBuffer implements Emuable {
 	 * @see ByteBuffer#put(int, byte)
 	 * @param address Adresse.
 	 * @param source {@code byte}-Wert. */
-	public void put(final long address, final byte source) {
-		this.buffers[MappedBuffer.bufferIndex(address)].put(MappedBuffer.valueIndex(address), source);
+	public void put(long address, byte source) {
+		this.buffers[bufferIndex(address)].put(valueIndex(address), source);
 	}
 
 	/** Diese Methode schreibt die {@code byte}-Werte des gegebenen Arrays an die gegebene Adresse.
@@ -356,7 +356,7 @@ public class MappedBuffer implements Emuable {
 	 * @see ByteBuffer#put(byte[])
 	 * @param address Adresse.
 	 * @param source {@code byte}-Array. */
-	public void put(final long address, final byte[] source) {
+	public void put(long address, byte[] source) {
 		this.put(address, source, 0, source.length);
 	}
 
@@ -367,11 +367,11 @@ public class MappedBuffer implements Emuable {
 	 * @param source {@code byte}-Array.
 	 * @param offset Beginn des Abschnitts.
 	 * @param length Länge des Abschnitts. */
-	public void put(long address, final byte[] source, int offset, int length) {
+	public void put(long address, byte[] source, int offset, int length) {
 		while (length != 0) {
-			final ByteBuffer target = this.buffers[MappedBuffer.bufferIndex(address)].duplicate();
-			final int index = MappedBuffer.valueIndex(address);
-			final int count = MappedBuffer.valueCount1(index, length);
+			ByteBuffer target = this.buffers[bufferIndex(address)].duplicate();
+			int index = valueIndex(address);
+			int count = valueCount1(index, length);
 			target.position(index);
 			target.put(source, offset, count);
 			length -= count;
@@ -384,12 +384,12 @@ public class MappedBuffer implements Emuable {
 	 *
 	 * @param address Adresse.
 	 * @param source {@code byte}-Puffer. */
-	public void put(long address, final ByteBuffer source) {
+	public void put(long address, ByteBuffer source) {
 		int length = source.remaining();
 		while (length != 0) {
-			final ByteBuffer target = this.buffers[MappedBuffer.bufferIndex(address)].duplicate();
-			final int index = MappedBuffer.valueIndex(address);
-			final int count = MappedBuffer.valueCount1(index, length);
+			ByteBuffer target = this.buffers[bufferIndex(address)].duplicate();
+			int index = valueIndex(address);
+			int count = valueCount1(index, length);
 			source.limit(index + count);
 			target.position(index);
 			target.put(source);
@@ -404,8 +404,8 @@ public class MappedBuffer implements Emuable {
 	 * @param source Puffer.
 	 * @param offset Beginn des Abschnitts.
 	 * @param length Länge des Abschnitts. */
-	public void put(final long address, final MappedBuffer source, final long offset, final long length) {
-		MappedBuffer.copyImpl(this.buffers, address, source.buffers, offset, length);
+	public void put(long address, MappedBuffer source, long offset, long length) {
+		copyImpl(this.buffers, address, source.buffers, offset, length);
 	}
 
 	/** Diese Methode gibt das {@code char} an der gegebenen Adresse zurück.
@@ -413,8 +413,8 @@ public class MappedBuffer implements Emuable {
 	 * @see CharBuffer#get(int)
 	 * @param address Adresse.
 	 * @return {@code char}-Wert. */
-	public char getChar(final long address) {
-		return this.buffers[MappedBuffer.bufferIndex(address)].getChar(MappedBuffer.valueIndex(address));
+	public char getChar(long address) {
+		return this.buffers[bufferIndex(address)].getChar(valueIndex(address));
 	}
 
 	/** Diese Methode füllt das gegebene Array mit den {@code char}-Werten ab der gegebenen Adresse.
@@ -422,7 +422,7 @@ public class MappedBuffer implements Emuable {
 	 * @see CharBuffer#get(char[])
 	 * @param address Adresse.
 	 * @param target {@code char}-Array. */
-	public void getChar(final long address, final char[] target) {
+	public void getChar(long address, char[] target) {
 		this.getChar(address, target, 0, target.length);
 	}
 
@@ -433,11 +433,11 @@ public class MappedBuffer implements Emuable {
 	 * @param target {@code char}-Array.
 	 * @param offset Beginn des Abschnitts.
 	 * @param length Länge des Abschnitts. */
-	public void getChar(long address, final char[] target, int offset, int length) {
+	public void getChar(long address, char[] target, int offset, int length) {
 		while (length != 0) {
-			final ByteBuffer source = this.buffers[MappedBuffer.bufferIndex(address)].duplicate().order(this.order);
-			final int index = MappedBuffer.valueIndex(address);
-			final int count = MappedBuffer.valueCount2(index, length);
+			ByteBuffer source = this.buffers[bufferIndex(address)].duplicate().order(this.order);
+			int index = valueIndex(address);
+			int count = valueCount2(index, length);
 			source.position(index);
 			source.asCharBuffer().get(target, offset, count);
 			length -= count;
@@ -450,12 +450,12 @@ public class MappedBuffer implements Emuable {
 	 *
 	 * @param address Adresse.
 	 * @param target {@code char}-Puffer. */
-	public void getChar(long address, final CharBuffer target) {
+	public void getChar(long address, CharBuffer target) {
 		int length = target.remaining();
 		while (length != 0) {
-			final ByteBuffer source = this.buffers[MappedBuffer.bufferIndex(address)].duplicate().order(this.order);
-			final int index = MappedBuffer.valueIndex(address);
-			final int count = MappedBuffer.valueCount2(index, length);
+			ByteBuffer source = this.buffers[bufferIndex(address)].duplicate().order(this.order);
+			int index = valueIndex(address);
+			int count = valueCount2(index, length);
 			source.limit(index + count);
 			source.position(index);
 			target.put(source.asCharBuffer());
@@ -469,8 +469,8 @@ public class MappedBuffer implements Emuable {
 	 * @see CharBuffer#put(int, char)
 	 * @param address Adresse.
 	 * @param source {@code char}-Wert. */
-	public void putChar(final long address, final char source) {
-		this.buffers[MappedBuffer.bufferIndex(address)].putChar(MappedBuffer.valueIndex(address), source);
+	public void putChar(long address, char source) {
+		this.buffers[bufferIndex(address)].putChar(valueIndex(address), source);
 	}
 
 	/** Diese Methode schreibt die {@code char}-Werte des gegebenen Arrays an die gegebene Adresse.
@@ -478,7 +478,7 @@ public class MappedBuffer implements Emuable {
 	 * @see CharBuffer#put(char[])
 	 * @param address Adresse.
 	 * @param source {@code char}-Array. */
-	public void putChar(final long address, final char[] source) {
+	public void putChar(long address, char[] source) {
 		this.putChar(address, source, 0, source.length);
 	}
 
@@ -489,11 +489,11 @@ public class MappedBuffer implements Emuable {
 	 * @param source {@code char}-Array.
 	 * @param offset Beginn des Abschnitts.
 	 * @param length Länge des Abschnitts. */
-	public void putChar(long address, final char[] source, int offset, int length) {
+	public void putChar(long address, char[] source, int offset, int length) {
 		while (length != 0) {
-			final ByteBuffer target = this.buffers[MappedBuffer.bufferIndex(address)].duplicate().order(this.order);
-			final int index = MappedBuffer.valueIndex(address);
-			final int count = MappedBuffer.valueCount2(index, length);
+			ByteBuffer target = this.buffers[bufferIndex(address)].duplicate().order(this.order);
+			int index = valueIndex(address);
+			int count = valueCount2(index, length);
 			target.position(index);
 			target.asCharBuffer().put(source, offset, count);
 			length -= count;
@@ -506,12 +506,12 @@ public class MappedBuffer implements Emuable {
 	 *
 	 * @param address Adresse.
 	 * @param source {@code char}-Puffer. */
-	public void putChar(long address, final CharBuffer source) {
+	public void putChar(long address, CharBuffer source) {
 		int length = source.remaining();
 		while (length != 0) {
-			final ByteBuffer target = this.buffers[MappedBuffer.bufferIndex(address)].duplicate().order(this.order);
-			final int index = MappedBuffer.valueIndex(address);
-			final int count = MappedBuffer.valueCount2(index, length);
+			ByteBuffer target = this.buffers[bufferIndex(address)].duplicate().order(this.order);
+			int index = valueIndex(address);
+			int count = valueCount2(index, length);
 			source.limit(index + count);
 			target.position(index);
 			target.asCharBuffer().put(source);
@@ -525,8 +525,8 @@ public class MappedBuffer implements Emuable {
 	 * @see ShortBuffer#get(int)
 	 * @param address Adresse.
 	 * @return {@code short}-Wert. */
-	public short getShort(final long address) {
-		return this.buffers[MappedBuffer.bufferIndex(address)].getShort(MappedBuffer.valueIndex(address));
+	public short getShort(long address) {
+		return this.buffers[bufferIndex(address)].getShort(valueIndex(address));
 	}
 
 	/** Diese Methode füllt das gegebene Array mit den {@code short}-Werten ab der gegebenen Adresse.
@@ -534,7 +534,7 @@ public class MappedBuffer implements Emuable {
 	 * @see ShortBuffer#get(short[])
 	 * @param address Adresse.
 	 * @param target {@code short}-Array. */
-	public void getShort(final long address, final short[] target) {
+	public void getShort(long address, short[] target) {
 		this.getShort(address, target, 0, target.length);
 	}
 
@@ -545,11 +545,11 @@ public class MappedBuffer implements Emuable {
 	 * @param target {@code short}-Array.
 	 * @param offset Beginn des Abschnitts.
 	 * @param length Länge des Abschnitts. */
-	public void getShort(long address, final short[] target, int offset, int length) {
+	public void getShort(long address, short[] target, int offset, int length) {
 		while (length != 0) {
-			final ByteBuffer source = this.buffers[MappedBuffer.bufferIndex(address)].duplicate().order(this.order);
-			final int index = MappedBuffer.valueIndex(address);
-			final int count = MappedBuffer.valueCount2(index, length);
+			ByteBuffer source = this.buffers[bufferIndex(address)].duplicate().order(this.order);
+			int index = valueIndex(address);
+			int count = valueCount2(index, length);
 			source.position(index);
 			source.asShortBuffer().get(target, offset, count);
 			length -= count;
@@ -562,12 +562,12 @@ public class MappedBuffer implements Emuable {
 	 *
 	 * @param address Adresse.
 	 * @param target {@code short}-Puffer. */
-	public void getShort(long address, final ShortBuffer target) {
+	public void getShort(long address, ShortBuffer target) {
 		int length = target.remaining();
 		while (length != 0) {
-			final ByteBuffer source = this.buffers[MappedBuffer.bufferIndex(address)].duplicate().order(this.order);
-			final int index = MappedBuffer.valueIndex(address);
-			final int count = MappedBuffer.valueCount2(index, length);
+			ByteBuffer source = this.buffers[bufferIndex(address)].duplicate().order(this.order);
+			int index = valueIndex(address);
+			int count = valueCount2(index, length);
 			source.limit(index + count);
 			source.position(index);
 			target.put(source.asShortBuffer());
@@ -581,8 +581,8 @@ public class MappedBuffer implements Emuable {
 	 * @see ShortBuffer#put(int, short)
 	 * @param address Adresse.
 	 * @param source {@code short}-Wert. */
-	public void putShort(final long address, final short source) {
-		this.buffers[MappedBuffer.bufferIndex(address)].putShort(MappedBuffer.valueIndex(address), source);
+	public void putShort(long address, short source) {
+		this.buffers[bufferIndex(address)].putShort(valueIndex(address), source);
 	}
 
 	/** Diese Methode schreibt die {@code short}-Werte des gegebenen Arrays an die gegebene Adresse.
@@ -590,7 +590,7 @@ public class MappedBuffer implements Emuable {
 	 * @see ShortBuffer#put(short[])
 	 * @param address Adresse.
 	 * @param source {@code short}-Array. */
-	public void putShort(final long address, final short[] source) {
+	public void putShort(long address, short[] source) {
 		this.putShort(address, source, 0, source.length);
 	}
 
@@ -601,11 +601,11 @@ public class MappedBuffer implements Emuable {
 	 * @param source {@code short}-Array.
 	 * @param offset Beginn des Abschnitts.
 	 * @param length Länge des Abschnitts. */
-	public void putShort(long address, final short[] source, int offset, int length) {
+	public void putShort(long address, short[] source, int offset, int length) {
 		while (length != 0) {
-			final ByteBuffer target = this.buffers[MappedBuffer.bufferIndex(address)].duplicate().order(this.order);
-			final int index = MappedBuffer.valueIndex(address);
-			final int count = MappedBuffer.valueCount2(index, length);
+			ByteBuffer target = this.buffers[bufferIndex(address)].duplicate().order(this.order);
+			int index = valueIndex(address);
+			int count = valueCount2(index, length);
 			target.position(index);
 			target.asShortBuffer().put(source, offset, count);
 			length -= count;
@@ -618,12 +618,12 @@ public class MappedBuffer implements Emuable {
 	 *
 	 * @param address Adresse.
 	 * @param source {@code short}-Puffer. */
-	public void putShort(long address, final ShortBuffer source) {
+	public void putShort(long address, ShortBuffer source) {
 		int length = source.remaining();
 		while (length != 0) {
-			final ByteBuffer target = this.buffers[MappedBuffer.bufferIndex(address)].duplicate().order(this.order);
-			final int index = MappedBuffer.valueIndex(address);
-			final int count = MappedBuffer.valueCount2(index, length);
+			ByteBuffer target = this.buffers[bufferIndex(address)].duplicate().order(this.order);
+			int index = valueIndex(address);
+			int count = valueCount2(index, length);
 			source.limit(index + count);
 			target.position(index);
 			target.asShortBuffer().put(source);
@@ -637,8 +637,8 @@ public class MappedBuffer implements Emuable {
 	 * @see IntBuffer#get(int)
 	 * @param address Adresse.
 	 * @return {@code int}-Wert. */
-	public int getInt(final long address) {
-		return this.buffers[MappedBuffer.bufferIndex(address)].getInt(MappedBuffer.valueIndex(address));
+	public int getInt(long address) {
+		return this.buffers[bufferIndex(address)].getInt(valueIndex(address));
 	}
 
 	/** Diese Methode füllt das gegebene Array mit den {@code int}-Werten ab der gegebenen Adresse.
@@ -646,7 +646,7 @@ public class MappedBuffer implements Emuable {
 	 * @see IntBuffer#get(int[])
 	 * @param address Adresse.
 	 * @param target {@code int}-Array. */
-	public void getInt(final long address, final int[] target) {
+	public void getInt(long address, int[] target) {
 		this.getInt(address, target, 0, target.length);
 	}
 
@@ -657,11 +657,11 @@ public class MappedBuffer implements Emuable {
 	 * @param target {@code int}-Array.
 	 * @param offset Beginn des Abschnitts.
 	 * @param length Länge des Abschnitts. */
-	public void getInt(long address, final int[] target, int offset, int length) {
+	public void getInt(long address, int[] target, int offset, int length) {
 		while (length != 0) {
-			final ByteBuffer source = this.buffers[MappedBuffer.bufferIndex(address)].duplicate().order(this.order);
-			final int index = MappedBuffer.valueIndex(address);
-			final int count = MappedBuffer.valueCount4(index, length);
+			ByteBuffer source = this.buffers[bufferIndex(address)].duplicate().order(this.order);
+			int index = valueIndex(address);
+			int count = valueCount4(index, length);
 			source.position(index);
 			source.asIntBuffer().get(target, offset, count);
 			length -= count;
@@ -674,12 +674,12 @@ public class MappedBuffer implements Emuable {
 	 *
 	 * @param address Adresse.
 	 * @param target {@code int}-Puffer. */
-	public void getInt(long address, final IntBuffer target) {
+	public void getInt(long address, IntBuffer target) {
 		int length = target.remaining();
 		while (length != 0) {
-			final ByteBuffer source = this.buffers[MappedBuffer.bufferIndex(address)].duplicate().order(this.order);
-			final int index = MappedBuffer.valueIndex(address);
-			final int count = MappedBuffer.valueCount4(index, length);
+			ByteBuffer source = this.buffers[bufferIndex(address)].duplicate().order(this.order);
+			int index = valueIndex(address);
+			int count = valueCount4(index, length);
 			source.limit(index + count);
 			source.position(index);
 			target.put(source.asIntBuffer());
@@ -693,8 +693,8 @@ public class MappedBuffer implements Emuable {
 	 * @see IntBuffer#put(int, int)
 	 * @param address Adresse.
 	 * @param source {@code int}-Wert. */
-	public void putInt(final long address, final int source) {
-		this.buffers[MappedBuffer.bufferIndex(address)].putInt(MappedBuffer.valueIndex(address), source);
+	public void putInt(long address, int source) {
+		this.buffers[bufferIndex(address)].putInt(valueIndex(address), source);
 	}
 
 	/** Diese Methode schreibt die {@code int}-Werte des gegebenen Arrays an die gegebene Adresse.
@@ -702,7 +702,7 @@ public class MappedBuffer implements Emuable {
 	 * @see IntBuffer#put(int[])
 	 * @param address Adresse.
 	 * @param source {@code int}-Array. */
-	public void putInt(final long address, final int[] source) {
+	public void putInt(long address, int[] source) {
 		this.putInt(address, source, 0, source.length);
 	}
 
@@ -713,11 +713,11 @@ public class MappedBuffer implements Emuable {
 	 * @param source {@code int}-Array.
 	 * @param offset Beginn des Abschnitts.
 	 * @param length Länge des Abschnitts. */
-	public void putInt(long address, final int[] source, int offset, int length) {
+	public void putInt(long address, int[] source, int offset, int length) {
 		while (length != 0) {
-			final ByteBuffer target = this.buffers[MappedBuffer.bufferIndex(address)].duplicate().order(this.order);
-			final int index = MappedBuffer.valueIndex(address);
-			final int count = MappedBuffer.valueCount4(index, length);
+			ByteBuffer target = this.buffers[bufferIndex(address)].duplicate().order(this.order);
+			int index = valueIndex(address);
+			int count = valueCount4(index, length);
 			target.position(index);
 			target.asIntBuffer().put(source, offset, count);
 			length -= count;
@@ -730,12 +730,12 @@ public class MappedBuffer implements Emuable {
 	 *
 	 * @param address Adresse.
 	 * @param source {@code int}-Puffer. */
-	public void putInt(long address, final IntBuffer source) {
+	public void putInt(long address, IntBuffer source) {
 		int length = source.remaining();
 		while (length != 0) {
-			final ByteBuffer target = this.buffers[MappedBuffer.bufferIndex(address)].duplicate().order(this.order);
-			final int index = MappedBuffer.valueIndex(address);
-			final int count = MappedBuffer.valueCount4(index, length);
+			ByteBuffer target = this.buffers[bufferIndex(address)].duplicate().order(this.order);
+			int index = valueIndex(address);
+			int count = valueCount4(index, length);
 			source.limit(index + count);
 			target.position(index);
 			target.asIntBuffer().put(source);
@@ -749,8 +749,8 @@ public class MappedBuffer implements Emuable {
 	 * @see LongBuffer#get(int)
 	 * @param address Adresse.
 	 * @return {@code long}-Wert. */
-	public long getLong(final long address) {
-		return this.buffers[MappedBuffer.bufferIndex(address)].getLong(MappedBuffer.valueIndex(address));
+	public long getLong(long address) {
+		return this.buffers[bufferIndex(address)].getLong(valueIndex(address));
 	}
 
 	/** Diese Methode füllt das gegebene Array mit den {@code long}-Werten ab der gegebenen Adresse.
@@ -758,7 +758,7 @@ public class MappedBuffer implements Emuable {
 	 * @see LongBuffer#get(long[])
 	 * @param address Adresse.
 	 * @param target {@code long}-Array. */
-	public void getLong(final long address, final long[] target) {
+	public void getLong(long address, long[] target) {
 		this.getLong(address, target, 0, target.length);
 	}
 
@@ -769,11 +769,11 @@ public class MappedBuffer implements Emuable {
 	 * @param target {@code long}-Array.
 	 * @param offset Beginn des Abschnitts.
 	 * @param length Länge des Abschnitts. */
-	public void getLong(long address, final long[] target, int offset, int length) {
+	public void getLong(long address, long[] target, int offset, int length) {
 		while (length != 0) {
-			final ByteBuffer source = this.buffers[MappedBuffer.bufferIndex(address)].duplicate().order(this.order);
-			final int index = MappedBuffer.valueIndex(address);
-			final int count = MappedBuffer.valueCount8(index, length);
+			ByteBuffer source = this.buffers[bufferIndex(address)].duplicate().order(this.order);
+			int index = valueIndex(address);
+			int count = valueCount8(index, length);
 			source.position(index);
 			source.asLongBuffer().get(target, offset, count);
 			length -= count;
@@ -786,12 +786,12 @@ public class MappedBuffer implements Emuable {
 	 *
 	 * @param address Adresse.
 	 * @param target {@code long}-Puffer. */
-	public void getLong(long address, final LongBuffer target) {
+	public void getLong(long address, LongBuffer target) {
 		int length = target.remaining();
 		while (length != 0) {
-			final ByteBuffer source = this.buffers[MappedBuffer.bufferIndex(address)].duplicate().order(this.order);
-			final int index = MappedBuffer.valueIndex(address);
-			final int count = MappedBuffer.valueCount8(index, length);
+			ByteBuffer source = this.buffers[bufferIndex(address)].duplicate().order(this.order);
+			int index = valueIndex(address);
+			int count = valueCount8(index, length);
 			source.limit(index + count);
 			source.position(index);
 			target.put(source.asLongBuffer());
@@ -805,8 +805,8 @@ public class MappedBuffer implements Emuable {
 	 * @see LongBuffer#put(int, long)
 	 * @param address Adresse.
 	 * @param source {@code long}-Wert. */
-	public void putLong(final long address, final long source) {
-		this.buffers[MappedBuffer.bufferIndex(address)].putLong(MappedBuffer.valueIndex(address), source);
+	public void putLong(long address, long source) {
+		this.buffers[bufferIndex(address)].putLong(valueIndex(address), source);
 	}
 
 	/** Diese Methode schreibt die {@code long}-Werte des gegebenen Arrays an die gegebene Adresse.
@@ -814,7 +814,7 @@ public class MappedBuffer implements Emuable {
 	 * @see LongBuffer#put(long[])
 	 * @param address Adresse.
 	 * @param source {@code long}-Array. */
-	public void putLong(final long address, final long[] source) {
+	public void putLong(long address, long[] source) {
 		this.putLong(address, source, 0, source.length);
 	}
 
@@ -825,11 +825,11 @@ public class MappedBuffer implements Emuable {
 	 * @param source {@code long}-Array.
 	 * @param offset Beginn des Abschnitts.
 	 * @param length Länge des Abschnitts. */
-	public void putLong(long address, final long[] source, int offset, int length) {
+	public void putLong(long address, long[] source, int offset, int length) {
 		while (length != 0) {
-			final ByteBuffer target = this.buffers[MappedBuffer.bufferIndex(address)].duplicate().order(this.order);
-			final int index = MappedBuffer.valueIndex(address);
-			final int count = MappedBuffer.valueCount8(index, length);
+			ByteBuffer target = this.buffers[bufferIndex(address)].duplicate().order(this.order);
+			int index = valueIndex(address);
+			int count = valueCount8(index, length);
 			target.position(index);
 			target.asLongBuffer().put(source, offset, count);
 			length -= count;
@@ -842,12 +842,12 @@ public class MappedBuffer implements Emuable {
 	 *
 	 * @param address Adresse.
 	 * @param source {@code long}-Puffer. */
-	public void putLong(long address, final LongBuffer source) {
+	public void putLong(long address, LongBuffer source) {
 		int length = source.remaining();
 		while (length != 0) {
-			final ByteBuffer target = this.buffers[MappedBuffer.bufferIndex(address)].duplicate().order(this.order);
-			final int index = MappedBuffer.valueIndex(address);
-			final int count = MappedBuffer.valueCount8(index, length);
+			ByteBuffer target = this.buffers[bufferIndex(address)].duplicate().order(this.order);
+			int index = valueIndex(address);
+			int count = valueCount8(index, length);
 			source.limit(index + count);
 			target.position(index);
 			target.asLongBuffer().put(source);
@@ -861,8 +861,8 @@ public class MappedBuffer implements Emuable {
 	 * @see FloatBuffer#get(int)
 	 * @param address Adresse.
 	 * @return {@code float}-Wert. */
-	public float getFloat(final long address) {
-		return this.buffers[MappedBuffer.bufferIndex(address)].getFloat(MappedBuffer.valueIndex(address));
+	public float getFloat(long address) {
+		return this.buffers[bufferIndex(address)].getFloat(valueIndex(address));
 	}
 
 	/** Diese Methode füllt das gegebene Array mit den {@code float}-Werten ab der gegebenen Adresse.
@@ -870,7 +870,7 @@ public class MappedBuffer implements Emuable {
 	 * @see FloatBuffer#get(float[])
 	 * @param address Adresse.
 	 * @param target {@code float}-Array. */
-	public void getFloat(final long address, final float[] target) {
+	public void getFloat(long address, float[] target) {
 		this.getFloat(address, target, 0, target.length);
 	}
 
@@ -881,11 +881,11 @@ public class MappedBuffer implements Emuable {
 	 * @param target {@code float}-Array.
 	 * @param offset Beginn des Abschnitts.
 	 * @param length Länge des Abschnitts. */
-	public void getFloat(long address, final float[] target, int offset, int length) {
+	public void getFloat(long address, float[] target, int offset, int length) {
 		while (length != 0) {
-			final ByteBuffer source = this.buffers[MappedBuffer.bufferIndex(address)].duplicate().order(this.order);
-			final int index = MappedBuffer.valueIndex(address);
-			final int count = MappedBuffer.valueCount4(index, length);
+			ByteBuffer source = this.buffers[bufferIndex(address)].duplicate().order(this.order);
+			int index = valueIndex(address);
+			int count = valueCount4(index, length);
 			source.position(index);
 			source.asFloatBuffer().get(target, offset, count);
 			length -= count;
@@ -898,12 +898,12 @@ public class MappedBuffer implements Emuable {
 	 *
 	 * @param address Adresse.
 	 * @param target {@code float}-Puffer. */
-	public void getFloat(long address, final FloatBuffer target) {
+	public void getFloat(long address, FloatBuffer target) {
 		int length = target.remaining();
 		while (length != 0) {
-			final ByteBuffer source = this.buffers[MappedBuffer.bufferIndex(address)].duplicate().order(this.order);
-			final int index = MappedBuffer.valueIndex(address);
-			final int count = MappedBuffer.valueCount4(index, length);
+			ByteBuffer source = this.buffers[bufferIndex(address)].duplicate().order(this.order);
+			int index = valueIndex(address);
+			int count = valueCount4(index, length);
 			source.limit(index + count);
 			source.position(index);
 			target.put(source.asFloatBuffer());
@@ -917,8 +917,8 @@ public class MappedBuffer implements Emuable {
 	 * @see FloatBuffer#put(int, float)
 	 * @param address Adresse.
 	 * @param source {@code float}-Wert. */
-	public void putFloat(final long address, final float source) {
-		this.buffers[MappedBuffer.bufferIndex(address)].putFloat(MappedBuffer.valueIndex(address), source);
+	public void putFloat(long address, float source) {
+		this.buffers[bufferIndex(address)].putFloat(valueIndex(address), source);
 	}
 
 	/** Diese Methode schreibt die {@code float}-Werte des gegebenen Arrays an die gegebene Adresse.
@@ -926,7 +926,7 @@ public class MappedBuffer implements Emuable {
 	 * @see FloatBuffer#put(float[])
 	 * @param address Adresse.
 	 * @param source {@code float}-Array. */
-	public void putFloat(final long address, final float[] source) {
+	public void putFloat(long address, float[] source) {
 		this.putFloat(address, source, 0, source.length);
 	}
 
@@ -937,11 +937,11 @@ public class MappedBuffer implements Emuable {
 	 * @param source {@code float}-Array.
 	 * @param offset Beginn des Abschnitts.
 	 * @param length Länge des Abschnitts. */
-	public void putFloat(long address, final float[] source, int offset, int length) {
+	public void putFloat(long address, float[] source, int offset, int length) {
 		while (length != 0) {
-			final ByteBuffer target = this.buffers[MappedBuffer.bufferIndex(address)].duplicate().order(this.order);
-			final int index = MappedBuffer.valueIndex(address);
-			final int count = MappedBuffer.valueCount4(index, length);
+			ByteBuffer target = this.buffers[bufferIndex(address)].duplicate().order(this.order);
+			int index = valueIndex(address);
+			int count = valueCount4(index, length);
 			target.position(index);
 			target.asFloatBuffer().put(source, offset, count);
 			length -= count;
@@ -954,12 +954,12 @@ public class MappedBuffer implements Emuable {
 	 *
 	 * @param address Adresse.
 	 * @param source {@code float}-Puffer. */
-	public void putFloat(long address, final FloatBuffer source) {
+	public void putFloat(long address, FloatBuffer source) {
 		int length = source.remaining();
 		while (length != 0) {
-			final ByteBuffer target = this.buffers[MappedBuffer.bufferIndex(address)].duplicate().order(this.order);
-			final int index = MappedBuffer.valueIndex(address);
-			final int count = MappedBuffer.valueCount4(index, length);
+			ByteBuffer target = this.buffers[bufferIndex(address)].duplicate().order(this.order);
+			int index = valueIndex(address);
+			int count = valueCount4(index, length);
 			source.limit(index + count);
 			target.position(index);
 			target.asFloatBuffer().put(source);
@@ -973,8 +973,8 @@ public class MappedBuffer implements Emuable {
 	 * @see DoubleBuffer#get(int)
 	 * @param address Adresse.
 	 * @return {@code double}-Wert. */
-	public double getDouble(final long address) {
-		return this.buffers[MappedBuffer.bufferIndex(address)].getDouble(MappedBuffer.valueIndex(address));
+	public double getDouble(long address) {
+		return this.buffers[bufferIndex(address)].getDouble(valueIndex(address));
 	}
 
 	/** Diese Methode füllt das gegebene Array mit den {@code double}-Werten ab der gegebenen Adresse.
@@ -982,7 +982,7 @@ public class MappedBuffer implements Emuable {
 	 * @see DoubleBuffer#get(double[])
 	 * @param address Adresse.
 	 * @param target {@code double}-Array. */
-	public void getDouble(final long address, final double[] target) {
+	public void getDouble(long address, double[] target) {
 		this.getDouble(address, target, 0, target.length);
 	}
 
@@ -993,11 +993,11 @@ public class MappedBuffer implements Emuable {
 	 * @param target {@code double}-Array.
 	 * @param offset Beginn des Abschnitts.
 	 * @param length Länge des Abschnitts. */
-	public void getDouble(long address, final double[] target, int offset, int length) {
+	public void getDouble(long address, double[] target, int offset, int length) {
 		while (length != 0) {
-			final ByteBuffer source = this.buffers[MappedBuffer.bufferIndex(address)].duplicate().order(this.order);
-			final int index = MappedBuffer.valueIndex(address);
-			final int count = MappedBuffer.valueCount8(index, length);
+			ByteBuffer source = this.buffers[bufferIndex(address)].duplicate().order(this.order);
+			int index = valueIndex(address);
+			int count = valueCount8(index, length);
 			source.position(index);
 			source.asDoubleBuffer().get(target, offset, count);
 			length -= count;
@@ -1010,12 +1010,12 @@ public class MappedBuffer implements Emuable {
 	 *
 	 * @param address Adresse.
 	 * @param target {@code double}-Puffer. */
-	public void getDouble(long address, final DoubleBuffer target) {
+	public void getDouble(long address, DoubleBuffer target) {
 		int length = target.remaining();
 		while (length != 0) {
-			final ByteBuffer source = this.buffers[MappedBuffer.bufferIndex(address)].duplicate().order(this.order);
-			final int index = MappedBuffer.valueIndex(address);
-			final int count = MappedBuffer.valueCount4(index, length);
+			ByteBuffer source = this.buffers[bufferIndex(address)].duplicate().order(this.order);
+			int index = valueIndex(address);
+			int count = valueCount4(index, length);
 			source.limit(index + count);
 			source.position(index);
 			target.put(source.asDoubleBuffer());
@@ -1029,8 +1029,8 @@ public class MappedBuffer implements Emuable {
 	 * @see DoubleBuffer#put(int, double)
 	 * @param address Adresse.
 	 * @param source {@code double}-Wert. */
-	public void putDouble(final long address, final double source) {
-		this.buffers[MappedBuffer.bufferIndex(address)].putDouble(MappedBuffer.valueIndex(address), source);
+	public void putDouble(long address, double source) {
+		this.buffers[bufferIndex(address)].putDouble(valueIndex(address), source);
 	}
 
 	/** Diese Methode schreibt die {@code double}-Werte des gegebenen Arrays an die gegebene Adresse.
@@ -1038,7 +1038,7 @@ public class MappedBuffer implements Emuable {
 	 * @see DoubleBuffer#put(double[])
 	 * @param address Adresse.
 	 * @param source {@code double}-Array. */
-	public void putDouble(final long address, final double[] source) {
+	public void putDouble(long address, double[] source) {
 		this.putDouble(address, source, 0, source.length);
 	}
 
@@ -1049,11 +1049,11 @@ public class MappedBuffer implements Emuable {
 	 * @param source {@code double}-Array.
 	 * @param offset Beginn des Abschnitts.
 	 * @param length Länge des Abschnitts. */
-	public void putDouble(long address, final double[] source, int offset, int length) {
+	public void putDouble(long address, double[] source, int offset, int length) {
 		while (length != 0) {
-			final ByteBuffer target = this.buffers[MappedBuffer.bufferIndex(address)].duplicate().order(this.order);
-			final int index = MappedBuffer.valueIndex(address);
-			final int count = MappedBuffer.valueCount8(index, length);
+			ByteBuffer target = this.buffers[bufferIndex(address)].duplicate().order(this.order);
+			int index = valueIndex(address);
+			int count = valueCount8(index, length);
 			target.position(index);
 			target.asDoubleBuffer().put(source, offset, count);
 			length -= count;
@@ -1066,12 +1066,12 @@ public class MappedBuffer implements Emuable {
 	 *
 	 * @param address Adresse.
 	 * @param source {@code double}-Puffer. */
-	public void putDouble(long address, final DoubleBuffer source) {
+	public void putDouble(long address, DoubleBuffer source) {
 		int length = source.remaining();
 		while (length != 0) {
-			final ByteBuffer target = this.buffers[MappedBuffer.bufferIndex(address)].duplicate().order(this.order);
-			final int index = MappedBuffer.valueIndex(address);
-			final int count = MappedBuffer.valueCount8(index, length);
+			ByteBuffer target = this.buffers[bufferIndex(address)].duplicate().order(this.order);
+			int index = valueIndex(address);
+			int count = valueCount8(index, length);
 			source.limit(index + count);
 			target.position(index);
 			target.asDoubleBuffer().put(source);
@@ -1092,7 +1092,7 @@ public class MappedBuffer implements Emuable {
 	 * @param mode Zahlenkodierung zur Interpretation des Speicherbereichs.
 	 * @return {@link MMIArray}-Sicht auf den Speicherbereich.
 	 * @throws IllegalArgumentException Wenn {@link MMIArray#from(MappedBuffer, long, int, int)} diese auslöst. */
-	public MMIArrayL getArray(final long address, final int length, final int mode) throws IllegalArgumentException {
+	public MMIArrayL getArray(long address, int length, int mode) throws IllegalArgumentException {
 		return MMIArray.from(this, address, length, mode);
 	}
 
@@ -1105,8 +1105,8 @@ public class MappedBuffer implements Emuable {
 	 * @see #putInt(long, int[])
 	 * @param address Adresse.
 	 * @param source Zahlenfolge. */
-	public void putArray(final long address, final IAMArray source) {
-		final int mode = source.mode();
+	public void putArray(long address, IAMArray source) {
+		int mode = source.mode();
 		if ((mode == IAMArray.MODE_INT8) || (mode == IAMArray.MODE_UINT8)) {
 			this.put(address, source.toBytes());
 		} else if ((mode == IAMArray.MODE_INT16) || (mode == IAMArray.MODE_UINT16)) {
@@ -1121,8 +1121,8 @@ public class MappedBuffer implements Emuable {
 	 * @param target Beginn des Zielabschnitts.
 	 * @param source Beginn des Quellabschnitts.
 	 * @param length Länge des Abschnitts. */
-	public void copy(final long target, final long source, final long length) {
-		MappedBuffer.copyImpl(this.buffers, target, this.buffers, source, length);
+	public void copy(long target, long source, long length) {
+		copyImpl(this.buffers, target, this.buffers, source, length);
 	}
 
 	@Override
@@ -1140,42 +1140,42 @@ public class MappedBuffer implements Emuable {
 	private static final int INDEX_SIZE = 30;
 
 	/** Dieses Feld speichert die Bitmaske zur Auswahl der {@link #INDEX_SIZE niederwertigen Bit einer Adresse}. */
-	private static final int INDEX_MASK = (1 << MappedBuffer.INDEX_SIZE) - 1;
+	private static final int INDEX_MASK = (1 << INDEX_SIZE) - 1;
 
 	/** Dieses Feld speichert die Größe des Speicherbereichs, den je zwei in {@link #buffers} auf einander folgende {@link MappedByteBuffer} gleichzeitig
 	 * anbinden. */
 	private static final int BUFFER_GUARD = 1 << 14;
 
 	/** Dieses Feld speichert die Größe der {@link MappedByteBuffer}, die vor dem letzten in {@link #buffers} verwaltet werden. */
-	private static final int BUFFER_LENGTH = MappedBuffer.BUFFER_GUARD + MappedBuffer.INDEX_MASK + 1;
+	private static final int BUFFER_LENGTH = BUFFER_GUARD + INDEX_MASK + 1;
 
 	/** Diese Methode gibt den Index eines {@link MappedByteBuffer} in {@link #buffers} zur gegebenen Adresse zurück. */
-	private static int bufferIndex(final long address) {
-		return (int)(address >> MappedBuffer.INDEX_SIZE);
+	private static int bufferIndex(long address) {
+		return (int)(address >> INDEX_SIZE);
 	}
 
 	/** Diese Methode gibt den Index eines Werts innerhalb eins {@link MappedByteBuffer} zur gegebenen Adresse zurück. */
-	private static int valueIndex(final long address) {
-		return (int)address & MappedBuffer.INDEX_MASK;
+	private static int valueIndex(long address) {
+		return (int)address & INDEX_MASK;
 	}
 
-	private static int valueCount1(final int index, final int length) {
-		return Math.min(length, (MappedBuffer.BUFFER_LENGTH - index) / 1);
+	private static int valueCount1(int index, int length) {
+		return Math.min(length, (BUFFER_LENGTH - index) / 1);
 	}
 
-	private static int valueCount2(final int index, final int length) {
-		return Math.min(length, (MappedBuffer.BUFFER_LENGTH - index) / 2);
+	private static int valueCount2(int index, int length) {
+		return Math.min(length, (BUFFER_LENGTH - index) / 2);
 	}
 
-	private static int valueCount4(final int index, final int length) {
-		return Math.min(length, (MappedBuffer.BUFFER_LENGTH - index) / 4);
+	private static int valueCount4(int index, int length) {
+		return Math.min(length, (BUFFER_LENGTH - index) / 4);
 	}
 
-	private static int valueCount8(final int index, final int length) {
-		return Math.min(length, (MappedBuffer.BUFFER_LENGTH - index) / 8);
+	private static int valueCount8(int index, int length) {
+		return Math.min(length, (BUFFER_LENGTH - index) / 8);
 	}
 
-	private static void forceImpl(ByteBuffer buffer, final int minOffset, final int maxOffset) {
+	private static void forceImpl(ByteBuffer buffer, int minOffset, int maxOffset) {
 		buffer = buffer.duplicate();
 		buffer.limit(maxOffset);
 		buffer.position(minOffset);
@@ -1183,16 +1183,16 @@ public class MappedBuffer implements Emuable {
 		((MappedByteBuffer)buffer).force();
 	}
 
-	private static void copyImpl(final ByteBuffer[] targetBuffers, long targetAddress, final ByteBuffer[] sourceBuffers, long sourceAddress, long length) {
+	private static void copyImpl(ByteBuffer[] targetBuffers, long targetAddress, ByteBuffer[] sourceBuffers, long sourceAddress, long length) {
 		if (length < 0) throw new IllegalArgumentException();
 		if ((targetBuffers == sourceBuffers) && (targetAddress == sourceAddress)) return;
 		if (targetAddress < sourceAddress) {
 			while (length != 0) {
-				final int targetIndex = MappedBuffer.valueIndex(targetAddress);
-				final int sourceIndex = MappedBuffer.valueIndex(sourceAddress);
-				final int count = (int)Math.min(length, MappedBuffer.BUFFER_LENGTH - Math.max(targetIndex, sourceIndex));
-				final ByteBuffer target = targetBuffers[MappedBuffer.bufferIndex(targetAddress)].duplicate();
-				final ByteBuffer source = sourceBuffers[MappedBuffer.bufferIndex(sourceAddress)].duplicate();
+				int targetIndex = valueIndex(targetAddress);
+				int sourceIndex = valueIndex(sourceAddress);
+				int count = (int)Math.min(length, BUFFER_LENGTH - Math.max(targetIndex, sourceIndex));
+				ByteBuffer target = targetBuffers[bufferIndex(targetAddress)].duplicate();
+				ByteBuffer source = sourceBuffers[bufferIndex(sourceAddress)].duplicate();
 				source.limit(sourceIndex + count);
 				source.position(sourceIndex);
 				target.position(targetIndex);
@@ -1205,14 +1205,14 @@ public class MappedBuffer implements Emuable {
 			targetAddress += length;
 			sourceAddress += length;
 			while (length != 0) {
-				final int count = (int)Math.min(length, Math.min(MappedBuffer.valueIndex(targetAddress - 1), MappedBuffer.valueIndex(sourceAddress - 1)) + 1);
+				int count = (int)Math.min(length, Math.min(valueIndex(targetAddress - 1), valueIndex(sourceAddress - 1)) + 1);
 				length -= count;
 				targetAddress -= count;
 				sourceAddress -= count;
-				final int targetIndex = MappedBuffer.valueIndex(targetAddress);
-				final int sourceIndex = MappedBuffer.valueIndex(sourceAddress);
-				final ByteBuffer target = targetBuffers[MappedBuffer.bufferIndex(targetAddress)].duplicate();
-				final ByteBuffer source = sourceBuffers[MappedBuffer.bufferIndex(sourceAddress)].duplicate();
+				int targetIndex = valueIndex(targetAddress);
+				int sourceIndex = valueIndex(sourceAddress);
+				ByteBuffer target = targetBuffers[bufferIndex(targetAddress)].duplicate();
+				ByteBuffer source = sourceBuffers[bufferIndex(sourceAddress)].duplicate();
 				source.limit(sourceIndex + count);
 				source.position(sourceIndex);
 				target.position(targetIndex);
@@ -1243,25 +1243,25 @@ public class MappedBuffer implements Emuable {
 	private byte growScale = 16;
 
 	/** Diese Methode implementiert {@link #resize(long)} ohne {@code synchronized} und ohne Parameterprüfung. */
-	private void resizeImpl(final long newSize) throws IllegalStateException {
-		final MappedByteBuffer[] oldBuffers = this.buffers, newBuffers;
-		final int oldLength = oldBuffers.length, newLength = Math.max(MappedBuffer.bufferIndex(newSize - 1) + 1, 1);
+	private void resizeImpl(long newSize) throws IllegalStateException {
+		MappedByteBuffer[] oldBuffers = this.buffers, newBuffers;
+		int oldLength = oldBuffers.length, newLength = Math.max(bufferIndex(newSize - 1) + 1, 1);
 		if (oldLength != newLength) {
 			newBuffers = new MappedByteBuffer[newLength];
 			System.arraycopy(oldBuffers, 0, newBuffers, 0, Math.min(oldLength, newLength));
 		} else {
 			newBuffers = oldBuffers;
 		}
-		try (final RandomAccessFile file = new RandomAccessFile(this.file, this.isReadonly ? "r" : "rw"); final FileChannel channel = file.getChannel()) {
-			final long scale = MappedBuffer.BUFFER_LENGTH - MappedBuffer.BUFFER_GUARD;
-			final MapMode mode = this.isReadonly ? MapMode.READ_ONLY : MapMode.READ_WRITE;
-			final ByteOrder order = this.order;
+		try (RandomAccessFile file = new RandomAccessFile(this.file, this.isReadonly ? "r" : "rw"); FileChannel channel = file.getChannel()) {
+			long scale = BUFFER_LENGTH - BUFFER_GUARD;
+			MapMode mode = this.isReadonly ? MapMode.READ_ONLY : MapMode.READ_WRITE;
+			ByteOrder order = this.order;
 			for (int i = oldLength; i < newLength; i++) {
-				(newBuffers[i - 1] = channel.map(mode, (i - 1) * scale, MappedBuffer.BUFFER_LENGTH)).order(order);
+				(newBuffers[i - 1] = channel.map(mode, (i - 1) * scale, BUFFER_LENGTH)).order(order);
 			}
-			final long offset = (newLength - 1) * scale;
+			long offset = (newLength - 1) * scale;
 			(newBuffers[newLength - 1] = channel.map(mode, offset, newSize - offset)).order(order);
-		} catch (final IOException cause) {
+		} catch (IOException cause) {
 			throw new IllegalStateException(cause);
 		}
 		this.size = newSize;
