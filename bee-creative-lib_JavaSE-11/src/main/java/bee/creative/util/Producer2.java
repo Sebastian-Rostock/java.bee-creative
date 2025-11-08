@@ -8,7 +8,7 @@ import static bee.creative.util.Producers.producerFrom;
  * @param <V> Typ des Werts. */
 public interface Producer2<V> extends Producer<V> {
 
-	/** Diese Methode ist eine Abkürzung für {@link Producers#producerFrom(Producer) producerFrom(this)}. */
+	/** Diese Methode liefert die {@link Producer3}-Schnittstelle zu {@link #get()}. */
 	default Producer3<V> asProducer() {
 		return producerFrom(this);
 	}

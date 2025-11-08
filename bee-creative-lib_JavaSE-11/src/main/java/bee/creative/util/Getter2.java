@@ -9,7 +9,7 @@ import static bee.creative.util.Getters.getterFrom;
  * @param <V> Typ des Werts der Eigenschaft. */
 public interface Getter2<T, V> extends Getter<T, V> {
 
-	/** Diese Methode ist eine Abkürzung für {@link Getters#getterFrom(Getter) getterFrom(this)}. */
+	/** Diese Methode liefert die {@link Getter3}-Schnittstelle zu {@link #get(Object)}. */
 	default Getter3<T, V> asGetter() {
 		return getterFrom(this);
 	}

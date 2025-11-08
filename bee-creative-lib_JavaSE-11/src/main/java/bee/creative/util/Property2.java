@@ -8,7 +8,7 @@ import static bee.creative.util.Properties.propertyFrom;
  * @param <V> Typ des Werts. */
 public interface Property2<V> extends Property<V> {
 
-	/** Diese Methode ist eine Abkürzung für {@link Properties#propertyFrom(Property) propertyFrom(this)}. */
+	/** Diese Methode liefert die {@link Property3}-Schnittstelle zu {@link #get()} und {@link #set(Object)}. */
 	default Property3<V> asProperty() {
 		return propertyFrom(this);
 	}

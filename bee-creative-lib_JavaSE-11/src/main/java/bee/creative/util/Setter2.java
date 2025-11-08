@@ -9,7 +9,7 @@ import static bee.creative.util.Setters.setterFrom;
  * @param <V> Typ des Werts der Eigenschaft. */
 public interface Setter2<T, V> extends Setter<T, V> {
 
-	/** Diese Methode ist eine Abkürzung für {@link Setters#setterFrom(Setter) setterFrom(this)}. */
+	/** Diese Methode liefert die {@link Setter3}-Schnittstelle zu {@link #set(Object, Object)}. */
 	default Setter3<T, V> asSetter() {
 		return setterFrom(this);
 	}

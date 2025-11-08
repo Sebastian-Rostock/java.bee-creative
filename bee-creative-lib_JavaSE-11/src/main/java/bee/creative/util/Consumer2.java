@@ -8,7 +8,7 @@ import static bee.creative.util.Consumers.consumerFrom;
  * @param <V> Typ des Werts. */
 public interface Consumer2<V> extends Consumer<V> {
 
-	/** Diese Methode ist eine Abkürzung für {@link Consumers#consumerFrom(Consumer) consumerFrom(this)}. */
+	/** Diese Methode liefert die {@link Consumer3}-Schnittstelle zu {@link #set(Object)}. */
 	default Consumer3<V> asConsumer() {
 		return consumerFrom(this);
 	}

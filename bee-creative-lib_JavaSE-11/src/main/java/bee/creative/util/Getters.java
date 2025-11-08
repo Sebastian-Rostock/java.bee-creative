@@ -149,7 +149,7 @@ public class Getters {
 	/** Diese Klasse implementiert die Referenzstärke für {@link Getters#bufferedGetter(Getter, RefMode, Hasher)}.
 	 *
 	 * @author [cc-by] 2025 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public static enum RefMode {
+	public enum RefMode {
 
 		/** Dieses Feld identifiziert die direkte Referenz. */
 		HARD_REF,
@@ -166,7 +166,7 @@ public class Getters {
 
 	private static final Getter3<?, ?> neutralGetter = item -> item;
 
-	private static interface Ref extends Producer<Object> {
+	private interface Ref extends Producer<Object> {
 
 		public Object item();
 

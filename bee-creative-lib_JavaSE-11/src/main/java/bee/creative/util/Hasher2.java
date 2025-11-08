@@ -7,7 +7,7 @@ import static bee.creative.util.Hashers.hasherFrom;
  * @author [cc-by] 2025 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public interface Hasher2 extends Hasher {
 
-	/** Diese Methode ist eine Abkürzung für {@link Hashers#hasherFrom(Hasher) hasherFrom(this)}. */
+	/** Diese Methode liefert die {@link Hasher3}-Schnittstelle zu {@link #hash(Object)} und {@link #equals(Object, Object)}. */
 	default Hasher3 asHasher() {
 		return hasherFrom(this);
 	}
