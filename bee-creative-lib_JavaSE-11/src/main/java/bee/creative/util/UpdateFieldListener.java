@@ -1,7 +1,5 @@
 package bee.creative.util;
 
-import bee.creative.util.Fields.ObservableField;
-
 /** Diese Schnittstelle definiert den Empfänger des {@link UpdateFieldEvent}. */
 public interface UpdateFieldListener {
 

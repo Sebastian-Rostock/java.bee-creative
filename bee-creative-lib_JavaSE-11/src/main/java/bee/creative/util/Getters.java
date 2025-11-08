@@ -2,7 +2,6 @@ package bee.creative.util;
 
 import static bee.creative.lang.Objects.notNull;
 import static bee.creative.util.HashMap2.hashMapFrom;
-import static bee.creative.util.Producers.emptyProducer;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
@@ -28,13 +27,14 @@ public class Getters {
 
 	/** Diese Methode liefert einen {@link Getter3} zu {@link Producer#get()} des gegebenen {@link Producer}. */
 	public static <V> Getter3<Object, V> getterFromProducer(Producer<? extends V> that) throws NullPointerException {
-		return notNull(that) == emptyProducer() ? emptyGetter() : item -> that.get();
+		notNull(that);
+		return item -> that.get();
 	}
 
 	/** Diese Methode liefert den leeren {@link Getter3}, der beim Lesen stets {@code null} liefert. */
 	@SuppressWarnings ("unchecked")
-	public static <V> Getter3<Object, V> emptyGetter() {
-		return (Getter3<Object, V>)emptyGetter;
+	public static <T, V> Getter3<T, V> emptyGetter() {
+		return (Getter3<T, V>)emptyGetter;
 	}
 
 	/** Diese Methode liefert den neutralen {@link Getter3}, der beim Lesen stets den gegebenen Datensatz als Wert liefert. */
@@ -51,7 +51,7 @@ public class Getters {
 		return item -> trans.get(that.get(item));
 	}
 
-	/** Diese Methode liefert einen gepufferten {@link Getter3}, der das Lesen an den gegebenen {@link Getter} {@code that} delegiert und den ermittelten Wert zur
+	/** Diese Methode liefert einen gepufferten {@link Getter3}, der das Lesen an den gegebenen {@link Getter} delegiert und den ermittelten Wert zur
 	 * Wiederverwendung in einem {@link HashMap2 Puffer} ablegt, sofern der Puffer den Wert zum Datensatz noch nicht enthält, und sonst den im Puffer abgelegte
 	 * Wert liefert. Der Abgleich der Datensätze erfolgt über einen gegebenen {@link Hasher}. Die Ablage der Werte zu den Datensätzen erfolgt über Verweise der
 	 * gegebenen Stärke ({@link RefMode#HARD_REF}, {@link RefMode#SOFT_REF}, {@link RefMode#WEAK_REF}). */

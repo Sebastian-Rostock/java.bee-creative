@@ -1,7 +1,6 @@
 package bee.creative.util;
 
 import bee.creative.lang.Objects;
-import bee.creative.util.Fields.ObservableField;
 
 /** Diese Klasse implementiert die von einem {@link UpdateFieldListener} empfangene Nachricht zur Aktualisierung des Werts eines {@link ObservableField}. */
 public class UpdateFieldEvent {

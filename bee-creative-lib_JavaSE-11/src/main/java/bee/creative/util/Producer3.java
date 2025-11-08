@@ -1,14 +1,14 @@
 package bee.creative.util;
 
-import static bee.creative.util.Consumers.concatConsumer;
+import static bee.creative.util.Consumers.consumerFromSetter;
 import static bee.creative.util.Consumers.emptyConsumer;
 import static bee.creative.util.Getters.getterFromProducer;
 import static bee.creative.util.Getters.RefMode.SOFT_REF;
 import static bee.creative.util.Hashers.naturalHasher;
-import static bee.creative.util.Producers.concatProducer;
+import static bee.creative.util.Producers.producerFromGetter;
 import static bee.creative.util.Producers.synchronizedProducer;
 import static bee.creative.util.Producers.translatedProducer;
-import static bee.creative.util.Properties.concatProperty;
+import static bee.creative.util.Properties.propertyFromField;
 import static bee.creative.util.Properties.propertyFrom;
 import bee.creative.util.Getters.RefMode;
 
@@ -18,19 +18,19 @@ import bee.creative.util.Getters.RefMode;
  * @param <V> Typ des Werts. */
 public interface Producer3<V> extends Producer<V> {
 
-	/** Diese Methode ist eine Abkürzung für {@link Properties#concatProperty(Producer, Field) concatProperty(this, that)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Properties#propertyFromField(Field, Producer) concatProperty(this, that)}. */
 	default <V2> Property3<V2> concat(Field<? super V, V2> that) {
-		return concatProperty(this, that);
+		return propertyFromField(that, this);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Producers#concatProducer(Producer, Getter) concatProducer(this, that)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Producers#producerFromGetter(Getter, Producer) concatProducer(this, that)}. */
 	default <V2> Producer3<V2> concat(Getter<? super V, ? extends V2> that) {
-		return concatProducer(this, that);
+		return producerFromGetter(that, this);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Consumers#concatConsumer(Producer, Setter) concatConsumer(this, that)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Consumers#consumerFromSetter(Setter, Producer) consumerFromSetter(that, this)}. */
 	default <V2> Consumer3<V2> concat(Setter<? super V, ? super V2> that) {
-		return concatConsumer(this, that);
+		return consumerFromSetter(that, this);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #buffer(RefMode, Hasher) this.buffer(SOFT_REF, naturalHasher())}. */

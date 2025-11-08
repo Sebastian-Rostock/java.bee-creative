@@ -1,11 +1,9 @@
 package bee.creative.util;
 
 import static bee.creative.lang.Objects.notNull;
-import static bee.creative.util.Consumers.concatConsumer;
 import static bee.creative.util.Consumers.consumerFromSetter;
 import static bee.creative.util.Consumers.emptyConsumer;
 import static bee.creative.util.Consumers.translatedConsumer;
-import static bee.creative.util.Producers.concatProducer;
 import static bee.creative.util.Producers.emptyProducer;
 import static bee.creative.util.Producers.producerFromGetter;
 import static bee.creative.util.Producers.translatedProducer;
@@ -19,7 +17,7 @@ public class Properties {
 	public static <V> Property3<V> propertyFrom(Property<V> that) {
 		notNull(that);
 		if (that instanceof Property3<?>) return (Property3<V>)that;
-		return propertyFrom(that::get, that::set);
+		return propertyFrom(that, that);
 	}
 
 	/** Diese Methode liefert ein zusammengesetztes {@link Property3}mit den gegebenen Methoden. */
@@ -41,13 +39,20 @@ public class Properties {
 		};
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@link #propertyFrom(Producer, Consumer) propertyFrom(producerFromGetter(that), consumerFromSetter(that))}. */
 	public static <V> Property3<V> propertyFromField(Field<?, V> that) {
 		return propertyFrom(producerFromGetter(that), consumerFromSetter(that));
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@link #propertyFrom(Producer, Consumer) propertyFrom(producerFromGetter(that, item), consumerFromSetter(that,
+	 * item))}. */
+	public static <T, V> Property3<V> propertyFromField(Field<? super T, V> that, Producer<? extends T> item) {
+		return propertyFrom(producerFromGetter(that, item), consumerFromSetter(that, item));
+	}
+
 	/** Diese Methode liefert ein {@link Property3}, das einen Wert verwaltet, der gelesen und geschrieben werden kann. Der Wert ist initial {@code null}. */
 	public static <V> Property3<V> propertyWithValue() {
-		return propertyWithValue();
+		return propertyWithValue(null);
 	}
 
 	/** Diese Methode liefert ein {@link Property3}, das einen Wert verwaltet, der gelesen und geschrieben werden kann. Der Wert ist initial {@code value}. */
@@ -73,8 +78,8 @@ public class Properties {
 
 	/** Diese Methode liefert ein {@link Property3}, das das Schreiben ignoriert und beim Lesen stets {@code null} liefert. */
 	@SuppressWarnings ("unchecked")
-	public static <VALUE> Property3<VALUE> emptyProperty() {
-		return (Property3<VALUE>)emptyProperty;
+	public static <V> Property3<V> emptyProperty() {
+		return (Property3<V>)emptyProperty;
 	}
 
 	/** Diese Methode liefert ein initialisierendes {@link Property3}, das das Lesen und Schreiben an das gegebene {@link Property} delegiert. Wenn der gelesene
@@ -92,27 +97,19 @@ public class Properties {
 		}, that);
 	}
 
-	public static <T, V> Property3<V> concatProperty(Producer<? extends T> item, Field<? super T, V> that) {
-		return propertyFrom(concatProducer(item, that), concatConsumer(item, that));
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link #translatedProperty(Property, Getter, Getter) Properties.translate(that, Getters.fromTarget(trans),
-	 * Getters.fromSource(trans))}.
-	 *
-	 * @see Translator#toTarget(Object)
-	 * @see Translator#toSource(Object) */
-	public static <VALUE, VALUE2> Property3<VALUE> translatedProperty(Property<VALUE2> that, Translator<VALUE2, VALUE> trans) throws NullPointerException {
+	/** Diese Methode ist eine Abkürzung für {@link #translatedProperty(Property, Getter, Getter) translatedProperty(that, trans::toTarget, trans::toSource)}. */
+	public static <V, V2> Property3<V> translatedProperty(Property<V2> that, Translator<V2, V> trans) throws NullPointerException {
 		return translatedProperty(that, trans::toTarget, trans::toSource);
 	}
 
 	/** Diese Methode liefert ein übersetztes {@link Property3} und ist eine Abkürzung für {@link #propertyFrom(Producer, Consumer)
 	 * propertyFrom(translatedProducer(that, transGet), translatedConsumer(that, transSet))}. */
-	public static <GSource, GTarget> Property3<GTarget> translatedProperty(Property<GSource> that, Getter<? super GSource, ? extends GTarget> transGet,
-		Getter<? super GTarget, ? extends GSource> transSet) throws NullPointerException {
+	public static <V, V2> Property3<V> translatedProperty(Property<V2> that, Getter<? super V2, ? extends V> transGet, Getter<? super V, ? extends V2> transSet)
+		throws NullPointerException {
 		return propertyFrom(translatedProducer(that, transGet), translatedConsumer(that, transSet));
 	}
 
-	/** Diese Methode liefert ein {@link Property3}, das das gegebenen {@link Property} {@code that} über {@code synchronized(mutex)} synchronisiert. Wenn dieses
+	/** Diese Methode liefert ein {@link Property3}, das das gegebenen {@link Property} über {@code synchronized(mutex)} synchronisiert. Wenn dieses
 	 * Synchronisationsobjekt {@code null} ist, wird das gelieferte {@link Property} verwendet. */
 	public static <V> Property3<V> synchronizedProperty(Property<V> that, final Object mutex) throws NullPointerException {
 		notNull(that);
