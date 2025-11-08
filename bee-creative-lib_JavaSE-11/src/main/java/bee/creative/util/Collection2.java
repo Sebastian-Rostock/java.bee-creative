@@ -7,7 +7,13 @@ import java.util.Collection;
 /** Diese Schnittstelle definiert eine {@link Collection} mit {@link Iterator2}.
  *
  * @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public interface Collection2<E> extends Collection<E> {
+public interface Collection2<E> extends Collection<E>, Filter<Object> {
+
+	/** Diese Methode delegiert an {@link #contains(Object)}. */
+	@Override
+	default boolean accepts(Object item) {
+		return this.contains(item);
+	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Iterables#addAll(java.util.Collection, Iterable) Iterables.addAll(this, c)}. */
 	default boolean addAll(Iterable<? extends E> c) {

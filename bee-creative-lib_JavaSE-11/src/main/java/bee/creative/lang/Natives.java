@@ -10,9 +10,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
-import bee.creative.util.AbstractGetter;
-import bee.creative.util.AbstractProducer;
-import bee.creative.util.AbstractSetter;
 import bee.creative.util.Builders.MapBuilder;
 import bee.creative.util.Consumer;
 import bee.creative.util.Consumer3;
@@ -672,7 +669,7 @@ public class Natives {
 	 *
 	 * @param <ITEM> Typ des Datensatzes.
 	 * @param <VALUE> Typ des Werts der Eigenschaft. */
-	public static class MethodSetter<ITEM, VALUE> extends AbstractSetter<ITEM, VALUE> {
+	public static class MethodSetter<ITEM, VALUE> implements Setter3<ITEM, VALUE> {
 
 		public MethodSetter(Method method, boolean forceAccessible) throws NullPointerException, IllegalArgumentException {
 			this.forceAccessible = forceAccessible;
@@ -754,7 +751,7 @@ public class Natives {
 	 *
 	 * @param <GItem> Typ des Datensatzes.
 	 * @param <GValue> Typ des Werts. */
-	public static class MethodGetter<GItem, GValue> extends AbstractGetter<GItem, GValue> {
+	public static class MethodGetter<GItem, GValue> implements Getter3<GItem, GValue> {
 
 		public final Method that;
 
@@ -794,7 +791,7 @@ public class Natives {
 	 *
 	 * @param <GItem> Typ des Datensatzes.
 	 * @param <GValue> Typ des Werts. */
-	public static class ConstructorGetter<GItem, GValue> extends AbstractGetter<GItem, GValue> {
+	public static class ConstructorGetter<GItem, GValue> implements Getter3<GItem, GValue> {
 
 		public final Constructor<?> that;
 
@@ -856,7 +853,7 @@ public class Natives {
 	 * Lesen erfolgt über {@code this.that.invoke(null)}.
 	 *
 	 * @param <VALUE> Typ des Werts. */
-	public static class MethodProducer<VALUE> extends AbstractProducer<VALUE> {
+	public static class MethodProducer<VALUE> implements Producer3<VALUE> {
 
 		public final Method that;
 
@@ -890,7 +887,7 @@ public class Natives {
 	 * delegiert. Das Lesen erfolgt über {@code this.that.newInstance()}.
 	 *
 	 * @param <VALUE> Typ des Werts. */
-	public static class ConstructorProducer<VALUE> extends AbstractProducer<VALUE> {
+	public static class ConstructorProducer<VALUE> implements Producer3<VALUE> {
 
 		public final Constructor<?> that;
 

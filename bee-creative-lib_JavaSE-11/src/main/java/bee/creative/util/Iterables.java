@@ -331,7 +331,7 @@ public class Iterables {
 
 	}
 
-	static class IteratorGetter extends AbstractGetter<Iterable<?>, Iterator<?>> {
+	static class IteratorGetter implements Getter3<Iterable<?>, Iterator<?>> {
 
 		public static final Getter<?, ?> INSTANCE = new IteratorGetter();
 

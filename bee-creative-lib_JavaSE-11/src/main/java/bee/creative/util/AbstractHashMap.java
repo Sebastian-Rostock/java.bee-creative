@@ -1,7 +1,7 @@
 package bee.creative.util;
 
+import static bee.creative.util.Getters.neutralGetter;
 import java.util.Map;
-import java.util.function.BiFunction;
 
 /** Diese Klasse implementiert eine auf {@link AbstractHashData} aufbauende {@link Map} mit geringem {@link AbstractHashData Speicherverbrauch}.
  * <p>
@@ -9,9 +9,9 @@ import java.util.function.BiFunction;
  * {@link Map} beschrieben über die Methoden der Schlüssel, sondern über die Methoden {@link #customHash(Object)} bzw. {@link #customEqualsKey(int, Object)}.
  *
  * @author [cc-by] 2017 Sebastian Rostock [http://cureativecommons.org/licenses/by/3.0/de/]
- * @param <GKey> Typ der Schlüssel.
- * @param <GValue> Typ der Werte. */
-public abstract class AbstractHashMap<GKey, GValue> extends AbstractHashData<GKey, GValue> implements Map3<GKey, GValue> {
+ * @param <K> Typ der Schlüssel.
+ * @param <V> Typ der Werte. */
+public abstract class AbstractHashMap<K, V> extends AbstractHashData<K, V> implements Map3<K, V> {
 
 	/** Diese Methode setzt die Kapazität, sodass dieses die gegebene Anzahl an Einträgen verwaltet werden kann.
 	 *
@@ -42,17 +42,12 @@ public abstract class AbstractHashMap<GKey, GValue> extends AbstractHashData<GKe
 	 * @see #installImpl(Object)
 	 * @param key gesuchter Schlüssel.
 	 * @return enthaltener und ggf. erzeugter Wert. */
-	public GValue install(GKey key) {
+	public V install(K key) {
 		return this.customGetValue(this.installImpl(key));
 	}
 
-	@Override
-	public GValue compute(GKey key, BiFunction<? super GKey, ? super GValue, ? extends GValue> remappingFunction) {
-		return Map3.super.compute(key, remappingFunction);
-	}
-	
-	public GValue install(GKey key, Producer<? extends GValue> installValue) {
-		return this.install(key, Getters.<GKey>neutralGetter(), value -> installValue.get());
+	public V install(K key, Producer<? extends V> installValue) {
+		return this.install(key, neutralGetter(), value -> installValue.get());
 	}
 
 	/** Diese Methode liefert den zum gegebenen Schlüssel hinterlegten Wert, analog zu {@link #get(Object)}. Wenn zu diesem Schlüssel noch kein Wert hinterlegt
@@ -61,8 +56,8 @@ public abstract class AbstractHashMap<GKey, GValue> extends AbstractHashData<GKe
 	 * @param key Schlüssel des Eintrags.
 	 * @param installValue Methode zur Überführung des einzutragenden Schlüssels in den einzutragenden Wert.
 	 * @return enthaltener und ggf. erzeugter Wert. */
-	public GValue install(GKey key, Getter<? super GKey, ? extends GValue> installValue) {
-		return this.install(key, Getters.<GKey>neutralGetter(), installValue);
+	public V install(K key, Getter<? super K, ? extends V> installValue) {
+		return this.install(key, neutralGetter(), installValue);
 	}
 
 	/** Diese Methode liefert den zum gegebenen Schlüssel hinterlegten Wert, analog zu {@link #get(Object)}. Wenn zu diesem Schlüssel noch kein Wert hinterlegt
@@ -74,19 +69,19 @@ public abstract class AbstractHashMap<GKey, GValue> extends AbstractHashData<GKe
 	 * @param installKey Methode zur Überführung des gegebenen Schlüssels in den einzutragenden Schlüssel.
 	 * @param installValue Methode zur Überführung des einzutragenden Schlüssels in den einzutragenden Wert.
 	 * @return enthaltener und ggf. erzeugter Wert. */
-	public GValue install(GKey key, Getter<? super GKey, ? extends GKey> installKey, Getter<? super GKey, ? extends GValue> installValue) {
+	public V install(K key, Getter<? super K, ? extends K> installKey, Getter<? super K, ? extends V> installValue) {
 		return this.customGetValue(this.installImpl(key, installKey, installValue));
 	}
 
-	public GValue update(GKey key, Getter<GValue, GValue> updateValue) {
+	public V update(K key, Getter<V, V> updateValue) {
 		return this.update(key, (key2, value) -> updateValue.get(value));
 	}
 
-	public GValue update(GKey key, Reducer<? super GKey, GValue> updateValue) {
-		return this.update(key, Getters.<GKey>neutralGetter(), updateValue);
+	public V update(K key, Reducer<? super K, V> updateValue) {
+		return this.update(key, neutralGetter(), updateValue);
 	}
 
-	public GValue update(GKey key, Getter<? super GKey, ? extends GKey> installKey, Reducer<? super GKey, GValue> updateValue) {
+	public V update(K key, Getter<? super K, ? extends K> installKey, Reducer<? super K, V> updateValue) {
 		return this.updateImpl(key, installKey, updateValue);
 	}
 
@@ -111,17 +106,17 @@ public abstract class AbstractHashMap<GKey, GValue> extends AbstractHashData<GKe
 	}
 
 	@Override
-	public GValue get(Object key) {
+	public V get(Object key) {
 		return this.getImpl(key);
 	}
 
 	@Override
-	public GValue put(GKey key, GValue value) {
+	public V put(K key, V value) {
 		return this.putImpl(key, value);
 	}
 
 	@Override
-	public GValue remove(Object key) {
+	public V remove(Object key) {
 		return this.popImpl(key);
 	}
 
@@ -131,17 +126,17 @@ public abstract class AbstractHashMap<GKey, GValue> extends AbstractHashData<GKe
 	}
 
 	@Override
-	public Set2<GKey> keySet() {
+	public Set2<K> keySet() {
 		return this.newKeysImpl();
 	}
 
 	@Override
-	public Collection2<GValue> values() {
+	public Collection2<V> values() {
 		return this.newValuesImpl();
 	}
 
 	@Override
-	public Set2<Entry<GKey, GValue>> entrySet() {
+	public Set2<Entry<K, V>> entrySet() {
 		return this.newEntriesImpl();
 	}
 

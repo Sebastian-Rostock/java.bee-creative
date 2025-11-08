@@ -6,7 +6,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import bee.creative.util.AbstractGetter;
 import bee.creative.util.Getter;
 import bee.creative.util.Getter3;
 import bee.creative.util.Setter;
@@ -422,7 +421,7 @@ public class Strings {
 	 *        {@link Pattern#CANON_EQ}, {@link Pattern#UNIX_LINES}, {@link Pattern#LITERAL}, {@link Pattern#COMMENTS})
 	 * @return {@link Pattern}-Compiler. */
 	public static Getter3<String, Pattern> patternCompiler(int flags) {
-		return new PatternCompiler(flags);
+		return item -> Pattern.compile(item, flags);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code parseSequence(string, maskSymbol, maskSymbol, maskSymbol)}.
@@ -534,26 +533,6 @@ public class Strings {
 		@Override
 		public String toString() {
 			return String.format(this.format, this.args);
-		}
-
-	}
-
-	private static class PatternCompiler extends AbstractGetter<String, Pattern> {
-
-		final int flags;
-
-		PatternCompiler(int flags) {
-			this.flags = flags;
-		}
-
-		@Override
-		public Pattern get(String input) {
-			return Pattern.compile(input, this.flags);
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.flags);
 		}
 
 	}

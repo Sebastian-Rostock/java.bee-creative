@@ -4,15 +4,15 @@ package bee.creative.util;
  * Ergebniswert.
  * 
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GItem> Typ des Elements.
- * @param <GValue> Typ des Ergebniswerts. */
-public interface Reducer<GItem, GValue> {
+ * @param <T> Typ des Elements.
+ * @param <V> Typ des Ergebniswerts. */
+public interface Reducer<T, V> {
 
 	/** Diese Methode liefert den neuen Ergebniswert, der aus dem gegebenen Elements und dem gegebenen vorherigen Ergebniswert abgeleitet wurde.
 	 * 
 	 * @param item Element.
 	 * @param value vorheriger Ergebniswert.
 	 * @return neuer Ergebniswert. */
-	GValue get(GItem item, GValue value);
+	V get(T item, V value);
 
 }

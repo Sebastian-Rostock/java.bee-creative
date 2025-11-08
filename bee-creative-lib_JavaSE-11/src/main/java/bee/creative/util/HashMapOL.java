@@ -19,31 +19,6 @@ public class HashMapOL<GKey> extends AbstractHashMap<GKey, Long> implements Seri
 	/** Dieses Feld speichert das serialVersionUID. */
 	private static final long serialVersionUID = -3537880648284024766L;
 
-	/** Diese Methode gibt eine neue {@link HashMapOL} zurück, welche Streuwert und Äquivalenz der Schlüssel über den gegebenen {@link Hasher} ermittelt.
-	 *
-	 * @param <GKey> Typ der Schlüssel.
-	 * @param hasher Methoden zum Abgleich der Schlüssel.
-	 * @return An {@link Hasher} gebundene {@link HashMapOL}.
-	 * @throws NullPointerException Wenn {@code hasher} {@code null} ist. */
-	public static <GKey> HashMapOL<GKey> from(final Hasher hasher) throws NullPointerException {
-		Objects.notNull(hasher);
-		return new HashMapOL<>() {
-
-			private static final long serialVersionUID = 5915519385854194907L;
-
-			@Override
-			protected int customHash(final Object key) {
-				return hasher.hash(key);
-			}
-
-			@Override
-			protected boolean customEqualsKey(final int entryIndex, final Object key) {
-				return hasher.equals(this.customGetKey(entryIndex), key);
-			}
-
-		};
-	}
-
 	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Schlüssel ab. Für alle anderen Indizes bildet es auf {@code null} ab. */
 	transient Object[] keys = AbstractHashData.EMPTY_OBJECTS;
 
