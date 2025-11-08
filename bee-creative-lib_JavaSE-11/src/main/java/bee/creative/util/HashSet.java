@@ -14,62 +14,8 @@ import bee.creative.lang.Objects;
  * {@link #add(Object) Einfügen} und {@link #remove(Object) Entfernen} von Elementen liegen dazu bei ca. 60 % bzw. 85 % der Rechenzeit.
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GItem> Typ der Elemente. */
-public class HashSet<GItem> extends AbstractHashSet<GItem> implements Serializable, Cloneable {
-
-	/** Dieses Feld speichert das serialVersionUID. */
-	private static final long serialVersionUID = 1947961515821394540L;
-
-	/** Diese Methode ist eine Abkürzung für {@link #from(Hasher, Getter, Consumer) HashSet.from(hasher, Getters.neutral(), null)}. */
-	public static <GItem> HashSet<GItem> from(final Hasher hasher) throws NullPointerException {
-		return HashSet.from(hasher, Getters.<GItem>neutralGetter(), null);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link #from(Hasher, Getter, Consumer) HashSet.from(hasher, installItem, null)}. */
-	public static <GItem> HashSet<GItem> from(final Hasher hasher, final Getter<? super GItem, ? extends GItem> installItem) throws NullPointerException {
-		return HashSet.from(hasher, installItem, null);
-	}
-
-	/** Diese Methode liefert ein neues {@link HashSet}, welches Streuwert, Äquivalenz, Installation und Wiederverwendung von Elementen an die gegebenen Methoden
-	 * delegiert.
-	 *
-	 * @param hasher Methoden zur Berechnung von {@link #customHash(Object) Streuwert} und {@link #customEqualsKey(int, Object) Äquivalenz} der Elemente.
-	 * @param installItem Methode zur {@link #customInstallKey(Object) Installation} des Elements.
-	 * @param reuseItem Methode zur Anzeige der {@link #customReuseEntry(int) Wiederverwendung} des Elements oder {@code null}. */
-	public static <GItem> HashSet<GItem> from(final Hasher hasher, final Getter<? super GItem, ? extends GItem> installItem,
-		final Consumer<? super GItem> reuseItem) throws NullPointerException {
-		Objects.notNull(hasher);
-		Objects.notNull(installItem);
-		return new HashSet<>() {
-
-			private static final long serialVersionUID = -1363112074783475978L;
-
-			@Override
-			protected int customHash(final Object item) {
-				return hasher.hash(item);
-			}
-
-			@Override
-			protected boolean customEqualsKey(final int entryIndex, final Object item) {
-				return hasher.equals(this.customGetKey(entryIndex), item);
-			}
-
-			@Override
-			protected GItem customInstallKey(final GItem key) {
-				return installItem.get(key);
-			}
-
-			@Override
-			protected void customReuseEntry(final int entryIndex) {
-				if (reuseItem == null) return;
-				reuseItem.set(this.customGetKey(entryIndex));
-			}
-
-		};
-	}
-
-	/** Dieses Feld bildet vom Index eines Elements auf dessen Wert ab. Für alle anderen Indizes bildet es auf {@code null} ab. */
-	transient Object[] items = AbstractHashData.EMPTY_OBJECTS;
+ * @param <E> Typ der Elemente. */
+public class HashSet<E> extends AbstractHashSet<E> implements Serializable, Cloneable {
 
 	/** Dieser Konstruktor initialisiert die Kapazität mit {@code 0}. */
 	public HashSet() {
@@ -78,14 +24,14 @@ public class HashSet<GItem> extends AbstractHashSet<GItem> implements Serializab
 	/** Dieser Konstruktor initialisiert die Kapazität.
 	 *
 	 * @param capacity Kapazität. */
-	public HashSet(final int capacity) {
+	public HashSet(int capacity) {
 		this.allocateImpl(capacity);
 	}
 
 	/** Dieser Konstruktor initialisiert das {@link HashSet} mit dem Inhalt des gegebenen {@link Set}.
 	 *
 	 * @param source gegebene Elemente. */
-	public HashSet(final Set<? extends GItem> source) {
+	public HashSet(Set<? extends E> source) {
 		this(source.size());
 		this.addAll(source);
 	}
@@ -93,34 +39,31 @@ public class HashSet<GItem> extends AbstractHashSet<GItem> implements Serializab
 	/** Dieser Konstruktor initialisiert das {@link HashSet} mit dem Inhalt des gegebenen {@link Iterable}.
 	 *
 	 * @param source gegebene Elemente. */
-	public HashSet(final Iterable<? extends GItem> source) {
+	public HashSet(Iterable<? extends E> source) {
 		this.addAll(source);
 	}
 
-	@SuppressWarnings ({"unchecked"})
-	private void readObject(final ObjectInputStream stream) throws IOException, ClassNotFoundException {
-		final int count = stream.readInt();
-		this.allocateImpl(count);
-		for (int i = 0; i < count; i++) {
-			this.putKeyImpl((GItem)stream.readObject());
-		}
+	@Override
+	public long emu() {
+		return super.emu() + EMU.fromArray(this.items);
 	}
 
-	private void writeObject(final ObjectOutputStream stream) throws IOException {
-		stream.writeInt(this.countImpl());
-		for (final GItem item: this) {
-			stream.writeObject(item);
-		}
+	@Override
+	public HashSet<E> clone() {
+		var result = (HashSet<E>)super.clone();
+		if (this.capacityImpl() == 0) return result;
+		result.items = this.items.clone();
+		return result;
 	}
 
 	@Override
 	@SuppressWarnings ("unchecked")
-	protected GItem customGetKey(final int entryIndex) {
-		return (GItem)this.items[entryIndex];
+	protected E customGetKey(int entryIndex) {
+		return (E)this.items[entryIndex];
 	}
 
 	@Override
-	protected void customSetKey(final int entryIndex, final GItem item) {
+	protected void customSetKey(int entryIndex, E item) {
 		this.items[entryIndex] = item;
 	}
 
@@ -130,22 +73,22 @@ public class HashSet<GItem> extends AbstractHashSet<GItem> implements Serializab
 	}
 
 	@Override
-	protected void customClearKey(final int entryIndex) {
+	protected void customClearKey(int entryIndex) {
 		this.items[entryIndex] = null;
 	}
 
 	@Override
-	protected HashAllocator customAllocator(final int capacity) {
-		final Object[] items2;
+	protected HashAllocator customAllocator(int capacity) {
+		Object[] items2;
 		if (capacity == 0) {
-			items2 = AbstractHashData.EMPTY_OBJECTS;
+			items2 = EMPTY_OBJECTS;
 		} else {
 			items2 = new Object[capacity];
 		}
 		return new HashAllocator() {
 
 			@Override
-			public void copy(final int sourceIndex, final int targetIndex) {
+			public void copy(int sourceIndex, int targetIndex) {
 				items2[targetIndex] = HashSet.this.items[sourceIndex];
 			}
 
@@ -157,17 +100,26 @@ public class HashSet<GItem> extends AbstractHashSet<GItem> implements Serializab
 		};
 	}
 
-	@Override
-	public long emu() {
-		return super.emu() + EMU.fromArray(this.items);
+	/** Dieses Feld bildet vom Index eines Elements auf dessen Wert ab. Für alle anderen Indizes bildet es auf {@code null} ab. */
+	transient Object[] items = EMPTY_OBJECTS;
+
+	/** Dieses Feld speichert das serialVersionUID. */
+	private static final long serialVersionUID = 1947961515821394540L;
+
+	@SuppressWarnings ({"unchecked"})
+	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
+		var count = stream.readInt();
+		this.allocateImpl(count);
+		for (var i = 0; i < count; i++) {
+			this.putKeyImpl((E)stream.readObject());
+		}
 	}
 
-	@Override
-	public HashSet<GItem> clone() {
-		final HashSet<GItem> result = (HashSet<GItem>)super.clone();
-		if (this.capacityImpl() == 0) return result;
-		result.items = this.items.clone();
-		return result;
+	private void writeObject(ObjectOutputStream stream) throws IOException {
+		stream.writeInt(this.countImpl());
+		for (var item: this) {
+			stream.writeObject(item);
+		}
 	}
 
 }

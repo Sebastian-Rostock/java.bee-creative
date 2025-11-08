@@ -10,7 +10,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
-import bee.creative.util.AbstractConsumer;
 import bee.creative.util.AbstractField;
 import bee.creative.util.AbstractGetter;
 import bee.creative.util.AbstractProducer;
@@ -830,7 +829,7 @@ public class Natives {
 	 * delegiert. Das Schreiben des Werts {@code value} erfolgt über {@code this.that.invoke(null, value)}.
 	 *
 	 * @param <GValue> Typ des Werts. */
-	public static class MethodConsumer<GValue> extends AbstractConsumer<GValue> {
+	public static class MethodConsumer<GValue> implements Consumer3<GValue> {
 
 		public final Method that;
 
@@ -850,11 +849,6 @@ public class Natives {
 			} catch (IllegalAccessException | InvocationTargetException cause) {
 				throw new IllegalArgumentException(cause);
 			}
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.that, this.forceAccessible);
 		}
 
 	}

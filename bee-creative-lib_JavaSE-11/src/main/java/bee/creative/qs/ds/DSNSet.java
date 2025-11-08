@@ -208,7 +208,7 @@ public interface DSNSet extends QNSet {
 	 * @see QS#valueTrans()
 	 * @return Textwerte. */
 	default Set2<String> asValueSet() {
-		return this.asNodeSet().translate(this.owner().valueTrans());
+		return this.asNodeSet().asTranslatedSet(this.owner().valueTrans());
 	}
 
 }

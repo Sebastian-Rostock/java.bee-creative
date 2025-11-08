@@ -14,12 +14,6 @@ import bee.creative.emu.EMU;
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class HashSetL extends AbstractHashSet<Long> implements Serializable, Cloneable {
 
-	/** Dieses Feld speichert das serialVersionUID. */
-	private static final long serialVersionUID = 4228392317821609623L;
-
-	/** Dieses Feld bildet vom Index eines Elements auf dessen Wert ab. */
-	transient long[] items = AbstractHashData.EMPTY_LONGS;
-
 	/** Dieser Konstruktor initialisiert die Kapazität mit {@code 0}. */
 	public HashSetL() {
 	}
@@ -27,14 +21,14 @@ public class HashSetL extends AbstractHashSet<Long> implements Serializable, Clo
 	/** Dieser Konstruktor initialisiert die Kapazität.
 	 *
 	 * @param capacity Kapazität. */
-	public HashSetL(final int capacity) {
+	public HashSetL(int capacity) {
 		this.allocateImpl(capacity);
 	}
 
 	/** Dieser Konstruktor initialisiert das {@link HashSetL} mit dem Inhalt des gegebenen {@link Set}.
 	 *
 	 * @param source gegebene Elemente. */
-	public HashSetL(final Set<? extends Long> source) {
+	public HashSetL(Set<? extends Long> source) {
 		this(source.size());
 		this.addAll(source);
 	}
@@ -42,52 +36,50 @@ public class HashSetL extends AbstractHashSet<Long> implements Serializable, Clo
 	/** Dieser Konstruktor initialisiert das {@link HashSetL} mit dem Inhalt der gegebenen {@link Collection}.
 	 *
 	 * @param source gegebene Elemente. */
-	public HashSetL(final Collection<? extends Long> source) {
+	public HashSetL(Collection<? extends Long> source) {
 		this.addAll(source);
 	}
 
-	private void readObject(final ObjectInputStream stream) throws IOException, ClassNotFoundException {
-		final int count = stream.readInt();
-		this.allocateImpl(count);
-		for (int i = 0; i < count; i++) {
-			this.putKeyImpl(stream.readLong());
-		}
-	}
-
-	private void writeObject(final ObjectOutputStream stream) throws IOException {
-		stream.writeInt(this.countImpl());
-		for (final Long item: this) {
-			stream.writeLong(item);
-		}
+	@Override
+	public long emu() {
+		return super.emu() + EMU.fromArray(this.items);
 	}
 
 	@Override
-	protected Long customGetKey(final int entryIndex) {
+	public HashSetL clone() {
+		var result = (HashSetL)super.clone();
+		if (this.capacityImpl() == 0) return result;
+		result.items = this.items.clone();
+		return result;
+	}
+
+	@Override
+	protected Long customGetKey(int entryIndex) {
 		return this.items[entryIndex];
 	}
 
 	@Override
-	protected void customSetKey(final int entryIndex, final Long item) {
+	protected void customSetKey(int entryIndex, Long item) {
 		this.items[entryIndex] = item;
 	}
 
 	@Override
-	protected boolean customEqualsKey(final int entryIndex, final Object item) {
+	protected boolean customEqualsKey(int entryIndex, Object item) {
 		return (item instanceof Long) && (((Long)item).longValue() == this.items[entryIndex]);
 	}
 
 	@Override
-	protected HashAllocator customAllocator(final int capacity) {
-		final long[] items2;
+	protected HashAllocator customAllocator(int capacity) {
+		long[] items2;
 		if (capacity == 0) {
-			items2 = AbstractHashData.EMPTY_LONGS;
+			items2 = EMPTY_LONGS;
 		} else {
 			items2 = new long[capacity];
 		}
 		return new HashAllocator() {
 
 			@Override
-			public void copy(final int sourceIndex, final int targetIndex) {
+			public void copy(int sourceIndex, int targetIndex) {
 				items2[targetIndex] = HashSetL.this.items[sourceIndex];
 			}
 
@@ -99,17 +91,25 @@ public class HashSetL extends AbstractHashSet<Long> implements Serializable, Clo
 		};
 	}
 
-	@Override
-	public long emu() {
-		return super.emu() + EMU.fromArray(this.items);
+	/** Dieses Feld bildet vom Index eines Elements auf dessen Wert ab. */
+	transient long[] items = EMPTY_LONGS;
+
+	/** Dieses Feld speichert das serialVersionUID. */
+	private static final long serialVersionUID = 4228392317821609623L;
+
+	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
+		var count = stream.readInt();
+		this.allocateImpl(count);
+		for (var i = 0; i < count; i++) {
+			this.putKeyImpl(stream.readLong());
+		}
 	}
 
-	@Override
-	public HashSetL clone() {
-		final HashSetL result = (HashSetL)super.clone();
-		if (this.capacityImpl() == 0) return result;
-		result.items = this.items.clone();
-		return result;
+	private void writeObject(ObjectOutputStream stream) throws IOException {
+		stream.writeInt(this.countImpl());
+		for (var item: this) {
+			stream.writeLong(item);
+		}
 	}
 
 }

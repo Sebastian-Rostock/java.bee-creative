@@ -54,7 +54,7 @@ public interface DT extends DE {
 	 * @see DM#linkTrans()
 	 * @return Objektdatenfelder. */
 	default Set2<DL> targetLinks() {
-		return this.targetLinksAsNodes().translate(this.parent().linkTrans());
+		return this.targetLinksAsNodes().asTranslatedSet(this.parent().linkTrans());
 	}
 
 	/** Diese Methode erlaubt Zugriff auf die {@link DL#node() Hyperknoten} der diesen Datentyp als {@link DL#targetType() Objektdatentyp} zulassenden
@@ -73,7 +73,7 @@ public interface DT extends DE {
 	 * @see DM#linkTrans()
 	 * @return Subjektdatenfelder. */
 	default Set2<DL> sourceLinks() {
-		return this.sourceLinksAsNodes().translate(this.parent().linkTrans());
+		return this.sourceLinksAsNodes().asTranslatedSet(this.parent().linkTrans());
 	}
 
 	/** Diese Methode erlaubt Zugriff auf die {@link DL#node() Hyperknoten} der diesen Datentyp als {@link DL#sourceType() Subjektdatentyp} zulassenden

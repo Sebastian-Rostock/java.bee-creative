@@ -532,7 +532,7 @@ public class Collections {
 	 * @param <GValue2> Typ der Werte der gegebenen {@link Map}. */
 	public static class TranslatedMap<GKey, GValue, GKey2, GValue2> extends AbstractMap<GKey, GValue> implements Map3<GKey, GValue> {
 
-		class SourceEntry extends AbstractEntry<GKey2, GValue2> {
+		class SourceEntry extends AbstractEntry2<GKey2, GValue2> {
 
 			public final Entry<GKey, GValue> that;
 
@@ -558,7 +558,7 @@ public class Collections {
 
 		}
 
-		class TargetEntry extends AbstractEntry<GKey, GValue> {
+		class TargetEntry extends AbstractEntry2<GKey, GValue> {
 
 			final Entry<GKey2, GValue2> that;
 

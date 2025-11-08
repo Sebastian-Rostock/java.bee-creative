@@ -20,7 +20,7 @@ public interface DS {
 	QS store();
 
 	default Set2<DM> models() {
-		return this.modelsAsNodes().translate(this.modelTrans());
+		return this.modelsAsNodes().asTranslatedSet(this.modelTrans());
 	}
 	
 	default Set2<QN> modelsAsNodes() {

@@ -45,7 +45,7 @@ public interface DM extends QO {
 	 * @see #links()
 	 * @return Datenfelder. */
 	default Set2<DL> links() {
-		return this.linksAsNodes().translate(this.linkTrans());
+		return this.linksAsNodes().asTranslatedSet(this.linkTrans());
 	}
 
 	/** Diese Methode erlaubt Zugriff auf die {@link DL#node() Hyperknoten} aller {@link DL Datenfelder}.
@@ -64,7 +64,7 @@ public interface DM extends QO {
 	 * @see #typeTrans()
 	 * @return Datentypen. */
 	default Set2<DT> types() {
-		return this.typesAsNodes().translate(this.typeTrans());
+		return this.typesAsNodes().asTranslatedSet(this.typeTrans());
 	}
 
 	/** Diese Methode erlaubt Zugriff auf die {@link DT#node() Hyperknoten} aller {@link DT Datentypen}.

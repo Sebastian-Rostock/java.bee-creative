@@ -1,5 +1,7 @@
 package bee.creative.util;
 
+import static bee.creative.util.Collections.concatCollection;
+import static bee.creative.util.Collections.translatedCollection;
 import java.util.Collection;
 
 /** Diese Schnittstelle definiert eine {@link Collection} mit {@link Iterator2}.
@@ -32,22 +34,22 @@ public interface Collection2<E> extends Collection<E> {
 		return Iterables.containsAll(this, c);
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@link #asConcatCollection(Collection, boolean) this.asConcatCollection(that, true)}. */
+	default Collection2<E> asConcatCollection(Collection<E> that) throws NullPointerException {
+		return this.asConcatCollection(that, true);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link Collections#concatCollection(Collection, Collection, boolean) concatCollection(this, that, extendMode)}. */
+	default Collection2<E> asConcatCollection(Collection<E> that, boolean extendMode) throws NullPointerException {
+		return concatCollection(this, that, extendMode);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link Collections#translatedCollection(Collection, Translator) translatedCollection(this, trans)}. */
+	default <E2> Collection2<E2> asTranslatedCollection(Translator<E, E2> trans) throws NullPointerException {
+		return translatedCollection(this, trans);
+	}
+
 	@Override
 	Iterator2<E> iterator();
-
-	/** Diese Methode ist eine Abkürzung für {@link Collections#concatCollection(Collection, Collection, boolean) Collections.concat(this, that, true)}. */
-	default Collection2<E> concat(Collection<E> that) throws NullPointerException {
-		return Collections.concatCollection(this, that, true);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link Collections#concatCollection(Collection, Collection, boolean) Collections.concat(this, that, extendMode)}. */
-	default Collection2<E> concat(Collection<E> that, boolean extendMode) throws NullPointerException {
-		return Collections.concatCollection(this, that, extendMode);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link Collections#translatedCollection(Collection, Translator) Collections#translate(this, trans)}. */
-	default <E2> Collection2<E2> translate(Translator<E, E2> trans) throws NullPointerException {
-		return Collections.translatedCollection(this, trans);
-	}
 
 }

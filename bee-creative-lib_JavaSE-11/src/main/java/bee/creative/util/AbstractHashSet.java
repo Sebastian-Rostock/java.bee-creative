@@ -1,5 +1,6 @@
 package bee.creative.util;
 
+import static bee.creative.util.Getters.neutralGetter;
 import java.util.Collection;
 import java.util.Set;
 
@@ -9,8 +10,8 @@ import java.util.Set;
  * {@link Set} beschrieben über die Methoden der Elemente, sondern über die Methoden {@link #customHash(Object)} bzw. {@link #customEqualsKey(int, Object)}.
  *
  * @author [cc-by] 2017 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GItem> Typ der Elemente. */
-public abstract class AbstractHashSet<GItem> extends AbstractHashData<GItem, GItem> implements Set2<GItem> {
+ * @param <E> Typ der Elemente. */
+public abstract class AbstractHashSet<E> extends AbstractHashData<E, E> implements Set2<E> {
 
 	/** Diese Methode setzt die Kapazität, sodass dieses die gegebene Anzahl an Elementen verwaltet werden kann.
 	 *
@@ -40,7 +41,7 @@ public abstract class AbstractHashSet<GItem> extends AbstractHashData<GItem, GIt
 	 * @see #installImpl(Object)
 	 * @param item gesuchtes Element.
 	 * @return enthaltenes und ggf. eingefügtes Element. */
-	public GItem install(GItem item) {
+	public E install(E item) {
 		return this.customGetKey(this.installImpl(item));
 	}
 
@@ -52,18 +53,8 @@ public abstract class AbstractHashSet<GItem> extends AbstractHashData<GItem, GIt
 	 * @param item gesuchtes Element.
 	 * @param installItem Methode zur Überführung des gegebenen Elements in das einzutragende Element.
 	 * @return enthaltenes und ggf. eingefügtes Element. */
-	public GItem install(GItem item, Getter<? super GItem, ? extends GItem> installItem) {
-		return this.customGetKey(this.installImpl(item, installItem, Getters.<GItem>neutralGetter()));
-	}
-
-	@Override
-	protected GItem customGetValue(int entryIndex) {
-		return null;
-	}
-
-	@Override
-	protected GItem customSetValue(int entryIndex, GItem value) {
-		return null;
+	public E install(E item, Getter<? super E, ? extends E> installItem) {
+		return this.customGetKey(this.installImpl(item, installItem, neutralGetter()));
 	}
 
 	@Override
@@ -82,12 +73,12 @@ public abstract class AbstractHashSet<GItem> extends AbstractHashData<GItem, GIt
 	}
 
 	@Override
-	public boolean add(GItem item) {
+	public boolean add(E item) {
 		return this.putKeyImpl(item);
 	}
 
 	@Override
-	public boolean addAll(Collection<? extends GItem> items) {
+	public boolean addAll(Collection<? extends E> items) {
 		var count = this.countImpl();
 		for (var item: items) {
 			this.putKeyImpl(item);
@@ -121,7 +112,7 @@ public abstract class AbstractHashSet<GItem> extends AbstractHashData<GItem, GIt
 	}
 
 	@Override
-	public Iterator2<GItem> iterator() {
+	public Iterator2<E> iterator() {
 		return this.newKeysIteratorImpl();
 	}
 
@@ -152,6 +143,16 @@ public abstract class AbstractHashSet<GItem> extends AbstractHashData<GItem, GIt
 	@Override
 	public String toString() {
 		return this.newKeysImpl().toString();
+	}
+
+	@Override
+	protected E customGetValue(int entryIndex) {
+		return null;
+	}
+
+	@Override
+	protected E customSetValue(int entryIndex, E value) {
+		return null;
 	}
 
 }

@@ -1,26 +1,36 @@
 package bee.creative.util;
 
+import static bee.creative.lang.Objects.notNull;
+import static bee.creative.util.Getters.neutralGetter;
+import static bee.creative.util.Hashers.naturalHasher;
 import java.util.Set;
 import bee.creative.emu.EMU;
-import bee.creative.lang.Objects;
 
 /** Diese Klasse erweitert ein {@link HashSet} um einen Streuwertpuffer mit geringem {@link AbstractHashData Speicherverbrauch}, analog zu
  * {@link java.util.HashSet}.
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GItem> Typ der Elemente. */
-public class HashSet2<GItem> extends HashSet<GItem> {
+ * @param <E> Typ der Elemente. */
+public class HashSet2<E> extends HashSet<E> {
 
-	private static final long serialVersionUID = -6978391927144580624L;
-
-	/** Diese Methode ist eine Abkürzung für {@link #from(Hasher, Getter, Consumer) HashSet2.from(hasher, Getters.neutral(), null)}. */
-	public static <GItem> HashSet2<GItem> from(final Hasher hasher) throws NullPointerException {
-		return HashSet2.from(hasher, Getters.<GItem>neutralGetter(), null);
+	/** Diese Methode ist eine Abkürzung für {@link #hashSetFrom(Hasher, Getter, Consumer) hashSetFrom(naturalHasher(), installItem, null)}. */
+	public static <E> HashSet2<E> hashSetFrom(Getter<? super E, ? extends E> installItem) throws NullPointerException {
+		return hashSetFrom(naturalHasher(), installItem, null);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(Hasher, Getter, Consumer) HashSet2.from(hasher, installItem, null)}. */
-	public static <GItem> HashSet2<GItem> from(final Hasher hasher, final Getter<? super GItem, ? extends GItem> installItem) throws NullPointerException {
-		return HashSet2.from(hasher, installItem, null);
+	/** Diese Methode ist eine Abkürzung für {@link #hashSetFrom(Hasher, Getter, Consumer) hashSetFrom(naturalHasher(), installItem, reuseItem)}. */
+	public static <E> HashSet2<E> hashSetFrom(Getter<? super E, ? extends E> installItem, Consumer<? super E> reuseItem) throws NullPointerException {
+		return hashSetFrom(naturalHasher(), installItem, reuseItem);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #hashSetFrom(Hasher, Getter, Consumer) hashSetFrom(hasher, neutralGetter(), null)}. */
+	public static <E> HashSet2<E> hashSetFrom(Hasher hasher) throws NullPointerException {
+		return hashSetFrom(hasher, neutralGetter(), null);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #hashSetFrom(Hasher, Getter, Consumer) hashSetFrom(hasher, installItem, null)}. */
+	public static <E> HashSet2<E> hashSetFrom(Hasher hasher, Getter<? super E, ? extends E> installItem) throws NullPointerException {
+		return hashSetFrom(hasher, installItem, null);
 	}
 
 	/** Diese Methode liefert ein neues {@link HashSet2}, welches Streuwert, Äquivalenz, Installation und Wiederverwendung von Elementen an die gegebenen Methoden
@@ -29,40 +39,37 @@ public class HashSet2<GItem> extends HashSet<GItem> {
 	 * @param hasher Methoden zur Berechnung von {@link #customHash(Object) Streuwert} und {@link #customEqualsKey(int, Object) Äquivalenz} der Elemente.
 	 * @param installItem Methode zur {@link #customInstallKey(Object) Installation} des Elements.
 	 * @param reuseItem Methode zur Anzeige der {@link #customReuseEntry(int) Wiederverwendung} des Elements oder {@code null}. */
-	public static <GItem> HashSet2<GItem> from(final Hasher hasher, final Getter<? super GItem, ? extends GItem> installItem,
-		final Consumer<? super GItem> reuseItem) throws NullPointerException {
-		Objects.notNull(hasher);
-		Objects.notNull(installItem);
+	public static <E> HashSet2<E> hashSetFrom(Hasher hasher, Getter<? super E, ? extends E> installItem, Consumer<? super E> reuseItem)
+		throws NullPointerException {
+		notNull(hasher);
+		notNull(installItem);
 		return new HashSet2<>() {
 
-			private static final long serialVersionUID = 2607996617303285033L;
-
 			@Override
-			protected int customHash(final Object item) {
+			protected int customHash(Object item) {
 				return hasher.hash(item);
 			}
 
 			@Override
-			protected boolean customEqualsKey(final int entryIndex, final Object item) {
+			protected boolean customEqualsKey(int entryIndex, Object item) {
 				return hasher.equals(this.customGetKey(entryIndex), item);
 			}
 
 			@Override
-			protected GItem customInstallKey(final GItem key) {
+			protected E customInstallKey(E key) {
 				return installItem.get(key);
 			}
 
 			@Override
-			protected void customReuseEntry(final int entryIndex) {
+			protected void customReuseEntry(int entryIndex) {
 				if (reuseItem == null) return;
 				reuseItem.set(this.customGetKey(entryIndex));
 			}
 
+			private static final long serialVersionUID = 2607996617303285033L;
+
 		};
 	}
-
-	/** Dieses Feld bildet vom Index eines Eintrags auf den Streuwert seines Schlüssels ab. */
-	transient int[] hashes = AbstractHashData.EMPTY_INTS;
 
 	/** Dieser Konstruktor initialisiert die Kapazität mit {@code 0}. */
 	public HashSet2() {
@@ -71,14 +78,14 @@ public class HashSet2<GItem> extends HashSet<GItem> {
 	/** Dieser Konstruktor initialisiert die Kapazität.
 	 *
 	 * @param capacity Kapazität. */
-	public HashSet2(final int capacity) {
+	public HashSet2(int capacity) {
 		this.allocateImpl(capacity);
 	}
 
 	/** Dieser Konstruktor initialisiert das {@link HashSet2} mit dem Inhalt der gegebenen {@link Set}.
 	 *
 	 * @param source gegebene Einträge. */
-	public HashSet2(final Set<? extends GItem> source) {
+	public HashSet2(Set<? extends E> source) {
 		this.allocateImpl(source.size());
 		this.addAll(source);
 	}
@@ -86,33 +93,46 @@ public class HashSet2<GItem> extends HashSet<GItem> {
 	/** Dieser Konstruktor initialisiert das {@link HashSet2} mit dem Inhalt des gegebenen {@link Iterable}.
 	 *
 	 * @param source gegebene Einträge. */
-	public HashSet2(final Iterable<? extends GItem> source) {
+	public HashSet2(Iterable<? extends E> source) {
 		this.addAll(source);
 	}
 
 	@Override
-	protected void customSetKey(final int entryIndex, final GItem item, final int itemHash) {
+	public long emu() {
+		return super.emu() + EMU.fromArray(this.hashes);
+	}
+
+	@Override
+	public HashSet2<E> clone() {
+		var result = (HashSet2<E>)super.clone();
+		if (this.capacityImpl() == 0) return result;
+		result.hashes = this.hashes.clone();
+		return result;
+	}
+
+	@Override
+	protected void customSetKey(int entryIndex, E item, int itemHash) {
 		this.customSetKey(entryIndex, item);
 		this.hashes[entryIndex] = itemHash;
 	}
 
 	@Override
-	protected int customHashKey(final int entryIndex) {
+	protected int customHashKey(int entryIndex) {
 		return this.hashes[entryIndex];
 	}
 
 	@Override
-	protected boolean customEqualsKey(final int entryIndex, final Object item, final int itemHash) {
+	protected boolean customEqualsKey(int entryIndex, Object item, int itemHash) {
 		return (this.customHashKey(entryIndex) == itemHash) && this.customEqualsKey(entryIndex, item);
 	}
 
 	@Override
-	protected HashAllocator customAllocator(final int capacity) {
-		final Object[] items2;
-		final int[] hashes2;
+	protected HashAllocator customAllocator(int capacity) {
+		Object[] items2;
+		int[] hashes2;
 		if (capacity == 0) {
-			items2 = AbstractHashData.EMPTY_OBJECTS;
-			hashes2 = AbstractHashData.EMPTY_INTS;
+			items2 = EMPTY_OBJECTS;
+			hashes2 = EMPTY_INTS;
 		} else {
 			items2 = new Object[capacity];
 			hashes2 = new int[capacity];
@@ -120,7 +140,7 @@ public class HashSet2<GItem> extends HashSet<GItem> {
 		return new HashAllocator() {
 
 			@Override
-			public void copy(final int sourceIndex, final int targetIndex) {
+			public void copy(int sourceIndex, int targetIndex) {
 				items2[targetIndex] = HashSet2.this.items[sourceIndex];
 				hashes2[targetIndex] = HashSet2.this.hashes[sourceIndex];
 			}
@@ -134,17 +154,9 @@ public class HashSet2<GItem> extends HashSet<GItem> {
 		};
 	}
 
-	@Override
-	public long emu() {
-		return super.emu() + EMU.fromArray(this.hashes);
-	}
+	/** Dieses Feld bildet vom Index eines Eintrags auf den Streuwert seines Schlüssels ab. */
+	transient int[] hashes = EMPTY_INTS;
 
-	@Override
-	public HashSet2<GItem> clone() {
-		final HashSet2<GItem> result = (HashSet2<GItem>)super.clone();
-		if (this.capacityImpl() == 0) return result;
-		result.hashes = this.hashes.clone();
-		return result;
-	}
+	private static final long serialVersionUID = -6978391927144580624L;
 
 }

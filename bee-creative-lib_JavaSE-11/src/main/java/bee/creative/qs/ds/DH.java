@@ -74,7 +74,7 @@ public interface DH extends DO {
 	}
 
 	default Set2<DC> changes() {
-		return this.changesAsNodes().translate(this.changeTrans());
+		return this.changesAsNodes().asTranslatedSet(this.changeTrans());
 	}
 
 	default Set2<QN> changesAsNodes() {

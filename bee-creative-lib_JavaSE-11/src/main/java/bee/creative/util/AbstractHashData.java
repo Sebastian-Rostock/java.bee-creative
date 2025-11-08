@@ -150,6 +150,15 @@ public abstract class AbstractHashData<KEY, VALUE> implements Emuable {
 		return result;
 	}
 
+	/** Dieses Feld speichert den initialwert für eine leere Zahlenliste. */
+	protected static final int[] EMPTY_INTS = {};
+
+	/** Dieses Feld speichert den initialwert für eine leere Zahlenliste. */
+	protected static final long[] EMPTY_LONGS = {};
+
+	/** Dieses Feld speichert den initialwert für eine Objektliste. */
+	protected static final Object[] EMPTY_OBJECTS = {};
+
 	/** Diese Methode wird in {@link HashEntry#getKey()} sowie {@link HashIterator#nextKey()} genutzt und gibt den Schlüssel des gegebenen Eintrags zurück.
 	 *
 	 * @param entryIndex Index eines Eintrags.
@@ -1129,15 +1138,6 @@ public abstract class AbstractHashData<KEY, VALUE> implements Emuable {
 	/** Dieses Feld speichert den Index des nächsten freien Speicherbereiches in {@link #nexts}. Die ungenutzten Speicherbereiche bilden über {@link #nexts} eine
 	 * einfach verkettete Liste. */
 	transient int empty;
-
-	/** Dieses Feld speichert den initialwert für eine leere Zahlenliste. */
-	protected static final int[] EMPTY_INTS = {};
-
-	/** Dieses Feld speichert den initialwert für eine leere Zahlenliste. */
-	protected static final long[] EMPTY_LONGS = {};
-
-	/** Dieses Feld speichert den initialwert für eine Objektliste. */
-	protected static final Object[] EMPTY_OBJECTS = {};
 
 	/** Dieses Feld speichert den initialwert für {@link #table}. */
 	private static final int[] EMPTY_TABLE = {-1};

@@ -27,7 +27,7 @@ public interface List2<E> extends List<E>, Collection2<E> {
 
 	/** Diese Methode ist eine Abkürzung für {@link Collections#translatedList(List, Translator) Collections#translate(this, trans)}. */
 	@Override
-	default <E2> List2<E2> translate(Translator<E, E2> trans) throws NullPointerException {
+	default <E2> List2<E2> asTranslatedCollection(Translator<E, E2> trans) throws NullPointerException {
 		return Collections.translatedList(this, trans);
 	}
 

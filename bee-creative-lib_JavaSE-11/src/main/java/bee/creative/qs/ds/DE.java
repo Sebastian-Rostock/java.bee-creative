@@ -44,7 +44,7 @@ public interface DE extends DO {
 	 * @see QS#valueTrans()
 	 * @return Erkennungstextwerte. */
 	default Set2<String> idents() {
-		return this.identsAsNodes().translate(this.owner().valueTrans());
+		return this.identsAsNodes().asTranslatedSet(this.owner().valueTrans());
 	}
 
 	/** Diese Methode erlaubt Zugriff auf die {@link QN Hyperknoten} zur Erkennung dieses Objekts. Diese Erkennungsknoten sollten dazu einen {@link QN#value()

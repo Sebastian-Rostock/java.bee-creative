@@ -816,7 +816,7 @@ public class Iterators {
 
 	/** Diese Methode ist eine Abkürzung für {@link #unique(Iterator, Collection) Iterators.unique(that, HashSet2.from(hasher))}. */
 	public static <GItem> Iterator2<GItem> unique(final Iterator<? extends GItem> that, final Hasher hasher) throws NullPointerException {
-		return Iterators.unique(that, HashSet2.from(hasher));
+		return Iterators.unique(that, HashSet2.hashSetFrom(hasher));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link UniqueIterator new UniqueIterator<>(that, buffer)}. */

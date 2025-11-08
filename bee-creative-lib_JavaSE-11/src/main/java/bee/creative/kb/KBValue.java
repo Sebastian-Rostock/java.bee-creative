@@ -1,9 +1,9 @@
 package bee.creative.kb;
 
 import bee.creative.fem.FEMString;
-import bee.creative.util.AbstractEntry;
+import bee.creative.util.AbstractEntry2;
 
-public class KBValue extends AbstractEntry<Integer, FEMString> {
+public class KBValue extends AbstractEntry2<Integer, FEMString> {
 
 	public static KBValue from(int valueRef, FEMString valueStr) {
 		if ((valueRef == 0) || (valueStr == null)) return null;

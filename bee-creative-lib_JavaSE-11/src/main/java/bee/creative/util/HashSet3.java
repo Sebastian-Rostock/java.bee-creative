@@ -8,10 +8,8 @@ import bee.creative.lang.Objects;
  * {@link System#identityHashCode(Object)} abgeglichen werden.
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GItem> Typ der Elemente. */
-public class HashSet3<GItem> extends HashSet<GItem> {
-
-	private static final long serialVersionUID = -472585728645140310L;
+ * @param <E> Typ der Elemente. */
+public class HashSet3<E> extends HashSet<E> {
 
 	/** Dieser Konstruktor initialisiert die Kapazität mit {@code 0}. */
 	public HashSet3() {
@@ -20,14 +18,14 @@ public class HashSet3<GItem> extends HashSet<GItem> {
 	/** Dieser Konstruktor initialisiert die Kapazität.
 	 *
 	 * @param capacity Kapazität. */
-	public HashSet3(final int capacity) {
+	public HashSet3(int capacity) {
 		this.allocateImpl(capacity);
 	}
 
 	/** Dieser Konstruktor initialisiert das {@link HashSet3} mit dem Inhalt der gegebenen {@link Set}.
 	 *
 	 * @param source gegebene Einträge. */
-	public HashSet3(final Set<? extends GItem> source) {
+	public HashSet3(Set<? extends E> source) {
 		this.allocateImpl(source.size());
 		this.addAll(source);
 	}
@@ -35,18 +33,20 @@ public class HashSet3<GItem> extends HashSet<GItem> {
 	/** Dieser Konstruktor initialisiert das {@link HashSet3} mit dem Inhalt der gegebenen {@link Collection}.
 	 *
 	 * @param source gegebene Einträge. */
-	public HashSet3(final Collection<? extends GItem> source) {
+	public HashSet3(Collection<? extends E> source) {
 		this.addAll(source);
 	}
 
 	@Override
-	protected int customHash(final Object key) {
+	protected int customHash(Object key) {
 		return Objects.identityHash(key);
 	}
 
 	@Override
-	protected boolean customEqualsKey(final int entryIndex, final Object key) {
+	protected boolean customEqualsKey(int entryIndex, Object key) {
 		return Objects.identityEquals(this.customGetKey(entryIndex), key);
 	}
+
+	private static final long serialVersionUID = -472585728645140310L;
 
 }
