@@ -324,7 +324,7 @@ public class MappedBuffer implements Emuable {
 			var source = this.buffers[bufferIndex(address)].duplicate();
 			var index = valueIndex(address);
 			var count = valueCount1(index, length);
-			source.limit(index + count);
+			source.limit(index + (count * 1));
 			source.position(index);
 			target.put(source);
 			length -= count;
@@ -390,7 +390,7 @@ public class MappedBuffer implements Emuable {
 			var target = this.buffers[bufferIndex(address)].duplicate();
 			var index = valueIndex(address);
 			var count = valueCount1(index, length);
-			source.limit(index + count);
+			source.limit(source.position() + count);
 			target.position(index);
 			target.put(source);
 			length -= count;
@@ -456,7 +456,7 @@ public class MappedBuffer implements Emuable {
 			var source = this.buffers[bufferIndex(address)].duplicate().order(this.order);
 			var index = valueIndex(address);
 			var count = valueCount2(index, length);
-			source.limit(index + count);
+			source.limit(index + (count * 2));
 			source.position(index);
 			target.put(source.asCharBuffer());
 			length -= count;
@@ -512,7 +512,7 @@ public class MappedBuffer implements Emuable {
 			var target = this.buffers[bufferIndex(address)].duplicate().order(this.order);
 			var index = valueIndex(address);
 			var count = valueCount2(index, length);
-			source.limit(index + count);
+			source.limit(source.position() + count);
 			target.position(index);
 			target.asCharBuffer().put(source);
 			length -= count;
@@ -568,7 +568,7 @@ public class MappedBuffer implements Emuable {
 			var source = this.buffers[bufferIndex(address)].duplicate().order(this.order);
 			var index = valueIndex(address);
 			var count = valueCount2(index, length);
-			source.limit(index + count);
+			source.limit(index + (count * 2));
 			source.position(index);
 			target.put(source.asShortBuffer());
 			length -= count;
@@ -624,7 +624,7 @@ public class MappedBuffer implements Emuable {
 			var target = this.buffers[bufferIndex(address)].duplicate().order(this.order);
 			var index = valueIndex(address);
 			var count = valueCount2(index, length);
-			source.limit(index + count);
+			source.limit(source.position() + count);
 			target.position(index);
 			target.asShortBuffer().put(source);
 			length -= count;
@@ -680,7 +680,7 @@ public class MappedBuffer implements Emuable {
 			var source = this.buffers[bufferIndex(address)].duplicate().order(this.order);
 			var index = valueIndex(address);
 			var count = valueCount4(index, length);
-			source.limit(index + count);
+			source.limit(index + (count * 4));
 			source.position(index);
 			target.put(source.asIntBuffer());
 			length -= count;
@@ -736,7 +736,7 @@ public class MappedBuffer implements Emuable {
 			var target = this.buffers[bufferIndex(address)].duplicate().order(this.order);
 			var index = valueIndex(address);
 			var count = valueCount4(index, length);
-			source.limit(index + count);
+			source.limit(source.position() + count);
 			target.position(index);
 			target.asIntBuffer().put(source);
 			length -= count;
@@ -792,7 +792,7 @@ public class MappedBuffer implements Emuable {
 			var source = this.buffers[bufferIndex(address)].duplicate().order(this.order);
 			var index = valueIndex(address);
 			var count = valueCount8(index, length);
-			source.limit(index + count);
+			source.limit(index + (count * 8));
 			source.position(index);
 			target.put(source.asLongBuffer());
 			length -= count;
@@ -848,7 +848,7 @@ public class MappedBuffer implements Emuable {
 			var target = this.buffers[bufferIndex(address)].duplicate().order(this.order);
 			var index = valueIndex(address);
 			var count = valueCount8(index, length);
-			source.limit(index + count);
+			source.limit(source.position() + count);
 			target.position(index);
 			target.asLongBuffer().put(source);
 			length -= count;
@@ -904,7 +904,7 @@ public class MappedBuffer implements Emuable {
 			var source = this.buffers[bufferIndex(address)].duplicate().order(this.order);
 			var index = valueIndex(address);
 			var count = valueCount4(index, length);
-			source.limit(index + count);
+			source.limit(index + (count * 4));
 			source.position(index);
 			target.put(source.asFloatBuffer());
 			length -= count;
@@ -960,7 +960,7 @@ public class MappedBuffer implements Emuable {
 			var target = this.buffers[bufferIndex(address)].duplicate().order(this.order);
 			var index = valueIndex(address);
 			var count = valueCount4(index, length);
-			source.limit(index + count);
+			source.limit(source.position() + count);
 			target.position(index);
 			target.asFloatBuffer().put(source);
 			length -= count;
@@ -1015,12 +1015,12 @@ public class MappedBuffer implements Emuable {
 		while (length != 0) {
 			var source = this.buffers[bufferIndex(address)].duplicate().order(this.order);
 			var index = valueIndex(address);
-			var count = valueCount4(index, length);
-			source.limit(index + count);
+			var count = valueCount8(index, length);
+			source.limit(index + (count * 8));
 			source.position(index);
 			target.put(source.asDoubleBuffer());
 			length -= count;
-			address += count * 4;
+			address += count * 8;
 		}
 	}
 
@@ -1072,7 +1072,7 @@ public class MappedBuffer implements Emuable {
 			var target = this.buffers[bufferIndex(address)].duplicate().order(this.order);
 			var index = valueIndex(address);
 			var count = valueCount8(index, length);
-			source.limit(index + count);
+			source.limit(source.position() + count);
 			target.position(index);
 			target.asDoubleBuffer().put(source);
 			length -= count;
