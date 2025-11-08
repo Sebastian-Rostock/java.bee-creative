@@ -356,7 +356,7 @@ public class MappedBuffer implements Emuable {
 	 * @see ByteBuffer#put(byte[])
 	 * @param address Adresse.
 	 * @param source {@code byte}-Array. */
-	public void put(long address, byte[] source) {
+	public void put(long address, byte... source) {
 		this.put(address, source, 0, source.length);
 	}
 
@@ -478,7 +478,7 @@ public class MappedBuffer implements Emuable {
 	 * @see CharBuffer#put(char[])
 	 * @param address Adresse.
 	 * @param source {@code char}-Array. */
-	public void putChar(long address, char[] source) {
+	public void putChar(long address, char... source) {
 		this.putChar(address, source, 0, source.length);
 	}
 
@@ -590,7 +590,7 @@ public class MappedBuffer implements Emuable {
 	 * @see ShortBuffer#put(short[])
 	 * @param address Adresse.
 	 * @param source {@code short}-Array. */
-	public void putShort(long address, short[] source) {
+	public void putShort(long address, short... source) {
 		this.putShort(address, source, 0, source.length);
 	}
 
@@ -702,7 +702,7 @@ public class MappedBuffer implements Emuable {
 	 * @see IntBuffer#put(int[])
 	 * @param address Adresse.
 	 * @param source {@code int}-Array. */
-	public void putInt(long address, int[] source) {
+	public void putInt(long address, int... source) {
 		this.putInt(address, source, 0, source.length);
 	}
 
@@ -814,7 +814,7 @@ public class MappedBuffer implements Emuable {
 	 * @see LongBuffer#put(long[])
 	 * @param address Adresse.
 	 * @param source {@code long}-Array. */
-	public void putLong(long address, long[] source) {
+	public void putLong(long address, long... source) {
 		this.putLong(address, source, 0, source.length);
 	}
 
@@ -926,7 +926,7 @@ public class MappedBuffer implements Emuable {
 	 * @see FloatBuffer#put(float[])
 	 * @param address Adresse.
 	 * @param source {@code float}-Array. */
-	public void putFloat(long address, float[] source) {
+	public void putFloat(long address, float... source) {
 		this.putFloat(address, source, 0, source.length);
 	}
 
@@ -1038,7 +1038,7 @@ public class MappedBuffer implements Emuable {
 	 * @see DoubleBuffer#put(double[])
 	 * @param address Adresse.
 	 * @param source {@code double}-Array. */
-	public void putDouble(long address, double[] source) {
+	public void putDouble(long address, double... source) {
 		this.putDouble(address, source, 0, source.length);
 	}
 
@@ -1118,11 +1118,11 @@ public class MappedBuffer implements Emuable {
 
 	/** Diese Methode ist eine Abkürzung für {@link #put(long, MappedBuffer, long, long) this.put(target, this, source, length)}.
 	 *
-	 * @param target Beginn des Zielabschnitts.
-	 * @param source Beginn des Quellabschnitts.
+	 * @param targetAddress Beginn des Zielabschnitts.
+	 * @param sourceAddress Beginn des Quellabschnitts.
 	 * @param length Länge des Abschnitts. */
-	public void copy(long target, long source, long length) {
-		copyImpl(this.buffers, target, this.buffers, source, length);
+	public void copy(long targetAddress, long sourceAddress, long length) {
+		copyImpl(this.buffers, targetAddress, this.buffers, sourceAddress, length);
 	}
 
 	@Override
