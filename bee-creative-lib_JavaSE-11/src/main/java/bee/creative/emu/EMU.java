@@ -1,5 +1,6 @@
 package bee.creative.emu;
 
+import static bee.creative.util.Hashers.identityHasher;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -8,7 +9,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import bee.creative.util.HashMap2;
-import bee.creative.util.Hashers;
 
 /** Diese Klasse implementiert Methoden zur Schätzung des Speicherverbrauchs von Objekten (<i>Estimated Memory Usage</i>).
  *
@@ -18,20 +18,20 @@ public class EMU {
 	/** Diese Methode registriert den gegebenen {@link Emuator} zur Schätzung des Speicherverbrauchs der Instanzen der gegebenen Klasse in {@link #from(Object)}.
 	 * Wenn der {@link Emuator} {@code null} ist, wird die Sonderbehandlung für die Instanzen der gegebenen Klasse aufgehoben.
 	 *
-	 * @param <GItem> Typ der Instanzen.
+	 * @param <T> Typ der Instanzen.
 	 * @param clazz Klasse der Instanzen.
 	 * @param emuator {@link Emuator} oder {@code null}.
 	 * @throws NullPointerException Wenn {@code clazz} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Klasse primitiv oder ein Array ist. */
-	public static <GItem> void use(Class<GItem> clazz, Emuator<GItem> emuator) throws NullPointerException, IllegalArgumentException {
+	public static <T> void use(Class<T> clazz, Emuator<? super T> emuator) throws NullPointerException, IllegalArgumentException {
 		if (clazz.isArray() || clazz.isPrimitive()) throw new IllegalArgumentException();
-		synchronized (EMU.useMap) {
+		synchronized (useMap) {
 			if (emuator == null) {
-				EMU.useMap.remove(clazz);
+				useMap.remove(clazz);
 			} else {
-				EMU.useMap.put(clazz, emuator);
+				useMap.put(clazz, emuator);
 			}
-			EMU.emuatorCache.clear();
+			emuatorCache.clear();
 		}
 	}
 
@@ -63,9 +63,9 @@ public class EMU {
 		if (object == null) return 0;
 		if (object instanceof Emuable) return ((Emuable)object).emu();
 		var clazz = object.getClass();
-		if (clazz.isArray()) return EMU.fromArray(clazz.getComponentType(), Array.getLength(object));
-		synchronized (EMU.useMap) {
-			return ((Emuator<Object>)EMU.emuatorCache.install(clazz)).emu(object);
+		if (clazz.isArray()) return fromArray(clazz.getComponentType(), Array.getLength(object));
+		synchronized (useMap) {
+			return ((Emuator<Object>)emuatorCache.install(clazz)).emu(object);
 		}
 	}
 
@@ -78,7 +78,7 @@ public class EMU {
 	public static <GItem> long fromAll(GItem... items) {
 		var result = 0L;
 		for (var item: items) {
-			result += EMU.from(item);
+			result += from(item);
 		}
 		return result;
 	}
@@ -91,7 +91,7 @@ public class EMU {
 	public static long fromAll(Iterable<?> items) {
 		var result = 0L;
 		for (var item: items) {
-			result += EMU.from(item);
+			result += from(item);
 		}
 		return result;
 	}
@@ -115,7 +115,7 @@ public class EMU {
 	 * @return geschätzter Speicherverbrauch.
 	 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
 	public static int fromField(Field field) throws NullPointerException {
-		return EMU.fromType(field.getType());
+		return fromType(field.getType());
 	}
 
 	/** Diese Methode gibt den geschätzten Speicherverbrauch des gegebenen Arrays zurück. Wenn es {@code null} ist, wird {@code 0} geliefert. Der
@@ -127,7 +127,7 @@ public class EMU {
 	 * @throws IllegalArgumentException Wenn das gegebene Objewkt kein Array ist. */
 	public static long fromArray(Object array) throws IllegalArgumentException {
 		if (array == null) return 0;
-		return EMU.fromArray(array.getClass().getComponentType(), Array.getLength(array));
+		return fromArray(array.getClass().getComponentType(), Array.getLength(array));
 	}
 
 	/** Diese Methode gibt den geschätzten Speicherverbrauch eines Arrays mit der gegebenen Länge und Elementen vom gegebenen Datentyp zurück.
@@ -138,7 +138,7 @@ public class EMU {
 	 * @param length Länge des Arrays.
 	 * @return geschätzter Speicherverbrauch. */
 	public static long fromArray(Class<?> type, int length) {
-		return EMU.align(12 + (EMU.fromType(type) * (long)length));
+		return align(12 + (fromType(type) * (long)length));
 	}
 
 	/** Diese Methode gibt den geschätzten Speicherverbrauch für die Kopfdaten sowie die Instanzdatenfelder der gegebenen Klasse zurück. Wenn sie {@code null}
@@ -149,8 +149,8 @@ public class EMU {
 	 * @param clazz Klasse oder {@code null}.
 	 * @return geschätzter Speicherverbrauch. */
 	public static int fromClass(Class<?> clazz) {
-		synchronized (EMU.useMap) {
-			return EMU.integerCache.install(clazz);
+		synchronized (useMap) {
+			return integerCache.install(clazz);
 		}
 	}
 
@@ -164,41 +164,41 @@ public class EMU {
 	public static long fromObject(Object object) {
 		if (object == null) return 0;
 		var clazz = object.getClass();
-		return clazz.isArray() ? EMU.fromArray(clazz.getComponentType(), Array.getLength(object)) : EMU.fromClass(clazz);
+		return clazz.isArray() ? fromArray(clazz.getComponentType(), Array.getLength(object)) : fromClass(clazz);
 	}
 
 	/** Dieses Feld speichert die in {@link #use(Class, Emuator)} registrierten {@link Emuator}. */
 	private static final HashMap2<Class<?>, Emuator<?>> useMap = new HashMap2<>();
 
 	/** Dieses Feld speichert die in {@link #fromClass(Class)} gepufferten Größen. */
-	private static final HashMap2<Class<?>, Integer> integerCache = HashMap2.hashMapFrom(Hashers.identityHasher(), clazz -> {
+	private static final HashMap2<Class<?>, Integer> integerCache = HashMap2.hashMapFrom(identityHasher(), clazz -> {
 		var result = 8;
 		for (var type = clazz; type != null; type = type.getSuperclass()) {
 			for (var field: type.getDeclaredFields()) {
 				if (!Modifier.isStatic(field.getModifiers())) {
-					result += EMU.fromField(field);
+					result += fromField(field);
 				}
 			}
 		}
-		return EMU.align(result);
+		return align(result);
 	});
 
 	/** Dieses Feld speichert die in {@link #from(Object)} gepufferten {@link Emuator}. */
-	private static final HashMap2<Class<?>, Emuator<?>> emuatorCache = HashMap2.hashMapFrom(Hashers.identityHasher(), clazz -> {
+	private static final HashMap2<Class<?>, Emuator<?>> emuatorCache = HashMap2.hashMapFrom(identityHasher(), clazz -> {
 		for (var type = clazz; type != null; type = type.getSuperclass()) {
-			var emuator = EMU.useMap.get(type);
+			var emuator = useMap.get(type);
 			if (emuator != null) return emuator;
 		}
-		var result = EMU.fromClass(clazz);
+		var result = fromClass(clazz);
 		return ignored -> result;
 	});
 
 	static {
-		EMU.use(String.class, input -> EMU.fromObject(input) + EMU.fromArray(char.class, input.length()));
-		EMU.use(ArrayList.class, input -> EMU.fromObject(input) + EMU.fromArray(Object.class, input.size()));
-		EMU.use(LinkedList.class, input -> EMU.fromObject(input) + (24 * input.size()));
-		EMU.use(HashSet.class, input -> EMU.fromObject(input) + EMU.fromClass(HashMap.class) + (36 * input.size()));
-		EMU.use(HashMap.class, input -> EMU.fromClass(HashMap.class) + (36 * input.size()));
+		use(String.class, input -> fromObject(input) + fromArray(char.class, input.length()));
+		use(ArrayList.class, input -> fromObject(input) + fromArray(Object.class, input.size()));
+		use(LinkedList.class, input -> fromObject(input) + (24 * input.size()));
+		use(HashSet.class, input -> fromObject(input) + fromClass(HashMap.class) + (36 * input.size()));
+		use(HashMap.class, input -> fromClass(HashMap.class) + (36 * input.size()));
 	}
 
 }
