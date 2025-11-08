@@ -16,7 +16,6 @@ import bee.creative.lang.Objects;
  * @param <GKey> Typ der Schlüssel. */
 public class HashMapOI<GKey> extends AbstractHashMap<GKey, Integer> implements Serializable, Cloneable {
 
-	/** Dieses Feld speichert das serialVersionUID. */
 	private static final long serialVersionUID = -467621651047396939L;
 
 	/** Diese Methode gibt eine neue {@link HashMapOI} zurück, welche Streuwert und Äquivalenz der Schlüssel über den gegebenen {@link Hasher} ermittelt.

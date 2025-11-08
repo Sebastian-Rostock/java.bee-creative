@@ -94,7 +94,6 @@ public class HashSetI extends AbstractHashSet<Integer> implements Serializable, 
 	/** Dieses Feld bildet vom Index eines Elements auf dessen Wert ab. */
 	transient int[] items = EMPTY_INTS;
 
-	/** Dieses Feld speichert das serialVersionUID. */
 	private static final long serialVersionUID = 6862948924620051022L;
 
 	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {

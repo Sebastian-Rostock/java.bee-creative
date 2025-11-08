@@ -94,7 +94,6 @@ public class HashSetL extends AbstractHashSet<Long> implements Serializable, Clo
 	/** Dieses Feld bildet vom Index eines Elements auf dessen Wert ab. */
 	transient long[] items = EMPTY_LONGS;
 
-	/** Dieses Feld speichert das serialVersionUID. */
 	private static final long serialVersionUID = 4228392317821609623L;
 
 	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {

@@ -103,7 +103,6 @@ public class HashSet<E> extends AbstractHashSet<E> implements Serializable, Clon
 	/** Dieses Feld bildet vom Index eines Elements auf dessen Wert ab. Für alle anderen Indizes bildet es auf {@code null} ab. */
 	transient Object[] items = EMPTY_OBJECTS;
 
-	/** Dieses Feld speichert das serialVersionUID. */
 	private static final long serialVersionUID = 1947961515821394540L;
 
 	@SuppressWarnings ({"unchecked"})

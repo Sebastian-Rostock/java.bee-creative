@@ -53,7 +53,6 @@ class H2QTSetNames extends HashSet2<String> implements Array<String> {
 		if ((size == 0) || (size != this.size())) throw new IllegalArgumentException();
 	}
 
-	/** Dieses Feld speichert das serialVersionUID. */
 	private static final long serialVersionUID = 2301871603459115562L;
 
 }

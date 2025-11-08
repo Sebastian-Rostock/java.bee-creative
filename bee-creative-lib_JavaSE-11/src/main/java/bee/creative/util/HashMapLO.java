@@ -16,7 +16,6 @@ import bee.creative.lang.Objects;
  * @param <GValue> Typ der Werte. */
 public class HashMapLO<GValue> extends AbstractHashMap<Long, GValue> implements Serializable, Cloneable {
 
-	/** Dieses Feld speichert das serialVersionUID. */
 	private static final long serialVersionUID = -6864886543365066180L;
 
 	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Schlüssel ab. */

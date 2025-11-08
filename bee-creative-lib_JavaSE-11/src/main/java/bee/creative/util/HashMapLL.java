@@ -14,7 +14,6 @@ import bee.creative.lang.Objects;
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class HashMapLL extends AbstractHashMap<Long, Long> implements Serializable, Cloneable {
 
-	/** Dieses Feld speichert das serialVersionUID. */
 	private static final long serialVersionUID = -5580543670395051911L;
 
 	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Schlüssel ab. */

@@ -176,7 +176,6 @@ public abstract class Observables<GMessage, GObserver> {
 	/** Diese Klasse implementiert die Verwaltung der Ereignissender und ihrer Ereignisempfänger. */
 	private static final class SenderStore extends HashSet<Object> {
 
-		/** Dieses Feld speichert das serialVersionUID. */
 		private static final long serialVersionUID = -427892278890180125L;
 
 		/** Dieses Feld speichert den Ereignissender für {@code null}. */
