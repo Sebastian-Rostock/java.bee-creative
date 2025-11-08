@@ -15,7 +15,7 @@ public class StreamDataWriter extends DataWriter {
 	}
 
 	@Override
-	public Object wrappedTarget() {
+	public OutputStream wrappedTarget() {
 		return this.wrappedTarget;
 	}
 

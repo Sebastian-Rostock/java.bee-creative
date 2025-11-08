@@ -1,10 +1,9 @@
 package bee.creative.io;
 
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-/** Diese Klasse implementiert erweitert einen {@link FilterInputStream} um den {@link #getReadCount() Zähler der gelesenen bzw. ausgelassenen Bytes}.
+/** Diese Klasse erweitert einen {@link ByteReader} um den {@link #getReadCount() Zähler der gelesenen bzw. ausgelassenen Bytes}.
  *
  * @author [cc-by] 2017 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class CountingByteReader extends ByteReader {

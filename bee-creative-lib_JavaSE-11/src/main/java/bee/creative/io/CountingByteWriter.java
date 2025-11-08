@@ -1,10 +1,9 @@
 package bee.creative.io;
 
-import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-/** Diese Klasse implementiert erweitert einen {@link FilterOutputStream} um den {@link #getWriteCount() Zähler der geschriebenen Bytes}.
+/** Diese Klasse erweitert einen {@link ByteWriter} um den {@link #getWriteCount() Zähler der geschriebenen Bytes}.
  *
  * @author [cc-by] 2017 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class CountingByteWriter extends ByteWriter {

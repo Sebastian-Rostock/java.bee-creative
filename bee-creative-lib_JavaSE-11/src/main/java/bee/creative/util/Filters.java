@@ -15,15 +15,15 @@ public class Filters {
 	 *
 	 * @see #acceptFilter()
 	 * @see #rejectFilter() */
-	public static <ITEM> Filter3<ITEM> filterFrom(boolean value) {
+	public static <T> Filter3<T> filterFrom(boolean value) {
 		return value ? acceptFilter() : rejectFilter();
 	}
 
 	/** Diese Methode liefert den gegebenen {@link Filter} als {@link Filter3}. */
 	@SuppressWarnings ("unchecked")
-	public static <ITEM> Filter3<ITEM> filterFrom(Filter<? super ITEM> that) throws NullPointerException {
-		Objects.notNull(that);
-		if (that instanceof Filter2) return ((Filter2<ITEM>)that).asFilter();
+	public static <T> Filter3<T> filterFrom(Filter<? super T> that) throws NullPointerException {
+		notNull(that);
+		if (that instanceof Filter3) return (Filter3<T>)that;
 		return item -> that.accepts(item);
 	}
 
@@ -51,32 +51,32 @@ public class Filters {
 	/** Diese Methode liefert einen {@link Filter}, der alle Datensätze akzeptiert, die nicht {@code null} sind. Die Akzeptanz eines Datensatzes {@code item} ist
 	 * {@code item != null}. */
 	@SuppressWarnings ("unchecked")
-	public static <ITEM> Filter3<ITEM> nullFilter() {
-		return (Filter3<ITEM>)nullFilter;
+	public static <T> Filter3<T> nullFilter() {
+		return (Filter3<T>)nullFilter;
 	}
 
 	/** Diese Methode liefert einen {@link Filter}, der alle Datensätze akzeptiert. Die Akzeptanz ist stets {@code true}. */
 	@SuppressWarnings ("unchecked")
-	public static <ITEM> Filter3<ITEM> acceptFilter() {
-		return (Filter3<ITEM>)acceptFilter;
+	public static <T> Filter3<T> acceptFilter() {
+		return (Filter3<T>)acceptFilter;
 	}
 
 	/** Diese Methode liefert einen {@link Filter}, der alle Datensätze ablehnt. Die Akzeptanz ist stets {@code false}. */
 	@SuppressWarnings ("unchecked")
-	public static <ITEM> Filter3<ITEM> rejectFilter() {
-		return (Filter3<ITEM>)rejectFilter;
+	public static <T> Filter3<T> rejectFilter() {
+		return (Filter3<T>)rejectFilter;
 	}
 
 	/** Diese Methode liefert einen {@link Filter3}, der nur die Datensätze akzeptiert, die von {@code that} abgelehnt werden. Die Akzeptanz eines Datensatzen
 	 * {@code item} ist {@code !that.accepts(item)}. */
-	public static <ITEM> Filter3<ITEM> negatedFilter(Filter<? super ITEM> that) throws NullPointerException {
+	public static <T> Filter3<T> negatedFilter(Filter<? super T> that) throws NullPointerException {
 		notNull(that);
 		return item -> !that.accepts(item);
 	}
 
 	/** Diese Methode liefert einen {@link Filter3}, der nur die Datensätze akzeptiert, die von {@code that1} oder {@code that2} akzeptiert werden. Die Akzeptanz
 	 * eines Datensatzes {@code item} ist {@code that1.accepts(item) || that2.accepts(item)}. */
-	public static <ITEM> Filter3<ITEM> disjoinedFilter(Filter<? super ITEM> that1, Filter<? super ITEM> that2) throws NullPointerException {
+	public static <T> Filter3<T> disjoinedFilter(Filter<? super T> that1, Filter<? super T> that2) throws NullPointerException {
 		notNull(that1);
 		notNull(that2);
 		return item -> that1.accepts(item) || that2.accepts(item);
@@ -84,7 +84,7 @@ public class Filters {
 
 	/** Diese Methode liefert einen {@link Filter3}, der nur die Datensätze akzeptiert, die von {@code that1} und {@code that2} akzeptiert werden. Die Akzeptanz
 	 * eines Datensatzes {@code item} ist {@code that1.accepts(item) && that2.accepts(item)}. */
-	public static <ITEM> Filter3<ITEM> conjoinedFilter(Filter<? super ITEM> that1, Filter<? super ITEM> that2) throws NullPointerException {
+	public static <T> Filter3<T> conjoinedFilter(Filter<? super T> that1, Filter<? super T> that2) throws NullPointerException {
 		notNull(that1);
 		notNull(that2);
 		return item -> that1.accepts(item) && that2.accepts(item);

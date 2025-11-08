@@ -1,10 +1,9 @@
 package bee.creative.io;
 
-import java.io.FilterReader;
 import java.io.IOException;
 import java.io.Reader;
 
-/** Diese Klasse implementiert erweitert einen {@link FilterReader} um den {@link #getReadCount() Zähler der gelesenen bzw. ausgelassenen Zeichen}.
+/** Diese Klasse erweitert einen {@link CharReader} um den {@link #getReadCount() Zähler der gelesenen bzw. ausgelassenen Zeichen}.
  *
  * @author [cc-by] 2017 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class CountingCharReader extends CharReader {

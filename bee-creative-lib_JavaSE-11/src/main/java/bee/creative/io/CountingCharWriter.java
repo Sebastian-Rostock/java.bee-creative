@@ -1,10 +1,9 @@
 package bee.creative.io;
 
-import java.io.FilterWriter;
 import java.io.IOException;
 import java.io.Writer;
 
-/** Diese Klasse implementiert erweitert einen {@link FilterWriter} um den {@link #getWriteCount() Zähler der geschriebenen Zeichen}.
+/** Diese Klasse erweitert einen {@link CharWriter} um den {@link #getWriteCount() Zähler der geschriebenen Zeichen}.
  *
  * @author [cc-by] 2017 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class CountingCharWriter extends CharWriter {

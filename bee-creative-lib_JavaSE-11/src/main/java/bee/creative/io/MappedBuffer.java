@@ -22,7 +22,7 @@ import bee.creative.lang.Objects;
 import bee.creative.mmi.MMIArray;
 import bee.creative.mmi.MMIArrayL;
 
-/** Diese Klasse implementiert eine threadsichere alternative zu {@link MappedByteBuffer}, der mit {@code long}-Adressen arbeitet und beliebig große Dateien per
+/** Diese Klasse implementiert eine threadsichere alternative zu {@link MappedByteBuffer}, die mit {@code long}-Adressen arbeitet und beliebig große Dateien per
  * momory-mapping zum Lesen und Schreiben zugänglich machen kann.
  * <p>
  * Die Anbindung der Datei erfolgt intern über einen {@link MappedByteBuffer} pro Gigabyte. Wenn eine der Methoden eine ungültige Adresse übergeben wird, welche

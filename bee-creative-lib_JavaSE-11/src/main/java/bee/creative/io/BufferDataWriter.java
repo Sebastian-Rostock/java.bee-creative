@@ -17,7 +17,7 @@ public class BufferDataWriter extends DataWriter {
 	}
 
 	@Override
-	public Object wrappedTarget() {
+	public ByteBuffer wrappedTarget() {
 		return this.wrappedTarget;
 	}
 

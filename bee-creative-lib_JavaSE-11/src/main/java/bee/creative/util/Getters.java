@@ -21,6 +21,7 @@ public class Getters {
 		return item -> that.get(item);
 	}
 
+	/** Diese Methode liefert einen {@link Getter3}, der beim Lesen stets den gegebenen Wert liefert. */
 	public static <V> Getter3<Object, V> getterFromValue(V value) {
 		return value == null ? emptyGetter() : item -> value;
 	}

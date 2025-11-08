@@ -1096,8 +1096,8 @@ public class BEXAdapter {
 
 	}
 
-	/** Diese Klasse implementiert erweitert den {@link BEXNodeAdapter} und die Methoden {@link #getParentNode()}, {@link #getNextSibling()} und
-	 * {@link #getPreviousSibling()} als Basis des {@link BEXTextAdapter} sowie des {@link BEXElemAdapter}.
+	/** Diese Klasse erweitert den {@link BEXNodeAdapter} und die Methoden {@link #getParentNode()}, {@link #getNextSibling()} und {@link #getPreviousSibling()}
+	 * als Basis des {@link BEXTextAdapter} sowie des {@link BEXElemAdapter}.
 	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static abstract class BEXChldAdapter extends BEXNodeAdapter {

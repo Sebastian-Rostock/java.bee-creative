@@ -8,11 +8,6 @@ import static bee.creative.util.Getters.emptyGetter;
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Producers {
 
-	/** Diese Methode liefert den gegebenen {@link Producer3}. */
-	public static <V> Producer3<V> producer(Producer3<V> that) throws NullPointerException {
-		return notNull(that);
-	}
-
 	/** Diese Methode liefert den gegebenen {@link Producer} als {@link Producer3}. */
 	@SuppressWarnings ("unchecked")
 	public static <V> Producer3<V> producerFrom(Producer<? extends V> that) throws NullPointerException {

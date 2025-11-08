@@ -14,16 +14,16 @@ import bee.creative.util.Getters.RefMode;
  * @see Filters
  * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <T> Typ der Datensätze. */
-public interface Filter3<T> extends Filter2<T> {
+public interface Filter3<T> extends Filter<T> {
 
 	/** Diese Methode ist eine Abkürzung für {@link #buffer(RefMode, Hasher) this.buffer(SOFT_REF_MODE, naturalHasher())}. */
 	default Filter3<T> buffer() {
 		return this.buffer(SOFT_REF, naturalHasher());
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Getters#bufferedGetter(Getter, RefMode, Hasher) this.toGetter().buffer(mode, hasher)::get}. */
+	/** Diese Methode ist eine Abkürzung für {@link Getters#bufferedGetter(Getter, RefMode, Hasher) this.asGetter().buffer(mode, hasher)::get}. */
 	default Filter3<T> buffer(RefMode mode, Hasher hasher) throws IllegalArgumentException {
-		return this.toGetter().buffer(mode, hasher)::get;
+		return this.asGetter().buffer(mode, hasher)::get;
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Filters#negatedFilter(Filter) negatedFilter(this)}. */
@@ -32,12 +32,12 @@ public interface Filter3<T> extends Filter2<T> {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Filters#disjoinedFilter(Filter, Filter) disjoinedFilter(this, that)}. */
-	default Filter3<T> disjoin(Filter3<? super T> that) throws NullPointerException {
+	default Filter3<T> disjoin(Filter<? super T> that) throws NullPointerException {
 		return disjoinedFilter(this, that);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Filters#conjoinedFilter(Filter, Filter) conjoinedFilter(this, that)}. */
-	default Filter3<T> conjoin(Filter3<? super T> that) throws NullPointerException {
+	default Filter3<T> conjoin(Filter<? super T> that) throws NullPointerException {
 		return conjoinedFilter(this, that);
 	}
 
@@ -56,8 +56,13 @@ public interface Filter3<T> extends Filter2<T> {
 		return synchronizedFilter(this, mutex);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #conjoin(Filter3) conjoin(that)}. */
-	default Filter3<T> and(Filter3<? super T> that) throws NullPointerException {
+	/** Diese Methode liefert den {@link Getter3} zu {@link #accepts(Object)}. */
+	default Getter3<T, Boolean> asGetter() {
+		return this::accepts;
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #conjoin(Filter) conjoin(that)}. */
+	default Filter3<T> and(Filter<? super T> that) throws NullPointerException {
 		return this.conjoin(that);
 	}
 
@@ -66,19 +71,9 @@ public interface Filter3<T> extends Filter2<T> {
 		return this.negate();
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #disjoin(Filter3) disjoin(that)}. */
-	default Filter3<T> or(Filter3<? super T> that) throws NullPointerException {
+	/** Diese Methode ist eine Abkürzung für {@link #disjoin(Filter) disjoin(that)}. */
+	default Filter3<T> or(Filter<? super T> that) throws NullPointerException {
 		return this.disjoin(that);
-	}
-
-	/** Diese Methode liefert den {@link Getter3} zu {@link #accepts(Object)}. */
-	default Getter3<T, Boolean> toGetter() {
-		return this::accepts;
-	}
-
-	@Override
-	default Filter3<T> asFilter() {
-		return this;
 	}
 
 }
