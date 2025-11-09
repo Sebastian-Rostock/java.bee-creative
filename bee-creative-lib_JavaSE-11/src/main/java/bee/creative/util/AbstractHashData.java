@@ -106,9 +106,9 @@ import bee.creative.lang.Objects;
  * @see HashSet
  * @see HashSet2
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <KEY> Typ der Schlüssel.
- * @param <VALUE> Typ der Werte. */
-public abstract class AbstractHashData<KEY, VALUE> implements Emuable {
+ * @param <K> Typ der Schlüssel.
+ * @param <V> Typ der Werte. */
+public abstract class AbstractHashData<K, V> implements Emuable {
 
 	/** Dieser Konstruktor initialisiert das die {@link #capacityImpl() Kapazität} mit {@code 0}. */
 	public AbstractHashData() {
@@ -163,13 +163,13 @@ public abstract class AbstractHashData<KEY, VALUE> implements Emuable {
 	 *
 	 * @param entryIndex Index eines Eintrags.
 	 * @return Schlüssel oder {@code null}. */
-	protected abstract KEY customGetKey(int entryIndex);
+	protected abstract K customGetKey(int entryIndex);
 
 	/** Diese Methode wird in {@link HashIterator#nextEntry()} genutzt und gibt den Eintrag zum gegebenen Index zurück.
 	 *
 	 * @param entryIndex Index eines Eintrags.
 	 * @return Eintrag. */
-	protected Entry<KEY, VALUE> customGetEntry(int entryIndex) {
+	protected Entry<K, V> customGetEntry(int entryIndex) {
 		return new HashEntry<>(this, entryIndex);
 	}
 
@@ -178,30 +178,28 @@ public abstract class AbstractHashData<KEY, VALUE> implements Emuable {
 	 *
 	 * @param entryIndex Index eines Eintrags.
 	 * @return Wert oder {@code null}. */
-	protected abstract VALUE customGetValue(int entryIndex);
+	protected abstract V customGetValue(int entryIndex);
 
 	/** Diese Methode wird von {@link #customSetKey(int, Object)} genutzt und ersetzt den Wert des gegebenen Schlüssels.
 	 *
 	 * @param entryIndex Index eines Eintrags.
 	 * @param key neuer Schlüssel oder {@code null}. */
-	protected abstract void customSetKey(int entryIndex, KEY key);
+	protected abstract void customSetKey(int entryIndex, K key);
 
 	/** Diese Methode wird von {@link #putIndexImpl(Object)} genutzt und ersetzt den Wert des gegebenen Schlüssels.
 	 *
 	 * @param entryIndex Index eines Eintrags.
 	 * @param key neuer Schlüssel oder {@code null}.
 	 * @param keyHash Streuwert des Schlüssels. */
-	protected void customSetKey(int entryIndex, KEY key, int keyHash) {
+	protected void customSetKey(int entryIndex, K key, int keyHash) {
 		this.customSetKey(entryIndex, key);
 	}
 
-	/** Diese Methode wird in {@link #putImpl(Object, Object)} sowie {@link HashEntry#setValue(Object)} genutzt, ersetzt den Wert des gegebenen Eintrags und gibt
-	 * den vorherigen Wert zurück.
+	/** Diese Methode wird in {@link #putValueImpl(Object, Object)} sowie {@link HashEntry#setValue(Object)} genutzt und ersetzt den Wert des gegebenen Eintrags.
 	 *
 	 * @param entryIndex Index eines Eintrags.
-	 * @param value neuer Wert oder {@code null}.
-	 * @return alter Wert oder {@code null}. */
-	protected abstract VALUE customSetValue(int entryIndex, VALUE value);
+	 * @param value neuer Wert oder {@code null}. */
+	protected abstract void customSetValue(int entryIndex, V value);
 
 	/** Diese Methode wird in {@link #getIndexImpl(Object)}, {@link #putIndexImpl(Object)}, {@link #popIndexImpl(Object)} sowie
 	 * {@link #popEntryImpl(Object, Object)} genutzt und gibt den {@link Object#hashCode() Streuwert} des gegebenen Schlüssels zurück.
@@ -286,7 +284,7 @@ public abstract class AbstractHashData<KEY, VALUE> implements Emuable {
 	 *
 	 * @param key Schlüssel zur Ermittlung des Eintrags.
 	 * @return Schlüssel des neuen Eintrags. */
-	protected KEY customInstallKey(KEY key) {
+	protected K customInstallKey(K key) {
 		return key;
 	}
 
@@ -296,7 +294,7 @@ public abstract class AbstractHashData<KEY, VALUE> implements Emuable {
 	 *
 	 * @param key Schlüssel des neuen Eintrags.
 	 * @return Wert des neuen Eintrags. */
-	protected VALUE customInstallValue(KEY key) {
+	protected V customInstallValue(K key) {
 		return null;
 	}
 
@@ -321,7 +319,7 @@ public abstract class AbstractHashData<KEY, VALUE> implements Emuable {
 	 *
 	 * @param key Schlüssel des Eintrags.
 	 * @return Index des gefundenen oder erzeugten Eintrags. */
-	protected final int installImpl(KEY key) {
+	protected final int installImpl(K key) {
 		var count = this.count;
 		var index = this.putIndexImpl(key);
 		if (count == this.count) {
@@ -343,8 +341,8 @@ public abstract class AbstractHashData<KEY, VALUE> implements Emuable {
 	 * @param installKey Methode zur Überführung des gegebenen Schlüssels in den einzutragenden Schlüssel.
 	 * @param installValue Methode zur Überführung des einzutragenden Schlüssels in den einzutragenden Wert.
 	 * @return Index des gefundenen oder erzeugten Eintrags. */
-	protected final <KEY2 extends KEY, KEY3 extends KEY> int installImpl(KEY3 key, Getter<? super KEY3, ? extends KEY2> installKey,
-		Getter<? super KEY2, ? extends VALUE> installValue) {
+	protected final <KEY2 extends K, KEY3 extends K> int installImpl(KEY3 key, Getter<? super KEY3, ? extends KEY2> installKey,
+		Getter<? super KEY2, ? extends V> installValue) {
 		var count = this.count;
 		var index = this.putIndexImpl(key);
 		if (count == this.count) return index;
@@ -355,7 +353,7 @@ public abstract class AbstractHashData<KEY, VALUE> implements Emuable {
 		return index;
 	}
 
-	protected final <KEY2 extends KEY> VALUE updateImpl(KEY2 key2, Getter<? super KEY2, ? extends KEY2> installKey, Reducer<? super KEY, VALUE> updateValue) {
+	protected final <KEY2 extends K> V updateImpl(KEY2 key2, Getter<? super KEY2, ? extends KEY2> installKey, Reducer<? super K, V> updateValue) {
 		var index = this.getIndexImpl(key2);
 		if (index < 0) {
 			key2 = installKey.get(key2);
@@ -471,7 +469,7 @@ public abstract class AbstractHashData<KEY, VALUE> implements Emuable {
 	 * @see Map#get(Object)
 	 * @param key Schlüssel des Eintrags.
 	 * @return Wert des gefundenen Eintrags oder {@code null}. */
-	protected final VALUE getImpl(Object key) {
+	protected final V getImpl(Object key) {
 		var entryIndex = this.getIndexImpl(key);
 		return entryIndex < 0 ? null : this.customGetValue(entryIndex);
 	}
@@ -485,6 +483,18 @@ public abstract class AbstractHashData<KEY, VALUE> implements Emuable {
 		return this.getIndexImpl2(key, this.customHash(key));
 	}
 
+	/** Diese Methode sucht den Eintrag mit dem gegebenen Schlüssel und gibt nur dann {@code false} zurück, wenn ein solcher Eintrag existiert. Wenn kein solcher
+	 * Eintrag existierte, wird er erzeugt und {@code true} geliefert.
+	 *
+	 * @see Set#add(Object)
+	 * @param key Schlüssel des Eintrags.
+	 * @return {@code true}, wenn der Eintrag erzeugt wurde. */
+	protected final boolean putKeyImpl(K key) {
+		var count = this.count;
+		this.putIndexImpl(key);
+		return count != this.count;
+	}
+
 	/** Diese Methode sucht den Eintrag mit dem gegebenen Schlüssel, setzt dessen Wert und gibt seinen vorherigen Wert zurück. Wenn kein solcher Eintrag
 	 * existierte, wird {@code null} geliefert.
 	 *
@@ -492,28 +502,19 @@ public abstract class AbstractHashData<KEY, VALUE> implements Emuable {
 	 * @param key Schlüssel des Eintrags.
 	 * @param value neuer Wert des Eintrags.
 	 * @return alert Wert des gefundenen Eintrags oder {@code null}. */
-	protected final VALUE putImpl(KEY key, VALUE value) {
-		var entryIndex = this.putIndexImpl(key);
-		return this.customSetValue(entryIndex, value);
-	}
-
-	/** Diese Methode sucht den Eintrag mit dem gegebenen Schlüssel und gibt nur dann {@code false} zurück, wenn ein solcher Eintrag existiert. Wenn kein solcher
-	 * Eintrag existierte, wird er erzeugt und {@code true} geliefert.
-	 *
-	 * @see Set#add(Object)
-	 * @param key Schlüssel des Eintrags.
-	 * @return {@code true}, wenn der Eintrag erzeugt wurde. */
-	protected final boolean putKeyImpl(KEY key) {
+	protected final V putValueImpl(K key, V value) {
 		var count = this.count;
-		this.putIndexImpl(key);
-		return count != this.count;
+		var index = this.putIndexImpl(key);
+		var result = count != this.count ? null : this.customGetValue(index);
+		this.customSetValue(index, value);
+		return result;
 	}
 
 	/** Diese Methode sucht den Eintrag mit dem gegebenen Schlüssel und gibt dessen Position zurück. Wenn kein solcher Eintrag existiert, wird er erzeugt.
 	 *
 	 * @param key Schlüssel des Eintrags.
 	 * @return Index des gefundenen oder erzeugten Eintrags. */
-	protected final int putIndexImpl(KEY key) {
+	protected final int putIndexImpl(K key) {
 		var keyHash = this.customHash(key);
 		var result = this.getIndexImpl2(key, keyHash);
 		if (result >= 0) return result;
@@ -533,7 +534,7 @@ public abstract class AbstractHashData<KEY, VALUE> implements Emuable {
 	 * @see Map#remove(Object)
 	 * @param key Schlüssel.
 	 * @return Wert oder {@code null}. */
-	protected final VALUE popImpl(Object key) {
+	protected final V popImpl(Object key) {
 		var entryIndex = this.popIndexImpl(key);
 		if (entryIndex < 0) return null;
 		var result = this.customGetValue(entryIndex);
@@ -604,7 +605,7 @@ public abstract class AbstractHashData<KEY, VALUE> implements Emuable {
 	}
 
 	/** Diese Methode entfernt den Eintrag mit dem gegebenen Schlüssel sowie dem gegebenen Wert und liefet nur dann {@code true}, wenn dieser zuvor über
-	 * {@link #putImpl(Object, Object)} hinzugefügt wurde.
+	 * {@link #putValueImpl(Object, Object)} hinzugefügt wurde.
 	 *
 	 * @param key Schlüssel des Eintrags.
 	 * @param value Wert des Eintrags.
@@ -651,49 +652,49 @@ public abstract class AbstractHashData<KEY, VALUE> implements Emuable {
 	/** Diese Methode gibt das {@link Set} der Schlüssel zurück.
 	 *
 	 * @return Schlüssel. */
-	protected final Keys<KEY> newKeysImpl() {
+	protected final Keys<K> newKeysImpl() {
 		return new Keys<>(this);
 	}
 
 	/** Diese Methode gibt den {@link Iterator} über die Schlüssel zurück.
 	 *
 	 * @return Interator für {@link #newKeysImpl()}. */
-	protected final KeysIterator<KEY, VALUE> newKeysIteratorImpl() {
+	protected final KeysIterator<K, V> newKeysIteratorImpl() {
 		return new KeysIterator<>(this);
 	}
 
 	/** Diese Methode gibt die {@link Collection} der Werte zurück.
 	 *
 	 * @return Werte. */
-	protected final Values<VALUE> newValuesImpl() {
+	protected final Values<V> newValuesImpl() {
 		return new Values<>(this);
 	}
 
 	/** Diese Methode gibt den {@link Iterator} über die Werte zurück.
 	 *
 	 * @return Interator für {@link #newValuesImpl()}. */
-	protected final ValuesIterator<KEY, VALUE> newValuesIteratorImpl() {
+	protected final ValuesIterator<K, V> newValuesIteratorImpl() {
 		return new ValuesIterator<>(this);
 	}
 
 	/** Diese Methode gibt das {@link Set} der Einträge zurück.
 	 *
 	 * @return Einträge. */
-	protected final Entries<KEY, VALUE> newEntriesImpl() {
+	protected final Entries<K, V> newEntriesImpl() {
 		return new Entries<>(this);
 	}
 
 	/** Diese Methode gibt den {@link Iterator} über die Einträge zurück.
 	 *
 	 * @return Interator für {@link #newEntriesImpl()}. */
-	protected final EntriesIterator<KEY, VALUE> newEntriesIteratorImpl() {
+	protected final EntriesIterator<K, V> newEntriesIteratorImpl() {
 		return new EntriesIterator<>(this);
 	}
 
 	/** Diese Methode gibt die {@link Map} zu den Schlüsseln und Werten zurück.
 	 *
 	 * @return Abbildung. */
-	protected final Mapping<KEY, VALUE> newMappingImpl() {
+	protected final Mapping<K, V> newMappingImpl() {
 		return new Mapping<>(this);
 	}
 
@@ -708,10 +709,10 @@ public abstract class AbstractHashData<KEY, VALUE> implements Emuable {
 	}
 
 	@Override
-	protected AbstractHashData<KEY, VALUE> clone() {
+	protected AbstractHashData<K, V> clone() {
 		try {
 			@SuppressWarnings ("unchecked")
-			var result = (AbstractHashData<KEY, VALUE>)super.clone();
+			var result = (AbstractHashData<K, V>)super.clone();
 			if (this.capacityImpl() == 0) return result;
 			result.table = this.table.clone();
 			result.nexts = this.nexts.clone();
@@ -741,7 +742,9 @@ public abstract class AbstractHashData<KEY, VALUE> implements Emuable {
 
 		@Override
 		public GValue setValue(GValue value) {
-			return this.entryData.customSetValue(this.entryIndex, value);
+			var result = this.entryData.customGetValue(this.entryIndex);
+			this.entryData.customSetValue(this.entryIndex, value);
+			return result;
 		}
 
 		@Override
@@ -1102,7 +1105,7 @@ public abstract class AbstractHashData<KEY, VALUE> implements Emuable {
 
 		@Override
 		public GValue put(GKey key, GValue value) {
-			return this.entryData.putImpl(key, value);
+			return this.entryData.putValueImpl(key, value);
 		}
 
 		@Override
@@ -1164,7 +1167,7 @@ public abstract class AbstractHashData<KEY, VALUE> implements Emuable {
 		return -1;
 	}
 
-	private int putIndexImpl2(KEY key, int keyHash) {
+	private int putIndexImpl2(K key, int keyHash) {
 		var table = this.table;
 		var nexts = this.nexts;
 		var index = keyHash & (table.length - 1);

@@ -151,8 +151,7 @@ public abstract class AbstractHashSet<E> extends AbstractHashData<E, E> implemen
 	}
 
 	@Override
-	protected E customSetValue(int entryIndex, E value) {
-		return null;
+	protected void customSetValue(int entryIndex, E value) {
 	}
 
 }

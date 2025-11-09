@@ -1,11 +1,11 @@
 package bee.creative.util;
 
+import static bee.creative.lang.Objects.notNull;
 import static bee.creative.util.Getters.emptyGetter;
 import static bee.creative.util.Getters.neutralGetter;
 import static bee.creative.util.Hashers.naturalHasher;
 import java.util.Map;
 import bee.creative.emu.EMU;
-import bee.creative.lang.Objects;
 
 /** Diese Klasse erweitert eine {@link HashMap} um einen Streuwertpuffer mit geringem {@link AbstractHashData Speicherverbrauch}, analog zu
  * {@link java.util.HashMap}. Der Speicerverbrauch liegt bei ca. 56 % (20 Byte je {@link #capacity() reservierten} Eintrag) von dem, den eine
@@ -16,51 +16,53 @@ import bee.creative.lang.Objects;
  * @param <V> Typ der Werte. */
 public class HashMap2<K, V> extends HashMap<K, V> {
 
-	/** Diese Methode ist eine Abkürzung für {@link #hashMapFrom(Hasher, Getter, Getter, Setter) HashMap2.from(hasher, Getters.neutral(), installValue, null)}. */
+	/** Diese Methode ist eine Abkürzung für {@link #hashMapFrom(Hasher, Getter, Getter, Setter) hashMapFrom(naturalHasher(), neutralGetter(), installValue,
+	 * null)}. */
 	public static <K, V> HashMap2<K, V> hashMapFrom(Getter<? super K, ? extends V> installValue) throws NullPointerException {
 		return hashMapFrom(naturalHasher(), neutralGetter(), installValue, null);
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@link #hashMapFrom(Hasher, Getter, Getter, Setter) hashMapFrom(naturalHasher(), neutralGetter(), installValue,
+	 * reuseEntry)}. */
 	public static <K, V> HashMap2<K, V> hashMapFrom(Getter<? super K, ? extends V> installValue, Setter<? super K, ? super V> reuseEntry)
 		throws NullPointerException {
 		return hashMapFrom(naturalHasher(), neutralGetter(), installValue, reuseEntry);
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@link #hashMapFrom(Hasher, Getter, Getter, Setter) hashMapFrom(naturalHasher(), installKey, installValue, null)}. */
 	public static <K, V> HashMap2<K, V> hashMapFrom(Getter<? super K, ? extends K> installKey, Getter<? super K, ? extends V> installValue)
 		throws NullPointerException {
 		return hashMapFrom(naturalHasher(), installKey, installValue, null);
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@link #hashMapFrom(Hasher, Getter, Getter, Setter) hashMapFrom(naturalHasher(), installKey, installValue,
+	 * reuseEntry)}. */
 	public static <K, V> HashMap2<K, V> hashMapFrom(Getter<? super K, ? extends K> installKey, Getter<? super K, ? extends V> installValue,
 		Setter<? super K, ? super V> reuseEntry) throws NullPointerException {
 		return hashMapFrom(naturalHasher(), installKey, installValue, reuseEntry);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #hashMapFrom(Hasher, Getter, Getter, Setter) HashMap2.from(hasher, Getters.neutral(), Getters.empty(),
-	 * null)}. */
+	/** Diese Methode ist eine Abkürzung für {@link #hashMapFrom(Hasher, Getter, Getter, Setter) hashMapFrom(hasher, neutralGetter(), emptyGetter(), null)}. */
 	public static <K, V> HashMap2<K, V> hashMapFrom(Hasher hasher) throws NullPointerException {
-		return HashMap2.hashMapFrom(hasher, neutralGetter(), emptyGetter(), null);
+		return hashMapFrom(hasher, neutralGetter(), emptyGetter(), null);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #hashMapFrom(Hasher, Getter, Getter, Setter) HashMap2.from(hasher, Getters.neutral(), installValue, null)}. */
+	/** Diese Methode ist eine Abkürzung für {@link #hashMapFrom(Hasher, Getter, Getter, Setter) hashMapFrom(hasher, neutralGetter(), installValue, null)}. */
 	public static <K, V> HashMap2<K, V> hashMapFrom(Hasher hasher, Getter<? super K, ? extends V> installValue) throws NullPointerException {
-		return HashMap2.hashMapFrom(hasher, neutralGetter(), installValue, null);
+		return hashMapFrom(hasher, neutralGetter(), installValue, null);
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@link #hashMapFrom(Hasher, Getter, Getter, Setter) hashMapFrom(hasher, neutralGetter(), installValue,
+	 * reuseEntry)}. */
 	public static <K, V> HashMap2<K, V> hashMapFrom(Hasher hasher, Getter<? super K, ? extends V> installValue, Setter<? super K, ? super V> reuseEntry)
 		throws NullPointerException {
 		return hashMapFrom(hasher, neutralGetter(), installValue, reuseEntry);
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@link #hashMapFrom(Hasher, Getter, Getter, Setter) hashMapFrom(hasher, installKey, installValue, null)}. */
 	public static <K, V> HashMap2<K, V> hashMapFrom(Hasher hasher, Getter<? super K, ? extends K> installKey, Getter<? super K, ? extends V> installValue)
 		throws NullPointerException {
 		return hashMapFrom(hasher, installKey, installValue, null);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link #hashMapFrom(Hasher, Getter, Getter, Setter) HashMap2.from(hasher, Getters.neutral(), installAndReuseValue,
-	 * installAndReuseValue)}. */
-	public static <K, V> HashMap2<K, V> hashMapFrom(Hasher hasher, Field<? super K, V> installAndReuseValue) throws NullPointerException {
-		return HashMap2.hashMapFrom(hasher, neutralGetter(), installAndReuseValue, installAndReuseValue);
 	}
 
 	/** Diese Methode liefert eine neue {@link HashMap2}, welche Streuwert, Äquivalenz, Installation und Wiederverwendung von Schlüsseln, Werten bzw. Einträgen an
@@ -72,12 +74,10 @@ public class HashMap2<K, V> extends HashMap<K, V> {
 	 * @param reuseEntry Methode zur Anzeige der {@link #customReuseEntry(int) Wiederverwendung} des Eintrags oder {@code null}. */
 	public static <K, V> HashMap2<K, V> hashMapFrom(Hasher hasher, Getter<? super K, ? extends K> installKey, Getter<? super K, ? extends V> installValue,
 		Setter<? super K, ? super V> reuseEntry) throws NullPointerException {
-		Objects.notNull(hasher);
-		Objects.notNull(installKey);
-		Objects.notNull(installValue);
+		notNull(hasher);
+		notNull(installKey);
+		notNull(installValue);
 		return new HashMap2<>() {
-
-			private static final long serialVersionUID = 2518756984792880994L;
 
 			@Override
 			protected int customHash(Object key) {
@@ -104,6 +104,8 @@ public class HashMap2<K, V> extends HashMap<K, V> {
 				if (reuseEntry == null) return;
 				reuseEntry.set(this.customGetKey(entryIndex), this.customGetValue(entryIndex));
 			}
+
+			private static final long serialVersionUID = 2518756984792880994L;
 
 		};
 	}

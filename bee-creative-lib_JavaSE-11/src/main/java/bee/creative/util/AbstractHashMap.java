@@ -112,7 +112,7 @@ public abstract class AbstractHashMap<K, V> extends AbstractHashData<K, V> imple
 
 	@Override
 	public V put(K key, V value) {
-		return this.putImpl(key, value);
+		return this.putValueImpl(key, value);
 	}
 
 	@Override

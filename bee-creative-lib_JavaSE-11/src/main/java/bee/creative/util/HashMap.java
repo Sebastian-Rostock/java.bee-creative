@@ -69,12 +69,8 @@ public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> impleme
 	}
 
 	@Override
-	@SuppressWarnings ("unchecked")
-	protected GValue customSetValue(final int entryIndex, final GValue value) {
-		final Object[] values = this.values;
-		final Object result = values[entryIndex];
-		values[entryIndex] = value;
-		return (GValue)result;
+	protected void customSetValue(final int entryIndex, final GValue value) {
+		this.values[entryIndex] = value;
 	}
 
 	@Override
@@ -136,7 +132,7 @@ public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> impleme
 		for (int i = 0; i < count; i++) {
 			final Object key = stream.readObject();
 			final Object value = stream.readObject();
-			this.putImpl((GKey)key, (GValue)value);
+			this.putValueImpl((GKey)key, (GValue)value);
 		}
 	}
 
