@@ -10,49 +10,6 @@ import java.util.Iterator;
  * @param <D> Typ des Inhalts. */
 public abstract class AbstractProxyCollection<E, D extends Collection<E>> implements Collection2<E> {
 
-	final class Iter extends AbstractIterator<E> {
-
-		final D data;
-
-		final Iterator<E> iter;
-
-		Iter() {
-			this.data = AbstractProxyCollection.this.getData(false);
-			this.iter = this.data.iterator();
-		}
-
-		@Override
-		public boolean hasNext() {
-			return this.iter.hasNext();
-		}
-
-		@Override
-		public E next() {
-			return this.iter.next();
-		}
-
-		@Override
-		public void remove() {
-			this.iter.remove();
-			AbstractProxyCollection.this.setData(this.data);
-		}
-
-	}
-
-	/** Diese Methode gibt den Inhalt zum Lesen bzw. Schreiben zurück. Zum Lesen wird er nur in {@link #size()}, {@link #isEmpty()}, {@link #contains(Object)},
-	 * {@link #containsAll(Collection)}, {@link #equals(Object)}, {@link #hashCode()}, {@link #iterator()}, {@link #toArray()}, {@link #toArray(Object[])} und
-	 * {@link #toString()} angefordert.
-	 *
-	 * @param readonly {@code true}, wenn der Inhalt nur zum Lesen verwendet wird und eine Kopie damit nicht nötig ist.<br>
-	 *        {@code false}, wenn der Inhalt verändert werden könnte und daher ggf. eine Kopie nötig ist.
-	 * @return Inhalt. */
-	protected abstract D getData(boolean readonly);
-
-	/** Diese Methode setzt den Inhalt. Dieser wurde zuvor über {@link #getData(boolean)} zum Schreiben beschafft und anschließend verändert.
-	 *
-	 * @param items neuer Inhalt. */
-	protected abstract void setData(D items);
-
 	@Override
 	public int size() {
 		return this.getData(true).size();
@@ -148,6 +105,49 @@ public abstract class AbstractProxyCollection<E, D extends Collection<E>> implem
 	@Override
 	public String toString() {
 		return this.getData(true).toString();
+	}
+
+	/** Diese Methode gibt den Inhalt zum Lesen bzw. Schreiben zurück. Zum Lesen wird er nur in {@link #size()}, {@link #isEmpty()}, {@link #contains(Object)},
+	 * {@link #containsAll(Collection)}, {@link #equals(Object)}, {@link #hashCode()}, {@link #iterator()}, {@link #toArray()}, {@link #toArray(Object[])} und
+	 * {@link #toString()} angefordert.
+	 *
+	 * @param readonly {@code true}, wenn der Inhalt nur zum Lesen verwendet wird und eine Kopie damit nicht nötig ist.<br>
+	 *        {@code false}, wenn der Inhalt verändert werden könnte und daher ggf. eine Kopie nötig ist.
+	 * @return Inhalt. */
+	protected abstract D getData(boolean readonly);
+
+	/** Diese Methode setzt den Inhalt. Dieser wurde zuvor über {@link #getData(boolean)} zum Schreiben beschafft und anschließend verändert.
+	 *
+	 * @param items neuer Inhalt. */
+	protected abstract void setData(D items);
+
+	final class Iter extends AbstractIterator<E> {
+
+		@Override
+		public boolean hasNext() {
+			return this.iter.hasNext();
+		}
+
+		@Override
+		public E next() {
+			return this.iter.next();
+		}
+
+		@Override
+		public void remove() {
+			this.iter.remove();
+			AbstractProxyCollection.this.setData(this.data);
+		}
+
+		final D data;
+
+		final Iterator<E> iter;
+
+		Iter() {
+			this.data = AbstractProxyCollection.this.getData(false);
+			this.iter = this.data.iterator();
+		}
+
 	}
 
 }

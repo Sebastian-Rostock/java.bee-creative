@@ -1,5 +1,6 @@
 package bee.creative.util;
 
+import static bee.creative.util.Iterators.iteratorFrom;
 import java.util.Collection;
 import java.util.List;
 import java.util.ListIterator;
@@ -7,9 +8,9 @@ import java.util.ListIterator;
 /** Diese Klasse implementiert eine abstrakte {@link List2} als Platzhalter. Ihren Inhalt liest sie über {@link #getData(boolean)}. Änderungen am Inhalt werden
  * über {@link #setData(List)} geschrieben.
  *
- * @param <GItem> Typ der Elemente.
- * @param <GData> Typ des Inhalts. */
-public abstract class AbstractProxyList<GItem, GData extends List<GItem>> extends AbstractList2<GItem> {
+ * @param <E> Typ der Elemente.
+ * @param <D> Typ des Inhalts. */
+public abstract class AbstractProxyList<E, D extends List<E>> extends AbstractList2<E> {
 
 	@Override
 	public int size() {
@@ -22,12 +23,12 @@ public abstract class AbstractProxyList<GItem, GData extends List<GItem>> extend
 	}
 
 	@Override
-	public GItem get(int index) {
+	public E get(int index) {
 		return this.getData(true).get(index);
 	}
 
 	@Override
-	public GItem set(int index, GItem e) {
+	public E set(int index, E e) {
 		var data = this.getData(false);
 		var result = data.set(index, e);
 		this.setData(data);
@@ -35,7 +36,7 @@ public abstract class AbstractProxyList<GItem, GData extends List<GItem>> extend
 	}
 
 	@Override
-	public boolean add(GItem e) {
+	public boolean add(E e) {
 		var data = this.getData(false);
 		if (!data.add(e)) return false;
 		this.setData(data);
@@ -43,14 +44,14 @@ public abstract class AbstractProxyList<GItem, GData extends List<GItem>> extend
 	}
 
 	@Override
-	public void add(int index, GItem c) {
+	public void add(int index, E c) {
 		var data = this.getData(false);
 		data.add(index, c);
 		this.setData(data);
 	}
 
 	@Override
-	public boolean addAll(Collection<? extends GItem> c) {
+	public boolean addAll(Collection<? extends E> c) {
 		var data = this.getData(false);
 		if (!data.addAll(c)) return false;
 		this.setData(data);
@@ -58,7 +59,7 @@ public abstract class AbstractProxyList<GItem, GData extends List<GItem>> extend
 	}
 
 	@Override
-	public boolean addAll(int index, Collection<? extends GItem> c) {
+	public boolean addAll(int index, Collection<? extends E> c) {
 		var data = this.getData(false);
 		if (!data.addAll(index, c)) return false;
 		this.setData(data);
@@ -66,7 +67,7 @@ public abstract class AbstractProxyList<GItem, GData extends List<GItem>> extend
 	}
 
 	@Override
-	public GItem remove(int index) {
+	public E remove(int index) {
 		var data = this.getData(false);
 		var result = data.remove(index);
 		this.setData(data);
@@ -118,7 +119,7 @@ public abstract class AbstractProxyList<GItem, GData extends List<GItem>> extend
 	}
 
 	@Override
-	public ListIterator<GItem> listIterator(int index) {
+	public ListIterator<E> listIterator(int index) {
 		return new Iter(index);
 	}
 
@@ -140,8 +141,8 @@ public abstract class AbstractProxyList<GItem, GData extends List<GItem>> extend
 	}
 
 	@Override
-	public Iterator2<GItem> iterator() {
-		return Iterators.iteratorFrom(this.listIterator(0));
+	public Iterator2<E> iterator() {
+		return iteratorFrom(this.listIterator(0));
 	}
 
 	@Override
@@ -174,18 +175,18 @@ public abstract class AbstractProxyList<GItem, GData extends List<GItem>> extend
 	 * @param readonly {@code true}, wenn der Inhalt nur zum Lesen verwendet wird und eine Kopie damit nicht nötig ist.<br>
 	 *        {@code false}, wenn der Inhalt verändert werden könnte und daher ggf. eine Kopie nötig ist.
 	 * @return Inhalt. */
-	protected abstract GData getData(boolean readonly);
+	protected abstract D getData(boolean readonly);
 
 	/** Diese Methode setzt den Inhalt. Dieser wurde zuvor über {@link #getData(boolean)} zum Schreiben beschafft und anschließend verändert.
 	 *
 	 * @param items neuer Inhalt. */
-	protected abstract void setData(GData items);
+	protected abstract void setData(D items);
 
-	class Iter implements ListIterator<GItem> {
+	class Iter implements ListIterator<E> {
 
-		final GData data;
+		final D data;
 
-		final ListIterator<GItem> iter;
+		final ListIterator<E> iter;
 
 		Iter(int index) {
 			this.data = AbstractProxyList.this.getData(false);
@@ -198,7 +199,7 @@ public abstract class AbstractProxyList<GItem, GData extends List<GItem>> extend
 		}
 
 		@Override
-		public GItem next() {
+		public E next() {
 			return this.iter.next();
 		}
 
@@ -208,7 +209,7 @@ public abstract class AbstractProxyList<GItem, GData extends List<GItem>> extend
 		}
 
 		@Override
-		public GItem previous() {
+		public E previous() {
 			return this.iter.previous();
 		}
 
@@ -229,13 +230,13 @@ public abstract class AbstractProxyList<GItem, GData extends List<GItem>> extend
 		}
 
 		@Override
-		public void set(GItem e) {
+		public void set(E e) {
 			this.iter.set(e);
 			AbstractProxyList.this.setData(this.data);
 		}
 
 		@Override
-		public void add(GItem e) {
+		public void add(E e) {
 			this.iter.add(e);
 			AbstractProxyList.this.setData(this.data);
 		}
