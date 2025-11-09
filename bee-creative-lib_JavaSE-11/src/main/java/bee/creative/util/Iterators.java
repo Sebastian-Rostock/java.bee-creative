@@ -158,7 +158,7 @@ public class Iterators {
 		public UniqueIterator(final Iterator<? extends GItem> that, final Collection<? super GItem> buffer) throws NullPointerException {
 			this.that = Objects.notNull(that);
 			this.buffer = Objects.notNull(buffer);
-			this.helper = Iterators.filter(that, Filters.filterFromItems(buffer).negate());
+			this.helper = Iterators.filteredIterator(that, Filters.filterFromItems(buffer).negate());
 		}
 
 		@Override
@@ -581,14 +581,14 @@ public class Iterators {
 
 	/** Diese Methode liefert den {@link EmptyIterator}. */
 	@SuppressWarnings ("unchecked")
-	public static <GItem> Iterator2<GItem> empty() {
+	public static <GItem> Iterator2<GItem> emptyIterator() {
 		return (Iterator2<GItem>)EmptyIterator.INSTANCE;
 	}
 
 	/** Diese Methode liefert den gegebenen {@link Iterator} als {@link Iterator2}. Wenn er {@code null} ist, wird der {@link EmptyIterator} geliefert. */
 	@SuppressWarnings ("unchecked")
 	public static <GItem> Iterator2<GItem> iteratorFrom(final Iterator<? extends GItem> that) {
-		if (that == null) return Iterators.empty();
+		if (that == null) return Iterators.emptyIterator();
 		if (that instanceof Iterator2<?>) return (Iterator2<GItem>)that;
 		return Iterators.translatedIterator(that, neutralGetter());
 	}
@@ -600,7 +600,7 @@ public class Iterators {
 
 	/** Diese Methode ist eine Abkürzung für {@link UniformIterator new UniformIterator<>(item, count)}. */
 	public static <GItem> Iterator2<GItem> fromItem(final GItem item, final int count) throws IllegalArgumentException {
-		if (count == 0) return Iterators.empty();
+		if (count == 0) return Iterators.emptyIterator();
 		return new UniformIterator<>(item, count);
 	}
 
@@ -674,7 +674,7 @@ public class Iterators {
 	 *
 	 * @see Collection#retainAll(Collection) */
 	public static boolean retainAll(final Iterator<?> target, final Collection<?> filter) throws NullPointerException {
-		return Iterators.removeAll(Iterators.filter(target, Filters.filterFromItems(filter).negate()));
+		return Iterators.removeAll(Iterators.filteredIterator(target, Filters.filterFromItems(filter).negate()));
 	}
 
 	/** Diese Methode entfernt alle Elemente der gegebenen {@link Collection}, die nicht im gegebenen {@link Iterator} vorkommen, und gibt nur dann {@code true}
@@ -705,7 +705,7 @@ public class Iterators {
 	 *
 	 * @see Collection#removeAll(Collection) */
 	public static boolean removeAll(final Iterator<?> target, final Collection<?> filter) throws NullPointerException {
-		return Iterators.removeAll(Iterators.filter(target, Filters.filterFromItems(filter)));
+		return Iterators.removeAll(Iterators.filteredIterator(target, Filters.filterFromItems(filter)));
 	}
 
 	/** Diese Methode entfernt alle Elemente des gegebenen {@link Iterator} aus der gegebenen {@link Collection} und gibt nur dann {@code true} zurück, wenn
@@ -742,7 +742,7 @@ public class Iterators {
 	/** Diese Methode ist eine Abkürzung für {@link #concatAll(Iterator) Iterators.concatAll(Iterators.fromArray(iter1, iter2))}.
 	 *
 	 * @see #iteratorFromArray(Object...) */
-	public static <GItem> Iterator2<GItem> concat(final Iterator<? extends GItem> iter1, final Iterator<? extends GItem> iter2) {
+	public static <GItem> Iterator2<GItem> concatIterator(final Iterator<? extends GItem> iter1, final Iterator<? extends GItem> iter2) {
 		return Iterators.concatAll(Iterators.iteratorFromArray(iter1, iter2));
 	}
 
@@ -760,11 +760,11 @@ public class Iterators {
 	/** Diese Methode liefert einen {@link Iterator2}, welcher die aufsteigend geordnete Vereinigung der Elemente der gegebenen Iteratoren liefert und welcher das
 	 * Entfernen von Elementen nicht unterstützt. Die gegebenen Iteratoren müssen ihre Elemente dazu aufsteigend bezüglich einer gegebenen Ordnung liefern.
 	 *
-	 * @see #empty()
+	 * @see #emptyIterator()
 	 * @see #union(Comparator, Iterator, Iterator) */
 	public static <GItem> Iterator2<GItem> unionAll(final Comparator<? super GItem> order, final Iterator<? extends Iterator<? extends GItem>> iters)
 		throws NullPointerException {
-		if (!iters.hasNext()) return Iterators.empty();
+		if (!iters.hasNext()) return Iterators.emptyIterator();
 		Iterator2<GItem> result = Iterators.iteratorFrom(iters.next());
 		while (iters.hasNext()) {
 			result = Iterators.union(order, result, iters.next());
@@ -787,11 +787,11 @@ public class Iterators {
 	/** Diese Methode liefert einen {@link Iterator2}, welcher den aufsteigend geordneten Schnitt der Elemente der gegebenen Iteratoren liefert und welcher das
 	 * Entfernen von Elementen nicht unterstützt. Die gegebenen Iteratoren müssen ihre Elemente dazu aufsteigend bezüglich einer gegebenen Ordnung liefern.
 	 *
-	 * @see #empty()
+	 * @see #emptyIterator()
 	 * @see #intersect(Comparator, Iterator, Iterator) */
 	public static <GItem> Iterator2<GItem> intersectAll(final Comparator<? super GItem> order, final Iterator<? extends Iterator<? extends GItem>> iters)
 		throws NullPointerException {
-		if (!iters.hasNext()) return Iterators.empty();
+		if (!iters.hasNext()) return Iterators.emptyIterator();
 		Iterator2<GItem> result = Iterators.iteratorFrom(iters.next());
 		while (iters.hasNext()) {
 			result = Iterators.intersect(order, result, iters.next());
@@ -805,7 +805,7 @@ public class Iterators {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link FilteredIterator new FilteredIterator<>(that, filter)}. */
-	public static <GItem> Iterator2<GItem> filter(final Iterator<? extends GItem> that, final Filter<? super GItem> filter) throws NullPointerException {
+	public static <GItem> Iterator2<GItem> filteredIterator(final Iterator<? extends GItem> that, final Filter<? super GItem> filter) throws NullPointerException {
 		return new FilteredIterator<>(that, filter);
 	}
 

@@ -18,7 +18,7 @@ import bee.creative.util.Iterators.UnmodifiableIterator;
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Iterables {
 
-	/** Diese Klasse implementiert das {@link Iterable2} zu {@link Iterators#empty()}. */
+	/** Diese Klasse implementiert das {@link Iterable2} zu {@link Iterators#emptyIterator()}. */
 	public static class EmptyIterable extends AbstractIterable<Object> {
 
 		public static final Iterable<?> INSTANCE = new EmptyIterable();
@@ -154,7 +154,7 @@ public class Iterables {
 
 	}
 
-	/** Diese Klasse implementiert das {@link Iterable2} zu {@link Iterators#filter(Iterator, Filter)}.
+	/** Diese Klasse implementiert das {@link Iterable2} zu {@link Iterators#filteredIterator(Iterator, Filter)}.
 	 *
 	 * @param <GItem> Typ der Elemente. */
 	public static class FilteredIterable<GItem> extends AbstractIterable<GItem> {
@@ -170,7 +170,7 @@ public class Iterables {
 
 		@Override
 		public Iterator2<GItem> iterator() {
-			return Iterators.filter(this.that.iterator(), this.filter);
+			return Iterators.filteredIterator(this.that.iterator(), this.filter);
 		}
 
 		@Override

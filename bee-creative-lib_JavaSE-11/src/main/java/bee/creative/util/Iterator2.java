@@ -11,9 +11,9 @@ import java.util.Set;
  * @param <E> Typ der Elemente. */
 public interface Iterator2<E> extends Iterator<E> {
 
-	/** Diese Methode ist eine Abkürzung für {@link Iterators#concat(Iterator, Iterator) Iterators.concat(this, that)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Iterators#concatIterator(Iterator, Iterator) Iterators.concat(this, that)}. */
 	default Iterator2<E> concat(Iterator<? extends E> that) throws NullPointerException {
-		return Iterators.concat(this, that);
+		return Iterators.concatIterator(this, that);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Iterators#retainAll(Iterator, Collection) Iterators.retainAll(this, filter)}. */
@@ -31,9 +31,9 @@ public interface Iterator2<E> extends Iterator<E> {
 		return Iterators.skip(this, count);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Iterators#filter(Iterator, Filter) Iterators.filter(this, filter)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Iterators#filteredIterator(Iterator, Filter) Iterators.filter(this, filter)}. */
 	default Iterator2<E> filter(Filter<? super E> filter) throws NullPointerException {
-		return Iterators.filter(this, filter);
+		return Iterators.filteredIterator(this, filter);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Iterators#limit(Iterator, int) Iterators.limit(this, count)}. */

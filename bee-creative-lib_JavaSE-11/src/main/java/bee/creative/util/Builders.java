@@ -17,7 +17,7 @@ import bee.creative.lang.Objects;
 import bee.creative.util.Collections.CartesianSet;
 import bee.creative.util.Collections.ConcatList;
 import bee.creative.util.Collections.IntersectSet;
-import bee.creative.util.Collections.ReverseList;
+import bee.creative.util.Collections.ReversedList;
 import bee.creative.util.Collections.TranslatedList;
 import bee.creative.util.Collections.TranslatedSet;
 import bee.creative.util.Collections.UnionSet;
@@ -418,7 +418,7 @@ public class Builders {
 		@Override
 		public Iterator2<GValue> iterator() {
 			var result = this.get();
-			if (result == null) return Iterators.empty();
+			if (result == null) return Iterators.emptyIterator();
 			return Iterators.fromItem(result);
 		}
 
@@ -654,7 +654,7 @@ public class Builders {
 
 		/** Diese Methode gibt einen neuen {@link ListBuilder} für die rückwärts geordnete {@link #get() Liste} zurück.
 		 *
-		 * @return neuer {@link ListBuilder} zur {@link ReverseList}. */
+		 * @return neuer {@link ListBuilder} zur {@link ReversedList}. */
 		public ItemListBuilder<GItem> toReverse() {
 			return ListBuilder.from(bee.creative.util.Collections.reversedList(this.get()));
 		}
@@ -664,7 +664,7 @@ public class Builders {
 		 * @param items zweite Liste.
 		 * @return neuer {@link ListBuilder} zur {@link ConcatList}. */
 		public ItemListBuilder<GItem> toChained(List<GItem> items) {
-			return ListBuilder.from(bee.creative.util.Collections.concatList(this.get(), items));
+			return ListBuilder.from(bee.creative.util.Collections.concatList(this.get(), items, true));
 		}
 
 		/** Diese Methode gibt einen neuen {@link ListBuilder} für die Verkettung dieser {@link #get() Liste} mit der gegebenen zurück.

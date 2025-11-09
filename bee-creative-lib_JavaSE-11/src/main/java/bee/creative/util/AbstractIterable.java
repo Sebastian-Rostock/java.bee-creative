@@ -11,7 +11,7 @@ public abstract class AbstractIterable<GItem> extends BaseObject implements Iter
 
 	@Override
 	public Iterator2<GItem> iterator() {
-		return Iterators.empty();
+		return Iterators.emptyIterator();
 	}
 
 }

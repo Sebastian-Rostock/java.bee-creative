@@ -14,9 +14,9 @@ import bee.creative.emu.EMU;
  * bzw. 95 % der Rechenzeit. Der Speicerverbrauch liegt bei ca. 44 % (16 Byte je {@link #capacity() reservierten} Eintrag).
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GKey> Typ der Schlüssel.
- * @param <GValue> Typ der Werte. */
-public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> implements Serializable, Cloneable {
+ * @param <K> Typ der Schlüssel.
+ * @param <V> Typ der Werte. */
+public class HashMap<K, V> extends AbstractHashMap<K, V> implements Serializable, Cloneable {
 
 	/** Dieser Konstruktor initialisiert die Kapazität mit {@code 0}. */
 	public HashMap() {
@@ -25,14 +25,14 @@ public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> impleme
 	/** Dieser Konstruktor initialisiert die Kapazität.
 	 *
 	 * @param capacity Kapazität. */
-	public HashMap(final int capacity) {
+	public HashMap(int capacity) {
 		this.allocateImpl(capacity);
 	}
 
 	/** Dieser Konstruktor initialisiert die {@link HashMap} mit dem Inhalt der gegebenen {@link Map}.
 	 *
 	 * @param source gegebene Einträge. */
-	public HashMap(final Map<? extends GKey, ? extends GValue> source) {
+	public HashMap(Map<? extends K, ? extends V> source) {
 		this(source.size());
 		this.putAll(source);
 	}
@@ -43,8 +43,8 @@ public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> impleme
 	}
 
 	@Override
-	public HashMap<GKey, GValue> clone() {
-		final HashMap<GKey, GValue> result = (HashMap<GKey, GValue>)super.clone();
+	public HashMap<K, V> clone() {
+		var result = (HashMap<K, V>)super.clone();
 		if (this.capacityImpl() == 0) return result;
 		result.keys = this.keys.clone();
 		result.values = this.values.clone();
@@ -53,23 +53,23 @@ public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> impleme
 
 	@Override
 	@SuppressWarnings ("unchecked")
-	protected GKey customGetKey(final int entryIndex) {
-		return (GKey)this.keys[entryIndex];
+	protected K customGetKey(int entryIndex) {
+		return (K)this.keys[entryIndex];
 	}
 
 	@Override
 	@SuppressWarnings ("unchecked")
-	protected GValue customGetValue(final int entryIndex) {
-		return (GValue)this.values[entryIndex];
+	protected V customGetValue(int entryIndex) {
+		return (V)this.values[entryIndex];
 	}
 
 	@Override
-	protected void customSetKey(final int entryIndex, final GKey key) {
+	protected void customSetKey(int entryIndex, K key) {
 		this.keys[entryIndex] = key;
 	}
 
 	@Override
-	protected void customSetValue(final int entryIndex, final GValue value) {
+	protected void customSetValue(int entryIndex, V value) {
 		this.values[entryIndex] = value;
 	}
 
@@ -80,19 +80,19 @@ public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> impleme
 	}
 
 	@Override
-	protected void customClearKey(final int entryIndex) {
+	protected void customClearKey(int entryIndex) {
 		this.keys[entryIndex] = null;
 	}
 
 	@Override
-	protected void customClearValue(final int entryIndex) {
+	protected void customClearValue(int entryIndex) {
 		this.values[entryIndex] = null;
 	}
 
 	@Override
-	protected HashAllocator customAllocator(final int capacity) {
-		final Object[] keys2;
-		final Object[] values2;
+	protected HashAllocator customAllocator(int capacity) {
+		Object[] keys2;
+		Object[] values2;
 		if (capacity == 0) {
 			keys2 = AbstractHashData.EMPTY_OBJECTS;
 			values2 = AbstractHashData.EMPTY_OBJECTS;
@@ -103,7 +103,7 @@ public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> impleme
 		return new HashAllocator() {
 
 			@Override
-			public void copy(final int sourceIndex, final int targetIndex) {
+			public void copy(int sourceIndex, int targetIndex) {
 				keys2[targetIndex] = HashMap.this.keys[sourceIndex];
 				values2[targetIndex] = HashMap.this.values[sourceIndex];
 			}
@@ -126,19 +126,19 @@ public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> impleme
 	private static final long serialVersionUID = -8792297171308603896L;
 
 	@SuppressWarnings ("unchecked")
-	private void readObject(final ObjectInputStream stream) throws IOException, ClassNotFoundException {
-		final int count = stream.readInt();
+	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
+		var count = stream.readInt();
 		this.allocateImpl(count);
-		for (int i = 0; i < count; i++) {
-			final Object key = stream.readObject();
-			final Object value = stream.readObject();
-			this.putValueImpl((GKey)key, (GValue)value);
+		for (var i = 0; i < count; i++) {
+			var key = stream.readObject();
+			var value = stream.readObject();
+			this.putValueImpl((K)key, (V)value);
 		}
 	}
 
-	private void writeObject(final ObjectOutputStream stream) throws IOException {
+	private void writeObject(ObjectOutputStream stream) throws IOException {
 		stream.writeInt(this.countImpl());
-		for (final Entry<GKey, GValue> entry: this.newEntriesImpl()) {
+		for (var entry: this.newEntriesImpl()) {
 			stream.writeObject(entry.getKey());
 			stream.writeObject(entry.getValue());
 		}

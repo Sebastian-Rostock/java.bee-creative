@@ -616,7 +616,7 @@ public class KBState implements Emuable {
 						var relationRef = relationIter.nextRef();
 						if (KBState.isRef(targetVal)) {
 							var targetRef = KBState.asRef(targetVal);
-							if (!REFSET.isValid(targetRef, acceptTargetRefset_or_null, refuseTargetRefset_or_null)) return Iterators.empty();
+							if (!REFSET.isValid(targetRef, acceptTargetRefset_or_null, refuseTargetRefset_or_null)) return Iterators.emptyIterator();
 							return Iterators.fromItem(new KBEdge(sourceRef, targetRef, relationRef));
 						}
 						var targetIter = REFSET.iterator(targetVal, acceptTargetRefset_or_null, refuseTargetRefset_or_null);

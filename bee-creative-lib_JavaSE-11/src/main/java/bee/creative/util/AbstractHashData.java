@@ -341,8 +341,8 @@ public abstract class AbstractHashData<K, V> implements Emuable {
 	 * @param installKey Methode zur Überführung des gegebenen Schlüssels in den einzutragenden Schlüssel.
 	 * @param installValue Methode zur Überführung des einzutragenden Schlüssels in den einzutragenden Wert.
 	 * @return Index des gefundenen oder erzeugten Eintrags. */
-	protected final <KEY2 extends K, KEY3 extends K> int installImpl(KEY3 key, Getter<? super KEY3, ? extends KEY2> installKey,
-		Getter<? super KEY2, ? extends V> installValue) {
+	protected final <K2 extends K, K3 extends K> int installImpl(K3 key, Getter<? super K3, ? extends K2> installKey,
+		Getter<? super K2, ? extends V> installValue) {
 		var count = this.count;
 		var index = this.putIndexImpl(key);
 		if (count == this.count) return index;
@@ -353,7 +353,7 @@ public abstract class AbstractHashData<K, V> implements Emuable {
 		return index;
 	}
 
-	protected final <KEY2 extends K> V updateImpl(KEY2 key2, Getter<? super KEY2, ? extends KEY2> installKey, Reducer<? super K, V> updateValue) {
+	protected final <K2 extends K> V updateImpl(K2 key2, Getter<? super K2, ? extends K2> installKey, Reducer<? super K, V> updateValue) {
 		var index = this.getIndexImpl(key2);
 		if (index < 0) {
 			key2 = installKey.get(key2);

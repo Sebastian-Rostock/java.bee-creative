@@ -242,7 +242,7 @@ public class LOGBuilder implements Iterable<LOGEntry> {
 
 		private LOGEntry next;
 
-		private Iterator<LOGEntry> iter = Iterators.empty();
+		private Iterator<LOGEntry> iter = Iterators.emptyIterator();
 
 		private LOGEntry seek() {
 			while (true) {
