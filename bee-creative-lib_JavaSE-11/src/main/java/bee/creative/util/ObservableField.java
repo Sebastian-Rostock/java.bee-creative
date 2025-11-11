@@ -1,19 +1,18 @@
 package bee.creative.util;
 
+import static bee.creative.lang.Objects.notNull;
+import static bee.creative.util.Observers.observersFrom;
 import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert ein {@link Observable überwachbares} {@link Field Datenfeld}.
  *
  * @param <T> Typ der Eingabe.
  * @param <V> Typ des Werts der Eigenschaft. */
-public class ObservableField<T, V> implements Field3<T, V>, Observable<UpdateFieldEvent, UpdateFieldListener> {
-
-	/** Dieses Feld speichert das Datenfel, an das in {@link #get(Object)} und {@link #set(Object, Object)} delegiert wird. */
-	public final Field<? super T, V> that;
+public class ObservableField<T, V> implements Field3<T, V>, Observable2<UpdateFieldEvent, UpdateFieldListener> {
 
 	/** Dieser Konstruktor initialisiert das überwachte Datenfeld. */
 	public ObservableField(Field<? super T, V> that) throws NullPointerException {
-		this.that = Objects.notNull(that);
+		this.that = notNull(that);
 	}
 
 	@Override
@@ -31,23 +30,8 @@ public class ObservableField<T, V> implements Field3<T, V>, Observable<UpdateFie
 	}
 
 	@Override
-	public UpdateFieldListener put(UpdateFieldListener listener) throws IllegalArgumentException {
-		return UpdateFieldObservables.INSTANCE.put(this, listener);
-	}
-
-	@Override
-	public UpdateFieldListener putWeak(UpdateFieldListener listener) throws IllegalArgumentException {
-		return UpdateFieldObservables.INSTANCE.putWeak(this, listener);
-	}
-
-	@Override
-	public void pop(UpdateFieldListener listener) throws IllegalArgumentException {
-		UpdateFieldObservables.INSTANCE.pop(this, listener);
-	}
-
-	@Override
-	public UpdateFieldEvent fire(UpdateFieldEvent event) throws NullPointerException {
-		return UpdateFieldObservables.INSTANCE.fire(this, event);
+	public Observers<UpdateFieldEvent, UpdateFieldListener> observers() {
+		return observers;
 	}
 
 	@Override
@@ -74,5 +58,9 @@ public class ObservableField<T, V> implements Field3<T, V>, Observable<UpdateFie
 	protected boolean customEquals(V value1, V value2) {
 		return Objects.deepEquals(value1, value2);
 	}
+
+	private static final Observers<UpdateFieldEvent, UpdateFieldListener> observers = observersFrom(UpdateFieldListener::onUpdateField);
+
+	private final Field<? super T, V> that;
 
 }

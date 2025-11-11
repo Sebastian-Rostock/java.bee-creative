@@ -28,6 +28,11 @@ public interface Comparator3<T> extends Comparator<T> {
 		return iterableComparator(this);
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@link Comparators#translatedComparator(Comparator, Getter) translatedComparator(this, trans)}. */
+	default <T2> Comparator3<T2> translate(Getter<? super T2, ? extends T> trans) throws NullPointerException {
+		return translatedComparator(this, trans);
+	}
+
 	/** Diese Methode ist eine Abkürzung für {@link Comparators#optionalizedComparator(Comparator) optionalizedComparator(this)}. */
 	default Comparator3<T> optionalize() {
 		return optionalizedComparator(this);
@@ -36,11 +41,6 @@ public interface Comparator3<T> extends Comparator<T> {
 	/** Diese Methode ist eine Abkürzung für {@link Comparators#optionalizedComparator(Comparator, boolean) optionalizedComparator(this, first)}. */
 	default Comparator3<T> optionalize(boolean first) {
 		return optionalizedComparator(this, first);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link Comparators#translatedComparator(Comparator, Getter) translatedComparator(this, trans)}. */
-	default <T2> Comparator3<T2> translate(Getter<? super T2, ? extends T> trans) throws NullPointerException {
-		return translatedComparator(this, trans);
 	}
 
 }

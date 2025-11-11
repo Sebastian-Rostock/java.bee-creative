@@ -1,7 +1,5 @@
 package bee.creative.util;
 
-import bee.creative.lang.Objects;
-
 /** Diese Klasse implementiert die von einem {@link UpdateFieldListener} empfangene Nachricht zur Aktualisierung des Werts eines {@link ObservableField}. */
 public class UpdateFieldEvent {
 
@@ -18,7 +16,7 @@ public class UpdateFieldEvent {
 	public final Object newValue;
 
 	/** Dieser Konstruktor initialisiert die Eigenschafte des Ereignisses. */
-	public <ITEM, VALUE> UpdateFieldEvent(ObservableField<? super ITEM, VALUE> sender, ITEM item, VALUE oldValue, VALUE newValue) {
+	public <T, V> UpdateFieldEvent(ObservableField<? super T, V> sender, T item, V oldValue, V newValue) {
 		this.sender = sender;
 		this.item = item;
 		this.oldValue = oldValue;
@@ -33,11 +31,6 @@ public class UpdateFieldEvent {
 	/** Diese Methode setzt den Wert des {@link #sender Datenfeldes} der {@link #item Einagbe} auf den {@link #newValue neuen Wert}. */
 	public void setNewValue() {
 		this.setValue(this.newValue);
-	}
-
-	@Override
-	public String toString() {
-		return Objects.toInvokeString(this, this.sender, this.item, this.oldValue, this.newValue);
 	}
 
 	@SuppressWarnings ({"unchecked", "rawtypes"})

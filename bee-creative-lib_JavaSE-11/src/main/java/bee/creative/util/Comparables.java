@@ -37,7 +37,7 @@ import bee.creative.lang.Objects;
 public class Comparables {
 
 	/** Diese Methode liefert das gegebene {@link Comparable3}. */
-	public static <T> Comparable3<T> comparable(Comparable3<T> that) {
+	public static <T> Comparable3<T> comparableFrom(Comparable3<T> that) {
 		return notNull(that);
 	}
 
@@ -46,7 +46,7 @@ public class Comparables {
 	public static <T> Comparable3<T> comparableFrom(Comparable<? super T> that) {
 		notNull(that);
 		if (that instanceof Comparable3<?>) return (Comparable3<T>)that;
-		return item -> that.compareTo(item);
+		return that::compareTo;
 	}
 
 	/** Diese Methode liefert ein {@link Comparable3}, das die gegebene Eingabe und den gegebenen {@link Comparator} zur Berechnung des Navigationswerts

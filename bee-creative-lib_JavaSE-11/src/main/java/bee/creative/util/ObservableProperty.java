@@ -1,15 +1,13 @@
 package bee.creative.util;
 
+import static bee.creative.util.Observers.observersFrom;
 import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert eine {@link Observable} {@link Property3}, das das {@link #get() Lesen} und {@link #set(Object) Schreiben} an ein gegebenes
  * {@link Property} delegiert und beim ändernden Schreiben ein {@link UpdatePropertyListener Änderungsereignis} auslöst.
  *
  * @param <V> Typ des Werts der Eigenschaft. */
-public class ObservableProperty<V> implements Property3<V>, Observable<UpdatePropertyEvent, UpdatePropertyListener> {
-
-	/** Dieses Feld speichert die Eigenschaft, an die in {@link #get()} und {@link #set(Object)} delegiert wird. */
-	public final Property<V> that;
+public class ObservableProperty<V> implements Property3<V>, Observable2<UpdatePropertyEvent, UpdatePropertyListener> {
 
 	/** Dieser Konstruktor initialisiert die überwachte Eigenschaft. */
 	public ObservableProperty(Property<V> that) {
@@ -31,23 +29,8 @@ public class ObservableProperty<V> implements Property3<V>, Observable<UpdatePro
 	}
 
 	@Override
-	public UpdatePropertyListener put(UpdatePropertyListener listener) throws IllegalArgumentException {
-		return UpdatePropertyObservables.INSTANCE.put(this, listener);
-	}
-
-	@Override
-	public UpdatePropertyListener putWeak(UpdatePropertyListener listener) throws IllegalArgumentException {
-		return UpdatePropertyObservables.INSTANCE.putWeak(this, listener);
-	}
-
-	@Override
-	public void pop(UpdatePropertyListener listener) throws IllegalArgumentException {
-		UpdatePropertyObservables.INSTANCE.pop(this, listener);
-	}
-
-	@Override
-	public UpdatePropertyEvent fire(UpdatePropertyEvent event) throws NullPointerException {
-		return UpdatePropertyObservables.INSTANCE.fire(this, event);
+	public Observers<UpdatePropertyEvent, UpdatePropertyListener> observers() {
+		return observers;
 	}
 
 	@Override
@@ -55,9 +38,9 @@ public class ObservableProperty<V> implements Property3<V>, Observable<UpdatePro
 		return this.that.toString();
 	}
 
-	/** Diese Methode gibt eine Kopie des gegebenen Werts oder diesen unverändert zurück. Vor dem Schreiben des neuen Werts wird vom alten Wert über diese
-	 * Methode eine Kopie erzeugt, welche nach dem Schreiben beim auslösen des Ereignisses zur Aktualisierung eingesetzt wird. Eine Kopie ist hierbei nur dann
-	 * nötig, wenn der alte Wert sich durch das Schreiben des neuen ändert.
+	/** Diese Methode gibt eine Kopie des gegebenen Werts oder diesen unverändert zurück. Vor dem Schreiben des neuen Werts wird vom alten Wert über diese Methode
+	 * eine Kopie erzeugt, welche nach dem Schreiben beim auslösen des Ereignisses zur Aktualisierung eingesetzt wird. Eine Kopie ist hierbei nur dann nötig, wenn
+	 * der alte Wert sich durch das Schreiben des neuen ändert.
 	 *
 	 * @param value alter Wert.
 	 * @return gegebener oder kopierter Wert. */
@@ -74,5 +57,9 @@ public class ObservableProperty<V> implements Property3<V>, Observable<UpdatePro
 	protected boolean customEquals(V value1, V value2) {
 		return Objects.deepEquals(value1, value2);
 	}
+
+	private static final Observers<UpdatePropertyEvent, UpdatePropertyListener> observers = observersFrom(UpdatePropertyListener::onUpdateProperty);
+
+	private final Property<V> that;
 
 }
