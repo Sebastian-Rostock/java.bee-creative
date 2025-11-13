@@ -24,7 +24,7 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 
 	@Override
 	public H2QTSet2 copy(Filter<? super QT> filter) throws NullPointerException {
-		return this.owner.newTuples(this.names(), Iterables.filter(this, filter));
+		return this.owner.newTuples(this.names(), Iterables.filteredIterable(this, filter));
 	}
 
 	@Override

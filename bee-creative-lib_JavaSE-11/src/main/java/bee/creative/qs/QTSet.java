@@ -17,7 +17,7 @@ public interface QTSet extends QOSet<QT, QTSet> {
 	/** {@inheritDoc} Sie liefert damit {@link QS#newTuples(List, Iterable) this.owner().newTuples(this.names(), Iterables.filter(this, filter))}. */
 	@Override
 	default QTSet2 copy(Filter<? super QT> filter) throws NullPointerException {
-		return this.owner().newTuples(this.names(), Iterables.filter(this, filter));
+		return this.owner().newTuples(this.names(), Iterables.filteredIterable(this, filter));
 	}
 
 	/** Diese Methode liefert die Position, die der gegebene Rollennamen in der {@link #names() Liste der Rollennamen} hat. Wenn er dort nicht enthalten ist, wird

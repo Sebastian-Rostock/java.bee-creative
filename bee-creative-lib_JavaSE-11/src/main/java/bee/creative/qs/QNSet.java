@@ -16,7 +16,7 @@ public interface QNSet extends QXSet<QN, QNSet> {
 	/** {@inheritDoc} Sie liefert damit {@link QS#newNodes(Iterable) this.owner().newNodes(Iterables.filter(this, filter))}. */
 	@Override
 	default QNSet2 copy(Filter<? super QN> filter) throws NullPointerException {
-		return this.owner().newNodes(Iterables.filter(this, filter));
+		return this.owner().newNodes(Iterables.filteredIterable(this, filter));
 	}
 
 	/** Diese Methode entfernt alle in dieser Menge enthaltenen Hyperknoten aus dem {@link #owner() Graphspeicher} und liefert nur dann {@code true}, wenn dadurch

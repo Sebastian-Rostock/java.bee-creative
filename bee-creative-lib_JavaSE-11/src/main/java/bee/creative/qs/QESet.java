@@ -17,7 +17,7 @@ public interface QESet extends QXSet<QE, QESet> {
 	/** {@inheritDoc} Sie liefert damit {@link QS#newEdges(Iterable) this.owner().newEdges(Iterables.filter(this, filter))}. */
 	@Override
 	default QESet2 copy(Filter<? super QE> filter) {
-		return this.owner().newEdges(Iterables.filter(this, filter));
+		return this.owner().newEdges(Iterables.filteredIterable(this, filter));
 	}
 
 	/** Diese Methode liefert eine Mengensicht auf alle {@link QN Haperknoten}, die in den Hyperkanten dieser Menge aufgeführt sind.

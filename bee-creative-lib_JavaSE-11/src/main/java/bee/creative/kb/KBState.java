@@ -602,7 +602,7 @@ public class KBState implements Emuable {
 	final Iterator3<KBEdge> edgeIterator(int[] acceptSourceRefset_or_null, int[] refuseSourceRefset_or_null, int[] acceptTargetRefset_or_null,
 		int[] refuseTargetRefset_or_null, int[] acceptRelationRefset_or_null, int[] refuseRelationRefset_or_null) {
 		var sourceIter = REFMAP.iterator(this.sourceMap, acceptSourceRefset_or_null, refuseSourceRefset_or_null);
-		return Iterators.concatAllIterator(Iterators.concatAllIterator(new Iterator3<Iterator3<Iterator3<KBEdge>>>() {
+		return Iterators.concatIterator(Iterators.concatIterator(new Iterator3<Iterator3<Iterator3<KBEdge>>>() {
 
 			@Override
 			public Iterator3<Iterator3<KBEdge>> next() {

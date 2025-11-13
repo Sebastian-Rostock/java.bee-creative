@@ -17,19 +17,19 @@ public interface Iterable3<GItem> extends Iterable<GItem> {
 		return Iterables.size(this);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Iterables#concat(Iterable, Iterable) Iterables.concat(this, that)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Iterables#concatIterable(Iterable, Iterable) Iterables.concat(this, that)}. */
 	default Iterable3<GItem> concat(final Iterable<? extends GItem> that) throws NullPointerException {
-		return Iterables.concat(this, that);
+		return Iterables.concatIterable(this, that);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Iterables#limit(Iterable, int) Iterables.limit(this, count)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Iterables#limitedIterable(Iterable, int) Iterables.limit(this, count)}. */
 	default Iterable3<GItem> limit(final int count) throws IllegalArgumentException {
-		return Iterables.limit(this, count);
+		return Iterables.limitedIterable(this, count);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Iterables#filter(Iterable, Filter) Iterables.filter(this, filter)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Iterables#filteredIterable(Iterable, Filter) Iterables.filter(this, filter)}. */
 	default Iterable3<GItem> filter(final Filter<? super GItem> filter) throws NullPointerException {
-		return Iterables.filter(this, filter);
+		return Iterables.filteredIterable(this, filter);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Iterables#unique(Iterable) Iterables.unique(this)}. */
@@ -37,9 +37,9 @@ public interface Iterable3<GItem> extends Iterable<GItem> {
 		return Iterables.unique(this);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Iterables#repeat(Iterable, int) Iterables.repeat(this, count)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Iterables#repeatedIterable(Iterable, int) Iterables.repeat(this, count)}. */
 	default Iterable3<GItem> repeat(final int count) throws IllegalArgumentException {
-		return Iterables.repeat(this, count);
+		return Iterables.repeatedIterable(this, count);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Iterables#translatedIterable(Iterable, Getter) Iterables.translate(this, trans)}. */
@@ -52,9 +52,9 @@ public interface Iterable3<GItem> extends Iterable<GItem> {
 		return Iterables.unmodifiable(this);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Iterables#collectAll(Iterable, Consumer) Iterables.collectAll(this, target)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Iterables#forEach(Iterable, Consumer) Iterables.collectAll(this, target)}. */
 	default void collectAll(final Consumer<? super GItem> target) throws NullPointerException {
-		Iterables.collectAll(this, target);
+		Iterables.forEach(this, target);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Iterables#iterableToSet(Iterable) Iterables.toSet(this)}. */

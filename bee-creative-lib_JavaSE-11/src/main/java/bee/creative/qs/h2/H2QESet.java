@@ -179,7 +179,7 @@ public class H2QESet extends H2QOSet<QE, QESet> implements QESet {
 
 	@Override
 	public H2QESet2 copy(Filter<? super QE> filter) throws NullPointerException {
-		return this.owner.newEdges(Iterables.filter(this, filter));
+		return this.owner.newEdges(Iterables.filteredIterable(this, filter));
 	}
 
 	@Override

@@ -769,7 +769,7 @@ public class BEXLoader {
 
 		@Override
 		public String toString() {
-			return Objects.toString(true, Iterables.filter(Arrays.asList(this.cache), Filters.nullFilter()));
+			return Objects.toString(true, Iterables.filteredIterable(Arrays.asList(this.cache), Filters.nullFilter()));
 		}
 
 		/** Dieses Feld speichert die Elemente, deren Zeichenketten verwaltet werden. */

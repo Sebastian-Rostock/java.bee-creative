@@ -217,7 +217,7 @@ public class DQ {
 
 	static QESet newObjectSubjectSetMapEdges(QN context, QN predicate, Map<? extends QN, ? extends Iterable<? extends QN>> objectSubjectSetMap) {
 		var owner = context.owner();
-		return owner.newEdges(Iterables.concatAll(Iterables.translatedIterable(objectSubjectSetMap.entrySet(), entry -> {
+		return owner.newEdges(Iterables.concatIterable(Iterables.translatedIterable(objectSubjectSetMap.entrySet(), entry -> {
 			var object = entry.getKey();
 			return Iterables.translatedIterable(entry.getValue(), subject -> owner.newEdge(context, predicate, subject, object));
 		})));
@@ -233,7 +233,7 @@ public class DQ {
 
 	static QESet newSubjectObjectSetMapEdges(QN context, QN predicate, Map<? extends QN, ? extends Iterable<? extends QN>> subjectObjectSetMap) {
 		var owner = context.owner();
-		return owner.newEdges(Iterables.concatAll(Iterables.translatedIterable(subjectObjectSetMap.entrySet(), entry -> {
+		return owner.newEdges(Iterables.concatIterable(Iterables.translatedIterable(subjectObjectSetMap.entrySet(), entry -> {
 			var subject = entry.getKey();
 			return Iterables.translatedIterable(entry.getValue(), object -> owner.newEdge(context, predicate, subject, object));
 		})));

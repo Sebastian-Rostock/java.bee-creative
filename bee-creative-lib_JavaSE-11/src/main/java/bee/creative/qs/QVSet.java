@@ -16,7 +16,7 @@ public interface QVSet extends QXSet<String, QVSet> {
 	/** {@inheritDoc} Sie liefert damit {@link QS#newNodes(Iterable) this.owner().newValues(Iterables.filter(this, filter))}. */
 	@Override
 	default QVSet2 copy(Filter<? super String> filter) throws NullPointerException {
-		return this.owner().newValues(Iterables.filter(this, filter));
+		return this.owner().newValues(Iterables.filteredIterable(this, filter));
 	}
 
 	/** Diese Methode speichert alle in dieser Menge enthaltenen Textwerte im {@link #owner() Graphspeicher} und gibt nur dann {@code true} zurück, wenn dadurch

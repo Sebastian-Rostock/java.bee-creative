@@ -68,7 +68,7 @@ public class H2QNSet extends H2QOSet<QN, QNSet> implements QNSet {
 
 	@Override
 	public H2QNSet2 copy(Filter<? super QN> filter) throws NullPointerException {
-		return this.owner.newNodes(Iterables.filter(this, filter));
+		return this.owner.newNodes(Iterables.filteredIterable(this, filter));
 	}
 
 	@Override

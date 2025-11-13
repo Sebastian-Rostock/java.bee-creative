@@ -587,10 +587,10 @@ public class IO {
 	public static Iterable<File> listFiles(final int maxDepth, final Iterable<File> files) {
 		if (files == null) return emptyIterable();
 		if (maxDepth == 0) return files;
-		return Iterables.concatAll(Iterables.translatedIterable(files, file -> {
+		return Iterables.concatIterable(Iterables.translatedIterable(files, file -> {
 			var list = file.listFiles();
-			if (list == null) return Iterables.fromItem(file);
-			return Iterables.concat(Iterables.fromItem(file), listFiles(maxDepth - 1, list));
+			if (list == null) return Iterables.iterableFromItem(file);
+			return Iterables.concatIterable(Iterables.iterableFromItem(file), listFiles(maxDepth - 1, list));
 		}));
 	}
 

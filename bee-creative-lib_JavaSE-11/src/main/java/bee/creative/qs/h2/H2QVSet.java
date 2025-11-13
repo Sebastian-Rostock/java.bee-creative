@@ -52,7 +52,7 @@ public class H2QVSet extends H2QOSet<String, QVSet> implements QVSet {
 
 	@Override
 	public H2QVSet2 copy(Filter<? super String> filter) throws NullPointerException {
-		return this.owner.newValues(Iterables.filter(this, filter));
+		return this.owner.newValues(Iterables.filteredIterable(this, filter));
 	}
 
 	@Override
