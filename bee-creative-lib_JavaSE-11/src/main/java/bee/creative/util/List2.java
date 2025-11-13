@@ -2,13 +2,13 @@ package bee.creative.util;
 
 import java.util.List;
 
-/** Diese Schnittstelle definiert eine {@link List} mit {@link Iterator2}.
+/** Diese Schnittstelle definiert eine {@link List} mit {@link Iterator3}.
  *
  * @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public interface List2<E> extends List<E>, Collection2<E> {
 
 	@Override
-	Iterator2<E> iterator();
+	Iterator3<E> iterator();
 
 	/** Diese Methode ist eine Abkürzung für {@link Collections#reversedList(List) Collections.reverse(this)}. */
 	default List2<E> reverse() throws NullPointerException {

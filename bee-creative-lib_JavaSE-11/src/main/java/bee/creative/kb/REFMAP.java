@@ -9,7 +9,7 @@ import bee.creative.lang.Objects;
 import bee.creative.util.AbstractIterator;
 import bee.creative.util.Entries;
 import bee.creative.util.HashMapIO;
-import bee.creative.util.Iterator2;
+import bee.creative.util.Iterator3;
 
 /** Diese Klasse implementiert Methoden zur Verarbeitung einer steuwertbasierten Abbildung von Referenen ungleich {@code 0} auf Elemente ungleich {@code null}.
  * Die Methoden verzichten für maximale Effizienz weitgehend auf diePrüfung der Wertebereiche ihrer Argumente. Die Abbildung ist als {@code Object[]} mit
@@ -141,7 +141,7 @@ public final class REFMAP {
 		return new ITER(refmap, null, null);
 	}
 
-	/** Diese Methode liefert den {@link Iterator2} über die Referenzen und Elemente der gegebenen Referenzabbildung {@code refmap}, deren Referenzen in der
+	/** Diese Methode liefert den {@link Iterator3} über die Referenzen und Elemente der gegebenen Referenzabbildung {@code refmap}, deren Referenzen in der
 	 * ersten gegebenen {@link REFSET Referenzmenge} {@code acceptRefset_or_null} und nicht in der zweiten gegebenen {@link REFSET Referenzmenge}
 	 * {@code refuseRefset_or_null} enthalten sind. */
 	public static ITER iterator(Object[] refmap, int[] acceptRefset_or_null, int[] refuseRefset_or_null) {

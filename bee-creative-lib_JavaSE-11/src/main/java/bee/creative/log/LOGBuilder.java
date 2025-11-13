@@ -3,7 +3,7 @@ package bee.creative.log;
 import java.util.Iterator;
 import bee.creative.lang.Objects;
 import bee.creative.util.AbstractIterator;
-import bee.creative.util.Iterator2;
+import bee.creative.util.Iterator3;
 import bee.creative.util.Iterators;
 
 /** Diese Klasse dient der Erfassung hierarchischer Protokollzeilen. Diese werden in der {@link #toString() Textdarstellung} innerhalb von Protokollebenen
@@ -130,7 +130,7 @@ public class LOGBuilder implements Iterable<LOGEntry> {
 	}
 
 	@Override
-	public Iterator2<LOGEntry> iterator() {
+	public Iterator3<LOGEntry> iterator() {
 		return new ITER(this.head);
 	}
 

@@ -10,18 +10,19 @@ import java.util.Collection;
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Filters {
 
-	/** Diese Methode liefert den gegebenen {@link Filter3}. */
+	/** Diese Methode liefert den gegebenen {@link Filter3}. Wenn er {@code null} ist, wird {@link #nullFilter()} geliefert. */
 	@SuppressWarnings ("unchecked")
 	public static <T> Filter3<T> filterFrom(Filter3<? super T> that) throws NullPointerException {
-		return (Filter3<T>)notNull(that);
+		if (that == null) return nullFilter();
+		return (Filter3<T>)that;
 	}
 
-	/** Diese Methode liefert den gegebenen {@link Filter} als {@link Filter3}. */
+	/** Diese Methode liefert den gegebenen {@link Filter} als {@link Filter3}. Wenn er {@code null} ist, wird {@link #nullFilter()} geliefert. */
 	@SuppressWarnings ("unchecked")
 	public static <T> Filter3<T> filterFrom(Filter<? super T> that) throws NullPointerException {
-		notNull(that);
+		if (that == null) return nullFilter();
 		if (that instanceof Filter3) return (Filter3<T>)that;
-		return item -> that.accepts(item);
+		return that::accepts;
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #filterFromItems(Collection) filterFromItems(iterableFromArray(items))}.
@@ -99,7 +100,7 @@ public class Filters {
 	 * werden. Die Akzeptanz eines Datensatzes {@code item} ist {@code that.accepts(trans.get(item))}.
 	 *
 	 * @param <T2> Typ der Datensätze des gelieferten {@link Filter3}. */
-	public static <T, T2> Filter3<T> translatedFilter(Filter<? super T2> that, Getter<? super T, ? extends T2> trans) throws NullPointerException {
+	public static <T2, T> Filter3<T> translatedFilter(Filter<? super T2> that, Getter<? super T, ? extends T2> trans) throws NullPointerException {
 		notNull(that);
 		notNull(trans);
 		return item -> that.accepts(trans.get(item));

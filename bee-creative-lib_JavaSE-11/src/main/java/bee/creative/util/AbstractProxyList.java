@@ -141,7 +141,7 @@ public abstract class AbstractProxyList<E, D extends List<E>> extends AbstractLi
 	}
 
 	@Override
-	public Iterator2<E> iterator() {
+	public Iterator3<E> iterator() {
 		return iteratorFrom(this.listIterator(0));
 	}
 

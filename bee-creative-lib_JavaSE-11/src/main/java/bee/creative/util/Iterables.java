@@ -1,5 +1,8 @@
 package bee.creative.util;
 
+import static bee.creative.lang.Objects.notNull;
+import static bee.creative.util.Iterators.emptyIterator;
+import static bee.creative.util.Iterators.iteratorFrom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -7,10 +10,8 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import bee.creative.lang.Array;
 import bee.creative.lang.Array2;
 import bee.creative.lang.Objects;
-import bee.creative.util.Iterators.UnmodifiableIterator;
 
 /** Diese Klasse implementiert grundlegende {@link Iterable}.
  *
@@ -18,369 +19,47 @@ import bee.creative.util.Iterators.UnmodifiableIterator;
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Iterables {
 
-	/** Diese Klasse implementiert das {@link Iterable2} zu {@link Iterators#emptyIterator()}. */
-	public static class EmptyIterable extends AbstractIterable<Object> {
-
-		public static final Iterable<?> INSTANCE = new EmptyIterable();
-
-	}
-
-	/** Diese Klasse implementiert einen {@link Iterable2}, der die Elemente eines Abschnitts eines gegebenen Array liefert.
-	 *
-	 * @param <GItem> Typ der Elemente. */
-	public static class ArrayIterable<GItem> extends AbstractIterable<GItem> {
-
-		public ArrayIterable(GItem[] items, int fromIndex, int toIndex) throws NullPointerException, IllegalArgumentException {
-			if (fromIndex > toIndex) throw new IllegalArgumentException("fromIndex > toIndex");
-			this.items = Objects.notNull(items);
-			this.fromIndex = fromIndex;
-			this.toIndex = toIndex;
-		}
-
-		@Override
-		public Iterator2<GItem> iterator() {
-			return Iterators.fromArray(this.items, this.fromIndex, this.toIndex);
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.items, this.fromIndex, this.toIndex);
-		}
-
-		private final GItem[] items;
-
-		private final int fromIndex;
-
-		private final int toIndex;
-
-	}
-
-	/** Diese Klasse implementiert das {@link Iterable2} zu {@link Iterators#fromCount(int)}. */
-	public static class CountIterable extends AbstractIterable<Integer> {
-
-		public final int count;
-
-		public CountIterable(int count) throws IllegalArgumentException {
-			if (count < 0) throw new IllegalArgumentException();
-			this.count = count;
-		}
-
-		@Override
-		public Iterator2<Integer> iterator() {
-			return Iterators.fromCount(this.count);
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.count);
-		}
-
-	}
-
-	/** Diese Klasse implementiert das {@link Iterable2} zu {@link Iterators#concatAll(Iterator)}.
-	 *
-	 * @param <GItem> Typ der Elemente. */
-	public static class ConcatIterable<GItem> extends AbstractIterable<GItem> {
-
-		public final Iterable<? extends Iterable<? extends GItem>> that;
-
-		public ConcatIterable(Iterable<? extends Iterable<? extends GItem>> that) throws NullPointerException {
-			this.that = Objects.notNull(that);
-		}
-
-		@Override
-		public Iterator2<GItem> iterator() {
-			return Iterators.concatAll(Iterators.translatedIterator(this.that.iterator(), Iterables.<GItem>iterator()));
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.that);
-		}
-
-	}
-
-	/** Diese Klasse implementiert das {@link Iterable2} zu {@link Iterators#fromItem(Object, int)}.
-	 *
-	 * @param <GItem> Typ der Elemente. */
-	public static class UniformIterable<GItem> extends AbstractIterable<GItem> {
-
-		public final GItem item;
-
-		public final int count;
-
-		public UniformIterable(GItem item, int count) throws IllegalArgumentException {
-			if (count < 0) throw new IllegalArgumentException();
-			this.item = item;
-			this.count = count;
-		}
-
-		@Override
-		public Iterator2<GItem> iterator() {
-			return Iterators.fromItem(this.item, this.count);
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.item, this.count);
-		}
-
-	}
-
-	/** Diese Klasse implementiert das {@link Iterable2} zu {@link Iterators#unmodifiable(Iterator)}.
-	 *
-	 * @param <GItem> Typ der Elemente. */
-	public static class LimitedIterable<GItem> extends AbstractIterable<GItem> {
-
-		public final Iterable<? extends GItem> that;
-
-		public final int count;
-
-		public LimitedIterable(Iterable<? extends GItem> that, int count) throws NullPointerException, IllegalArgumentException {
-			if (count < 0) throw new IllegalArgumentException();
-			this.that = Objects.notNull(that);
-			this.count = count;
-		}
-
-		@Override
-		public Iterator2<GItem> iterator() {
-			return Iterators.limit(this.that.iterator(), this.count);
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.that, this.count);
-		}
-
-	}
-
-	/** Diese Klasse implementiert das {@link Iterable2} zu {@link Iterators#filteredIterator(Iterator, Filter)}.
-	 *
-	 * @param <GItem> Typ der Elemente. */
-	public static class FilteredIterable<GItem> extends AbstractIterable<GItem> {
-
-		public final Iterable<? extends GItem> that;
-
-		public final Filter<? super GItem> filter;
-
-		public FilteredIterable(Iterable<? extends GItem> that, Filter<? super GItem> filter) throws NullPointerException {
-			this.that = Objects.notNull(that);
-			this.filter = Objects.notNull(filter);
-		}
-
-		@Override
-		public Iterator2<GItem> iterator() {
-			return Iterators.filteredIterator(this.that.iterator(), this.filter);
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.that, this.filter);
-		}
-
-	}
-
-	/** Diese Klasse implementiert das {@link Iterable2} zu {@link Iterators#unique(Iterator)}.
-	 *
-	 * @param <GItem> Typ der Elemente. */
-	public static class UniqueIterable<GItem> extends AbstractIterable<GItem> {
-
-		public final Iterable<? extends GItem> that;
-
-		public UniqueIterable(Iterable<? extends GItem> that) throws NullPointerException {
-			this.that = Objects.notNull(that);
-		}
-
-		@Override
-		public Iterator2<GItem> iterator() {
-			return Iterators.unique(this.that.iterator());
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.that);
-		}
-
-	}
-
-	/** Diese Klasse implementiert das {@link Iterable2} zu {@link Iterators#translatedIterator(Iterator, Getter)}. */
-	public static class TranslatedIterable<GItem, GItem2> extends AbstractIterable<GItem> {
-
-		public final Iterable<? extends GItem2> that;
-
-		public final Getter<? super GItem2, ? extends GItem> trans;
-
-		public TranslatedIterable(Iterable<? extends GItem2> that, Getter<? super GItem2, ? extends GItem> trans) throws NullPointerException {
-			this.that = Objects.notNull(that);
-			this.trans = Objects.notNull(trans);
-		}
-
-		@Override
-		public Iterator2<GItem> iterator() {
-			return Iterators.translatedIterator(this.that.iterator(), this.trans);
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.that, this.trans);
-		}
-
-	}
-
-	/** Diese Klasse implementiert das {@link Iterable2} zu {@link UnmodifiableIterator}.
-	 *
-	 * @param <GItem> Typ der Elemente. */
-	public static class UnmodifiableIterable<GItem> extends AbstractIterable<GItem> {
-
-		public final Iterable<? extends GItem> that;
-
-		public UnmodifiableIterable(Iterable<? extends GItem> that) throws NullPointerException {
-			this.that = Objects.notNull(that);
-		}
-
-		@Override
-		public Iterator2<GItem> iterator() {
-			return Iterators.unmodifiable(this.that.iterator());
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.that);
-		}
-
-	}
-
-	/** Diese Klasse implementiert das {@link Iterable2} zu {@link Iterators#unionAll(Comparator, Iterator)}.
-	 *
-	 * @param <GItem> Typ der Elemente. */
-	public static class UnionIterable<GItem> extends AbstractIterable<GItem> {
-
-		public final Comparator<? super GItem> order;
-
-		public final Iterable<? extends Iterable<? extends GItem>> iters;
-
-		public UnionIterable(Comparator<? super GItem> order, Iterable<? extends Iterable<? extends GItem>> iters) throws NullPointerException {
-			this.order = Objects.notNull(order);
-			this.iters = Objects.notNull(iters);
-		}
-
-		@Override
-		public Iterator2<GItem> iterator() {
-			return Iterators.unionAll(this.order, Iterators.translatedIterator(this.iters.iterator(), Iterables.<GItem>iterator()));
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.order, this.iters);
-		}
-
-	}
-
-	/** Diese Klasse implementiert das {@link Iterable2} zu {@link Iterators#except(Comparator, Iterator, Iterator)}.
-	 *
-	 * @param <GItem> Typ der Elemente. */
-	public static class ExceptIterable<GItem> extends AbstractIterable<GItem> {
-
-		public final Comparator<? super GItem> order;
-
-		public final Iterable<? extends GItem> iter1;
-
-		public final Iterable<? extends GItem> iter2;
-
-		public ExceptIterable(Comparator<? super GItem> order, Iterable<? extends GItem> iter1, Iterable<? extends GItem> iter2) throws NullPointerException {
-			this.order = Objects.notNull(order);
-			this.iter1 = Objects.notNull(iter1);
-			this.iter2 = Objects.notNull(iter2);
-		}
-
-		@Override
-		public Iterator2<GItem> iterator() {
-			return Iterators.except(this.order, this.iter1.iterator(), this.iter2.iterator());
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.order, this.iter1, this.iter2);
-		}
-
-	}
-
-	/** Diese Klasse implementiert das {@link Iterable2} zu {@link Iterators#intersectAll(Comparator, Iterator)}.
-	 *
-	 * @param <GItem> Typ der Elemente. */
-	public static class IntersectIterable<GItem> extends AbstractIterable<GItem> {
-
-		public final Comparator<? super GItem> order;
-
-		public final Iterable<? extends Iterable<? extends GItem>> iters;
-
-		public IntersectIterable(Comparator<? super GItem> order, Iterable<? extends Iterable<? extends GItem>> iters) throws NullPointerException {
-			this.order = Objects.notNull(order);
-			this.iters = Objects.notNull(iters);
-		}
-
-		@Override
-		public Iterator2<GItem> iterator() {
-			return Iterators.intersectAll(this.order, Iterators.translatedIterator(this.iters.iterator(), Iterables.<GItem>iterator()));
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.order, this.iters);
-		}
-
-	}
-
-	static class IteratorGetter implements Getter3<Iterable<?>, Iterator<?>> {
-
-		public static final Getter<?, ?> INSTANCE = new IteratorGetter();
-
-		@Override
-		public Iterator<?> get(Iterable<?> input) {
-			return input.iterator();
-		}
-
-	}
-
-	/** Diese Methode liefert {@link EmptyIterable EmptyIterable.INSTANCE}. */
+	/** Diese Methode liefert den gegebenen {@link Iterable} als {@link Iterable3}. Wenn er {@code null} ist, wird {@link #emptyIterable()} geliefert. */
 	@SuppressWarnings ("unchecked")
-	public static <GItem> Iterable2<GItem> emptyIterable() {
-		return (Iterable2<GItem>)EmptyIterable.INSTANCE;
-	}
-
-	/** Diese Methode liefert den gegebenen {@link Iterable} als {@link Iterable2}. Wenn er {@code null} ist, wird {@link #emptyIterable()} geliefert. */
-	@SuppressWarnings ("unchecked")
-	public static <ITEM> Iterable2<ITEM> from(Iterable<? extends ITEM> that) {
+	public static <T> Iterable3<T> iterableFrom(Iterable<? extends T> that) {
 		if (that == null) return emptyIterable();
-		if (that instanceof Iterable2<?>) return (Iterable2<ITEM>)that;
-		return () -> Iterators.iteratorFrom(that.iterator());
+		if (that instanceof Iterable3<?>) return (Iterable3<T>)that;
+		return () -> iteratorFrom(that.iterator());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #fromItem(Object, int) Iterables.fromItem(item, 1)}. */
-	public static <GItem> Iterable2<GItem> fromItem(GItem item) {
+	public static <T> Iterable3<T> fromItem(T item) {
 		return Iterables.fromItem(item, 1);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link UniformIterable new UniformIterable<>(item, count)}. */
-	public static <GItem> Iterable2<GItem> fromItem(GItem item, int count) throws IllegalArgumentException {
+	public static <T> Iterable3<T> fromItem(T item, int count) throws IllegalArgumentException {
 		return new UniformIterable<>(item, count);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #iterableFromArray(Object[], int, int) iterableFromArray(items, 0, items.length)}. */
 	@SafeVarargs
-	public static <GItem> Iterable2<GItem> iterableFromArray(GItem... items) throws NullPointerException {
+	public static <T> Iterable3<T> iterableFromArray(T... items) throws NullPointerException {
 		return iterableFromArray(items, 0, items.length);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ArrayIterable new ArrayIterable<>(items, fromIndex, toIndex)}. */
-	public static <GItem> Iterable2<GItem> iterableFromArray(GItem[] items, int fromIndex, int toIndex) throws NullPointerException, IllegalArgumentException {
+	public static <T> Iterable3<T> iterableFromArray(T[] items, int fromIndex, int toIndex) throws NullPointerException, IllegalArgumentException {
 		return new ArrayIterable<>(items, fromIndex, toIndex);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link CountIterable new CountIterable<>(count)}. */
-	public static Iterable2<Integer> iterableFromCount(int count) throws IllegalArgumentException {
+	public static Iterable3<Integer> iterableFromCount(int count) throws IllegalArgumentException {
 		return new CountIterable(count);
 	}
+
+	/** Diese Methode liefert das {@link Iterable3} zu {@link Iterators#emptyIterator()}. */
+	@SuppressWarnings ("unchecked")
+	public static <T> Iterable3<T> emptyIterable() {
+		return (Iterable3<T>)emptyIterable;
+	}
+
+	private static final Iterable<?> emptyIterable = () -> emptyIterator();
 
 	/** Diese Methode gibt die Anzahl der vom gegebenen {@link Iterable} gelieferten Elemente zurück. */
 	public static int size(Iterable<?> that) throws NullPointerException {
@@ -392,8 +71,8 @@ public class Iterables {
 
 	/** Diese Methode fügt alle Elemente des gegebenen {@link Iterable} in die gegebene {@link Collection} ein und gibt nur bei Veränderungen an der
 	 * {@link Collection} {@code true} zurück. */
-	public static <GItem> boolean addAll(Collection<GItem> target, Iterable<? extends GItem> source) throws NullPointerException {
-		if (source instanceof Collection<?>) return target.addAll((Collection<? extends GItem>)source);
+	public static <T> boolean addAll(Collection<T> target, Iterable<? extends T> source) throws NullPointerException {
+		if (source instanceof Collection<?>) return target.addAll((Collection<? extends T>)source);
 		return Iterators.addAll(target, source.iterator());
 	}
 
@@ -401,7 +80,7 @@ public class Iterables {
 	 * des {@link Iterable} {@code true} zurück. */
 	public static boolean retainAll(Iterable<?> target, Collection<?> filter) throws NullPointerException {
 		if (target instanceof Collection<?>) return ((Collection<?>)target).retainAll(filter);
-		return Iterators.retainAll(target.iterator(), Objects.notNull(filter));
+		return Iterators.iteratorRetainAll(target.iterator(), Objects.notNull(filter));
 	}
 
 	/** Diese Methode entfernt alle Elemente der gegebenen {@link Collection}, die nicht im gegebenen {@link Iterable} vorkommen, und gibt nur bei Veränderung der
@@ -413,14 +92,14 @@ public class Iterables {
 
 	/** Diese Methode entfernt alle Elemente der gegebenen {@link Collection}, die nicht im gegebenen {@link Iterable} vorkommen, fügt alle Elemetne des
 	 * {@link Iterable} in die {@link Collection} ein und gibt nur bei Veränderung der {@link Collection} {@code true} zurück. */
-	public static <GItem> boolean replaceAll(Collection<GItem> target, Iterable<? extends GItem> source) throws NullPointerException {
+	public static <T> boolean replaceAll(Collection<T> target, Iterable<? extends T> source) throws NullPointerException {
 		var buffer = Iterables.iterableToSet(source);
 		return target.retainAll(buffer) | target.addAll(buffer);
 	}
 
 	/** Diese Methode entfernt alle Elemente des gegebenen {@link Iterable} und gibt nur bei Veränderung des {@link Iterable} {@code true} zurück. */
 	public static boolean removeAll(Iterable<?> target) throws NullPointerException {
-		return Iterators.removeAll(target.iterator());
+		return Iterators.iteratorRemoveAll(target.iterator());
 	}
 
 	/** Diese Methode entfernt alle Elemente des gegebenen {@link Iterable}, die in der gegebenen {@link Collection} vorkommen, und gibt nur bei Veränderung des
@@ -445,102 +124,193 @@ public class Iterables {
 	}
 
 	/** Diese Methode übergibt alle Elemente des gegebene {@link Iterable} an den gegebenen {@link Consumer}. */
-	public static <GItem> void collectAll(Iterable<? extends GItem> source, Consumer<? super GItem> target) throws NullPointerException {
-		Iterators.collectAll(source.iterator(), target);
+	public static <T> void collectAll(Iterable<? extends T> source, Consumer<? super T> target) throws NullPointerException {
+		Iterators.forEachRemaining(source.iterator(), target);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #concatAll(Iterable) Iterables.concatAll(Arrays.asList(iter1, iter2))}. */
-	public static <GItem> Iterable2<GItem> concat(Iterable<? extends GItem> iter1, Iterable<? extends GItem> iter2) throws NullPointerException {
+	public static <T> Iterable3<T> concat(Iterable<? extends T> iter1, Iterable<? extends T> iter2) throws NullPointerException {
 		return Iterables.concatAll(Arrays.asList(Objects.notNull(iter1), Objects.notNull(iter2)));
 	}
 
+	/** Diese Klasse implementiert das {@link Iterable3} zu {@link Iterators#concatAllIterator(Iterator)}.
+	 *
+	 * @param <T> Typ der Elemente. */
+	public static class ConcatIterable<T> extends AbstractIterable<T> {
+
+		public final Iterable<? extends Iterable<? extends T>> that;
+
+		public ConcatIterable(Iterable<? extends Iterable<? extends T>> that) throws NullPointerException {
+			this.that = Objects.notNull(that);
+		}
+
+		@Override
+		public Iterator3<T> iterator() {
+			return Iterators.concatAllIterator(Iterators.translatedIterator(this.that.iterator(), Iterables.<T>iterableIterator()));
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.that);
+		}
+
+	}
+
 	/** Diese Methode ist eine Abkürzung für {@link ConcatIterable new ConcatIterable<>(iters)}. */
-	public static <GItem> Iterable2<GItem> concatAll(Iterable<? extends Iterable<? extends GItem>> iters) throws NullPointerException {
+	public static <T> Iterable3<T> concatAll(Iterable<? extends Iterable<? extends T>> iters) throws NullPointerException {
 		return new ConcatIterable<>(iters);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #unionAll(Comparator, Iterable) Iterables.unionAll(order, Arrays.asList(iter1, iter2))}. */
-	public static <GItem> Iterable2<GItem> union(Comparator<? super GItem> order, Iterable<? extends GItem> iter1, Iterable<? extends GItem> iter2)
-		throws NullPointerException {
+	public static <T> Iterable3<T> union(Comparator<? super T> order, Iterable<? extends T> iter1, Iterable<? extends T> iter2) throws NullPointerException {
 		return Iterables.unionAll(order, Arrays.asList(Objects.notNull(iter1), Objects.notNull(iter2)));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link UnionIterable new UnionIterable<>(order, iters)}. */
-	public static <GItem> Iterable2<GItem> unionAll(Comparator<? super GItem> order, Iterable<? extends Iterable<? extends GItem>> iters)
-		throws NullPointerException {
+	public static <T> Iterable3<T> unionAll(Comparator<? super T> order, Iterable<? extends Iterable<? extends T>> iters) throws NullPointerException {
 		return new UnionIterable<>(order, iters);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ExceptIterable new ExceptIterable<>(order, iter1, iter2)}. */
-	public static <GItem> Iterable2<GItem> except(Comparator<? super GItem> order, Iterable<? extends GItem> iter1, Iterable<? extends GItem> iter2)
-		throws NullPointerException {
+	public static <T> Iterable3<T> except(Comparator<? super T> order, Iterable<? extends T> iter1, Iterable<? extends T> iter2) throws NullPointerException {
 		return new ExceptIterable<>(order, iter1, iter2);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #intersectAll(Comparator, Iterable) Iterables.intersectAll(order, Arrays.asList(iter1, iter2))}. */
-	public static <GItem> Iterable2<GItem> intersect(Comparator<? super GItem> order, Iterable<? extends GItem> iter1, Iterable<? extends GItem> iter2)
-		throws NullPointerException {
+	public static <T> Iterable3<T> intersect(Comparator<? super T> order, Iterable<? extends T> iter1, Iterable<? extends T> iter2) throws NullPointerException {
 		return Iterables.intersectAll(order, Arrays.asList(Objects.notNull(iter1), Objects.notNull(iter2)));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link IntersectIterable new IntersectIterable<>(order, iters)}. */
-	public static <GItem> Iterable2<GItem> intersectAll(Comparator<? super GItem> order, Iterable<? extends Iterable<? extends GItem>> iters)
-		throws NullPointerException {
+	public static <T> Iterable3<T> intersectAll(Comparator<? super T> order, Iterable<? extends Iterable<? extends T>> iters) throws NullPointerException {
 		return new IntersectIterable<>(order, iters);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link FilteredIterable new FilteredIterable<>(that, filter)}. */
-	public static <GItem> Iterable2<GItem> limit(Iterable<? extends GItem> that, int count) throws NullPointerException, IllegalArgumentException {
-		return new LimitedIterable<>(that, count);
+	/** Diese Methode liefert das {@link Iterable3} zu {@link Iterators#limitedIterator(Iterator, int)}. */
+	public static <T> Iterable3<T> limit(Iterable<? extends T> that, int count) throws NullPointerException, IllegalArgumentException {
+		notNull(that);
+		if (count < 0) throw new IllegalArgumentException();
+		return () -> Iterators.limitedIterator(that.iterator(), count);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link FilteredIterable new FilteredIterable<>(that, filter)}. */
-	public static <GItem> Iterable2<GItem> filter(Iterable<? extends GItem> that, Filter<? super GItem> filter) throws NullPointerException {
+	public static <T> Iterable3<T> filter(Iterable<? extends T> that, Filter<? super T> filter) throws NullPointerException {
 		return new FilteredIterable<>(that, filter);
 	}
 
+	/** Diese Klasse implementiert das {@link Iterable3} zu {@link Iterators#filteredIterator(Iterator, Filter)}.
+	 *
+	 * @param <T> Typ der Elemente. */
+	public static class FilteredIterable<T> extends AbstractIterable<T> {
+
+		public final Iterable<? extends T> that;
+
+		public final Filter<? super T> filter;
+
+		public FilteredIterable(Iterable<? extends T> that, Filter<? super T> filter) throws NullPointerException {
+			this.that = Objects.notNull(that);
+			this.filter = Objects.notNull(filter);
+		}
+
+		@Override
+		public Iterator3<T> iterator() {
+			return Iterators.filteredIterator(this.that.iterator(), this.filter);
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.that, this.filter);
+		}
+
+	}
+
 	/** Diese Methode ist eine Abkürzung für {@link Iterables#concatAll(Iterable) Iterables.concatAll(Iterables.fromItem(that, count))} und liefert ein
-	 * {@link Iterable2}, welches die gegebene Anzahl Mal über die Elemente des gegebenen {@link Iterable} iteriert. */
-	public static <GItem> Iterable2<GItem> repeat(Iterable<? extends GItem> that, int count) throws NullPointerException, IllegalArgumentException {
+	 * {@link Iterable3}, welches die gegebene Anzahl Mal über die Elemente des gegebenen {@link Iterable} iteriert. */
+	public static <T> Iterable3<T> repeat(Iterable<? extends T> that, int count) throws NullPointerException, IllegalArgumentException {
 		return Iterables.concatAll(Iterables.fromItem(Objects.notNull(that), count));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link UniqueIterable new UniqueIterable<>(that)}. */
-	public static <GItem> Iterable2<GItem> unique(Iterable<? extends GItem> that) throws NullPointerException {
-		return new UniqueIterable<>(that);
+	/** Diese Methode liefert das {@link Iterable3} zu {@link Iterators#uniqueIterator(Iterator)}. */
+	public static <T> Iterable3<T> unique(Iterable<? extends T> that) throws NullPointerException {
+		notNull(that);
+		return () -> Iterators.uniqueIterator(that.iterator());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link TranslatedIterable new TranslatedIterable<>(that, trans)}. */
-	public static <GSource, GTarget> Iterable2<GTarget> translatedIterable(Iterable<? extends GSource> that, Getter<? super GSource, ? extends GTarget> trans)
+	public static <GSource, GTarget> Iterable3<GTarget> translatedIterable(Iterable<? extends GSource> that, Getter<? super GSource, ? extends GTarget> trans)
 		throws NullPointerException {
 		return new TranslatedIterable<>(that, trans);
 	}
 
+	/** Diese Klasse implementiert das {@link Iterable3} zu {@link Iterators#translatedIterator(Iterator, Getter)}. */
+	public static class TranslatedIterable<T, T2> extends AbstractIterable<T> {
+
+		public final Iterable<? extends T2> that;
+
+		public final Getter<? super T2, ? extends T> trans;
+
+		public TranslatedIterable(Iterable<? extends T2> that, Getter<? super T2, ? extends T> trans) throws NullPointerException {
+			this.that = Objects.notNull(that);
+			this.trans = Objects.notNull(trans);
+		}
+
+		@Override
+		public Iterator3<T> iterator() {
+			return Iterators.translatedIterator(this.that.iterator(), this.trans);
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.that, this.trans);
+		}
+
+	}
+
 	/** Diese Methode ist eine Abkürzung für {@link UnmodifiableIterable new UnmodifiableIterable<>(that)}. */
-	public static <GItem> Iterable2<GItem> unmodifiable(Iterable<? extends GItem> that) throws NullPointerException {
+	public static <T> Iterable3<T> unmodifiable(Iterable<? extends T> that) throws NullPointerException {
 		return new UnmodifiableIterable<>(that);
+	}
+
+	public static class UnmodifiableIterable<T> extends AbstractIterable<T> {
+
+		public final Iterable<? extends T> that;
+
+		public UnmodifiableIterable(Iterable<? extends T> that) throws NullPointerException {
+			this.that = Objects.notNull(that);
+		}
+
+		@Override
+		public Iterator3<T> iterator() {
+			return Iterators.unmodifiableIterator(this.that.iterator());
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.that);
+		}
+
 	}
 
 	/** Diese Methode liefert den {@link Getter3} zu {@link Iterable#iterator()}. */
 	@SuppressWarnings ("unchecked")
-	public static <GItem> Getter3<Iterable<? extends GItem>, Iterator<GItem>> iterator() {
-		return (Getter3<Iterable<? extends GItem>, Iterator<GItem>>)IteratorGetter.INSTANCE;
+	public static <T> Getter3<Iterable<? extends T>, Iterator<T>> iterableIterator() {
+		return (Getter3<Iterable<? extends T>, Iterator<T>>)iterableIterator;
 	}
 
 	/** Diese Methode liefert die Elemente des gegebenen {@link Iterable} als {@link Set}. Wenn das Iterable ein {@link Set} ist, wird dieses geliefert.
 	 * Andernfalls wird ein über {@link #addAll(Collection, Iterable)} befülltes {@link HashSet2} geliefert. */
-	public static <GItem> Set<GItem> iterableToSet(Iterable<GItem> source) throws NullPointerException {
-		if (source instanceof Set<?>) return (Set<GItem>)source;
-		var result = new HashSet2<GItem>();
+	public static <T> Set<T> iterableToSet(Iterable<T> source) throws NullPointerException {
+		if (source instanceof Set<?>) return (Set<T>)source;
+		var result = new HashSet2<T>();
 		Iterables.addAll(result, source);
 		return result;
 	}
 
 	/** Diese Methode liefert die Elemente des gegebenen {@link Iterable} als {@link List}. Wenn das Iterable eine {@link List} ist, wird diese geliefert.
 	 * Andernfalls wird eine über {@link #addAll(Collection, Iterable)} befüllte {@link ArrayList} geliefert. */
-	public static <GItem> List<GItem> toList(Iterable<GItem> source) throws NullPointerException {
-		if (source instanceof List<?>) return (List<GItem>)source;
-		var result = new ArrayList<GItem>();
+	public static <T> List<T> toList(Iterable<T> source) throws NullPointerException {
+		if (source instanceof List<?>) return (List<T>)source;
+		var result = new ArrayList<T>();
 		Iterables.addAll(result, source);
 		return result;
 	}
@@ -553,8 +323,170 @@ public class Iterables {
 
 	/** Diese Methode liefert die Elemente des gegebenen {@link Iterable} als Array. Dazu wird das Iterable in eine {@link Collection} überführt, deren Inhalt
 	 * schließlich als Array {@link Collection#toArray(Object[]) geliefert} wird. */
-	public static <GItem> GItem[] toArray(Iterable<? extends GItem> source, GItem[] array) throws NullPointerException {
-		return (source instanceof Collection<?> ? (Collection<? extends GItem>)source : Iterables.toList(source)).toArray(array);
+	public static <T> T[] toArray(Iterable<? extends T> source, T[] array) throws NullPointerException {
+		return (source instanceof Collection<?> ? (Collection<? extends T>)source : Iterables.toList(source)).toArray(array);
 	}
+
+	/** Diese Klasse implementiert einen {@link Iterable3}, der die Elemente eines Abschnitts eines gegebenen Array liefert.
+	 *
+	 * @param <T> Typ der Elemente. */
+	public static class ArrayIterable<T> extends AbstractIterable<T> {
+
+		public ArrayIterable(T[] items, int fromIndex, int toIndex) throws NullPointerException, IllegalArgumentException {
+			if (fromIndex > toIndex) throw new IllegalArgumentException("fromIndex > toIndex");
+			this.items = Objects.notNull(items);
+			this.fromIndex = fromIndex;
+			this.toIndex = toIndex;
+		}
+
+		@Override
+		public Iterator3<T> iterator() {
+			return Iterators.iteratorFromArray(this.items, this.fromIndex, this.toIndex);
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.items, this.fromIndex, this.toIndex);
+		}
+
+		private final T[] items;
+
+		private final int fromIndex;
+
+		private final int toIndex;
+
+	}
+
+	/** Diese Klasse implementiert das {@link Iterable3} zu {@link Iterators#iteratorFromCount(int)}. */
+	public static class CountIterable extends AbstractIterable<Integer> {
+
+		public final int count;
+
+		public CountIterable(int count) throws IllegalArgumentException {
+			if (count < 0) throw new IllegalArgumentException();
+			this.count = count;
+		}
+
+		@Override
+		public Iterator3<Integer> iterator() {
+			return Iterators.iteratorFromCount(this.count);
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.count);
+		}
+
+	}
+
+	/** Diese Klasse implementiert das {@link Iterable3} zu {@link Iterators#iteratorFromItem(Object, int)}.
+	 *
+	 * @param <T> Typ der Elemente. */
+	public static class UniformIterable<T> extends AbstractIterable<T> {
+
+		public final T item;
+
+		public final int count;
+
+		public UniformIterable(T item, int count) throws IllegalArgumentException {
+			if (count < 0) throw new IllegalArgumentException();
+			this.item = item;
+			this.count = count;
+		}
+
+		@Override
+		public Iterator3<T> iterator() {
+			return Iterators.iteratorFromItem(this.item, this.count);
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.item, this.count);
+		}
+
+	}
+
+	/** Diese Klasse implementiert das {@link Iterable3} zu {@link Iterators#unionAll(Comparator, Iterator)}.
+	 *
+	 * @param <T> Typ der Elemente. */
+	public static class UnionIterable<T> extends AbstractIterable<T> {
+
+		public final Comparator<? super T> order;
+
+		public final Iterable<? extends Iterable<? extends T>> iters;
+
+		public UnionIterable(Comparator<? super T> order, Iterable<? extends Iterable<? extends T>> iters) throws NullPointerException {
+			this.order = Objects.notNull(order);
+			this.iters = Objects.notNull(iters);
+		}
+
+		@Override
+		public Iterator3<T> iterator() {
+			return Iterators.unionAll(this.order, Iterators.translatedIterator(this.iters.iterator(), Iterables.<T>iterableIterator()));
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.order, this.iters);
+		}
+
+	}
+
+	/** Diese Klasse implementiert das {@link Iterable3} zu {@link Iterators#except(Comparator, Iterator, Iterator)}.
+	 *
+	 * @param <T> Typ der Elemente. */
+	public static class ExceptIterable<T> extends AbstractIterable<T> {
+
+		public final Comparator<? super T> order;
+
+		public final Iterable<? extends T> iter1;
+
+		public final Iterable<? extends T> iter2;
+
+		public ExceptIterable(Comparator<? super T> order, Iterable<? extends T> iter1, Iterable<? extends T> iter2) throws NullPointerException {
+			this.order = Objects.notNull(order);
+			this.iter1 = Objects.notNull(iter1);
+			this.iter2 = Objects.notNull(iter2);
+		}
+
+		@Override
+		public Iterator3<T> iterator() {
+			return Iterators.except(this.order, this.iter1.iterator(), this.iter2.iterator());
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.order, this.iter1, this.iter2);
+		}
+
+	}
+
+	/** Diese Klasse implementiert das {@link Iterable3} zu {@link Iterators#intersectAll(Comparator, Iterator)}.
+	 *
+	 * @param <T> Typ der Elemente. */
+	public static class IntersectIterable<T> extends AbstractIterable<T> {
+
+		public final Comparator<? super T> order;
+
+		public final Iterable<? extends Iterable<? extends T>> iters;
+
+		public IntersectIterable(Comparator<? super T> order, Iterable<? extends Iterable<? extends T>> iters) throws NullPointerException {
+			this.order = Objects.notNull(order);
+			this.iters = Objects.notNull(iters);
+		}
+
+		@Override
+		public Iterator3<T> iterator() {
+			return Iterators.intersectAll(this.order, Iterators.translatedIterator(this.iters.iterator(), Iterables.<T>iterableIterator()));
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.order, this.iters);
+		}
+
+	}
+
+	private static final Getter<? extends Iterable<?>, ?> iterableIterator = Iterable::iterator;
 
 }

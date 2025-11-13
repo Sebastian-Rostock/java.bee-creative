@@ -903,7 +903,7 @@ public abstract class AbstractHashData<K, V> implements Emuable {
 		}
 
 		@Override
-		public Iterator2<GKey> iterator() {
+		public Iterator3<GKey> iterator() {
 			return this.entryData.newKeysIteratorImpl();
 		}
 
@@ -972,7 +972,7 @@ public abstract class AbstractHashData<K, V> implements Emuable {
 		}
 
 		@Override
-		public Iterator2<GValue> iterator() {
+		public Iterator3<GValue> iterator() {
 			return this.entryData.newValuesIteratorImpl();
 		}
 
@@ -1024,7 +1024,7 @@ public abstract class AbstractHashData<K, V> implements Emuable {
 		}
 
 		@Override
-		public Iterator2<Entry<GKey, GValue>> iterator() {
+		public Iterator3<Entry<GKey, GValue>> iterator() {
 			return this.entryData.newEntriesIteratorImpl();
 		}
 

@@ -101,7 +101,7 @@ public class Collections {
 		}
 
 		@Override
-		public Iterator2<E> iterator() {
+		public Iterator3<E> iterator() {
 			return Iterators.<E>filteredIterator(this.items1.iterator(), filterFromItems(this.items2).negate()).concat(this.items2.iterator()).unmodifiable();
 		}
 
@@ -138,7 +138,7 @@ public class Collections {
 		}
 
 		@Override
-		public Iterator2<E> iterator() {
+		public Iterator3<E> iterator() {
 			return Iterators.<E>filteredIterator(this.items1.iterator(), filterFromItems(this.items2).negate()).unmodifiable();
 		}
 
@@ -174,7 +174,7 @@ public class Collections {
 		}
 
 		@Override
-		public Iterator2<E> iterator() {
+		public Iterator3<E> iterator() {
 			return Iterators.<E>filteredIterator(this.items1.iterator(), filterFromItems(this.items2)).unmodifiable();
 		}
 
@@ -211,7 +211,7 @@ public class Collections {
 		}
 
 		@Override
-		public Iterator2<Entry<K, V>> iterator() {
+		public Iterator3<Entry<K, V>> iterator() {
 			return new Iter();
 		}
 
@@ -316,7 +316,7 @@ public class Collections {
 		}
 	
 		@Override
-		public Iterator2<E> iterator() {
+		public Iterator3<E> iterator() {
 			return translatedIterator(this.that.iterator(), this.trans.asTargetGetter());
 		}
 	
@@ -726,7 +726,7 @@ public class Collections {
 		}
 	
 		@Override
-		public Iterator2<E> iterator() {
+		public Iterator3<E> iterator() {
 			return translatedIterator(this.that.iterator(), this.trans.asTargetGetter());
 		}
 	
@@ -814,7 +814,7 @@ public class Collections {
 		}
 
 		@Override
-		public Iterator2<E> iterator() {
+		public Iterator3<E> iterator() {
 			return concatIterator(this.items1.iterator(), this.items2.iterator());
 		}
 
@@ -889,7 +889,7 @@ public class Collections {
 		}
 
 		@Override
-		public Iterator2<E> iterator() {
+		public Iterator3<E> iterator() {
 			return translatedIterator(this.that.iterator(), this.trans.asTargetGetter());
 		}
 

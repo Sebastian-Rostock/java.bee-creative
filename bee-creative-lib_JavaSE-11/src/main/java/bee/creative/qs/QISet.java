@@ -3,7 +3,7 @@ package bee.creative.qs;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import bee.creative.util.Iterator2;
+import bee.creative.util.Iterator3;
 
 /** Diese Schnittstelle definiert eine beliebig große Sicht auf eine Menge von Elementen mit Bezug zu einem {@link #owner() Graphspeicher}.
  *
@@ -32,11 +32,11 @@ public interface QISet<ITEM> extends QO, Iterable<ITEM> {
 		return null;
 	}
 
-	/** Diese Methode gibt den {@link Iterator2} über die Objekte dieser Menge zurück. Die Methode {@link Iterator#remove()} wird nicht unterstützt.
+	/** Diese Methode gibt den {@link Iterator3} über die Objekte dieser Menge zurück. Die Methode {@link Iterator#remove()} wird nicht unterstützt.
 	 *
 	 * @return Iterator. */
 	@Override
-	Iterator2<ITEM> iterator();
+	Iterator3<ITEM> iterator();
 
 	/** Diese Methode gibt eine Kopie dieser Menge als {@link Set} zurück.
 	 *

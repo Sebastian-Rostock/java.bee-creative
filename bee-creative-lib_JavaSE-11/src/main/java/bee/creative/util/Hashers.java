@@ -8,9 +8,9 @@ import bee.creative.lang.Objects;
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Hashers {
 
-	/** Diese Methode liefert das gegebene {@link Hasher} als {@link Hasher3}. */
+	/** Diese Methode liefert das gegebene {@link Hasher} als {@link Hasher3}. Wenn er {@code null} ist, wird {@link #naturalHasher()} geliefert. */
 	public static Hasher3 hasherFrom(Hasher that) throws NullPointerException {
-		notNull(that);
+		if (that == null) return naturalHasher();
 		if (that instanceof Hasher3) return (Hasher3)that;
 		return hasherFrom(that, that);
 	}

@@ -17,9 +17,9 @@ import java.util.Map;
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class Fields {
 
-	/** Diese Methode liefert das gegebene {@link Field} als {@link Field3}.throws NullPointerException */
+	/** Diese Methode liefert das gegebene {@link Field} als {@link Field3}. Wenn es {@code null} ist, wird {@link #emptyField()} geliefert. */
 	public static <T, V> Field3<T, V> fieldFrom(Field<T, V> that) {
-		notNull(that);
+		if (that == null) return emptyField();
 		if (that instanceof Field3<?, ?>) return (Field3<T, V>)that;
 		return fieldFrom(that, that);
 	}

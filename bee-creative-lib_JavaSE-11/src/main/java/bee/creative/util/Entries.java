@@ -11,9 +11,9 @@ import java.util.Map.Entry;
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Entries {
 
-	/** Diese Methode liefert das gegebene {@link Entry} als {@link Entry3}. */
-	public static <K, V> Entry3<K, V> entryFrom(Entry<K, V> that) throws NullPointerException {
-		notNull(that);
+	/** Diese Methode liefert das gegebene {@link Entry} als {@link Entry3}. Wenn es {@code null} ist, wird {@link #emptyEntry()} geliefert. */
+	public static <K, V> Entry3<K, V> entryFrom(Entry<K, V> that) {
+		if (that == null) return emptyEntry();
 		if (that instanceof Entry3<?, ?>) return (Entry3<K, V>)that;
 		return entryFrom(that::getKey, propertyFrom(that::getValue, that::setValue));
 	}
@@ -116,7 +116,7 @@ public class Entries {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Entry3#translate(Translator, Translator) entryFrom(that).translate(keyTrans, valueTrans)}. */
-	public static <K, V, K2, V2> Entry3<K, V> translatedEntry(Entry<K2, V2> that, Translator<K2, K> keyTrans, Translator<V2, V> valueTrans)
+	public static <K2, V2, K, V> Entry3<K, V> translatedEntry(Entry<K2, V2> that, Translator<K2, K> keyTrans, Translator<V2, V> valueTrans)
 		throws NullPointerException {
 		return entryFrom(that).translate(keyTrans, valueTrans);
 	}

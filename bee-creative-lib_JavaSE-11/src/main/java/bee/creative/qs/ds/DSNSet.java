@@ -5,7 +5,7 @@ import bee.creative.qs.QN;
 import bee.creative.qs.QNSet;
 import bee.creative.qs.QS;
 import bee.creative.util.Iterables;
-import bee.creative.util.Iterator2;
+import bee.creative.util.Iterator3;
 import bee.creative.util.Properties;
 import bee.creative.util.Property3;
 import bee.creative.util.Set2;
@@ -139,9 +139,9 @@ public interface DSNSet extends QNSet {
 			}
 
 			@Override
-			public Iterator2<QN> iterator() {
+			public Iterator3<QN> iterator() {
 				var iter = DSNSet.this.iterator();
-				return new Iterator2<>() {
+				return new Iterator3<>() {
 
 					@Override
 					public QN next() {

@@ -7,7 +7,7 @@ import bee.creative.emu.Emuator;
 import bee.creative.lang.Objects;
 import bee.creative.util.AbstractIterator;
 import bee.creative.util.HashMapII;
-import bee.creative.util.Iterator2;
+import bee.creative.util.Iterator3;
 
 /** Diese Klasse implementiert Methoden zur Verarbeitung einer steuwertbasierten Menge von Referenen ungleich {@code 0} mit durchschnittlich vier
  * Speicherzugriffen zum {@link #getIdx(int[], int) Finden} einer vorhandenen Referenz. Die Methoden verzichten für maximale Effizienz weitgehend auf die
@@ -292,12 +292,12 @@ public final class REFSET {
 		}
 	}
 
-	/** Diese Methode liefert den {@link Iterator2} über die Referenzen der gegebenen Referenzmenge {@code refset}. */
+	/** Diese Methode liefert den {@link Iterator3} über die Referenzen der gegebenen Referenzmenge {@code refset}. */
 	public static ITER iterator(int[] refset) {
 		return new ITER(refset, null, null);
 	}
 
-	/** Diese Methode liefert den {@link Iterator2} über die Referenzen der gegebenen Referenzmenge {@code refset}, die in der zweiten gegebenen Referenzmenge
+	/** Diese Methode liefert den {@link Iterator3} über die Referenzen der gegebenen Referenzmenge {@code refset}, die in der zweiten gegebenen Referenzmenge
 	 * {@code acceptRefset_or_null} und nicht in der dritten gegebenen Referenzmenge {@code refuseRefset_or_null} enthalten sind. */
 	public static ITER iterator(int[] refset, int[] acceptRefset_or_null, int[] refuseRefset_or_null) {
 		return new ITER(refset, acceptRefset_or_null, refuseRefset_or_null);

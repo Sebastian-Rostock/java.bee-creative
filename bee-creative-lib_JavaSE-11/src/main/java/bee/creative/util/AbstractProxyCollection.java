@@ -88,7 +88,7 @@ public abstract class AbstractProxyCollection<E, D extends Collection<E>> implem
 	}
 
 	@Override
-	public Iterator2<E> iterator() {
+	public Iterator3<E> iterator() {
 		return new Iter();
 	}
 

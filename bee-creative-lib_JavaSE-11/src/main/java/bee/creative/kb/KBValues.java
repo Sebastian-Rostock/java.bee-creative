@@ -6,13 +6,13 @@ import bee.creative.emu.Emuable;
 import bee.creative.fem.FEMString;
 import bee.creative.lang.Objects;
 import bee.creative.lang.Objects.UseToString;
-import bee.creative.util.Iterable2;
-import bee.creative.util.Iterator2;
+import bee.creative.util.Iterable3;
+import bee.creative.util.Iterator3;
 
-/** Diese Klasse implementiert das {@link Iterable2} der Textwerte eines {@link KBState Wissensstands}.
+/** Diese Klasse implementiert das {@link Iterable3} der Textwerte eines {@link KBState Wissensstands}.
  *
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public class KBValues implements Iterable2<KBValue>, Emuable, UseToString {
+public class KBValues implements Iterable3<KBValue>, Emuable, UseToString {
 
 	/** Diese Methode liefert den {@link KBState Wissensstand}, dessen {@link FEMString Texterte} iteriert werden. */
 	public KBState owner() {
@@ -44,7 +44,7 @@ public class KBValues implements Iterable2<KBValue>, Emuable, UseToString {
 	}
 
 	@Override
-	public Iterator2<KBValue> iterator() {
+	public Iterator3<KBValue> iterator() {
 		return this.owner.valueIterator(this.acceptValueRefset, this.refuseValueRefset);
 	}
 

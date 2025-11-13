@@ -7,12 +7,19 @@ import static bee.creative.lang.Objects.notNull;
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Producers {
 
-	/** Diese Methode liefert den gegebenen {@link Producer} als {@link Producer3}. */
+	/** Diese Methode liefert den gegebenen {@link Producer3}. Wenn er {@code null} ist, wird {@link #emptyProducer()} geliefert. */
+	@SuppressWarnings ("unchecked")
+	public static <V> Producer3<V> producerFrom(Producer3<? extends V> that) throws NullPointerException {
+		if (that == null) return emptyProducer();
+		return (Producer3<V>)that;
+	}
+
+	/** Diese Methode liefert den gegebenen {@link Producer} als {@link Producer3}. Wenn er {@code null} ist, wird {@link #emptyProducer()} geliefert. */
 	@SuppressWarnings ("unchecked")
 	public static <V> Producer3<V> producerFrom(Producer<? extends V> that) throws NullPointerException {
-		notNull(that);
+		if (that == null) return emptyProducer();
 		if (that instanceof Producer3<?>) return (Producer3<V>)that;
-		return () -> that.get();
+		return that::get;
 	}
 
 	/** Diese Methode liefert einen {@link Producer3}, der beim Lesen den gegebenen {@code value} liefert. */
@@ -38,7 +45,7 @@ public class Producers {
 
 	/** Diese Methode liefert einen übersetzten {@link Producer3}, der beim Lesen einen Wert liefert, der über den gegebenen {@link Getter} {@code trans} aus dem
 	 * Wert des gegebenen {@link Producer} ermittelt wird. Das Lesen erfolgt über {@code trans.get(that.get())}. */
-	public static <V, V2> Producer3<V> translatedProducer(Producer<? extends V2> that, Getter<? super V2, ? extends V> trans) throws NullPointerException {
+	public static <V2, V> Producer3<V> translatedProducer(Producer<? extends V2> that, Getter<? super V2, ? extends V> trans) throws NullPointerException {
 		notNull(that);
 		notNull(trans);
 		return () -> trans.get(that.get());

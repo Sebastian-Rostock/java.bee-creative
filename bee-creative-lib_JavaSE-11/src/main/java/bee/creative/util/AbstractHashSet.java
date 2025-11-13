@@ -112,7 +112,7 @@ public abstract class AbstractHashSet<E> extends AbstractHashData<E, E> implemen
 	}
 
 	@Override
-	public Iterator2<E> iterator() {
+	public Iterator3<E> iterator() {
 		return this.newKeysIteratorImpl();
 	}
 

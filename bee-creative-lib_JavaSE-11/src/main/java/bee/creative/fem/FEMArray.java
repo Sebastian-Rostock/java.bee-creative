@@ -19,7 +19,7 @@ import bee.creative.util.AbstractList2;
 import bee.creative.util.AbstractSet2;
 import bee.creative.util.Comparators;
 import bee.creative.util.Iterables;
-import bee.creative.util.Iterator2;
+import bee.creative.util.Iterator3;
 import bee.creative.util.Iterators;
 import bee.creative.util.List2;
 import bee.creative.util.Map3;
@@ -153,7 +153,7 @@ public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable<FE
 			}
 
 			@Override
-			public Iterator2<FEMValue> iterator() {
+			public Iterator3<FEMValue> iterator() {
 				return ItemMap.this.keys.iterator();
 			}
 
@@ -172,7 +172,7 @@ public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable<FE
 			}
 
 			@Override
-			public Iterator2<FEMValue> iterator() {
+			public Iterator3<FEMValue> iterator() {
 				return ItemMap.this.values.iterator();
 			}
 
@@ -191,7 +191,7 @@ public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable<FE
 			}
 
 			@Override
-			public Iterator2<Entry<FEMValue, FEMValue>> iterator() {
+			public Iterator3<Entry<FEMValue, FEMValue>> iterator() {
 				return new EntryIter();
 			}
 
@@ -361,7 +361,7 @@ public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable<FE
 		}
 
 		@Override
-		public Iterator2<FEMValue> iterator() {
+		public Iterator3<FEMValue> iterator() {
 			return this.items.iterator();
 		}
 
@@ -1191,7 +1191,7 @@ public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable<FE
 	}
 
 	@Override
-	public Iterator2<FEMValue> iterator() {
+	public Iterator3<FEMValue> iterator() {
 		return Iterators.iteratorFromArray(this, 0, this.length);
 	}
 

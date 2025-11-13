@@ -8,12 +8,19 @@ import static bee.creative.util.Producers.emptyProducer;
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Consumers {
 
-	/** Diese Methode liefert den gegebenen {@link Consumer} als {@link Consumer3}. */
+	/** Diese Methode liefert den gegebenen {@link Consumer3}. Wenn er {@code null} ist, wird {@link #emptyConsumer()} geliefert. */
+	@SuppressWarnings ("unchecked")
+	public static <V> Consumer3<V> consumerFrom(Consumer3<? super V> that) {
+		if (that == null) return emptyConsumer();
+		return (Consumer3<V>)that;
+	}
+
+	/** Diese Methode liefert den gegebenen {@link Consumer} als {@link Consumer3}. Wenn er {@code null} ist, wird {@link #emptyConsumer()} geliefert. */
 	@SuppressWarnings ("unchecked")
 	public static <V> Consumer3<V> consumerFrom(Consumer<? super V> that) {
-		notNull(that);
+		if (that == null) return emptyConsumer();
 		if (that instanceof Consumer3<?>) return (Consumer3<V>)that;
-		return value -> that.set(value);
+		return that::set;
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #consumerFromSetter(Setter, Producer) consumerFromSetter(that, emptyProducer())}. */
@@ -38,7 +45,7 @@ public class Consumers {
 
 	/** Diese Methode liefert einen übersetzten {@link Consumer3}, der den Wert beim Schreiben über den gegebenen {@link Getter} in den Wert eines gegebenen
 	 * {@link Consumer} überführt. Das Schreiben des Werts {@code value} erfolgt über {@code that.set(trans.get(value))}. */
-	public static <V, V2> Consumer3<V> translatedConsumer(Consumer<? super V2> that, Getter<? super V, ? extends V2> trans) throws NullPointerException {
+	public static <V2, V> Consumer3<V> translatedConsumer(Consumer<? super V2> that, Getter<? super V, ? extends V2> trans) throws NullPointerException {
 		notNull(that);
 		notNull(trans);
 		return value -> that.set(trans.get(value));

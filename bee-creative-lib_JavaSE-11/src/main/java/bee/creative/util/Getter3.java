@@ -51,12 +51,12 @@ public interface Getter3<T, V> extends Getter<T, V> {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Iterables#translatedIterable(Iterable, Getter) translatedIterable(that, this)}. */
-	default Iterable2<V> translate(Iterable<? extends T> that) {
+	default Iterable3<V> translate(Iterable<? extends T> that) {
 		return translatedIterable(that, this);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Iterators#translatedIterator(Iterator, Getter) translatedIterator(that, this)}. */
-	default Iterator2<V> translate(Iterator<? extends T> that) {
+	default Iterator3<V> translate(Iterator<? extends T> that) {
 		return translatedIterator(that, this);
 	}
 

@@ -8,7 +8,7 @@ import static bee.creative.util.Collections.unionSet;
 import java.util.Map.Entry;
 import java.util.Set;
 
-/** Diese Schnittstelle definiert ein {@link Set} mit {@link Iterator2}.
+/** Diese Schnittstelle definiert ein {@link Set} mit {@link Iterator3}.
  *
  * @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public interface Set2<E> extends Set<E>, Collection2<E> {
@@ -39,6 +39,6 @@ public interface Set2<E> extends Set<E>, Collection2<E> {
 	}
 
 	@Override
-	Iterator2<E> iterator();
+	Iterator3<E> iterator();
 
 }

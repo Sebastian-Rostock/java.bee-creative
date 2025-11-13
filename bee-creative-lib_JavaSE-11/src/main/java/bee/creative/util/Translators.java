@@ -14,9 +14,15 @@ import java.util.Map;
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Translators {
 
-	/** Diese Methode liefert den gegebenen {@link Translator} als {@link Translator3}. */
+	/** Diese Methode liefert den gegebenen {@link Translator3}. Wenn er {@code null} ist, wird {@link #emptyTranslator()} geliefert. */
+	public static <S, T> Translator3<S, T> translatorFrom(Translator3<S, T> that) throws NullPointerException {
+		if (that == null) return emptyTranslator();
+		return that;
+	}
+	
+	/** Diese Methode liefert den gegebenen {@link Translator} als {@link Translator3}. Wenn er {@code null} ist, wird {@link #emptyTranslator()} geliefert. */
 	public static <S, T> Translator3<S, T> translatorFrom(Translator<S, T> that) throws NullPointerException {
-		notNull(that);
+		if (that == null) return emptyTranslator();
 		if (that instanceof Translator3) return (Translator3<S, T>)that;
 		return translatorFrom(filterFrom(that::isTarget), filterFrom(that::isSource), getterFrom(that::toTarget), getterFrom(that::toSource));
 	}

@@ -10,17 +10,20 @@ import java.util.Comparator;
  * @author Sebastian Rostock 2011. */
 public class Comparators {
 
-	/** Diese Methode liefert den gegebenen {@link Comparator3}. */
-	public static <T> Comparator3<T> comparator(Comparator3<T> that) {
-		return notNull(that);
+	/** Diese Methode liefert den gegebenen {@link Comparator3}. Wenn er {@code null} ist, wird der {@link #neutralComparator()} geliefert. */
+	@SuppressWarnings ("unchecked")
+	public static <T> Comparator3<T> comparator(Comparator3<? super T> that) {
+		if (that == null) return neutralComparator();
+		return (Comparator3<T>)that;
 	}
 
-	/** Diese Methode liefert den gegebenen {@link Comparator} als {@link Comparator3}. */
+	/** Diese Methode liefert den gegebenen {@link Comparator} als {@link Comparator3}. Wenn er {@code null} ist, wird der {@link #neutralComparator()}
+	 * geliefert. */
 	@SuppressWarnings ("unchecked")
 	public static <T> Comparator3<T> comparatorFrom(Comparator<? super T> that) {
-		notNull(that);
+		if (that == null) return neutralComparator();
 		if (that instanceof Comparator3<?>) return (Comparator3<T>)that;
-		return (item1, item2) -> that.compare(item1, item2);
+		return that::compare;
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Comparators#translatedComparator(Comparator, Getter) translatedComparator(naturalComparator(), that)}. */
@@ -104,7 +107,7 @@ public class Comparators {
 
 	/** Diese Methode liefert einen übersetzten {@link Comparator3}, der den {@link Comparator#compare(Object, Object) Vergleichswert} über
 	 * {@code that.compare(trans.get(item1), trans.get(item2))} ermittelt. */
-	public static <T, T2> Comparator3<T> translatedComparator(Comparator<? super T2> that, Getter<? super T, ? extends T2> trans) throws NullPointerException {
+	public static <T2, T> Comparator3<T> translatedComparator(Comparator<? super T2> that, Getter<? super T, ? extends T2> trans) throws NullPointerException {
 		notNull(that);
 		notNull(trans);
 		return (item1, item2) -> that.compare(trans.get(item1), trans.get(item2));

@@ -5,7 +5,7 @@ import java.sql.SQLException;
 import bee.creative.lang.Objects;
 import bee.creative.qs.QISet;
 import bee.creative.util.AbstractIterator;
-import bee.creative.util.Iterator2;
+import bee.creative.util.Iterator3;
 
 /** Diese Klasse implementiert ein {@link QISet} als Sicht auf das ergebnis einer SQL-Anfrage.
  *
@@ -49,7 +49,7 @@ public abstract class H2QISet<GI> implements QISet<GI> {
 	}
 
 	@Override
-	public Iterator2<GI> iterator() {
+	public Iterator3<GI> iterator() {
 		return new Iter();
 	}
 

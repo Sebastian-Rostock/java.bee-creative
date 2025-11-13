@@ -9,8 +9,8 @@ import bee.creative.lang.Objects;
 import bee.creative.util.Getter;
 import bee.creative.util.HashMapIO;
 import bee.creative.util.HashMapOI;
-import bee.creative.util.Iterable2;
-import bee.creative.util.Iterator2;
+import bee.creative.util.Iterable3;
+import bee.creative.util.Iterator3;
 import bee.creative.util.Iterators;
 
 /** Diese Klasse implementiert einen Wissensstand (<em>knowledge-base state</em>) als Menge {@link KBEdge typisierter gerichteter Kanen} zwischen Knoten mit
@@ -599,28 +599,28 @@ public class KBState implements Emuable {
 	// TODO targetIterator
 	// TODO targetRelationIterator
 	// TODO relationIterator
-	final Iterator2<KBEdge> edgeIterator(int[] acceptSourceRefset_or_null, int[] refuseSourceRefset_or_null, int[] acceptTargetRefset_or_null,
+	final Iterator3<KBEdge> edgeIterator(int[] acceptSourceRefset_or_null, int[] refuseSourceRefset_or_null, int[] acceptTargetRefset_or_null,
 		int[] refuseTargetRefset_or_null, int[] acceptRelationRefset_or_null, int[] refuseRelationRefset_or_null) {
 		var sourceIter = REFMAP.iterator(this.sourceMap, acceptSourceRefset_or_null, refuseSourceRefset_or_null);
-		return Iterators.concatAll(Iterators.concatAll(new Iterator2<Iterator2<Iterator2<KBEdge>>>() {
+		return Iterators.concatAllIterator(Iterators.concatAllIterator(new Iterator3<Iterator3<Iterator3<KBEdge>>>() {
 
 			@Override
-			public Iterator2<Iterator2<KBEdge>> next() {
+			public Iterator3<Iterator3<KBEdge>> next() {
 				var relationIter = REFMAP.iterator(KBState.asRefMap(sourceIter.nextVal()), acceptRelationRefset_or_null, refuseRelationRefset_or_null);
 				var sourceRef = sourceIter.nextRef();
-				return new Iterator2<>() {
+				return new Iterator3<>() {
 
 					@Override
-					public Iterator2<KBEdge> next() {
+					public Iterator3<KBEdge> next() {
 						var targetVal = KBState.asRefVal(relationIter.nextVal());
 						var relationRef = relationIter.nextRef();
 						if (KBState.isRef(targetVal)) {
 							var targetRef = KBState.asRef(targetVal);
 							if (!REFSET.isValid(targetRef, acceptTargetRefset_or_null, refuseTargetRefset_or_null)) return Iterators.emptyIterator();
-							return Iterators.fromItem(new KBEdge(sourceRef, targetRef, relationRef));
+							return Iterators.iteratorFromItem(new KBEdge(sourceRef, targetRef, relationRef));
 						}
 						var targetIter = REFSET.iterator(targetVal, acceptTargetRefset_or_null, refuseTargetRefset_or_null);
-						return new Iterator2<>() {
+						return new Iterator3<>() {
 
 							@Override
 							public KBEdge next() {
@@ -651,7 +651,7 @@ public class KBState implements Emuable {
 		}));
 	}
 
-	final Iterator2<KBValue> valueIterator(int[] acceptValueRefset_or_null, int[] refuseValueRefset_or_null) {
+	final Iterator3<KBValue> valueIterator(int[] acceptValueRefset_or_null, int[] refuseValueRefset_or_null) {
 		return ((acceptValueRefset_or_null == null) && (refuseValueRefset_or_null == null) ? this.valueStrMap.fastIterator()
 			: this.valueStrMap.fastIterator().filter(entry -> REFSET.isValid(entry.valueRef(), acceptValueRefset_or_null, refuseValueRefset_or_null)));
 	}
@@ -684,11 +684,11 @@ public class KBState implements Emuable {
 			return result;
 		}
 
-		public Iterable2<KBValue> fastEntries() {
+		public Iterable3<KBValue> fastEntries() {
 			return () -> this.fastIterator();
 		}
 
-		public Iterator2<KBValue> fastIterator() {
+		public Iterator3<KBValue> fastIterator() {
 			return new ITER();
 		}
 
@@ -702,7 +702,7 @@ public class KBState implements Emuable {
 		}
 
 		@SuppressWarnings ("synthetic-access")
-		final class ITER implements Iterator2<KBValue> {
+		final class ITER implements Iterator3<KBValue> {
 
 			@Override
 			public KBValue next() {

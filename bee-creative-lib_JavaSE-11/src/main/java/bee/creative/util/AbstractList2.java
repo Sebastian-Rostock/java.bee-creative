@@ -8,7 +8,7 @@ import java.util.AbstractList;
 public abstract class AbstractList2<E> extends AbstractList<E> implements List2<E> {
 
 	@Override
-	public Iterator2<E> iterator() {
+	public Iterator3<E> iterator() {
 		return Iterators.iteratorFrom(super.iterator());
 	}
 

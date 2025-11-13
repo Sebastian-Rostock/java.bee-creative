@@ -21,7 +21,7 @@ import bee.creative.lang.Objects;
 import bee.creative.util.AbstractSet2;
 import bee.creative.util.Entries;
 import bee.creative.util.HashMapLO;
-import bee.creative.util.Iterator2;
+import bee.creative.util.Iterator3;
 import bee.creative.util.Iterators;
 import bee.creative.util.Property;
 
@@ -261,7 +261,7 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 		}
 
 		@Override
-		public Iterator2<FEMFunction> iterator() {
+		public Iterator3<FEMFunction> iterator() {
 			return Iterators.iteratorFromArray(this, 0, this.size());
 		}
 

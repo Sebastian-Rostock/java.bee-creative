@@ -4,11 +4,11 @@ import java.util.NoSuchElementException;
 import bee.creative.lang.Objects.BaseObject;
 import bee.creative.lang.Objects.UseToString;
 
-/** Diese Klasse implementiert einen abstrakten {@link Iterator2} als {@link BaseObject} mit {@link UseToString}-Markierung.
+/** Diese Klasse implementiert einen abstrakten {@link Iterator3} als {@link BaseObject} mit {@link UseToString}-Markierung.
  *
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GItem> Typ der Elemente. */
-public abstract class AbstractIterator<GItem> extends BaseObject implements Iterator2<GItem>, UseToString {
+public abstract class AbstractIterator<GItem> extends BaseObject implements Iterator3<GItem>, UseToString {
 
 	@Override
 	public boolean hasNext() {

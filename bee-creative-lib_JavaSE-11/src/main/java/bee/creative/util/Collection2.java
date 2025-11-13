@@ -4,7 +4,7 @@ import static bee.creative.util.Collections.concatCollection;
 import static bee.creative.util.Collections.translatedCollection;
 import java.util.Collection;
 
-/** Diese Schnittstelle definiert eine {@link Collection} mit {@link Iterator2}.
+/** Diese Schnittstelle definiert eine {@link Collection} mit {@link Iterator3}.
  *
  * @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public interface Collection2<E> extends Collection<E>, Filter<Object> {
@@ -56,6 +56,6 @@ public interface Collection2<E> extends Collection<E>, Filter<Object> {
 	}
 
 	@Override
-	Iterator2<E> iterator();
+	Iterator3<E> iterator();
 
 }

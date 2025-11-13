@@ -7,18 +7,19 @@ import static bee.creative.lang.Objects.notNull;
  * @author [cc-by] 2017 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Setters {
 
-	/** Diese Methode liefert den gegebenen {@link Setter3}. */
+	/** Diese Methode liefert den gegebenen {@link Setter3}. Wenn er {@code null} ist, wird {@link #emptySetter()} geliefert. */
 	@SuppressWarnings ("unchecked")
 	public static <T, V> Setter3<T, V> setterFrom(Setter3<? super T, ? super V> that) throws NullPointerException {
+		if (that == null) return emptySetter();
 		return (Setter3<T, V>)notNull(that);
 	}
 
-	/** Diese Methode liefert den gegebenen {@link Setter} als {@link Setter3}. */
+	/** Diese Methode liefert den gegebenen {@link Setter} als {@link Setter3}. Wenn er {@code null} ist, wird {@link #emptySetter()} geliefert. */
 	@SuppressWarnings ("unchecked")
 	public static <T, V> Setter3<T, V> setterFrom(Setter<? super T, ? super V> that) throws NullPointerException {
-		notNull(that);
+		if (that == null) return emptySetter();
 		if (that instanceof Setter3) return (Setter3<T, V>)that;
-		return (item, value) -> that.set(item, value);
+		return that::set;
 	}
 
 	/** Diese Methode liefert den gegebenen {@link Setter3} zu {@link Consumer#set(Object)}. */
@@ -45,7 +46,7 @@ public class Setters {
 	/** Diese Methode liefert einen übersetzten {@link Setter3}, der das Schreiben mit dem über den gegebenen {@link Getter} übersetzten Wert an den gegebenen
 	 * {@link Setter} delegeirt. Das Schreiben des Werts {@code value} der Eigenschaft eines Datensatzes {@code item} erfolgt über
 	 * {@code that.set(item, trans.get(value))}. */
-	public static <T, V, V2> Setter3<T, V> translatedSetter(Setter<? super T, ? super V2> that, Getter<? super V, ? extends V2> trans)
+	public static <T, V2, V> Setter3<T, V> translatedSetter(Setter<? super T, ? super V2> that, Getter<? super V, ? extends V2> trans)
 		throws NullPointerException {
 		notNull(that);
 		notNull(trans);
@@ -84,7 +85,7 @@ public class Setters {
 	 * Synchronisationsobjekt {@code null} ist, wird der gelieferte {@link Setter} verwendet. */
 	public static <T, V> Setter3<T, V> synchronizedSetter(Setter<? super T, ? super V> that, Object mutex) throws NullPointerException {
 		notNull(that);
-		return new Setter3<T, V>() {
+		return new Setter3<>() {
 
 			@Override
 			public void set(T T, V V) {

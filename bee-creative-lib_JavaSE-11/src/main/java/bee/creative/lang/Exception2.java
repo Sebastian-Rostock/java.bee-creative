@@ -8,7 +8,7 @@ import java.util.IllegalFormatException;
 import java.util.LinkedList;
 import java.util.List;
 import bee.creative.util.Collections.ConcatList;
-import bee.creative.util.Iterator2;
+import bee.creative.util.Iterator3;
 import bee.creative.util.List2;
 
 /** Diese Klasse implementiert eine {@link RuntimeException}, an welche mehrere {@link #getMessages() Nachrichten} {@link #push(Object) angefügt} werden können
@@ -128,7 +128,7 @@ public class Exception2 extends RuntimeException implements Iterable<String> {
 	}
 
 	@Override
-	public Iterator2<String> iterator() {
+	public Iterator3<String> iterator() {
 		return iteratorFrom(this.messages.iterator());
 	}
 

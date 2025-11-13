@@ -13,9 +13,15 @@ import static bee.creative.util.Producers.translatedProducer;
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Properties {
 
-	/** Diese Methode liefert das gegebene {@link Property} als {@link Property3}. */
+	/** Diese Methode liefert das gegebene {@link Property3}. Wenn es {@code null} ist, wird {@link #emptyProperty()} geliefert. */
+	public static <V> Property3<V> propertyFrom(Property3<V> that) {
+		if (that == null) return emptyProperty();
+		return (Property3<V>)that;
+	}
+
+	/** Diese Methode liefert das gegebene {@link Property} als {@link Property3}. Wenn es {@code null} ist, wird {@link #emptyProperty()} geliefert. */
 	public static <V> Property3<V> propertyFrom(Property<V> that) {
-		notNull(that);
+		if (that == null) return emptyProperty();
 		if (that instanceof Property3<?>) return (Property3<V>)that;
 		return propertyFrom(that, that);
 	}
@@ -98,13 +104,13 @@ public class Properties {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #translatedProperty(Property, Getter, Getter) translatedProperty(that, trans::toTarget, trans::toSource)}. */
-	public static <V, V2> Property3<V> translatedProperty(Property<V2> that, Translator<V2, V> trans) throws NullPointerException {
+	public static <V2, V> Property3<V> translatedProperty(Property<V2> that, Translator<V2, V> trans) throws NullPointerException {
 		return translatedProperty(that, trans::toTarget, trans::toSource);
 	}
 
 	/** Diese Methode liefert ein übersetztes {@link Property3} und ist eine Abkürzung für {@link #propertyFrom(Producer, Consumer)
 	 * propertyFrom(translatedProducer(that, transGet), translatedConsumer(that, transSet))}. */
-	public static <V, V2> Property3<V> translatedProperty(Property<V2> that, Getter<? super V2, ? extends V> transGet, Getter<? super V, ? extends V2> transSet)
+	public static <V2, V> Property3<V> translatedProperty(Property<V2> that, Getter<? super V2, ? extends V> transGet, Getter<? super V, ? extends V2> transSet)
 		throws NullPointerException {
 		return propertyFrom(translatedProducer(that, transGet), translatedConsumer(that, transSet));
 	}

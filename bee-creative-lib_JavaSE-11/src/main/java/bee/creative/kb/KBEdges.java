@@ -5,13 +5,13 @@ import bee.creative.emu.EMU;
 import bee.creative.emu.Emuable;
 import bee.creative.lang.Objects;
 import bee.creative.lang.Objects.UseToString;
-import bee.creative.util.Iterable2;
-import bee.creative.util.Iterator2;
+import bee.creative.util.Iterable3;
+import bee.creative.util.Iterator3;
 
-/** Diese Klasse implementiert das {@link Iterable2} der {@link KBEdge Kanten} eines {@link KBState Wissensstands}.
+/** Diese Klasse implementiert das {@link Iterable3} der {@link KBEdge Kanten} eines {@link KBState Wissensstands}.
  *
  * @author [cc-by] 2024 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public class KBEdges implements Iterable2<KBEdge>, Emuable, UseToString {
+public class KBEdges implements Iterable3<KBEdge>, Emuable, UseToString {
 
 	/** Diese Methode liefert den {@link KBState Wissensstand}, dessen {@link KBEdge Kanten} iteriert werden. */
 	public KBState owner() {
@@ -81,7 +81,7 @@ public class KBEdges implements Iterable2<KBEdge>, Emuable, UseToString {
 	}
 
 	@Override
-	public Iterator2<KBEdge> iterator() {
+	public Iterator3<KBEdge> iterator() {
 		return this.owner.edgeIterator(this.acceptSourceRefset, this.refuseSourceRefset, this.acceptTargetRefset, this.refuseTargetRefset,
 			this.acceptRelationRefset, this.refuseRelationRefset);
 	}

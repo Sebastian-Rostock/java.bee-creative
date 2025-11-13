@@ -8,7 +8,7 @@ import bee.creative.lang.Strings;
 import bee.creative.qs.QN;
 import bee.creative.qs.QT;
 import bee.creative.util.Iterables;
-import bee.creative.util.Iterator2;
+import bee.creative.util.Iterator3;
 import bee.creative.util.Iterators;
 
 /** Diese Klasse implementiert ein {@link QT} mit Bezug zu einer Datenbank.
@@ -38,7 +38,7 @@ public final class H2QT implements QT, UseToString {
 	}
 
 	@Override
-	public Iterator2<QN> iterator() {
+	public Iterator3<QN> iterator() {
 		return Iterators.iteratorFromArray(this, 0, this.size());
 	}
 
