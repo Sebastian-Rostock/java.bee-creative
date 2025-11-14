@@ -281,9 +281,9 @@ public class FEMDomain extends BaseObject {
 	 * @param src Zeichenkette, die geparst werden soll.
 	 * @return aufbereiteter Quelltext. */
 	public Result parseResult(final String src) throws NullPointerException {
-		final var parser = new FEMParser(src);
+		final var parser = new FEMParser();parser.useSource(src);
 		final var res = this.parseScriptToken(parser);
-		return Result.from(res, parser.tokens());
+		return Result.resultFrom(res, parser.tokens());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #parseScript(Result) this.parseGroup(this.parseResult(src))}. */
@@ -1018,7 +1018,7 @@ public class FEMDomain extends BaseObject {
 	 * @param src Zeichenkette.
 	 * @return gegebene bzw. maskierte Zeichenkette. */
 	public String printConst(final String src) throws NullPointerException {
-		final var par = new FEMParser(src);
+		final var par = new FEMParser();par.useSource(src);
 		this.parseNameToken(par);
 		return !par.isParsed() ? this.printIdent(src) : src;
 	}

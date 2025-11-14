@@ -12,14 +12,6 @@ import bee.creative.util.Parser;
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class FEMParser extends Parser {
 
-	/** Dieser Konstruktor initialisiert die Eingabe.
-	 *
-	 * @param source Eingabe.
-	 * @throws NullPointerException Wenn die Eingabe {@code null} ist. */
-	public FEMParser(final String source) throws NullPointerException {
-		super(source);
-	}
-
 	/** Diese Methode gibt die Liste der aktellen Parameternamen zurück.
 	 *
 	 * @return Parameternamen. */

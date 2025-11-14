@@ -4,8 +4,8 @@ import java.util.Map;
 import bee.creative.lang.Objects;
 import bee.creative.util.HashMap;
 import bee.creative.util.Parser.Result;
+import bee.creative.util.Parser.Source;
 import bee.creative.util.Parser.Token;
-import bee.creative.util.Source;
 
 /** Diese Klasse implementiert ein Objekt zur Bereitstellung eines {@link #token() typisierten Abschnitt} eines {@link Result aufbereiteten Quelltexts}, um
  * diesen Abschnitt in {@link FEMFunction Funktionen} überführen zu können. Dazu wird auch eine {@link #proxies() Abbildung von Namen auf Platzhalter} zur

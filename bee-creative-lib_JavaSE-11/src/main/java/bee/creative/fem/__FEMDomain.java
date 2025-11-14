@@ -934,9 +934,9 @@ class __FEMDomain extends BaseObject {
 	 * @param src Zeichenkette, die geparst werden soll.
 	 * @return aufbereiteter Quelltext. */
 	public Result parseResult(final String src) throws NullPointerException { // XXX DONE
-		final var parser = new FEMParser(src);
+		final var parser = new FEMParser();parser.useSource(src);
 		final var res = this.parseScriptToken(parser);
-		return Result.from(res, parser.tokens());
+		return Result.resultFrom(res, parser.tokens());
 	}
 
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} den {@link Token Abschnitt} einer Parameterposition und gibt ihn zurück. Als Abschnittstyp wird
@@ -1018,7 +1018,7 @@ class __FEMDomain extends BaseObject {
 	 * @param src Zeichenkette.
 	 * @return gegebene bzw. maskierte Zeichenkette. */
 	public String printConst(final String src) throws NullPointerException {
-		final var par = new FEMParser(src);
+		final var par = new FEMParser();par.useSource(src);
 		this.parseNameToken(par);
 		return !par.isParsed() ? this.printIdent(src) : src;
 	}
