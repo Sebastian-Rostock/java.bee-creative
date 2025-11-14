@@ -10,13 +10,13 @@ import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 public final class FEMDatetimeAdapter extends XmlAdapter<String, FEMDatetime> {
 
 	@Override
-	public String marshal(final FEMDatetime value) throws Exception {
+	public String marshal(FEMDatetime value) throws Exception {
 		if (value == null) return null;
 		return value.toString();
 	}
 
 	@Override
-	public FEMDatetime unmarshal(final String value) throws Exception {
+	public FEMDatetime unmarshal(String value) throws Exception {
 		if (value == null) return null;
 		return FEMDatetime.from(value);
 	}

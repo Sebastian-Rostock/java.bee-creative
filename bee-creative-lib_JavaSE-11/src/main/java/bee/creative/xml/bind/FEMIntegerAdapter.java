@@ -10,13 +10,13 @@ import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 public final class FEMIntegerAdapter extends XmlAdapter<String, FEMInteger> {
 
 	@Override
-	public String marshal(final FEMInteger value) throws Exception {
+	public String marshal(FEMInteger value) throws Exception {
 		if (value == null) return null;
 		return value.toString();
 	}
 
 	@Override
-	public FEMInteger unmarshal(final String value) throws Exception {
+	public FEMInteger unmarshal(String value) throws Exception {
 		if (value == null) return null;
 		return FEMInteger.from(value);
 	}

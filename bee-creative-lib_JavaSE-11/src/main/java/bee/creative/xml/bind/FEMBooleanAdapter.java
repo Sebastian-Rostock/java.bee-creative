@@ -10,13 +10,13 @@ import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 public final class FEMBooleanAdapter extends XmlAdapter<String, FEMBoolean> {
 
 	@Override
-	public String marshal(final FEMBoolean value) throws Exception {
+	public String marshal(FEMBoolean value) throws Exception {
 		if (value == null) return null;
 		return value.toString();
 	}
 
 	@Override
-	public FEMBoolean unmarshal(final String value) throws Exception {
+	public FEMBoolean unmarshal(String value) throws Exception {
 		if (value == null) return null;
 		return FEMBoolean.from(value);
 	}

@@ -388,7 +388,7 @@ public interface DL extends DE {
 
 		/** Diese Methode liefert den {@link Translators#optionalizedTranslator(Translator) optionalisierten} {@link Handling}-{@link Translator3}. */
 		public static final Translator3<String, Handling> handlingTrans() {
-			return trans == null ? trans = translatorFromEnum(Handling.class).optionalize() : trans;
+			return trans == null ? trans = translatorFromEnum(Handling.class).asOptionalizedTranslator() : trans;
 		}
 
 		private static Translator3<String, Handling> trans;
@@ -412,7 +412,7 @@ public interface DL extends DE {
 
 		/** Diese Methode liefert den {@link Translators#optionalizedTranslator(Translator) optionalisierten} {@link Multiplicity}-{@link Translator3}. */
 		public static final Translator3<String, Multiplicity> multiplicityTrans() {
-			return trans == null ? trans = translatorFromEnum(Multiplicity.class).optionalize() : trans;
+			return trans == null ? trans = translatorFromEnum(Multiplicity.class).asOptionalizedTranslator() : trans;
 		}
 
 		private static Translator3<String, Multiplicity> trans;

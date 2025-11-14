@@ -97,7 +97,7 @@ public class H2DS implements DS, AutoCloseable {
 	}
 
 	private Translator3<QN, DM> createModelTrans() {
-		return translatorFromClass(QN.class, DM.class, this::asModel, DM::context).optionalize();
+		return translatorFromClass(QN.class, DM.class, this::asModel, DM::context).asOptionalizedTranslator();
 	}
 
 	private static class Items extends H2DSNSet {

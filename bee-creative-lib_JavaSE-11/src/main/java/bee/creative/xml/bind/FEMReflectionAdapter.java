@@ -11,13 +11,13 @@ import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 public final class FEMReflectionAdapter extends XmlAdapter<String, FEMFunction> {
 
 	@Override
-	public String marshal(final FEMFunction value) throws Exception {
+	public String marshal(FEMFunction value) throws Exception {
 		if (value == null) return null;
 		return value.toString();
 	}
 
 	@Override
-	public FEMFunction unmarshal(final String value) throws Exception {
+	public FEMFunction unmarshal(String value) throws Exception {
 		if (value == null) return null;
 		return FEMReflection.from(value);
 	}

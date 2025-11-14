@@ -126,12 +126,12 @@ public class H2DM implements DM {
 
 	@Override
 	public Translator3<QN, DL> linkTrans() {
-		return this.linkTrans == null ? this.linkTrans = translatorFromClass(QN.class, DL.class, this::asLink, DL::node).optionalize() : this.linkTrans;
+		return this.linkTrans == null ? this.linkTrans = translatorFromClass(QN.class, DL.class, this::asLink, DL::node).asOptionalizedTranslator() : this.linkTrans;
 	}
 
 	@Override
 	public Translator3<QN, DT> typeTrans() {
-		return this.typeTrans == null ? this.typeTrans = translatorFromClass(QN.class, DT.class, this::asType, DT::node).optionalize() : this.typeTrans;
+		return this.typeTrans == null ? this.typeTrans = translatorFromClass(QN.class, DT.class, this::asType, DT::node).asOptionalizedTranslator() : this.typeTrans;
 	}
 
 	protected H2DL asLink(QN node) {
