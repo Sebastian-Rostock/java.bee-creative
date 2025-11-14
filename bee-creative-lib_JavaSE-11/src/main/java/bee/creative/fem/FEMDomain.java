@@ -20,7 +20,7 @@ import bee.creative.util.Parser.Token;
  * Quelltexten und Funktionen ineinander dienen.
  * <p>
  * Die auf {@link FEMParser Zeichenketten} operierenden {@code parse}-Methoden erkennen die darin Bedeutung tragenden {@link Token Abschnitte},
- * {@link FEMParser#push(Token) erfassen} diese und versehen sie mit entsprechender {@link Token#type() Typkennung} und {@link Token#tokens() Struktur}. Die auf
+ * {@link FEMParser#push(Token) erfassen} diese und versehen sie mit entsprechender {@link Token#getType() Typkennung} und {@link Token#tokens() Struktur}. Die auf
  * diesen typisierten und strukturierten {@link FEMToken Abschnitten} operierenden {@code parse}-Methoden übersetzen diese schließlich in Werte und Funktionen.
  * Die auf {@link FEMFunction Funktionen} operierenden {@code format}-Methoden erzeugen dazu wieder deren Textdarstellung.
  * <p>
@@ -354,7 +354,7 @@ public class FEMDomain extends BaseObject {
 	/** Diese Methode überführt den von {@code parseGroupToken(FEMParser, boolean)} ermittelten Abschnitt in eine Funktionsliste und gibt diese zurück. */
 	protected List<FEMFunction> parseGroupData(final FEMToken src) throws NullPointerException, FEMException {
 		final List<FEMFunction> res = new ArrayList<>();
-		for (final Token tok: src.token()) {
+		for (final Token tok: src.token().children()) {
 			res.add(this.parseFunctionData(src.with(tok)));
 		}
 		return res;
@@ -419,7 +419,7 @@ public class FEMDomain extends BaseObject {
 		final var tok = src.token();
 		if (tok.type() != FEMDomain.TYPE_ARRAY_TOKEN) return null;
 		final List<FEMValue> res = new ArrayList<>();
-		for (final Token item: tok) {
+		for (final Token item: tok.children()) {
 			res.add(this.parseValueData(src.with(item)));
 		}
 		return FEMArray.from(res);
@@ -1046,7 +1046,7 @@ public class FEMDomain extends BaseObject {
 	 * @param res Formatierer.
 	 * @param src aufbereiteter Quelltext. */
 	protected void printResult(final FEMPrinter res, final Result src) throws NullPointerException {
-		for (final Token tok: src) {
+		for (final Token tok: src.tokens()) {
 			switch (tok.type()) {
 				default:
 					res.push(tok);

@@ -5,6 +5,7 @@ import bee.creative.lang.Objects;
 import bee.creative.util.HashMap;
 import bee.creative.util.Parser.Result;
 import bee.creative.util.Parser.Token;
+import bee.creative.util.Source;
 
 /** Diese Klasse implementiert ein Objekt zur Bereitstellung eines {@link #token() typisierten Abschnitt} eines {@link Result aufbereiteten Quelltexts}, um
  * diesen Abschnitt in {@link FEMFunction Funktionen} überführen zu können. Dazu wird auch eine {@link #proxies() Abbildung von Namen auf Platzhalter} zur
@@ -32,7 +33,7 @@ public class FEMToken {
 
 	/** Diese Methode gibt die Zeichenkette zurück, auf die sich die Positionsangaben dieses Abschnitts beziehen. Sie ist eine Abkürzung für {@link Token#source()
 	 * this.token().source()}. */
-	public String source() {
+	public Source source() {
 		return this.token.source();
 	}
 
@@ -44,17 +45,17 @@ public class FEMToken {
 
 	/** Diese Methode gibt die Spaltennummer zur {@link #srcIndex() aktuellen Quelltextposition} zurück. */
 	public int colIndex() {
-		var src = this.source();
+		var src = this.source() ;
 		var pos = this.srcIndex();
-		var add = src.lastIndexOf('\n', pos);
+		var add = src.maxIndexOf('\n', pos);
 		return (pos + 1) - (add < 0 ? 0 : add);
 	}
 
 	/** Diese Methode gibt die Zeilennummer zur {@link #srcIndex() aktuellen Quelltextposition} zurück. */
 	public int rowIndex() {
 		var res = 0;
-		var src = this.source();
-		for (var pos = this.srcIndex() + 1; pos >= 0; pos = src.lastIndexOf('\n', pos - 1), res++) {}
+		var src = this.source() ;
+		for (var pos = this.srcIndex() + 1; pos >= 0; pos = src.maxIndexOf('\n', pos - 1), res++) {}
 		return res;
 	}
 
