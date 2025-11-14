@@ -184,15 +184,6 @@ public abstract class AbstractProxyList<E, D extends List<E>> extends AbstractLi
 
 	class Iter implements ListIterator<E> {
 
-		final D data;
-
-		final ListIterator<E> iter;
-
-		Iter(int index) {
-			this.data = AbstractProxyList.this.getData(false);
-			this.iter = this.data.listIterator(index);
-		}
-
 		@Override
 		public boolean hasNext() {
 			return this.iter.hasNext();
@@ -239,6 +230,15 @@ public abstract class AbstractProxyList<E, D extends List<E>> extends AbstractLi
 		public void add(E e) {
 			this.iter.add(e);
 			AbstractProxyList.this.setData(this.data);
+		}
+
+		final D data;
+
+		final ListIterator<E> iter;
+
+		Iter(int index) {
+			this.data = AbstractProxyList.this.getData(false);
+			this.iter = this.data.listIterator(index);
 		}
 
 	}

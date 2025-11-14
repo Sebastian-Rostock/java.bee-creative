@@ -1,5 +1,6 @@
 package bee.creative.util;
 
+import static bee.creative.util.Iterators.iteratorFrom;
 import java.util.AbstractList;
 
 /** Diese Klasse implementiert eine {@link AbstractList} als {@link List2}.
@@ -9,7 +10,7 @@ public abstract class AbstractList2<E> extends AbstractList<E> implements List2<
 
 	@Override
 	public Iterator3<E> iterator() {
-		return Iterators.iteratorFrom(super.iterator());
+		return iteratorFrom(super.iterator());
 	}
 
 }

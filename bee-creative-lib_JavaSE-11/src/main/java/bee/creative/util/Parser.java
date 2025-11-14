@@ -333,12 +333,12 @@ public class Parser {
 
 		/** Diese Methode liefert eine Abbildung mit den Werten des Abschnitts. */
 		public Map2<Object, Object> values() {
-			return ProxyMap.from(() -> this.values, value -> this.values = value);
+			return ProxyMap.proxyMapFrom(() -> this.values, value -> this.values = value);
 		}
 
 		/** Diese Methode liefet die Liste der Kindabschnitte. */
 		public List2<Token> children() {
-			return ProxyList.from(() -> this.children, value -> this.children = value);
+			return ProxyList.proxyListFrom(() -> this.children, value -> this.children = value);
 		}
 
 		/** Diese Methode liefet die Position des ersten Zeichens nach dem Abschnitt. */

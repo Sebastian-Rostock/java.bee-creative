@@ -8,7 +8,7 @@ import bee.creative.lang.Objects.UseToString;
  *
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GItem> Typ der Elemente. */
-public abstract class AbstractIterator<GItem> extends BaseObject implements Iterator3<GItem>, UseToString {
+public abstract class AbstractIterator<GItem>  implements Iterator3<GItem>, UseToString {
 
 	@Override
 	public boolean hasNext() {
