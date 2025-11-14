@@ -14,5 +14,4 @@ public interface Consumer<V> {
 	 * @param value Wert. */
 	void set(V value);
 
-
 }

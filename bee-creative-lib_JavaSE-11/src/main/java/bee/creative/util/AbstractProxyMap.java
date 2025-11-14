@@ -200,7 +200,7 @@ public abstract class AbstractProxyMap<K, V, D extends Map<K, V>> implements Map
 		}
 
 		final class Iter extends AbstractIterator<Entry<K, V>> {
-		
+
 			@Override
 			public boolean hasNext() {
 				return this.iter.hasNext();
@@ -218,41 +218,41 @@ public abstract class AbstractProxyMap<K, V, D extends Map<K, V>> implements Map
 			}
 
 			final EntriesData data;
-		
+
 			final Iterator<Entry<K, V>> iter;
-		
+
 			Iter() {
 				this.data = new EntriesData(false);
 				this.iter = this.data.iterator();
 			}
-		
+
 			final class Next extends AbstractEntry3<K, V> {
-			
+
 				final Entry<K, V> entry;
-			
+
 				public Next(Entry<K, V> entry) {
 					this.entry = entry;
 				}
-			
+
 				@Override
 				public K getKey() {
 					return this.entry.getKey();
 				}
-			
+
 				@Override
 				public V getValue() {
 					return this.entry.getValue();
 				}
-			
+
 				@Override
 				public Entry3<K, V> useValue(V value) {
 					this.entry.setValue(value);
 					AbstractProxyMap.this.setData(Iter.this.data.data);
 					return this;
 				}
-			
+
 			}
-		
+
 		}
 
 	}

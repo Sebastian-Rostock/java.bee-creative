@@ -30,11 +30,11 @@ public interface Map2<K, V> extends Map<K, V>, Getter<Object, V>, Setter<K, V>, 
 
 	/** Diese Methode fügt die aus den gegebenen Elementen abgeleiteten Schlüssel-Wert-Paare hinzu.
 	 *
-	 * @param <E> Typ der Elemente.
+	 * @param <T> Typ der Elemente.
 	 * @param items Elemente.
 	 * @param asKey Funktion zur Ableitung des Schlüssels.
 	 * @param asValue Funktion zur Ableitung des Werts. */
-	default <E> void putAll(Iterable<? extends E> items, Getter<? super E, ? extends K> asKey, Getter<? super E, ? extends V> asValue) {
+	default <T> void putAll(Iterable<? extends T> items, Getter<? super T, ? extends K> asKey, Getter<? super T, ? extends V> asValue) {
 		items.forEach(item -> this.put(asKey.get(item), asValue.get(item)));
 	}
 

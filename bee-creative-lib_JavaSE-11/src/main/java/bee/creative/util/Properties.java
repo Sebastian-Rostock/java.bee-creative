@@ -16,7 +16,7 @@ public class Properties {
 	/** Diese Methode liefert das gegebene {@link Property3}. Wenn es {@code null} ist, wird {@link #emptyProperty()} geliefert. */
 	public static <V> Property3<V> propertyFrom(Property3<V> that) {
 		if (that == null) return emptyProperty();
-		return (Property3<V>)that;
+		return that;
 	}
 
 	/** Diese Methode liefert das gegebene {@link Property} als {@link Property3}. Wenn es {@code null} ist, wird {@link #emptyProperty()} geliefert. */

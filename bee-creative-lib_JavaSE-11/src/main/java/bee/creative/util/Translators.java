@@ -19,7 +19,7 @@ public class Translators {
 		if (that == null) return emptyTranslator();
 		return that;
 	}
-	
+
 	/** Diese Methode liefert den gegebenen {@link Translator} als {@link Translator3}. Wenn er {@code null} ist, wird {@link #emptyTranslator()} geliefert. */
 	public static <S, T> Translator3<S, T> translatorFrom(Translator<S, T> that) throws NullPointerException {
 		if (that == null) return emptyTranslator();

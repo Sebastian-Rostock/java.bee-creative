@@ -1,7 +1,7 @@
 package bee.creative.util;
 
 /** Diese Schnittstelle definiert ein {@link Observable}, dessen Methoden an ein {@link #observers()} delegieren.
- * 
+ *
  * @author [cc-by] 2025 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <M> Typ des Ereignisses bzw. der Ereignisnachricht.
  * @param <O> Typ der Ereignisempfänger. Dieser darf kein {@code Object[]} sein. */

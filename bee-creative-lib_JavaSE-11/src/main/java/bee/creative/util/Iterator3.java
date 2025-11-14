@@ -1,6 +1,5 @@
 package bee.creative.util;
 
-import static bee.creative.lang.Objects.notNull;
 import static bee.creative.util.Iterators.concatIterator;
 import static bee.creative.util.Iterators.filteredIterator;
 import static bee.creative.util.Iterators.limitedIterator;
@@ -18,19 +17,9 @@ import java.util.Set;
  * @param <E> Typ der Elemente. */
 public interface Iterator3<E> extends Iterator<E> {
 
-	/** Diese Methode ist eine Abkürzung für {@link Iterators#concatIterator(Iterator, Iterator) concatIterator(this, that)}. */
-	default Iterator3<E> concat(Iterator<? extends E> that) throws NullPointerException {
-		return concatIterator(this, that);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link Iterators#retainAll(Iterator, Collection) Iterators.retainAll(this, filter)}. */
-	default boolean retainAll(Collection<?> filter) throws NullPointerException {
-		return Iterators.retainAll(this, filter);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link Iterators#filteredIterator(Iterator, Filter) filteredIterator(this, filter)}. */
-	default Iterator3<E> filter(Filter<? super E> filter) throws NullPointerException {
-		return filteredIterator(this, filter);
+	/** Diese Methode ist eine Abkürzung für {@link Iterators#skip(Iterator, int) Iterators.skip(this, count)}. */
+	default int skip(int count) {
+		return Iterators.skip(this, count);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Iterators#limitedIterator(Iterator, int) limitedIterator(this, limit)}. */
@@ -38,9 +27,14 @@ public interface Iterator3<E> extends Iterator<E> {
 		return limitedIterator(this, limit);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Iterators#translatedIterator(Iterator, Getter) translatedIterator(this, trans)}. */
-	default <GTarget> Iterator3<GTarget> translate(Getter<? super E, ? extends GTarget> trans) throws NullPointerException {
-		return translatedIterator(this, trans);
+	/** Diese Methode ist eine Abkürzung für {@link Iterators#filteredIterator(Iterator, Filter) filteredIterator(this, filter)}. */
+	default Iterator3<E> filter(Filter<? super E> filter) throws NullPointerException {
+		return filteredIterator(this, filter);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link Iterators#concatIterator(Iterator, Iterator) concatIterator(this, that)}. */
+	default Iterator3<E> concat(Iterator<? extends E> that) throws NullPointerException {
+		return concatIterator(this, that);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Iterators#uniqueIterator(Iterator) uniqueIterator(this)}. */
@@ -58,27 +52,24 @@ public interface Iterator3<E> extends Iterator<E> {
 		return uniqueIterator(this, buffer);
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@link Iterators#translatedIterator(Iterator, Getter) translatedIterator(this, trans)}. */
+	default <GTarget> Iterator3<GTarget> translate(Getter<? super E, ? extends GTarget> trans) throws NullPointerException {
+		return translatedIterator(this, trans);
+	}
+
 	/** Diese Methode ist eine Abkürzung für {@link Iterators#unmodifiableIterator(Iterator) unmodifiableIterator(this)}. */
 	default Iterator3<E> unmodifiable() {
 		return unmodifiableIterator(this);
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@link Iterators#retainAll(Iterator, Collection) Iterators.retainAll(this, filter)}. */
+	default boolean retainAll(Collection<?> filter) throws NullPointerException {
+		return Iterators.retainAll(this, filter);
+	}
+
 	/** Diese Methode ist eine Abkürzung für {@link Iterators#removeAll(Iterator) Iterators.removeAll(this)}. */
 	default boolean removeAll() {
 		return Iterators.removeAll(this);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link Iterators#skip(Iterator, int) Iterators.skip(this, count)}. */
-	default int skip(int count) {
-		return Iterators.skip(this, count);
-	}
-
-	/** Diese Methode realisiert leitet alle verbliebenen Elemente an den gegebenen {@link Consumer} weiter. */
-	default void forEach(Consumer<? super E> target) throws NullPointerException {
-		notNull(target);
-		while (this.hasNext()) {
-			target.set(this.next());
-		}
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Iterators#toSet(Iterator) Iterators.toSet(this)}. */
@@ -97,7 +88,7 @@ public interface Iterator3<E> extends Iterator<E> {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Iterators#toArray(Iterator, Object[]) Iterators.toArray(this, array)}. */
-	default E[] toArray(E[] array) throws NullPointerException {
+	default <E2> E2[] toArray(E2[] array) throws NullPointerException {
 		return Iterators.toArray(this, array);
 	}
 

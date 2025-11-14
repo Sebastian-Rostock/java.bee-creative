@@ -82,6 +82,12 @@ public class Iterators {
 		return iteratorFromArray(index -> index, minInclIndex, maxExclIndex);
 	}
 
+	/** Diese Methode liefert einen {@link Iterator3}, der keine Elemente liefert. */
+	@SuppressWarnings ("unchecked")
+	public static <E> Iterator3<E> emptyIterator() {
+		return (Iterator3<E>)emptyIterator;
+	}
+
 	/** Diese Methode ist eine Abkürzung für {@link #concatIterator(Iterator) concatAllIterator(iteratorFromArray(iter1, iter2))}. */
 	public static <E> Iterator3<E> concatIterator(Iterator<? extends E> iter1, Iterator<? extends E> iter2) {
 		return concatIterator(iteratorFromArray(iter1, iter2));
@@ -248,12 +254,6 @@ public class Iterators {
 		};
 	}
 
-	/** Diese Methode liefert einen {@link Iterator3}, der keine Elemente liefert. */
-	@SuppressWarnings ("unchecked")
-	public static <E> Iterator3<E> emptyIterator() {
-		return (Iterator3<E>)emptyIterator;
-	}
-
 	/** Diese Methode liefert das {@code index}-te Elemente des gegebenen {@link Iterator} oder löst eine {@link NoSuchElementException} aus. */
 	public static <E> E get(Iterator<? extends E> iter, int index) throws NullPointerException, NoSuchElementException {
 		if ((index < 0) || (skip(iter, index) != 0) || !iter.hasNext()) throw new NoSuchElementException();
@@ -374,7 +374,7 @@ public class Iterators {
 
 	/** Diese Methode liefert die Elemente des gegebenen {@link Iterator} als Array. Dazu wird der Iterator in eine {@link Collection} überführt, deren Inhalt
 	 * schließlich als Array {@link Collection#toArray(Object[]) geliefert} wird. */
-	public static <E> E[] toArray(Iterator<? extends E> source, E[] array) throws NullPointerException {
+	public static <E> E[] toArray(Iterator<?> source, E[] array) throws NullPointerException {
 		return toList(source).toArray(array);
 	}
 

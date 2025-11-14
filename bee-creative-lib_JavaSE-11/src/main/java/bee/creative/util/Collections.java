@@ -49,8 +49,8 @@ public class Collections {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link TranslatedMap new TranslatedMap<>(that, keyTrans, valueTrans)}. */
-	public static <K2, V2, K, V> Map3<K, V> translatedMap(Map<K2, V2> that, Translator<K2, K> keyTrans,
-		Translator<V2, V> valueTrans) throws NullPointerException {
+	public static <K2, V2, K, V> Map3<K, V> translatedMap(Map<K2, V2> that, Translator<K2, K> keyTrans, Translator<V2, V> valueTrans)
+		throws NullPointerException {
 		return new TranslatedMap<>(that, keyTrans, valueTrans);
 	}
 
@@ -70,8 +70,7 @@ public class Collections {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ConcatCollection new ConcatCollection<>(items1, items2, extendMode)}. */
-	public static <E> Collection2<E> concatCollection(Collection<E> items1, Collection<E> items2, boolean extendMode)
-		throws NullPointerException {
+	public static <E> Collection2<E> concatCollection(Collection<E> items1, Collection<E> items2, boolean extendMode) throws NullPointerException {
 		return new ConcatCollection<>(items1, items2, extendMode);
 	}
 
@@ -258,74 +257,74 @@ public class Collections {
 	 * @param <E> Typ der Elemente.
 	 * @param <E2> Typ der Elemente des gegebenen {@link Set}. */
 	public static class TranslatedSet<E, E2> extends AbstractSet2<E> {
-	
+
 		public TranslatedSet(Set<E2> that, Translator<E2, E> trans) throws NullPointerException {
 			this.that = notNull(that);
 			this.trans = translatorFrom(trans);
 			this.trans2 = this.trans.reverse();
 		}
-	
+
 		@Override
 		public boolean add(E item2) {
 			return this.that.add(this.trans.toSource(item2));
 		}
-	
+
 		@Override
 		@SuppressWarnings ("unchecked")
 		public boolean addAll(Collection<? extends E> items2) {
 			return this.that.addAll(translatedCollection((Collection<E>)items2, this.trans2));
 		}
-	
+
 		@Override
 		public boolean remove(Object item2) {
 			if (!this.trans.isTarget(item2)) return false;
 			return this.that.remove(this.trans.toSource(item2));
 		}
-	
+
 		@Override
 		@SuppressWarnings ("unchecked")
 		public boolean removeAll(Collection<?> items2) {
 			return this.that.removeAll(translatedCollection((Collection<E>)items2, this.trans2));
 		}
-	
+
 		@Override
 		@SuppressWarnings ("unchecked")
 		public boolean retainAll(Collection<?> items2) {
 			return this.that.retainAll(translatedCollection((Collection<E>)items2, this.trans2));
 		}
-	
+
 		@Override
 		public int size() {
 			return this.that.size();
 		}
-	
+
 		@Override
 		public void clear() {
 			this.that.clear();
 		}
-	
+
 		@Override
 		public boolean isEmpty() {
 			return this.that.isEmpty();
 		}
-	
+
 		@Override
 		public boolean contains(Object item2) {
 			if (!this.trans.isTarget(item2)) return false;
 			return this.that.contains(this.trans.toSource(item2));
 		}
-	
+
 		@Override
 		public Iterator3<E> iterator() {
 			return translatedIterator(this.that.iterator(), this.trans.asTargetGetter());
 		}
-	
+
 		private final Set<E2> that;
-	
+
 		private final Translator3<E2, E> trans;
-	
+
 		private final Translator3<E, E2> trans2;
-	
+
 	}
 
 	/** Diese Klasse implementiert eine {@link Map} als {@link Translator übersetzte} Sicht auf eine gegebene {@link Map}.
@@ -335,7 +334,7 @@ public class Collections {
 	 * @param <V> Typ der Werte.
 	 * @param <V2> Typ der Werte der gegebenen {@link Map}. */
 	public static class TranslatedMap<K, V, K2, V2> extends AbstractMap<K, V> implements Map3<K, V> {
-	
+
 		public TranslatedMap(Map<K2, V2> that, Translator<K2, K> keyTrans, Translator<V2, V> valueTrans) throws NullPointerException {
 			this.that = notNull(that);
 			this.keyTrans = translatorFrom(keyTrans);
@@ -360,84 +359,84 @@ public class Collections {
 				return translatedEntry(entry, this.keyTrans2, this.valueTrans2);
 			}));
 		}
-	
+
 		@Override
 		public void clear() {
 			this.that.clear();
 		}
-	
+
 		@Override
 		public boolean containsKey(Object key2) {
 			if (!this.keyTrans.isTarget(key2)) return false;
 			return this.that.containsKey(this.keyTrans.toSource(key2));
 		}
-	
+
 		@Override
 		public boolean containsValue(Object value2) {
 			if (!this.valueTrans.isTarget(value2)) return false;
 			return this.that.containsValue(this.valueTrans.toSource(value2));
 		}
-	
+
 		@Override
 		public V get(Object key2) {
 			if (!this.keyTrans.isTarget(key2)) return null;
 			return this.valueTrans.toTarget(this.that.get(this.keyTrans.toSource(key2)));
 		}
-	
+
 		@Override
 		public boolean isEmpty() {
 			return this.that.isEmpty();
 		}
-	
+
 		@Override
 		public Set2<K> keySet() {
 			return translatedSet(this.that.keySet(), this.keyTrans);
 		}
-	
+
 		@Override
 		public V put(K key2, V value2) {
 			return this.valueTrans.toTarget(this.that.put(this.keyTrans.toSource(key2), this.valueTrans.toSource(value2)));
 		}
-	
+
 		@Override
 		@SuppressWarnings ("unchecked")
 		public void putAll(Map<? extends K, ? extends V> entries2) {
 			this.that.putAll(translatedMap((Map<K, V>)entries2, this.keyTrans2, this.valueTrans2));
 		}
-	
+
 		@Override
 		public V remove(final Object key2) {
 			if (!this.keyTrans.isTarget(key2)) return null;
 			return this.valueTrans.toTarget(this.that.remove(this.keyTrans.toSource(key2)));
 		}
-	
+
 		@Override
 		public int size() {
 			return this.that.size();
 		}
-	
+
 		@Override
 		public Collection2<V> values() {
 			return translatedCollection(this.that.values(), this.valueTrans);
 		}
-	
+
 		@Override
 		public Set2<Entry<K, V>> entrySet() {
 			return translatedSet(this.that.entrySet(), this.entryTrans);
 		}
-	
+
 		private final Map<K2, V2> that;
-	
+
 		private final Translator3<K2, K> keyTrans;
-	
+
 		private final Translator3<K, K2> keyTrans2;
-	
+
 		private final Translator3<V2, V> valueTrans;
-	
+
 		private final Translator3<V, V2> valueTrans2;
-	
+
 		private final Translator3<Entry<K2, V2>, Entry<K, V>> entryTrans;
-	
+
 	}
 
 	/** Diese Klasse implementiert eine verkettete {@link List} als Sicht auf zwei gegebene {@link List}. Wenn Elemente dazwischen eingefügt werden sollen,
@@ -555,86 +554,86 @@ public class Collections {
 	 *
 	 * @param <E> Typ der Elemente. */
 	public static class ReversedList<E> extends AbstractList2<E> {
-	
+
 		public ReversedList(List<E> items) {
 			this.items = notNull(items);
 		}
-	
+
 		@Override
 		public E get(int index) {
 			return this.items.get(this.items.size() - index - 1);
 		}
-	
+
 		@Override
 		public E set(int index, E item2) {
 			return this.items.set(this.items.size() - index - 1, item2);
 		}
-	
+
 		@Override
 		public void add(int index, E item2) {
 			this.items.add(this.items.size() - index, item2);
 		}
-	
+
 		@Override
 		public boolean retainAll(Collection<?> items2) {
 			return this.items.retainAll(items2);
 		}
-	
+
 		@Override
 		public E remove(int index) {
 			return this.items.remove(this.items.size() - index - 1);
 		}
-	
+
 		@Override
 		public boolean removeAll(Collection<?> items2) {
 			return this.items.removeAll(items2);
 		}
-	
+
 		@Override
 		public int size() {
 			return this.items.size();
 		}
-	
+
 		@Override
 		public void clear() {
 			this.items.clear();
 		}
-	
+
 		@Override
 		public boolean isEmpty() {
 			return this.items.isEmpty();
 		}
-	
+
 		@Override
 		public int indexOf(Object item2) {
 			var index = this.items.lastIndexOf(item2);
 			return index < 0 ? -1 : this.items.size() - index - 1;
 		}
-	
+
 		@Override
 		public int lastIndexOf(Object item2) {
 			var index = this.items.indexOf(item2);
 			return index < 0 ? -1 : this.items.size() - index - 1;
 		}
-	
+
 		@Override
 		public boolean contains(Object item2) {
 			return this.items.contains(item2);
 		}
-	
+
 		@Override
 		public boolean containsAll(Collection<?> items2) {
 			return this.items.containsAll(items2);
 		}
-	
+
 		@Override
 		protected void removeRange(int fromIndex, int toIndex) {
 			var size = this.items.size();
 			this.items.subList(size - toIndex, size - fromIndex).clear();
 		}
-	
+
 		private final List<E> items;
-	
+
 	}
 
 	/** Diese Klasse implementiert eine {@link List} als {@link Translator übersetzte} Sicht auf eine gegebene {@link List}.
@@ -642,117 +641,117 @@ public class Collections {
 	 * @param <E> Typ der Elemente.
 	 * @param <E2> Typ der Elemente der gegebenen {@link List}. */
 	public static class TranslatedList<E, E2> extends AbstractList2<E> {
-	
+
 		public TranslatedList(List<E2> that, Translator<E2, E> trans) throws NullPointerException {
 			this.that = notNull(that);
 			this.trans = translatorFrom(trans);
 			this.trans2 = this.trans.reverse();
 		}
-	
+
 		@Override
 		public E get(int index) {
 			return this.trans.toTarget(this.that.get(index));
 		}
-	
+
 		@Override
 		public E set(int index, E item2) {
 			return this.trans.toTarget(this.that.set(index, this.trans.toSource(item2)));
 		}
-	
+
 		@Override
 		public boolean add(E item2) {
 			return this.that.add(this.trans.toSource(item2));
 		}
-	
+
 		@Override
 		public void add(int index, E item2) {
 			this.that.add(index, this.trans.toSource(item2));
 		}
-	
+
 		@Override
 		@SuppressWarnings ("unchecked")
 		public boolean addAll(Collection<? extends E> items2) {
 			return this.that.addAll(translatedCollection((Collection<E>)items2, this.trans2));
 		}
-	
+
 		@Override
 		@SuppressWarnings ("unchecked")
 		public boolean addAll(int index, Collection<? extends E> items2) {
 			return this.that.addAll(index, translatedCollection((Collection<E>)items2, this.trans2));
 		}
-	
+
 		@Override
 		public E remove(int index) {
 			return this.trans.toTarget(this.that.remove(index));
 		}
-	
+
 		@Override
 		public boolean remove(Object item2) {
 			if (!this.trans.isTarget(item2)) return false;
 			return this.that.remove(this.trans.toSource(item2));
 		}
-	
+
 		@Override
 		@SuppressWarnings ("unchecked")
 		public boolean removeAll(Collection<?> items2) {
 			return this.that.removeAll(translatedCollection((Collection<E>)items2, this.trans2));
 		}
-	
+
 		@Override
 		@SuppressWarnings ("unchecked")
 		public boolean retainAll(Collection<?> items2) {
 			return this.that.retainAll(translatedCollection((Collection<E>)items2, this.trans2));
 		}
-	
+
 		@Override
 		public int size() {
 			return this.that.size();
 		}
-	
+
 		@Override
 		public void clear() {
 			this.that.clear();
 		}
-	
+
 		@Override
 		public boolean isEmpty() {
 			return this.that.isEmpty();
 		}
-	
+
 		@Override
 		public boolean contains(Object item2) {
 			if (!this.trans.isTarget(item2)) return false;
 			return this.that.contains(this.trans.toSource(item2));
 		}
-	
+
 		@Override
 		public Iterator3<E> iterator() {
 			return translatedIterator(this.that.iterator(), this.trans.asTargetGetter());
 		}
-	
+
 		@Override
 		public int indexOf(Object item2) {
 			if (!this.trans.isTarget(item2)) return -1;
 			return this.that.indexOf(this.trans.toSource(item2));
 		}
-	
+
 		@Override
 		public int lastIndexOf(Object item2) {
 			if (!this.trans.isTarget(item2)) return -1;
 			return this.that.lastIndexOf(this.trans.toSource(item2));
 		}
-	
+
 		@Override
 		protected void removeRange(int fromIndex, int toIndex) {
 			this.that.subList(fromIndex, toIndex).clear();
 		}
-	
+
 		private final List<E2> that;
-	
+
 		private final Translator3<E2, E> trans;
-	
+
 		private final Translator3<E, E2> trans2;
-	
+
 	}
 
 	/** Diese Klasse implementiert eine verkettete {@link Collection} als Sicht auf zwei gegebene {@link Collection}. Wenn Elemente angefügt werden sollen,

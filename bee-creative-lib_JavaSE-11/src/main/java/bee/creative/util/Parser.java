@@ -266,7 +266,7 @@ public class Parser {
 		public boolean equals(final Object object) {
 			if (object == this) return true;
 			if (!(object instanceof Token)) return false;
-			final Token that = (Token)object;
+			final var that = (Token)object;
 			return (this.type == that.type) && (this.offset == that.offset) && (this.length == that.length);
 		}
 
@@ -411,7 +411,7 @@ public class Parser {
 		public boolean equals(final Object object) {
 			if (object == this) return true;
 			if (!(object instanceof Result)) return false;
-			final Result that = (Result)object;
+			final var that = (Result)object;
 			return Objects.equals(this.source(), that.source()) && Objects.equals(this.root, that.root) && Objects.equals(this.tokens, that.tokens);
 		}
 

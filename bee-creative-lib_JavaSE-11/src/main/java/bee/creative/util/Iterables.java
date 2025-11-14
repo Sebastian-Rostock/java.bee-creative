@@ -11,12 +11,9 @@ import static bee.creative.util.Iterators.translatedIterator;
 import static bee.creative.util.Iterators.uniqueIterator;
 import static bee.creative.util.Iterators.unmodifiableIterator;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Set;
 import bee.creative.lang.Array;
 import bee.creative.lang.Array2;
@@ -78,6 +75,12 @@ public class Iterables {
 		return iterableFromArray(index -> index, minInclIndex, maxExclIndex);
 	}
 
+	/** Diese Methode liefert das {@link Iterable3} zu {@link Iterators#emptyIterator()}. */
+	@SuppressWarnings ("unchecked")
+	public static <E> Iterable3<E> emptyIterable() {
+		return (Iterable3<E>)emptyIterable;
+	}
+
 	/** Diese Methode ist eine Abkürzung für {@link #concatIterable(Iterable) concatIterable(iterableFromArray(notNull(iter1), notNull(iter2)))}. */
 	public static <E> Iterable3<E> concatIterable(Iterable<? extends E> iter1, Iterable<? extends E> iter2) throws NullPointerException {
 		return concatIterable(iterableFromArray(notNull(iter1), notNull(iter2)));
@@ -109,9 +112,16 @@ public class Iterables {
 	}
 
 	/** Diese Methode liefert das {@link Iterable3} zu {@link Iterators#uniqueIterator(Iterator)}. */
-	public static <E> Iterable3<E> unique(Iterable<? extends E> that) throws NullPointerException {
+	public static <E> Iterable3<E> uniqueIterable(Iterable<? extends E> that) throws NullPointerException {
 		notNull(that);
 		return () -> uniqueIterator(that.iterator());
+	}
+
+	/** Diese Methode liefert das {@link Iterable3} zu {@link Iterators#uniqueIterator(Iterator, Hasher)}. */
+	public static <E> Iterable3<E> uniqueIterable(Iterable<? extends E> that, Hasher hasher) throws NullPointerException {
+		notNull(that);
+		notNull(hasher);
+		return () -> uniqueIterator(that.iterator(), hasher);
 	}
 
 	/** Diese Methode liefert das {@link Iterable3} zu {@link Iterators#translatedIterator(Iterator, Getter)}. */
@@ -122,15 +132,9 @@ public class Iterables {
 	}
 
 	/** Diese Methode liefert das {@link Iterable3} zu {@link Iterators#unmodifiableIterator(Iterator)}. */
-	public static <E> Iterable3<E> unmodifiable(Iterable<? extends E> that) throws NullPointerException {
+	public static <E> Iterable3<E> unmodifiableIterable(Iterable<? extends E> that) throws NullPointerException {
 		notNull(that);
 		return () -> unmodifiableIterator(that.iterator());
-	}
-
-	/** Diese Methode liefert das {@link Iterable3} zu {@link Iterators#emptyIterator()}. */
-	@SuppressWarnings ("unchecked")
-	public static <T> Iterable3<T> emptyIterable() {
-		return (Iterable3<T>)emptyIterable;
 	}
 
 	/** Diese Methode gibt die Anzahl der vom gegebenen {@link Iterable} gelieferten Elemente zurück. */
@@ -143,8 +147,8 @@ public class Iterables {
 
 	/** Diese Methode fügt alle Elemente des gegebenen {@link Iterable} in die gegebene {@link Collection} ein und gibt nur bei Veränderungen an der
 	 * {@link Collection} {@code true} zurück. */
-	public static <T> boolean addAll(Collection<T> target, Iterable<? extends T> source) throws NullPointerException {
-		if (source instanceof Collection<?>) return target.addAll((Collection<? extends T>)source);
+	public static <E> boolean addAll(Collection<E> target, Iterable<? extends E> source) throws NullPointerException {
+		if (source instanceof Collection<?>) return target.addAll((Collection<? extends E>)source);
 		return Iterators.addAll(target, source.iterator());
 	}
 
@@ -164,8 +168,8 @@ public class Iterables {
 
 	/** Diese Methode entfernt alle Elemente der gegebenen {@link Collection}, die nicht im gegebenen {@link Iterable} vorkommen, fügt alle Elemetne des
 	 * {@link Iterable} in die {@link Collection} ein und gibt nur bei Veränderung der {@link Collection} {@code true} zurück. */
-	public static <T> boolean replaceAll(Collection<T> target, Iterable<? extends T> source) throws NullPointerException {
-		var buffer = Iterables.iterableToSet(source);
+	public static <E> boolean replaceAll(Collection<E> target, Iterable<? extends E> source) throws NullPointerException {
+		var buffer = Iterables.toSet(source);
 		return target.retainAll(buffer) | target.addAll(buffer);
 	}
 
@@ -185,7 +189,7 @@ public class Iterables {
 	 * {@link Collection} {@code true} zurück. */
 	public static boolean removeAll(Collection<?> target, Iterable<?> filter) throws NullPointerException {
 		if (filter instanceof Collection<?>) return target.removeAll((Collection<?>)filter);
-		return target.removeAll(Iterables.iterableToSet(filter));
+		return target.removeAll(Iterables.toSet(filter));
 	}
 
 	/** Diese Methode liefert nur dann {@code true} zurück, wenn alle Elemente des gegebenen {@link Iterable} in der gegebenen {@link Collection} enthalten
@@ -195,49 +199,40 @@ public class Iterables {
 		return Iterators.containsAll(target, filter.iterator());
 	}
 
-	/** Diese Methode übergibt alle Elemente des gegebene {@link Iterable} an den gegebenen {@link Consumer}. */
-	public static <T> void forEach(Iterable<? extends T> source, Consumer<? super T> target) throws NullPointerException {
-		Iterator<? extends T> source1 = source.iterator();
-		notNull(target);
-		while (source1.hasNext()) {
-			target.set(source1.next());
-		}
-	}
-
 	/** Diese Methode liefert den {@link Getter3} zu {@link Iterable#iterator()}. */
 	@SuppressWarnings ("unchecked")
-	public static <T> Getter3<Iterable<? extends T>, Iterator<T>> iterableIterator() {
-		return (Getter3<Iterable<? extends T>, Iterator<T>>)iterableIterator;
+	public static <E> Getter3<Iterable<? extends E>, Iterator<E>> iterableIterator() {
+		return (Getter3<Iterable<? extends E>, Iterator<E>>)iterableIterator;
 	}
 
 	/** Diese Methode liefert die Elemente des gegebenen {@link Iterable} als {@link Set}. Wenn das Iterable ein {@link Set} ist, wird dieses geliefert.
 	 * Andernfalls wird ein über {@link #addAll(Collection, Iterable)} befülltes {@link HashSet2} geliefert. */
-	public static <T> Set<T> iterableToSet(Iterable<T> source) throws NullPointerException {
-		if (source instanceof Set<?>) return (Set<T>)source;
-		var result = new HashSet2<T>();
-		Iterables.addAll(result, source);
+	public static <E> Set<E> toSet(Iterable<E> source) throws NullPointerException {
+		if (source instanceof Set<?>) return (Set<E>)source;
+		var result = new HashSet2<E>();
+		addAll(result, source);
 		return result;
 	}
 
 	/** Diese Methode liefert die Elemente des gegebenen {@link Iterable} als {@link List}. Wenn das Iterable eine {@link List} ist, wird diese geliefert.
 	 * Andernfalls wird eine über {@link #addAll(Collection, Iterable)} befüllte {@link ArrayList} geliefert. */
-	public static <T> List<T> toList(Iterable<T> source) throws NullPointerException {
-		if (source instanceof List<?>) return (List<T>)source;
-		var result = new ArrayList<T>();
-		Iterables.addAll(result, source);
+	public static <E> List<E> toList(Iterable<E> source) throws NullPointerException {
+		if (source instanceof List<?>) return (List<E>)source;
+		var result = new ArrayList<E>();
+		addAll(result, source);
 		return result;
 	}
 
 	/** Diese Methode liefert die Elemente des gegebenen {@link Iterable} als Array. Dazu wird das Iterable in eine {@link Collection} überführt, deren Inhalt
 	 * schließlich als Array {@link Collection#toArray() geliefert} wird. */
 	public static Object[] toArray(Iterable<?> source) throws NullPointerException {
-		return (source instanceof Collection<?> ? (Collection<?>)source : Iterables.toList(source)).toArray();
+		return (source instanceof Collection<?> ? (Collection<?>)source : toList(source)).toArray();
 	}
 
 	/** Diese Methode liefert die Elemente des gegebenen {@link Iterable} als Array. Dazu wird das Iterable in eine {@link Collection} überführt, deren Inhalt
 	 * schließlich als Array {@link Collection#toArray(Object[]) geliefert} wird. */
-	public static <T> T[] toArray(Iterable<? extends T> source, T[] array) throws NullPointerException {
-		return (source instanceof Collection<?> ? (Collection<? extends T>)source : Iterables.toList(source)).toArray(array);
+	public static <E> E[] toArray(Iterable<?> source, E[] array) throws NullPointerException {
+		return (source instanceof Collection<?> ? (Collection<?>)source : toList(source)).toArray(array);
 	}
 
 	private static final Iterable<?> emptyIterable = () -> emptyIterator();

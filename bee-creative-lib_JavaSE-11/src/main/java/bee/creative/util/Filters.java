@@ -2,7 +2,7 @@ package bee.creative.util;
 
 import static bee.creative.lang.Objects.notNull;
 import static bee.creative.util.Iterables.iterableFromArray;
-import static bee.creative.util.Iterables.iterableToSet;
+import static bee.creative.util.Iterables.toSet;
 import java.util.Collection;
 
 /** Diese Klasse implementiert grundlegende {@link Filter}.
@@ -34,9 +34,9 @@ public class Filters {
 
 	/** Diese Methode ist eine Abkürzung für {@link #filterFromItems(Collection) filterFromItems(iterableToSet(that))}.
 	 *
-	 * @see Iterables#iterableToSet(Iterable) */
+	 * @see Iterables#toSet(Iterable) */
 	public static Filter3<Object> filterFromItems(Iterable<?> that) throws NullPointerException {
-		return filterFromItems(iterableToSet(that));
+		return filterFromItems(toSet(that));
 	}
 
 	/** Diese Methode liefet den {@link Filter} zu {@link Collection#contains(Object)}. Die Akzeptanz eines Datensatzes {@code item} ist

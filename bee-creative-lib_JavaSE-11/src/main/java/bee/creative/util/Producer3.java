@@ -8,8 +8,8 @@ import static bee.creative.util.Hashers.naturalHasher;
 import static bee.creative.util.Producers.producerFromGetter;
 import static bee.creative.util.Producers.synchronizedProducer;
 import static bee.creative.util.Producers.translatedProducer;
-import static bee.creative.util.Properties.propertyFromField;
 import static bee.creative.util.Properties.propertyFrom;
+import static bee.creative.util.Properties.propertyFromField;
 import bee.creative.util.Getters.RefMode;
 
 /** Diese Schnittstelle ergänzt einen {@link Producer3} insb. um eine erweiterte Anbindung an Methoden von {@link Producers}.
