@@ -97,7 +97,7 @@ public interface DM extends QO {
 	 * @return {@code true} bei Änderung des Graphspeicherinhalts; {@code false} sonst. */
 	default boolean putEdges(Iterable<? extends QE> edges) throws NullPointerException, IllegalArgumentException {
 		var history = this.history();
-		return DQ.putEdges(this.context(), edges, history != null ? history.putContext() : null, history != null ? history.popContext() : null);
+		return DQ.putEdges(this.context(), edges, history != null ? history.currentPutContext() : null, history != null ? history.currentPopContext() : null);
 	}
 
 	/** Diese Methode entfernt die als {@link QE Hyperkanten} gegebenen Prädikat-Subjekt-Objekt-Tripel mit dem {@link #context() Kontextknoten} dieses
@@ -109,7 +109,7 @@ public interface DM extends QO {
 	 * @return {@code true} bei Änderung des Graphspeicherinhalts; {@code false} sonst. */
 	default boolean popEdges(Iterable<? extends QE> edges) throws NullPointerException, IllegalArgumentException {
 		var history = this.history();
-		return DQ.popEdges(this.context(), edges, history != null ? history.putContext() : null, history != null ? history.popContext() : null);
+		return DQ.popEdges(this.context(), edges, history != null ? history.currentPutContext() : null, history != null ? history.currentPopContext() : null);
 	}
 
 	/** Diese Methode liefert den {@link Translators#optionalizedTranslator(Translator) optionalisierten} {@link DL#node() Feldknoten}-{@link DL

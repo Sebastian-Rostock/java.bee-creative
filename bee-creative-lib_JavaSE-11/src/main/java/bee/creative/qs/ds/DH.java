@@ -18,51 +18,11 @@ public interface DH extends DO {
 	// gab es änderungen?
 	default boolean todo() {
 		var current = this.current().get();
-		return !current.putEdges().isEmpty() || !current.popEdges().isEmpty();
-	}
-
-	default boolean redo(Iterable<? extends DC> changes) throws NullPointerException, IllegalArgumentException {
-		var redoChangeNodes = changeTrans().asSourceGetter().translate(changes).toList();
-		if (redoChangeNodes.isEmpty()) return false;
-		if (redoChangeNodes.contains(null)) throw new NullPointerException();
-		var currentChangeNode = this.currentAsNode().get();
-		if (currentChangeNode == null) return false;
-		if (redoChangeNodes.contains(currentChangeNode)) throw new IllegalArgumentException();
-		var parent = parent();
-		var edges = parent.owner().edges();
-		var isChangeWithPutContext = parent.getLink(DC.IDENT_IsChangeWithPutContext);
-		var isChangeWithPopContext = parent.getLink(DC.IDENT_IsChangeWithPopContext);
-		var putContext = isChangeWithPutContext.getObject(currentChangeNode);
-		if (putContext == null) return false;
-		var popContext = isChangeWithPopContext.getObject(currentChangeNode);
-		if (popContext == null) return false;
-		var putContextByRedoChangeNode = isChangeWithPutContext.getObjectMap(redoChangeNodes);
-		if (putContextByRedoChangeNode.values().contains(null)) throw new NullPointerException();
-		var popContextByRedoChangeNode = isChangeWithPopContext.getObjectMap(redoChangeNodes);
-		if (popContextByRedoChangeNode.values().contains(null)) throw new NullPointerException();
-		redoChangeNodes.forEach(redoChangeNode -> {
-			DQ.putEdges(parent.context(), edges.havingContext(putContextByRedoChangeNode.get(redoChangeNode)), putContext, popContext);
-			DQ.popEdges(parent.context(), edges.havingContext(popContextByRedoChangeNode.get(redoChangeNode)), putContext, popContext);
-		});
-		return true;
-	}
-
-	default void undo(Iterable<? extends DC> changes) {
-
+		return (current != null) && (!current.recordedPutEdges().isEmpty() || !current.recordedPopEdges().isEmpty());
 	}
 
 	// änderung abschließen und neue beginnen
 	void done();
-
-	default QN putContext() {
-		var current = this.current().get();
-		return current != null ? current.putContext().get() : null;
-	}
-
-	default QN popContext() {
-		var current = this.current().get();
-		return current != null ? current.popContext().get() : null;
-	}
 
 	default Property3<DC> current() {
 		return this.currentAsNode().translate(this.changeTrans());
@@ -71,6 +31,16 @@ public interface DH extends DO {
 	default Property3<QN> currentAsNode() {
 		var parent = this.parent();
 		return parent.getLink(DH.IDENT_IsModelWithChange).getObjects(parent.context()).asNode();
+	}
+
+	default QN currentPutContext() {
+		var current = this.current().get();
+		return current != null ? current.recordingPutContext().get() : null;
+	}
+
+	default QN currentPopContext() {
+		var current = this.current().get();
+		return current != null ? current.recordingPopContext().get() : null;
 	}
 
 	default Set2<DC> changes() {

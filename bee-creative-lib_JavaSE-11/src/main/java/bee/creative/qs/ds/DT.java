@@ -51,41 +51,24 @@ public interface DT extends DE {
 	}
 
 	/** Diese Methode erlaubt Zugriff auf die {@link QN Hyperknoten}, die als {@link QE#subject() Subjektknoten} der Kanten mit {@link QE#subject()
-	 * Prädikatknoten} aus {@link #sourceLinksAsNodes()} und die als {@link QE#object() Objektknoten} der Kanten mit {@link QE#subject() Prädikatknoten} aus
-	 * {@link #targetLinksAsNodes()}.
+	 * Prädikatknoten} aus {@link #subjectLinksAsNodes()} und die als {@link QE#object() Objektknoten} der Kanten mit {@link QE#subject() Prädikatknoten} aus
+	 * {@link #objectLinksAsNodes()}.
 	 *
 	 * @return Exemplarknoten. */
 	default QNSet specimens() {
-		return this.owner().edges().havingPredicates(this.owner().newNodes(this.sourceLinksAsNodes())).subjects()
-			.union(this.owner().edges().havingPredicates(this.owner().newNodes(this.targetLinksAsNodes())).objects());
-	}
-
-	/** Diese Methode erlaubt Zugriff auf die diesen Datentyp als {@link DL#objectType() Objektdatentyp} zulassenden {@link DL Datenfelder}.
-	 *
-	 * @see DT#targetLinksAsNodes()
-	 * @see DM#linkTrans()
-	 * @return Objektdatenfelder. */
-	default Set2<DL> targetLinks() {
-		return this.targetLinksAsNodes().asTranslatedSet(this.parent().linkTrans());
-	}
-
-	/** Diese Methode erlaubt Zugriff auf die {@link DL#node() Hyperknoten} der diesen Datentyp als {@link DL#objectType() Objektdatentyp} zulassenden {@link DL
-	 * Datenfelder}.
-	 *
-	 * @see DL#IDENT_IsLinkWithObjectType
-	 * @see DL#asSubjectSet(QN)
-	 * @return Objektdatenfeldknoten. */
-	default Set2<QN> targetLinksAsNodes() {
-		return this.parent().getLink(DL.IDENT_IsLinkWithObjectType).asSubjectSet(this.node());
+		var owner = this.owner();
+		var edges = owner.edges();
+		return edges.havingPredicates(owner.newNodes(this.subjectLinksAsNodes())).subjects()
+			.union(edges.havingPredicates(owner.newNodes(this.objectLinksAsNodes())).objects());
 	}
 
 	/** Diese Methode erlaubt Zugriff auf die diesen Datentyp als {@link DL#subjectType() Subjektdatentyp} zulassenden {@link DL Datenfelder}.
 	 *
-	 * @see DT#sourceLinksAsNodes()
+	 * @see DT#subjectLinksAsNodes()
 	 * @see DM#linkTrans()
 	 * @return Subjektdatenfelder. */
-	default Set2<DL> sourceLinks() {
-		return this.sourceLinksAsNodes().asTranslatedSet(this.parent().linkTrans());
+	default Set2<DL> subjectLinks() {
+		return this.subjectLinksAsNodes().asTranslatedSet(this.parent().linkTrans());
 	}
 
 	/** Diese Methode erlaubt Zugriff auf die {@link DL#node() Hyperknoten} der diesen Datentyp als {@link DL#subjectType() Subjektdatentyp} zulassenden {@link DL
@@ -94,8 +77,27 @@ public interface DT extends DE {
 	 * @see DL#IDENT_IsLinkWithSubjectType
 	 * @see DL#asSubjectSet(QN)
 	 * @return Subjektdatenfeldknoten. */
-	default Set2<QN> sourceLinksAsNodes() {
+	default Set2<QN> subjectLinksAsNodes() {
 		return this.parent().getLink(DL.IDENT_IsLinkWithSubjectType).asSubjectSet(this.node());
+	}
+
+	/** Diese Methode erlaubt Zugriff auf die diesen Datentyp als {@link DL#objectType() Objektdatentyp} zulassenden {@link DL Datenfelder}.
+	 *
+	 * @see DT#objectLinksAsNodes()
+	 * @see DM#linkTrans()
+	 * @return Objektdatenfelder. */
+	default Set2<DL> objectLinks() {
+		return this.objectLinksAsNodes().asTranslatedSet(this.parent().linkTrans());
+	}
+
+	/** Diese Methode erlaubt Zugriff auf die {@link DL#node() Hyperknoten} der diesen Datentyp als {@link DL#objectType() Objektdatentyp} zulassenden {@link DL
+	 * Datenfelder}.
+	 *
+	 * @see DL#IDENT_IsLinkWithObjectType
+	 * @see DL#asSubjectSet(QN)
+	 * @return Objektdatenfeldknoten. */
+	default Set2<QN> objectLinksAsNodes() {
+		return this.parent().getLink(DL.IDENT_IsLinkWithObjectType).asSubjectSet(this.node());
 	}
 
 }

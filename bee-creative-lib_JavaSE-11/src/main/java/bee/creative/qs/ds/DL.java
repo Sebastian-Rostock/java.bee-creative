@@ -206,14 +206,14 @@ public interface DL extends DE {
 		var model = this.parent();
 		var history = model.history();
 		return DQ.setSubjectMap(model.context(), this.node(), objectSubjectMap, //
-			history != null ? history.putContext() : null, history != null ? history.popContext() : null);
+			history != null ? history.currentPutContext() : null, history != null ? history.currentPopContext() : null);
 	}
 
 	default boolean setSubjectSetMap(Map<? extends QN, ? extends Iterable<? extends QN>> objectSubjectSetMap) {
 		var model = this.parent();
 		var history = model.history();
 		return DQ.setSubjectSetMap(model.context(), this.node(), objectSubjectSetMap, //
-			history != null ? history.putContext() : null, history != null ? history.popContext() : null);
+			history != null ? history.currentPutContext() : null, history != null ? history.currentPopContext() : null);
 	}
 
 	default boolean putSubject(QN object, QN subject) throws NullPointerException, IllegalArgumentException {
@@ -228,14 +228,14 @@ public interface DL extends DE {
 		var model = this.parent();
 		var history = model.history();
 		return DQ.putSubjectMap(model.context(), this.node(), objectSubjectMap, //
-			history != null ? history.putContext() : null, history != null ? history.popContext() : null);
+			history != null ? history.currentPutContext() : null, history != null ? history.currentPopContext() : null);
 	}
 
 	default boolean putSubjectSetMap(Map<? extends QN, ? extends Iterable<? extends QN>> objectSubjectSetMap) {
 		var model = this.parent();
 		var history = model.history();
 		return DQ.putSubjectSetMap(model.context(), this.node(), objectSubjectSetMap, //
-			history != null ? history.putContext() : null, history != null ? history.popContext() : null);
+			history != null ? history.currentPutContext() : null, history != null ? history.currentPopContext() : null);
 	}
 
 	default boolean popSubject(QN object, QN subject) throws NullPointerException, IllegalArgumentException {
@@ -250,14 +250,14 @@ public interface DL extends DE {
 		var model = this.parent();
 		var history = model.history();
 		return DQ.popSubjectMap(model.context(), this.node(), objectSubjectMap, //
-			history != null ? history.putContext() : null, history != null ? history.popContext() : null);
+			history != null ? history.currentPutContext() : null, history != null ? history.currentPopContext() : null);
 	}
 
 	default boolean popSubjectSetMap(Map<? extends QN, ? extends Iterable<? extends QN>> objectSubjectSetMap) {
 		var model = this.parent();
 		var history = model.history();
 		return DQ.popSubjectSetMap(model.context(), this.node(), objectSubjectSetMap, //
-			history != null ? history.putContext() : null, history != null ? history.popContext() : null);
+			history != null ? history.currentPutContext() : null, history != null ? history.currentPopContext() : null);
 	}
 
 	default QN getObject(QN subject) throws NullPointerException, IllegalArgumentException {
@@ -298,14 +298,14 @@ public interface DL extends DE {
 		var model = this.parent();
 		var history = model.history();
 		return DQ.setObjectMap(model.context(), this.node(), subjectObjectMap, //
-			history != null ? history.putContext() : null, history != null ? history.popContext() : null);
+			history != null ? history.currentPutContext() : null, history != null ? history.currentPopContext() : null);
 	}
 
 	default boolean setObjectSetMap(Map<? extends QN, ? extends Iterable<? extends QN>> subjectObjectSetMap) {
 		var model = this.parent();
 		var history = model.history();
 		return DQ.setObjectSetMap(model.context(), this.node(), subjectObjectSetMap, //
-			history != null ? history.putContext() : null, history != null ? history.popContext() : null);
+			history != null ? history.currentPutContext() : null, history != null ? history.currentPopContext() : null);
 	}
 
 	default boolean putObject(QN subject, QN object) throws NullPointerException, IllegalArgumentException {
@@ -320,14 +320,14 @@ public interface DL extends DE {
 		var model = this.parent();
 		var history = model.history();
 		return DQ.putObjectMap(model.context(), this.node(), subjectObjectMap, //
-			history != null ? history.putContext() : null, history != null ? history.popContext() : null);
+			history != null ? history.currentPutContext() : null, history != null ? history.currentPopContext() : null);
 	}
 
 	default boolean putObjectSetMap(Map<? extends QN, ? extends Iterable<? extends QN>> subjectObjectSetMap) {
 		var model = this.parent();
 		var history = model.history();
 		return DQ.putObjectSetMap(model.context(), this.node(), subjectObjectSetMap, //
-			history != null ? history.putContext() : null, history != null ? history.popContext() : null);
+			history != null ? history.currentPutContext() : null, history != null ? history.currentPopContext() : null);
 	}
 
 	default boolean popObject(QN subject, QN object) throws NullPointerException, IllegalArgumentException {
@@ -342,14 +342,14 @@ public interface DL extends DE {
 		var model = this.parent();
 		var history = model.history();
 		return DQ.popObjectMap(model.context(), this.node(), subjectObjectMap, //
-			history != null ? history.putContext() : null, history != null ? history.popContext() : null);
+			history != null ? history.currentPutContext() : null, history != null ? history.currentPopContext() : null);
 	}
 
 	default boolean popObjectSetMap(Map<? extends QN, ? extends Iterable<? extends QN>> subjectObjectSetMap) {
 		var model = this.parent();
 		var history = model.history();
 		return DQ.popObjectSetMap(model.context(), this.node(), subjectObjectSetMap, //
-			history != null ? history.putContext() : null, history != null ? history.popContext() : null);
+			history != null ? history.currentPutContext() : null, history != null ? history.currentPopContext() : null);
 	}
 
 	default Set2<QN> asSubjectSet(QN object) {
