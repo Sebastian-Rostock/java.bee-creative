@@ -410,7 +410,7 @@ public class H2QS implements QS, AutoCloseable {
 
 	final HashMap<String, H2QIBag<?, ?>.Cache> cacheMap = new HashMap<>();
 
-	final Translator3<QN, String> valueTrans = translatorFromClass(QN.class, String.class, QN::value, this::newNode).asOptionalizedTranslator();
+	final Translator3<QN, String> valueTrans = translatorFromClass(QN.class, String.class, QN::value, this::newNode).optionalize();
 
 	Object putValueMark;
 

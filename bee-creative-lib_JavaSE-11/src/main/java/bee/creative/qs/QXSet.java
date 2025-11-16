@@ -4,9 +4,9 @@ package bee.creative.qs;
  * Graphspeicher}.
  *
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <ITEM> Typ der Elemente.
- * @param <THIS> Typ dieser Menge. */
-public interface QXSet<ITEM, THIS> extends QOSet<ITEM, THIS> {
+ * @param <E> Typ der Elemente.
+ * @param <T> Typ dieser Menge. */
+public interface QXSet<E, T> extends QOSet<E, T> {
 
 	/** Diese Methode entfernt alle in dieser Menge enthaltenen Elemente aus dem {@link #owner() Graphspeicher} und gibt nur dann {@code true} zurück, wenn
 	 * dadurch der Inhalt des Graphspeichers verändert wurde.
@@ -18,6 +18,6 @@ public interface QXSet<ITEM, THIS> extends QOSet<ITEM, THIS> {
 	 *
 	 * @param state {@code true} für die im {@link QS Graphspeicher} gespeicherten Objekte bzw. {@code false} für die temporären Objekte.
 	 * @return Objekte mit dem gegebenen Speicherzustand. */
-	THIS havingState(boolean state);
+	T havingState(boolean state);
 
 }

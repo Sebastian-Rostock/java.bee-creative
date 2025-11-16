@@ -32,7 +32,7 @@ public interface DC extends DO {
 	}
 
 	default Property3<QN> nextAsNode() {
-		return this.parent().getLink(DC.IDENT_IsChangeWithNextChange).getTargets(this.node()).asNode();
+		return this.parent().getLink(DC.IDENT_IsChangeWithNextChange).getObjects(this.node()).asNode();
 	}
 
 	default Property3<DC> prev() {
@@ -40,7 +40,7 @@ public interface DC extends DO {
 	}
 
 	default Property3<QN> prevAsNode() {
-		return this.parent().getLink(DC.IDENT_IsChangeWithNextChange).getSources(this.node()).asNode();
+		return this.parent().getLink(DC.IDENT_IsChangeWithNextChange).getSubjects(this.node()).asNode();
 	}
 
 	default QESet putEdges() {
@@ -48,7 +48,7 @@ public interface DC extends DO {
 	}
 
 	default Property3<QN> putContext() {
-		return this.parent().getLink(DC.IDENT_IsChangeWithPutContext).getTargets(this.node()).asNode();
+		return this.parent().getLink(DC.IDENT_IsChangeWithPutContext).getObjects(this.node()).asNode();
 	}
 
 	default QESet popEdges() {
@@ -56,7 +56,7 @@ public interface DC extends DO {
 	}
 
 	default Property3<QN> popContext() {
-		return this.parent().getLink(DC.IDENT_IsChangeWithPopContext).getTargets(this.node()).asNode();
+		return this.parent().getLink(DC.IDENT_IsChangeWithPopContext).getObjects(this.node()).asNode();
 	}
 
 }

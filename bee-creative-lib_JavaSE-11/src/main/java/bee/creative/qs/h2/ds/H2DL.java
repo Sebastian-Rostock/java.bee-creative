@@ -13,13 +13,13 @@ public class H2DL extends H2DE implements DL {
 	}
 
 	@Override
-	public H2DLSSet getSources(QN target) throws NullPointerException, IllegalArgumentException {
-		return new H2DLSSet(this, this.node.owner.asQN(target));
+	public H2DLSSet getSubjects(QN object) throws NullPointerException, IllegalArgumentException {
+		return new H2DLSSet(this, this.node.owner.asQN(object));
 	}
 
 	@Override
-	public H2DLTSet getTargets(QN source) throws NullPointerException, IllegalArgumentException {
-		return new H2DLTSet(this, this.node.owner.asQN(source));
+	public H2DLTSet getObjects(QN subject) throws NullPointerException, IllegalArgumentException {
+		return new H2DLTSet(this, this.node.owner.asQN(subject));
 	}
 
 	protected H2DL(H2DM parent, H2QN node) {

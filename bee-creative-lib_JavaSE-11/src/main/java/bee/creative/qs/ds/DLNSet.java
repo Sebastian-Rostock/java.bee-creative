@@ -5,8 +5,8 @@ import bee.creative.qs.QESet;
 import bee.creative.qs.QN;
 import bee.creative.qs.QNSet;
 
-/** Diese Schnittstelle definiert eine {@link QNSet Menge} von {@link QN Hyperknoten}, die über ein {@link #link() Datenfeld} einem {@link #source()
- * Subjektknoten} bzw. einem {@link #target() Objektknoten} zugeordnet ist.
+/** Diese Schnittstelle definiert eine {@link QNSet Menge} von {@link QN Hyperknoten}, die über ein {@link #link() Datenfeld} einem {@link #subject()
+ * Subjektknoten} bzw. einem {@link #object() Objektknoten} zugeordnet ist.
  *
  * @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public interface DLNSet extends DSNSet, DO {
@@ -30,11 +30,11 @@ public interface DLNSet extends DSNSet, DO {
 	/** Diese Methode liefert den als {@link QE#object() Objektnoten} der {@link #edges() Hyperkanten} verwendeten {@link QN Hyperknoten} oder {@code null}.
 	 *
 	 * @return Objektnoten oder {@code null}. */
-	QN target();
+	QN object();
 
 	/** Diese Methode liefert den als {@link QE#subject() Subjektnoten} der {@link #edges() Hyperkanten} verwendeten {@link QN Hyperknoten} oder {@code null}.
 	 *
 	 * @return Subjektnoten oder {@code null}. */
-	QN source();
+	QN subject();
 
 }

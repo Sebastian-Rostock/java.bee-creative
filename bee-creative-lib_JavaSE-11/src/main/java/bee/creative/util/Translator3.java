@@ -41,6 +41,27 @@ public interface Translator3<S, T> extends Translator<S, T> {
 		return concatTranslator(this, trans);
 	}
 
+	/** Diese Methode liefert einen {@link Translator3}, der die Übersetzung dises {@link Translator} umkehrt. Sie ist eine Abkürzung für
+	 * {@link Translators#translatorFrom translatorFrom(this.asSourceFilter(), this.asTargetFilter(), this.asSourceGetter(), this.asTargetGetter())} */
+	default Translator3<T, S> reverse() {
+		return translatorFrom(this.asSourceFilter(), this.asTargetFilter(), this.asSourceGetter(), this.asTargetGetter());
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link Translators#optionalizedTranslator(Translator) optionalizedTranslator(this)}. */
+	default Translator3<S, T> optionalize() {
+		return optionalizedTranslator(this);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #synchronize(Object) this.synchronize(this)}. */
+	default Translator3<S, T> synchronize() {
+		return this.synchronize(this);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link Translators#synchronizedTranslator(Translator, Object) synchronizedTranslator(this, mutex)}. */
+	default Translator3<S, T> synchronize(Object mutex) {
+		return synchronizedTranslator(this, mutex);
+	}
+
 	/** Diese Methode liefert den {@link Filter3} zu {@link #isTarget(Object)}. */
 	default Filter3<Object> asTargetFilter() {
 		return this::isTarget;
@@ -59,27 +80,6 @@ public interface Translator3<S, T> extends Translator<S, T> {
 	/** Diese Methode liefert den {@link Getter3} zu {@link #toSource(Object)}. */
 	default Getter3<Object, S> asSourceGetter() {
 		return this::toSource;
-	}
-
-	/** Diese Methode liefert einen {@link Translator3}, der die Übersetzung dises {@link Translator} umkehrt. Sie ist eine Abkürzung für
-	 * {@link Translators#translatorFrom translatorFrom(this.asSourceFilter(), this.asTargetFilter(), this.asSourceGetter(), this.asTargetGetter())} */
-	default Translator3<T, S> asReversedTranslator() {
-		return translatorFrom(this.asSourceFilter(), this.asTargetFilter(), this.asSourceGetter(), this.asTargetGetter());
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link Translators#optionalizedTranslator(Translator) optionalizedTranslator(this)}. */
-	default Translator3<S, T> asOptionalizedTranslator() {
-		return optionalizedTranslator(this);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link #asSynchronizedTranslator(Object) this.asSynchronizedTranslator(this)}. */
-	default Translator3<S, T> asSynchronizedTranslator() {
-		return this.asSynchronizedTranslator(this);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link Translators#synchronizedTranslator(Translator, Object) synchronizedTranslator(this, mutex)}. */
-	default Translator3<S, T> asSynchronizedTranslator(Object mutex) {
-		return synchronizedTranslator(this, mutex);
 	}
 
 }

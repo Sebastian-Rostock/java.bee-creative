@@ -99,17 +99,17 @@ public class H2DM implements DM {
 			DL.IDENT_IsLink, Handling.Association, Multiplicity.Multiplicity11, null, Handling.Association, Multiplicity.Multiplicity1N);
 		this.installLink(DL.IDENT_IsLinkWithLabel, "link-label", //
 			DL.IDENT_IsLink, Handling.Association, Multiplicity.Multiplicity1N, null, Handling.Aggregation, Multiplicity.Multiplicity01);
-		this.installLink(DL.IDENT_IsLinkWithSourceType, "link-source-type", //
+		this.installLink(DL.IDENT_IsLinkWithSubjectType, "link-source-type", //
 			DL.IDENT_IsLink, Handling.Association, Multiplicity.Multiplicity0N, DT.IDENT_IsType, Handling.Aggregation, Multiplicity.Multiplicity01);
-		this.installLink(DL.IDENT_IsLinkWithSourceHandling, "link-source-handling", //
+		this.installLink(DL.IDENT_IsLinkWithSubjectHandling, "link-source-handling", //
 			DL.IDENT_IsLink, Handling.Association, Multiplicity.Multiplicity0N, null, Handling.Aggregation, Multiplicity.Multiplicity11);
-		this.installLink(DL.IDENT_IsLinkWithSourceMultiplicity, "link-source-multiplicity", //
+		this.installLink(DL.IDENT_IsLinkWithSubjectMultiplicity, "link-source-multiplicity", //
 			DL.IDENT_IsLink, Handling.Association, Multiplicity.Multiplicity0N, null, Handling.Aggregation, Multiplicity.Multiplicity11);
-		this.installLink(DL.IDENT_IsLinkWithTargetType, "link-target-type", //
+		this.installLink(DL.IDENT_IsLinkWithObjectType, "link-target-type", //
 			DL.IDENT_IsLink, Handling.Association, Multiplicity.Multiplicity0N, DT.IDENT_IsType, Handling.Aggregation, Multiplicity.Multiplicity01);
-		this.installLink(DL.IDENT_IsLinkWithTargetHandling, "link-target-handling", //
+		this.installLink(DL.IDENT_IsLinkWithObjectHandling, "link-target-handling", //
 			DL.IDENT_IsLink, Handling.Association, Multiplicity.Multiplicity0N, null, Handling.Aggregation, Multiplicity.Multiplicity11);
-		this.installLink(DL.IDENT_IsLinkWithTargetMultiplicity, "link-target-multiplicity", //
+		this.installLink(DL.IDENT_IsLinkWithObjectMultiplicity, "link-target-multiplicity", //
 			DL.IDENT_IsLink, Handling.Association, Multiplicity.Multiplicity0N, null, Handling.Aggregation, Multiplicity.Multiplicity11);
 
 		this.installInstances(DT.IDENT_IsType, this.typeMap.values());
@@ -126,12 +126,12 @@ public class H2DM implements DM {
 
 	@Override
 	public Translator3<QN, DL> linkTrans() {
-		return this.linkTrans == null ? this.linkTrans = translatorFromClass(QN.class, DL.class, this::asLink, DL::node).asOptionalizedTranslator() : this.linkTrans;
+		return this.linkTrans == null ? this.linkTrans = translatorFromClass(QN.class, DL.class, this::asLink, DL::node).optionalize() : this.linkTrans;
 	}
 
 	@Override
 	public Translator3<QN, DT> typeTrans() {
-		return this.typeTrans == null ? this.typeTrans = translatorFromClass(QN.class, DT.class, this::asType, DT::node).asOptionalizedTranslator() : this.typeTrans;
+		return this.typeTrans == null ? this.typeTrans = translatorFromClass(QN.class, DT.class, this::asType, DT::node).optionalize() : this.typeTrans;
 	}
 
 	protected H2DL asLink(QN node) {
@@ -165,28 +165,28 @@ public class H2DM implements DM {
 		var link = this.installLink(ident);
 		this.installTargets(DL.IDENT_IsLinkWithIdent, link).asValueSet().add(ident);
 		this.installTargets(DL.IDENT_IsLinkWithLabel, link).asValue().set(label);
-		this.installTargets(DL.IDENT_IsLinkWithSourceType, link).asNode().translate(this.typeTrans()).set(this.installType(sourceTypeIdent));
-		this.installTargets(DL.IDENT_IsLinkWithSourceHandling, link).asValue().set(handlingTrans().toSource(sourceHandling));
-		this.installTargets(DL.IDENT_IsLinkWithSourceMultiplicity, link).asValue().set(multiplicityTrans().toSource(sourceMultiplicity));
-		this.installTargets(DL.IDENT_IsLinkWithTargetType, link).asNode().translate(this.typeTrans()).set(this.installType(targetTypeIdent));
-		this.installTargets(DL.IDENT_IsLinkWithTargetHandling, link).asValue().set(handlingTrans().toSource(targetHandling));
-		this.installTargets(DL.IDENT_IsLinkWithTargetMultiplicity, link).asValue().set(multiplicityTrans().toSource(targetMultiplicity));
+		this.installTargets(DL.IDENT_IsLinkWithSubjectType, link).asNode().translate(this.typeTrans()).set(this.installType(sourceTypeIdent));
+		this.installTargets(DL.IDENT_IsLinkWithSubjectHandling, link).asValue().set(handlingTrans().toSource(sourceHandling));
+		this.installTargets(DL.IDENT_IsLinkWithSubjectMultiplicity, link).asValue().set(multiplicityTrans().toSource(sourceMultiplicity));
+		this.installTargets(DL.IDENT_IsLinkWithObjectType, link).asNode().translate(this.typeTrans()).set(this.installType(targetTypeIdent));
+		this.installTargets(DL.IDENT_IsLinkWithObjectHandling, link).asValue().set(handlingTrans().toSource(targetHandling));
+		this.installTargets(DL.IDENT_IsLinkWithObjectMultiplicity, link).asValue().set(multiplicityTrans().toSource(targetMultiplicity));
 		this.installSources(DT.IDENT_IsTypeWithInstance, link).asNode().translate(this.typeTrans()).set(this.installType(DL.IDENT_IsLink));
 		return link;
 	}
 
 	protected H2DLTSet installTargets(String linkIdent, H2DE source) {
-		return this.installLink(linkIdent).getTargets(source.node);
+		return this.installLink(linkIdent).getObjects(source.node);
 	}
 
 	protected H2DLSSet installSources(String linkIdent, H2DE target) {
-		return this.installLink(linkIdent).getSources(target.node);
+		return this.installLink(linkIdent).getSubjects(target.node);
 	}
 
 	protected void installInstances(String typeIdent, Iterable<? extends H2DE> instances) {
 		var typeMap = new HashMap2<QN, QN>();
 		typeMap.putAll(instances, H2DE::node, Getters.getterFromValue(this.installType(typeIdent).node));
-		this.installLink(DT.IDENT_IsTypeWithInstance).setSourceMap(typeMap);
+		this.installLink(DT.IDENT_IsTypeWithInstance).setSubjectMap(typeMap);
 	}
 
 	protected <GItem> void setupItemMap(HashMap2<String, GItem> itemByIdentMap, H2DL identLink, Getter<QN, GItem> asItem, Getter<Object, String> asError) {

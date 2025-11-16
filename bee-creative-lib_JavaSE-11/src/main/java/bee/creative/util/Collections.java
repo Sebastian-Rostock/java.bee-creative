@@ -261,7 +261,7 @@ public class Collections {
 		public TranslatedSet(Set<E2> that, Translator<E2, E> trans) throws NullPointerException {
 			this.that = notNull(that);
 			this.trans = translatorFrom(trans);
-			this.trans2 = this.trans.asReversedTranslator();
+			this.trans2 = this.trans.reverse();
 		}
 
 		@Override
@@ -339,8 +339,8 @@ public class Collections {
 			this.that = notNull(that);
 			this.keyTrans = translatorFrom(keyTrans);
 			this.valueTrans = translatorFrom(valueTrans);
-			this.keyTrans2 = this.keyTrans.asReversedTranslator();
-			this.valueTrans2 = this.valueTrans.asReversedTranslator();
+			this.keyTrans2 = this.keyTrans.reverse();
+			this.valueTrans2 = this.valueTrans.reverse();
 			this.entryTrans = translatorFrom(filterFrom(object -> {
 				if (!(object instanceof Entry)) return false;
 				var entry = (Entry<?, ?>)object;
@@ -645,7 +645,7 @@ public class Collections {
 		public TranslatedList(List<E2> that, Translator<E2, E> trans) throws NullPointerException {
 			this.that = notNull(that);
 			this.trans = translatorFrom(trans);
-			this.trans2 = this.trans.asReversedTranslator();
+			this.trans2 = this.trans.reverse();
 		}
 
 		@Override
@@ -834,7 +834,7 @@ public class Collections {
 		public TranslatedCollection(Collection<E2> that, Translator<E2, E> trans) throws NullPointerException {
 			this.that = notNull(that);
 			this.trans = translatorFrom(trans);
-			this.trans2 = this.trans.asReversedTranslator();
+			this.trans2 = this.trans.reverse();
 		}
 
 		@Override

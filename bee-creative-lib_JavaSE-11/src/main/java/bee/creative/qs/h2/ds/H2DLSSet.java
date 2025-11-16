@@ -14,12 +14,12 @@ public class H2DLSSet extends H2DLNSet implements DLSSet {
 	}
 
 	@Override
-	public H2QN target() {
+	public H2QN object() {
 		return this.target;
 	}
 
 	protected H2DLSSet(H2DL link, H2QN target) {
-		super(link.edges().havingObject(target).subjects(), link);
+		super(link, link.edges().havingObject(target).subjects());
 		this.target = target;
 	}
 

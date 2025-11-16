@@ -1,8 +1,10 @@
 package bee.creative.qs;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import bee.creative.util.HashSet2;
 import bee.creative.util.Iterable2;
 import bee.creative.util.Iterator3;
 
@@ -42,15 +44,17 @@ public interface QISet<E> extends QO, Iterable2<E> {
 	/** Diese Methode gibt eine Kopie dieser Menge als {@link Set} zurück.
 	 *
 	 * @return Kopie dieser Menge. */
-	default Set<E> toSet() {
-		return this.iterator().toSet();
+	default HashSet2<E> toSet() {
+		return new HashSet2<>(this);
 	}
 
 	/** Diese Methode gibt eine Kopie dieser Menge als {@link List} zurück.
 	 *
 	 * @return Kopie dieser Menge. */
-	default List<E> toList() {
-		return this.iterator().toList();
+	default ArrayList<E> toList() {
+		var result = new ArrayList<E>();
+		this.iterator().forEachRemaining(result::add);
+		return result;
 	}
 
 }

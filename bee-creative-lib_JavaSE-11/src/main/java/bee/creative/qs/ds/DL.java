@@ -3,7 +3,7 @@ package bee.creative.qs.ds;
 import static bee.creative.qs.ds.DL.Handling.handlingTrans;
 import static bee.creative.util.Properties.propertyFrom;
 import static bee.creative.util.Translators.translatorFromEnum;
-import java.util.Collections;
+import static java.util.Collections.singletonMap;
 import java.util.List;
 import java.util.Map;
 import bee.creative.lang.Objects;
@@ -32,23 +32,23 @@ public interface DL extends DE {
 	/** Dieses Feld speichert den Textwert eines {@link DE#identsAsNodes() Erkennungsknoten} für das {@link #identsAsNodes()}-{@link DL Datenfeld}. */
 	String IDENT_IsLinkWithIdent = "DS:IsLinkWithIdent";
 
-	/** Dieses Feld speichert den Textwert eines {@link DE#identsAsNodes() Erkennungsknoten} für das {@link #sourceTypeAsNode()}-{@link DL Datenfeld}. */
-	String IDENT_IsLinkWithSourceType = "DS:IsLinkWithSourceType";
+	/** Dieses Feld speichert den Textwert eines {@link DE#identsAsNodes() Erkennungsknoten} für das {@link #subjectTypeAsNode()}-{@link DL Datenfeld}. */
+	String IDENT_IsLinkWithSubjectType = "DS:IsLinkWithSubjectType";
 
-	/** Dieses Feld speichert den Textwert eines {@link DE#identsAsNodes() Erkennungsknoten} für das {@link #sourceHandlingAsNode()}-{@link DL Datenfeld}. */
-	String IDENT_IsLinkWithSourceHandling = "DS:IsLinkWithSourceHandling";
+	/** Dieses Feld speichert den Textwert eines {@link DE#identsAsNodes() Erkennungsknoten} für das {@link #subjectHandlingAsNode()}-{@link DL Datenfeld}. */
+	String IDENT_IsLinkWithSubjectHandling = "DS:IsLinkWithSubjectHandling";
 
-	/** Dieses Feld speichert den Textwert eines {@link DE#identsAsNodes() Erkennungsknoten} für das {@link #sourceMultiplicityAsNode()}-{@link DL Datenfeld}. */
-	String IDENT_IsLinkWithSourceMultiplicity = "DS:IsLinkWithSourceMultiplicity";
+	/** Dieses Feld speichert den Textwert eines {@link DE#identsAsNodes() Erkennungsknoten} für das {@link #subjectMultiplicityAsNode()}-{@link DL Datenfeld}. */
+	String IDENT_IsLinkWithSubjectMultiplicity = "DS:IsLinkWithSubjectMultiplicity";
 
-	/** Dieses Feld speichert den Textwert eines {@link DE#identsAsNodes() Erkennungsknoten} für das {@link #targetTypeAsNode()}-{@link DL Datenfeld}. */
-	String IDENT_IsLinkWithTargetType = "DS:IsLinkWithTargetType";
+	/** Dieses Feld speichert den Textwert eines {@link DE#identsAsNodes() Erkennungsknoten} für das {@link #objectTypeAsNode()}-{@link DL Datenfeld}. */
+	String IDENT_IsLinkWithObjectType = "DS:IsLinkWithObjectType";
 
-	/** Dieses Feld speichert den Textwert eines {@link DE#identsAsNodes() Erkennungsknoten} für das {@link #targetHandlingAsNode()}-{@link DL Datenfeld}. */
-	String IDENT_IsLinkWithTargetHandling = "DS:IsLinkWithTargetHandling";
+	/** Dieses Feld speichert den Textwert eines {@link DE#identsAsNodes() Erkennungsknoten} für das {@link #objectHandlingAsNode()}-{@link DL Datenfeld}. */
+	String IDENT_IsLinkWithObjectHandling = "DS:IsLinkWithObjectHandling";
 
-	/** Dieses Feld speichert den Textwert eines {@link DE#identsAsNodes() Erkennungsknoten} für das {@link #targetMultiplicityAsNode()}-{@link DL Datenfeld}. */
-	String IDENT_IsLinkWithTargetMultiplicity = "DS:IsLinkWithTargetMultiplicity";
+	/** Dieses Feld speichert den Textwert eines {@link DE#identsAsNodes() Erkennungsknoten} für das {@link #objectMultiplicityAsNode()}-{@link DL Datenfeld}. */
+	String IDENT_IsLinkWithObjectMultiplicity = "DS:IsLinkWithObjectMultiplicity";
 
 	/** {@inheritDoc} Dieser wird als {@link QE#predicate() Prädikatknoten} der {@link #edges() Hyperkanten} verwendet. Als {@link QE#context() Kontextknoten}
 	 * wird der des {@link #parent() Domänenmodells} verwendet. */
@@ -60,7 +60,7 @@ public interface DL extends DE {
 	 * @see #IDENT_IsLinkWithLabel */
 	@Override
 	default Property3<QN> labelAsNode() {
-		return this.parent().getLink(DL.IDENT_IsLinkWithLabel).asTargetProperty(this.node());
+		return this.parent().getLink(DL.IDENT_IsLinkWithLabel).asObjectProperty(this.node());
 	}
 
 	/** {@inheritDoc}
@@ -68,7 +68,7 @@ public interface DL extends DE {
 	 * @see #IDENT_IsLinkWithIdent */
 	@Override
 	default Set2<QN> identsAsNodes() {
-		return this.parent().getLink(DL.IDENT_IsLinkWithIdent).asTargetSet(this.node());
+		return this.parent().getLink(DL.IDENT_IsLinkWithIdent).asObjectSet(this.node());
 	}
 
 	/** Diese Methode liefert die Mengensicht auf alle gespeicherten {@link QE Hyperkanten} mit dem {@link QE#context() Kontextknoten} des {@link #parent()
@@ -83,291 +83,291 @@ public interface DL extends DE {
 	 * Subjektknoten nicht eingeschränkt.
 	 *
 	 * @see DM#typeTrans()
-	 * @see DL#sourceTypeAsNode()
+	 * @see DL#subjectTypeAsNode()
 	 * @return Subjektdatentyp. */
-	default Property3<DT> sourceType() {
-		return this.sourceTypeAsNode().translate(this.parent().typeTrans());
+	default Property3<DT> subjectType() {
+		return this.subjectTypeAsNode().translate(this.parent().typeTrans());
 	}
 
 	/** Diese Methode erlaubt Zugriff auf den {@link DT#node() Hyperknoten} des {@link DT Datentyps} zulässiger {@link QE#subject() Subjektknoten}. Wenn dieser
 	 * {@code null} ist, sind die Subjektknoten nicht eingeschränkt.
 	 *
-	 * @see DL#IDENT_IsLinkWithSourceType
-	 * @see DL#asTargetProperty(QN)
+	 * @see DL#IDENT_IsLinkWithSubjectType
+	 * @see DL#asObjectProperty(QN)
 	 * @return Subjektdatentypknoten. */
-	default Property3<QN> sourceTypeAsNode() {
-		return this.parent().getLink(DL.IDENT_IsLinkWithSourceType).asTargetProperty(this.node());
+	default Property3<QN> subjectTypeAsNode() {
+		return this.parent().getLink(DL.IDENT_IsLinkWithSubjectType).asObjectProperty(this.node());
 	}
 
 	/** Diese Methode erlaubt Zugriff auf die {@link Handling Handhabung} von {@link QE#subject() Subjektknoten} beim Entfernen oder Duplizieren eines
 	 * {@link QE#object() Objektknoten}.
 	 *
-	 * @see DL#sourceHandlingAsNode()
+	 * @see DL#subjectHandlingAsNode()
 	 * @see QS#valueTrans()
 	 * @see Handling#handlingTrans()
 	 * @return Subjekthandhabung. */
-	default Property3<Handling> sourceHandling() {
-		return this.sourceHandlingAsNode().translate(this.owner().valueTrans()).translate(handlingTrans());
+	default Property3<Handling> subjectHandling() {
+		return this.subjectHandlingAsNode().translate(this.owner().valueTrans()).translate(handlingTrans());
 	}
 
 	/** Diese Methode erlaubt Zugriff auf den {@link DT#node() Hyperknoten} der {@link Handling Handhabung} von {@link QE#subject() Subjektknoten} beim Entfernen
 	 * oder Duplizieren eines {@link QE#object() Objektknoten}.
 	 *
-	 * @see DL#IDENT_IsLinkWithSourceHandling
+	 * @see DL#IDENT_IsLinkWithSubjectHandling
 	 * @return Subjekthandhabungsknoten. */
-	default Property3<QN> sourceHandlingAsNode() {
-		return this.parent().getLink(DL.IDENT_IsLinkWithSourceHandling).asTargetProperty(this.node());
+	default Property3<QN> subjectHandlingAsNode() {
+		return this.parent().getLink(DL.IDENT_IsLinkWithSubjectHandling).asObjectProperty(this.node());
 	}
 
 	/** Diese Methode erlaubt Zugriff auf die zulässige {@link Multiplicity Vielzahl} von {@link QE#subject() Subjektknoten} je {@link QE#object() Objektknoten}.
 	 *
-	 * @see DL#sourceMultiplicityAsNode()
+	 * @see DL#subjectMultiplicityAsNode()
 	 * @see QS#valueTrans()
 	 * @see Multiplicity#multiplicityTrans()
 	 * @return Subjektvielzahl. */
-	default Property3<Multiplicity> sourceMultiplicity() {
-		return this.sourceMultiplicityAsNode().translate(this.owner().valueTrans()).translate(Multiplicity.trans);
+	default Property3<Multiplicity> subjectMultiplicity() {
+		return this.subjectMultiplicityAsNode().translate(this.owner().valueTrans()).translate(Multiplicity.trans);
 	}
 
 	/** Diese Methode erlaubt Zugriff auf den {@link DT#node() Hyperknoten} der zulässigen {@link Multiplicity Vielzahl} von {@link QE#subject() Subjektknoten} je
 	 * {@link QE#object() Objektknoten}.
 	 *
-	 * @see DL#IDENT_IsLinkWithSourceMultiplicity
+	 * @see DL#IDENT_IsLinkWithSubjectMultiplicity
 	 * @return Subjektvielzahlknoten. */
-	default Property3<QN> sourceMultiplicityAsNode() {
-		return this.parent().getLink(DL.IDENT_IsLinkWithSourceMultiplicity).asTargetProperty(this.node());
+	default Property3<QN> subjectMultiplicityAsNode() {
+		return this.parent().getLink(DL.IDENT_IsLinkWithSubjectMultiplicity).asObjectProperty(this.node());
 	}
 
-	default Property3<DT> targetType() {
-		return this.targetTypeAsNode().translate(this.parent().typeTrans());
+	default Property3<DT> objectType() {
+		return this.objectTypeAsNode().translate(this.parent().typeTrans());
 	}
 
 	/** Diese Methode erlaubt Zugriff auf den {@link DT#node() Hyperknoten} des {@link DT Datentyps} zulässiger {@link QE#object() Objektknoten}. Wenn dieser
 	 * {@code null} ist, sind die Objektknoten nicht eingeschränkt.
 	 *
-	 * @see DL#IDENT_IsLinkWithTargetType
-	 * @see DL#asTargetProperty(QN)
+	 * @see DL#IDENT_IsLinkWithObjectType
+	 * @see DL#asObjectProperty(QN)
 	 * @return Objektdatentypknoten. */
-	default Property3<QN> targetTypeAsNode() {
-		return this.parent().getLink(DL.IDENT_IsLinkWithTargetType).asTargetProperty(this.node());
+	default Property3<QN> objectTypeAsNode() {
+		return this.parent().getLink(DL.IDENT_IsLinkWithObjectType).asObjectProperty(this.node());
 	}
 
-	default Property3<Handling> targetHandling() {
-		return this.targetHandlingAsNode().translate(this.owner().valueTrans()).translate(handlingTrans());
+	default Property3<Handling> objectHandling() {
+		return this.objectHandlingAsNode().translate(this.owner().valueTrans()).translate(handlingTrans());
 	}
 
-	default Property3<QN> targetHandlingAsNode() {
-		return this.parent().getLink(DL.IDENT_IsLinkWithTargetHandling).asTargetProperty(this.node());
+	default Property3<QN> objectHandlingAsNode() {
+		return this.parent().getLink(DL.IDENT_IsLinkWithObjectHandling).asObjectProperty(this.node());
 	}
 
-	default Property3<Multiplicity> targetMultiplicity() {
-		return this.targetMultiplicityAsNode().translate(this.owner().valueTrans()).translate(Multiplicity.trans);
+	default Property3<Multiplicity> objectMultiplicity() {
+		return this.objectMultiplicityAsNode().translate(this.owner().valueTrans()).translate(Multiplicity.trans);
 	}
 
-	default Property3<QN> targetMultiplicityAsNode() {
-		return this.parent().getLink(DL.IDENT_IsLinkWithTargetMultiplicity).asTargetProperty(this.node());
+	default Property3<QN> objectMultiplicityAsNode() {
+		return this.parent().getLink(DL.IDENT_IsLinkWithObjectMultiplicity).asObjectProperty(this.node());
 	}
 
-	default QN getSource(QN target) throws NullPointerException, IllegalArgumentException {
-		return this.getSources(target).first();
+	default QN getSubject(QN object) throws NullPointerException, IllegalArgumentException {
+		return this.getSubjects(object).first();
 	}
 
-	DLNSet getSources(QN target) throws NullPointerException, IllegalArgumentException;
+	DLNSet getSubjects(QN object) throws NullPointerException, IllegalArgumentException;
 
-	default List<QN> getSourceSet(QN target) throws NullPointerException, IllegalArgumentException {
-		return this.getSources(target).toList();
+	default Set2<QN> getSubjectSet(QN object) throws NullPointerException, IllegalArgumentException {
+		return this.getSubjects(object).toSet();
 	}
 
-	default Map<QN, QN> getSourceMap() throws NullPointerException, IllegalArgumentException {
+	default Map<QN, QN> getSubjectMap() throws NullPointerException, IllegalArgumentException {
 		return DQ.getSubjectMap(this.parent().context(), this.node());
 	}
 
-	default Map<QN, QN> getSourceMap(Iterable<? extends QN> targetSet) throws NullPointerException, IllegalArgumentException {
-		return DQ.getSubjectMap(this.parent().context(), this.node(), targetSet);
+	default Map<QN, QN> getSubjectMap(Iterable<? extends QN> objectSet) throws NullPointerException, IllegalArgumentException {
+		return DQ.getSubjectMap(this.parent().context(), this.node(), objectSet);
 	}
 
-	default Map<QN, List<QN>> getSourceSetMap() throws NullPointerException, IllegalArgumentException {
+	default Map<QN, List<QN>> getSubjectSetMap() throws NullPointerException, IllegalArgumentException {
 		return DQ.getSubjectSetMap(this.parent().context(), this.node());
 	}
 
-	default Map<QN, List<QN>> getSourceSetMap(Iterable<? extends QN> targetSet) throws NullPointerException, IllegalArgumentException {
-		return DQ.getSubjectSetMap(this.parent().context(), this.node(), targetSet);
+	default Map<QN, List<QN>> getSubjectSetMap(Iterable<? extends QN> objectSet) throws NullPointerException, IllegalArgumentException {
+		return DQ.getSubjectSetMap(this.parent().context(), this.node(), objectSet);
 	}
 
-	default boolean setSource(QN target, QN source) throws NullPointerException, IllegalArgumentException {
-		return this.setSourceMap(Collections.singletonMap(target, source));
+	default boolean setSubject(QN object, QN subject) throws NullPointerException, IllegalArgumentException {
+		return this.setSubjectMap(singletonMap(object, subject));
 	}
 
-	default boolean setSourceSet(QN target, Iterable<? extends QN> sourceSet) throws NullPointerException, IllegalArgumentException {
-		return this.setSourceSetMap(Collections.singletonMap(target, sourceSet));
+	default boolean setSubjectSet(QN object, Iterable<? extends QN> subjectSet) throws NullPointerException, IllegalArgumentException {
+		return this.setSubjectSetMap(singletonMap(object, subjectSet));
 	}
 
-	default boolean setSourceMap(Map<? extends QN, ? extends QN> targetSourceMap) {
+	default boolean setSubjectMap(Map<? extends QN, ? extends QN> objectSubjectMap) {
 		var model = this.parent();
 		var history = model.history();
-		return DQ.setSubjectMap(model.context(), this.node(), targetSourceMap, //
+		return DQ.setSubjectMap(model.context(), this.node(), objectSubjectMap, //
 			history != null ? history.putContext() : null, history != null ? history.popContext() : null);
 	}
 
-	default boolean setSourceSetMap(Map<? extends QN, ? extends Iterable<? extends QN>> targetSourceSetMap) {
+	default boolean setSubjectSetMap(Map<? extends QN, ? extends Iterable<? extends QN>> objectSubjectSetMap) {
 		var model = this.parent();
 		var history = model.history();
-		return DQ.setSubjectSetMap(model.context(), this.node(), targetSourceSetMap, //
+		return DQ.setSubjectSetMap(model.context(), this.node(), objectSubjectSetMap, //
 			history != null ? history.putContext() : null, history != null ? history.popContext() : null);
 	}
 
-	default boolean putSource(QN target, QN source) throws NullPointerException, IllegalArgumentException {
-		return this.putSourceMap(Collections.singletonMap(target, source));
+	default boolean putSubject(QN object, QN subject) throws NullPointerException, IllegalArgumentException {
+		return this.putSubjectMap(singletonMap(object, subject));
 	}
 
-	default boolean putSourceSet(QN target, Iterable<? extends QN> sourceSet) throws NullPointerException, IllegalArgumentException {
-		return this.putSourceSetMap(Collections.singletonMap(target, sourceSet));
+	default boolean putSubjectSet(QN object, Iterable<? extends QN> subjectSet) throws NullPointerException, IllegalArgumentException {
+		return this.putSubjectSetMap(singletonMap(object, subjectSet));
 	}
 
-	default boolean putSourceMap(Map<? extends QN, ? extends QN> targetSourceMap) {
+	default boolean putSubjectMap(Map<? extends QN, ? extends QN> objectSubjectMap) {
 		var model = this.parent();
 		var history = model.history();
-		return DQ.putSubjectMap(model.context(), this.node(), targetSourceMap, //
+		return DQ.putSubjectMap(model.context(), this.node(), objectSubjectMap, //
 			history != null ? history.putContext() : null, history != null ? history.popContext() : null);
 	}
 
-	default boolean putSourceSetMap(Map<? extends QN, ? extends Iterable<? extends QN>> targetSourceSetMap) {
+	default boolean putSubjectSetMap(Map<? extends QN, ? extends Iterable<? extends QN>> objectSubjectSetMap) {
 		var model = this.parent();
 		var history = model.history();
-		return DQ.putSubjectSetMap(model.context(), this.node(), targetSourceSetMap, //
+		return DQ.putSubjectSetMap(model.context(), this.node(), objectSubjectSetMap, //
 			history != null ? history.putContext() : null, history != null ? history.popContext() : null);
 	}
 
-	default boolean popSource(QN target, QN source) throws NullPointerException, IllegalArgumentException {
-		return this.popSourceMap(Collections.singletonMap(target, source));
+	default boolean popSubject(QN object, QN subject) throws NullPointerException, IllegalArgumentException {
+		return this.popSubjectMap(singletonMap(object, subject));
 	}
 
-	default boolean popSourceSet(QN target, Iterable<? extends QN> sourceSet) throws NullPointerException, IllegalArgumentException {
-		return this.popSourceSetMap(Collections.singletonMap(target, sourceSet));
+	default boolean popSubjectSet(QN object, Iterable<? extends QN> subjectSet) throws NullPointerException, IllegalArgumentException {
+		return this.popSubjectSetMap(singletonMap(object, subjectSet));
 	}
 
-	default boolean popSourceMap(Map<? extends QN, ? extends QN> targetSourceMap) {
+	default boolean popSubjectMap(Map<? extends QN, ? extends QN> objectSubjectMap) {
 		var model = this.parent();
 		var history = model.history();
-		return DQ.popSubjectMap(model.context(), this.node(), targetSourceMap, //
+		return DQ.popSubjectMap(model.context(), this.node(), objectSubjectMap, //
 			history != null ? history.putContext() : null, history != null ? history.popContext() : null);
 	}
 
-	default boolean popSourceSetMap(Map<? extends QN, ? extends Iterable<? extends QN>> targetSourceSetMap) {
+	default boolean popSubjectSetMap(Map<? extends QN, ? extends Iterable<? extends QN>> objectSubjectSetMap) {
 		var model = this.parent();
 		var history = model.history();
-		return DQ.popSubjectSetMap(model.context(), this.node(), targetSourceSetMap, //
+		return DQ.popSubjectSetMap(model.context(), this.node(), objectSubjectSetMap, //
 			history != null ? history.putContext() : null, history != null ? history.popContext() : null);
 	}
 
-	default QN getTarget(QN source) throws NullPointerException, IllegalArgumentException {
-		return this.getTargets(source).first();
+	default QN getObject(QN subject) throws NullPointerException, IllegalArgumentException {
+		return this.getObjects(subject).first();
 	}
 
-	DLNSet getTargets(QN source) throws NullPointerException, IllegalArgumentException;
+	DLNSet getObjects(QN subject) throws NullPointerException, IllegalArgumentException;
 
-	default List<QN> getTargetSet(QN source) throws NullPointerException, IllegalArgumentException {
-		return this.getTargets(source).toList();
+	default List<QN> getObjectSet(QN subject) throws NullPointerException, IllegalArgumentException {
+		return this.getObjects(subject).toList();
 	}
 
-	default Map<QN, QN> getTargetMap() throws NullPointerException, IllegalArgumentException {
+	default Map<QN, QN> getObjectMap() throws NullPointerException, IllegalArgumentException {
 		return DQ.getObjectMap(this.parent().context(), this.node());
 	}
 
-	default Map<QN, QN> getTargetMap(Iterable<? extends QN> sourceSet) throws NullPointerException, IllegalArgumentException {
-		return DQ.getObjectMap(this.parent().context(), this.node(), sourceSet);
+	default Map<QN, QN> getObjectMap(Iterable<? extends QN> subjectSet) throws NullPointerException, IllegalArgumentException {
+		return DQ.getObjectMap(this.parent().context(), this.node(), subjectSet);
 	}
 
-	default Map<QN, List<QN>> getTargetSetMap() throws NullPointerException, IllegalArgumentException {
+	default Map<QN, List<QN>> getObjectSetMap() throws NullPointerException, IllegalArgumentException {
 		return DQ.getObjectSetMap(this.parent().context(), this.node());
 	}
 
-	default Map<QN, List<QN>> getTargetSetMap(Iterable<? extends QN> sourceSet) throws NullPointerException, IllegalArgumentException {
-		return DQ.getObjectSetMap(this.parent().context(), this.node(), sourceSet);
+	default Map<QN, List<QN>> getObjectSetMap(Iterable<? extends QN> subjectSet) throws NullPointerException, IllegalArgumentException {
+		return DQ.getObjectSetMap(this.parent().context(), this.node(), subjectSet);
 	}
 
-	default boolean setTarget(QN source, QN target) throws NullPointerException, IllegalArgumentException {
-		return this.setTargetMap(Collections.singletonMap(source, target));
+	default boolean setObject(QN subject, QN object) throws NullPointerException, IllegalArgumentException {
+		return this.setObjectMap(singletonMap(subject, object));
 	}
 
-	default boolean setTargetSet(QN source, Iterable<? extends QN> targetSet) throws NullPointerException, IllegalArgumentException {
-		return this.setTargetSetMap(Collections.singletonMap(source, targetSet));
+	default boolean setObjectSet(QN subject, Iterable<? extends QN> objectSet) throws NullPointerException, IllegalArgumentException {
+		return this.setObjectSetMap(singletonMap(subject, objectSet));
 	}
 
-	default boolean setTargetMap(Map<? extends QN, ? extends QN> sourceTargetMap) {
+	default boolean setObjectMap(Map<? extends QN, ? extends QN> subjectObjectMap) {
 		var model = this.parent();
 		var history = model.history();
-		return DQ.setObjectMap(model.context(), this.node(), sourceTargetMap, //
+		return DQ.setObjectMap(model.context(), this.node(), subjectObjectMap, //
 			history != null ? history.putContext() : null, history != null ? history.popContext() : null);
 	}
 
-	default boolean setTargetSetMap(Map<? extends QN, ? extends Iterable<? extends QN>> sourceTargetSetMap) {
+	default boolean setObjectSetMap(Map<? extends QN, ? extends Iterable<? extends QN>> subjectObjectSetMap) {
 		var model = this.parent();
 		var history = model.history();
-		return DQ.setObjectSetMap(model.context(), this.node(), sourceTargetSetMap, //
+		return DQ.setObjectSetMap(model.context(), this.node(), subjectObjectSetMap, //
 			history != null ? history.putContext() : null, history != null ? history.popContext() : null);
 	}
 
-	default boolean putTarget(QN source, QN target) throws NullPointerException, IllegalArgumentException {
-		return this.putTargetMap(Collections.singletonMap(source, target));
+	default boolean putObject(QN subject, QN object) throws NullPointerException, IllegalArgumentException {
+		return this.putObjectMap(singletonMap(subject, object));
 	}
 
-	default boolean putTargetSet(QN source, Iterable<? extends QN> targetSet) throws NullPointerException, IllegalArgumentException {
-		return this.putTargetSetMap(Collections.singletonMap(source, targetSet));
+	default boolean putObjectSet(QN subject, Iterable<? extends QN> objectSet) throws NullPointerException, IllegalArgumentException {
+		return this.putObjectSetMap(singletonMap(subject, objectSet));
 	}
 
-	default boolean putTargetMap(Map<? extends QN, ? extends QN> sourceTargetMap) {
+	default boolean putObjectMap(Map<? extends QN, ? extends QN> subjectObjectMap) {
 		var model = this.parent();
 		var history = model.history();
-		return DQ.putObjectMap(model.context(), this.node(), sourceTargetMap, //
+		return DQ.putObjectMap(model.context(), this.node(), subjectObjectMap, //
 			history != null ? history.putContext() : null, history != null ? history.popContext() : null);
 	}
 
-	default boolean putTargetSetMap(Map<? extends QN, ? extends Iterable<? extends QN>> sourceTargetSetMap) {
+	default boolean putObjectSetMap(Map<? extends QN, ? extends Iterable<? extends QN>> subjectObjectSetMap) {
 		var model = this.parent();
 		var history = model.history();
-		return DQ.putObjectSetMap(model.context(), this.node(), sourceTargetSetMap, //
+		return DQ.putObjectSetMap(model.context(), this.node(), subjectObjectSetMap, //
 			history != null ? history.putContext() : null, history != null ? history.popContext() : null);
 	}
 
-	default boolean popTarget(QN source, QN target) throws NullPointerException, IllegalArgumentException {
-		return this.popTargetMap(Collections.singletonMap(source, target));
+	default boolean popObject(QN subject, QN object) throws NullPointerException, IllegalArgumentException {
+		return this.popObjectMap(singletonMap(subject, object));
 	}
 
-	default boolean popTargetSet(QN source, Iterable<? extends QN> targetSet) throws NullPointerException, IllegalArgumentException {
-		return this.popTargetSetMap(Collections.singletonMap(source, targetSet));
+	default boolean popObjectSet(QN subject, Iterable<? extends QN> objectSet) throws NullPointerException, IllegalArgumentException {
+		return this.popObjectSetMap(singletonMap(subject, objectSet));
 	}
 
-	default boolean popTargetMap(Map<? extends QN, ? extends QN> sourceTargetMap) {
+	default boolean popObjectMap(Map<? extends QN, ? extends QN> subjectObjectMap) {
 		var model = this.parent();
 		var history = model.history();
-		return DQ.popObjectMap(model.context(), this.node(), sourceTargetMap, //
+		return DQ.popObjectMap(model.context(), this.node(), subjectObjectMap, //
 			history != null ? history.putContext() : null, history != null ? history.popContext() : null);
 	}
 
-	default boolean popTargetSetMap(Map<? extends QN, ? extends Iterable<? extends QN>> sourceTargetSetMap) {
+	default boolean popObjectSetMap(Map<? extends QN, ? extends Iterable<? extends QN>> subjectObjectSetMap) {
 		var model = this.parent();
 		var history = model.history();
-		return DQ.popObjectSetMap(model.context(), this.node(), sourceTargetSetMap, //
+		return DQ.popObjectSetMap(model.context(), this.node(), subjectObjectSetMap, //
 			history != null ? history.putContext() : null, history != null ? history.popContext() : null);
 	}
 
-	default Set2<QN> asSourceSet(QN target) {
-		return this.getSources(target).asNodeSet();
+	default Set2<QN> asSubjectSet(QN object) {
+		return this.getSubjects(object).asNodeSet();
 	}
 
-	default Property3<QN> asSourceProperty(QN target) {
-		Objects.notNull(target);
-		return propertyFrom(() -> this.getSource(target), source -> this.setSource(target, source));
+	default Property3<QN> asSubjectProperty(QN object) {
+		Objects.notNull(object);
+		return propertyFrom(() -> this.getSubject(object), subject -> this.setSubject(object, subject));
 	}
 
-	default Set2<QN> asTargetSet(QN source) throws NullPointerException, IllegalArgumentException {
-		return this.getTargets(source).asNodeSet();
+	default Set2<QN> asObjectSet(QN subject) throws NullPointerException, IllegalArgumentException {
+		return this.getObjects(subject).asNodeSet();
 	}
 
-	default Property3<QN> asTargetProperty(QN source) throws NullPointerException, IllegalArgumentException {
-		Objects.notNull(source);
-		return propertyFrom(() -> this.getTarget(source), target -> this.setTarget(source, target));
+	default Property3<QN> asObjectProperty(QN subject) throws NullPointerException, IllegalArgumentException {
+		Objects.notNull(subject);
+		return propertyFrom(() -> this.getObject(subject), object -> this.setObject(subject, object));
 	}
 
 	/** Diese Klasse definiert die Handhabung eines referenzierten {@link QN Hyperknoten} beim Entfernen oder Duplizieren eines referenzierenden {@link QN
@@ -388,7 +388,7 @@ public interface DL extends DE {
 
 		/** Diese Methode liefert den {@link Translators#optionalizedTranslator(Translator) optionalisierten} {@link Handling}-{@link Translator3}. */
 		public static final Translator3<String, Handling> handlingTrans() {
-			return trans == null ? trans = translatorFromEnum(Handling.class).asOptionalizedTranslator() : trans;
+			return trans == null ? trans = translatorFromEnum(Handling.class).optionalize() : trans;
 		}
 
 		private static Translator3<String, Handling> trans;
@@ -412,7 +412,7 @@ public interface DL extends DE {
 
 		/** Diese Methode liefert den {@link Translators#optionalizedTranslator(Translator) optionalisierten} {@link Multiplicity}-{@link Translator3}. */
 		public static final Translator3<String, Multiplicity> multiplicityTrans() {
-			return trans == null ? trans = translatorFromEnum(Multiplicity.class).asOptionalizedTranslator() : trans;
+			return trans == null ? trans = translatorFromEnum(Multiplicity.class).optionalize() : trans;
 		}
 
 		private static Translator3<String, Multiplicity> trans;

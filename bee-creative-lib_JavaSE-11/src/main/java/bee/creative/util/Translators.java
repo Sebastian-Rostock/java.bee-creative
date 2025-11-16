@@ -125,7 +125,7 @@ public class Translators {
 
 	/** Diese Methode liefert einen {@link Translator3}, der die Übersetzung des gegebenen {@link Translator} umkehrt. */
 	public static <S, T> Translator3<S, T> reversedTranslator(Translator<T, S> that) throws NullPointerException {
-		return translatorFrom(that).asReversedTranslator();
+		return translatorFrom(that).reverse();
 	}
 
 	/** Diese Methode liefert einen {@link Translator3}, der den gegebenen {@link Translator} {@code null}-tollerant macht. */

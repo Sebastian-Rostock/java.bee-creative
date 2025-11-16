@@ -14,12 +14,12 @@ public class H2DLTSet extends H2DLNSet implements DLTSet {
 	}
 
 	@Override
-	public H2QN source() {
+	public H2QN subject() {
 		return this.source;
 	}
 
 	protected H2DLTSet(H2DL link, H2QN source) {
-		super(link.edges().havingSubject(source).objects(), link);
+		super(link, link.edges().havingSubject(source).objects());
 		this.source = source;
 	}
 

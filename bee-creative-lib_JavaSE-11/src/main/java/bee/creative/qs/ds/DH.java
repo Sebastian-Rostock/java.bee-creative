@@ -32,13 +32,13 @@ public interface DH extends DO {
 		var edges = parent.owner().edges();
 		var isChangeWithPutContext = parent.getLink(DC.IDENT_IsChangeWithPutContext);
 		var isChangeWithPopContext = parent.getLink(DC.IDENT_IsChangeWithPopContext);
-		var putContext = isChangeWithPutContext.getTarget(currentChangeNode);
+		var putContext = isChangeWithPutContext.getObject(currentChangeNode);
 		if (putContext == null) return false;
-		var popContext = isChangeWithPopContext.getTarget(currentChangeNode);
+		var popContext = isChangeWithPopContext.getObject(currentChangeNode);
 		if (popContext == null) return false;
-		var putContextByRedoChangeNode = isChangeWithPutContext.getTargetMap(redoChangeNodes);
+		var putContextByRedoChangeNode = isChangeWithPutContext.getObjectMap(redoChangeNodes);
 		if (putContextByRedoChangeNode.values().contains(null)) throw new NullPointerException();
-		var popContextByRedoChangeNode = isChangeWithPopContext.getTargetMap(redoChangeNodes);
+		var popContextByRedoChangeNode = isChangeWithPopContext.getObjectMap(redoChangeNodes);
 		if (popContextByRedoChangeNode.values().contains(null)) throw new NullPointerException();
 		redoChangeNodes.forEach(redoChangeNode -> {
 			DQ.putEdges(parent.context(), edges.havingContext(putContextByRedoChangeNode.get(redoChangeNode)), putContext, popContext);
@@ -70,7 +70,7 @@ public interface DH extends DO {
 
 	default Property3<QN> currentAsNode() {
 		var parent = this.parent();
-		return parent.getLink(DH.IDENT_IsModelWithChange).getTargets(parent.context()).asNode();
+		return parent.getLink(DH.IDENT_IsModelWithChange).getObjects(parent.context()).asNode();
 	}
 
 	default Set2<DC> changes() {
@@ -79,7 +79,7 @@ public interface DH extends DO {
 
 	default Set2<QN> changesAsNodes() {
 		var parent = this.parent();
-		return parent.getLink(DH.IDENT_IsModelWithHistory).getTargets(parent.context()).asNodeSet();
+		return parent.getLink(DH.IDENT_IsModelWithHistory).getObjects(parent.context()).asNodeSet();
 	}
 
 	/** Diese Methode liefert den {@link Translators#optionalizedTranslator(Translator) optionalisierten} {@link DC#node() Änderungsknoten}-{@link DC

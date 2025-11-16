@@ -12,7 +12,7 @@ public abstract class H2DLNSet extends H2DSNSet implements DLNSet {
 		return this.link;
 	}
 
-	protected H2DLNSet(H2QNSet source, H2DL link) {
+	protected H2DLNSet(H2DL link, H2QNSet source) {
 		super(source);
 		this.link = link;
 	}
