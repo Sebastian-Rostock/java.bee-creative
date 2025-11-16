@@ -1,7 +1,7 @@
 package bee.creative.qs.h2.ds;
 
 import bee.creative.qs.ds.DLNSet;
-import bee.creative.qs.h2.H2QQ;
+import bee.creative.qs.h2.H2QNSet;
 
 public abstract class H2DLNSet extends H2DSNSet implements DLNSet {
 
@@ -12,8 +12,8 @@ public abstract class H2DLNSet extends H2DSNSet implements DLNSet {
 		return this.link;
 	}
 
-	protected H2DLNSet(H2DL link, H2QQ table) {
-		super(link.owner(), table);
+	protected H2DLNSet(H2QNSet source, H2DL link) {
+		super(source);
 		this.link = link;
 	}
 

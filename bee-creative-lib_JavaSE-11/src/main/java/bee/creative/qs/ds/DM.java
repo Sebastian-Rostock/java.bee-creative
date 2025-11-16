@@ -112,10 +112,12 @@ public interface DM extends QO {
 		return DQ.popEdges(this.context(), edges, history != null ? history.putContext() : null, history != null ? history.popContext() : null);
 	}
 
-	/** Diese Methode liefert den {@link Translators#optionalizedTranslator(Translator) optionalisierten} {@link DL#node() Feldknoten}-{@link DL Datenfeld}-{@link Translator}. */
+	/** Diese Methode liefert den {@link Translators#optionalizedTranslator(Translator) optionalisierten} {@link DL#node() Feldknoten}-{@link DL
+	 * Datenfeld}-{@link Translator}. */
 	Translator3<QN, DL> linkTrans();
 
-	/** Diese Methode liefert den {@link Translators#optionalizedTranslator(Translator) optionalisierten} {@link DT#node() Typknoten}-{@link DT Datentyp}-{@link Translator}. */
+	/** Diese Methode liefert den {@link Translators#optionalizedTranslator(Translator) optionalisierten} {@link DT#node() Typknoten}-{@link DT
+	 * Datentyp}-{@link Translator}. */
 	Translator3<QN, DT> typeTrans();
 
 }

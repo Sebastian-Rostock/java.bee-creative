@@ -1,6 +1,7 @@
 package bee.creative.qs.ds;
 
 import static bee.creative.qs.ds.DL.Handling.handlingTrans;
+import static bee.creative.util.Properties.propertyFrom;
 import static bee.creative.util.Translators.translatorFromEnum;
 import java.util.Collections;
 import java.util.List;
@@ -10,7 +11,6 @@ import bee.creative.qs.QE;
 import bee.creative.qs.QESet;
 import bee.creative.qs.QN;
 import bee.creative.qs.QS;
-import bee.creative.util.Properties;
 import bee.creative.util.Property3;
 import bee.creative.util.Set2;
 import bee.creative.util.Translator;
@@ -358,7 +358,7 @@ public interface DL extends DE {
 
 	default Property3<QN> asSourceProperty(QN target) {
 		Objects.notNull(target);
-		return Properties.propertyFrom(() -> this.getSource(target), source -> this.setSource(target, source));
+		return propertyFrom(() -> this.getSource(target), source -> this.setSource(target, source));
 	}
 
 	default Set2<QN> asTargetSet(QN source) throws NullPointerException, IllegalArgumentException {
@@ -367,7 +367,7 @@ public interface DL extends DE {
 
 	default Property3<QN> asTargetProperty(QN source) throws NullPointerException, IllegalArgumentException {
 		Objects.notNull(source);
-		return Properties.propertyFrom(() -> this.getTarget(source), target -> this.setTarget(source, target));
+		return propertyFrom(() -> this.getTarget(source), target -> this.setTarget(source, target));
 	}
 
 	/** Diese Klasse definiert die Handhabung eines referenzierten {@link QN Hyperknoten} beim Entfernen oder Duplizieren eines referenzierenden {@link QN

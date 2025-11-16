@@ -1,17 +1,16 @@
 package bee.creative.qs.h2.ds;
 
+import static bee.creative.lang.Objects.notNull;
 import static bee.creative.util.Translators.translatorFromClass;
+import static java.util.Collections.singletonMap;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Collections;
-import bee.creative.lang.Objects;
 import bee.creative.qs.QN;
 import bee.creative.qs.ds.DM;
 import bee.creative.qs.ds.DQ;
 import bee.creative.qs.ds.DS;
 import bee.creative.qs.h2.H2C;
 import bee.creative.qs.h2.H2QN;
-import bee.creative.qs.h2.H2QQ;
 import bee.creative.qs.h2.H2QS;
 import bee.creative.util.HashMap2;
 import bee.creative.util.Set2;
@@ -35,7 +34,7 @@ public class H2DS implements DS, AutoCloseable {
 
 	@Override
 	public H2QN install(String value) throws NullPointerException {
-		return (this.installMap == null ? this.installMap = this.createInstallMap() : this.installMap).install(Objects.notNull(value), item -> {
+		return (this.installMap == null ? this.installMap = this.createInstallMap() : this.installMap).install(notNull(value), item -> {
 			var result = this.store.newNode();
 			this.store.newEdge(this.domain, this.store.newNode(item), this.domain, result).put();
 			return result;
@@ -45,7 +44,7 @@ public class H2DS implements DS, AutoCloseable {
 	@Override
 	public Set2<QN> installSet(String value) throws NullPointerException {
 		return (this.installSetMap == null ? this.installSetMap = this.createInstallSetMap() : this.installSetMap)
-			.install(Objects.notNull(value), item -> new Items(this, this.install(item))).asNodeSet();
+			.install(notNull(value), item -> new Items(this, this.install(item))).asNodeSet();
 	}
 
 	@Override
@@ -103,25 +102,24 @@ public class H2DS implements DS, AutoCloseable {
 	private static class Items extends H2DSNSet {
 
 		public Items(H2DS parent, H2QN predicate) {
-			super(parent.store, new H2QQ().push(parent.store.edges() //
-				.havingContext(parent.domain).havingSubject(parent.domain).havingPredicate(predicate).objects()));
+			super(parent.store.edges().havingContext(parent.domain).havingSubject(parent.domain).havingPredicate(predicate).objects());
 			this.parent = parent;
 			this.predicate = predicate;
 		}
 
 		@Override
 		public boolean setNodes(Iterable<? extends QN> nodes) throws NullPointerException, IllegalArgumentException {
-			return DQ.setObjectSetMap(this.parent.domain, this.predicate, Collections.singletonMap(this.parent.domain, nodes), null, null);
+			return DQ.setObjectSetMap(this.parent.domain, this.predicate, singletonMap(this.parent.domain, nodes), null, null);
 		}
 
 		@Override
 		public boolean putNodes(Iterable<? extends QN> nodes) throws NullPointerException, IllegalArgumentException {
-			return DQ.putObjectSetMap(this.parent.domain, this.predicate, Collections.singletonMap(this.parent.domain, nodes), null, null);
+			return DQ.putObjectSetMap(this.parent.domain, this.predicate, singletonMap(this.parent.domain, nodes), null, null);
 		}
 
 		@Override
 		public boolean popNodes(Iterable<? extends QN> nodes) throws NullPointerException, IllegalArgumentException {
-			return DQ.popObjectSetMap(this.parent.domain, this.predicate, Collections.singletonMap(this.parent.domain, nodes), null, null);
+			return DQ.popObjectSetMap(this.parent.domain, this.predicate, singletonMap(this.parent.domain, nodes), null, null);
 		}
 
 		private H2DS parent;

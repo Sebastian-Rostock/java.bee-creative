@@ -22,8 +22,8 @@ public class H2DL extends H2DE implements DL {
 		return new H2DLTSet(this, this.node.owner.asQN(source));
 	}
 
-	protected H2DL(H2DM model, H2QN node) {
-		super(model, node);
+	protected H2DL(H2DM parent, H2QN node) {
+		super(parent, node);
 	}
 
 }

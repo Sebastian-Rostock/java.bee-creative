@@ -45,8 +45,8 @@ public abstract class H2DE implements DE {
 	}
 
 	protected H2DE(H2DM parent, H2QN node) {
-		this.parent = parent;
 		this.node = node;
+		this.parent = parent;
 	}
 
 }
