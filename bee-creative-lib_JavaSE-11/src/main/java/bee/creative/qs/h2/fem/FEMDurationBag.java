@@ -9,12 +9,12 @@ import bee.creative.qs.h2.H2QS;
 
 public class FEMDurationBag extends H2QIRangeBag<FEMDuration, FEMDurationBag> {
 
-	public FEMDurationBag(final H2QS owner) {
+	public FEMDurationBag(H2QS owner) {
 		this(owner, new H2QQ().push("SELECT * FROM QD_FEMDURATION"), "QI_FEMDURATION");
 	}
 
 	@Override
-	protected FEMDuration customItem(final ResultSet next) throws SQLException {
+	protected FEMDuration customItem(ResultSet next) throws SQLException {
 		return new FEMDuration(next.getLong(2));
 	}
 
@@ -27,57 +27,56 @@ public class FEMDurationBag extends H2QIRangeBag<FEMDuration, FEMDurationBag> {
 	}
 
 	@Override
-	protected void customInsert(final InsertSet putItemSet) throws SQLException {
-		try (final var stmt =
-			new H2QQ().push("MERGE INTO QD_FEMDURATION (N, DURATIONVALUE, DURATIONMINIMUM, DURATIONMAXIMUM) VALUES (?, ?, ?, ?)").prepare(this.owner)) {
-			for (final var entry: putItemSet) {
+	protected void customInsert(InsertSet putItemSet) throws SQLException {
+		try (var stmt = new H2QQ().push("MERGE INTO QD_FEMDURATION (N, DURATIONVALUE, DURATIONMINIMUM, DURATIONMAXIMUM) VALUES (?, ?, ?, ?)").prepare(this.owner)) {
+			for (var entry: putItemSet) {
 				try {
-					final var item = FEMDuration.from(entry.getValue());
+					var item = FEMDuration.from(entry.getValue());
 					stmt.setObject(1, entry.getKey());
 					stmt.setLong(2, item.value());
 					stmt.setObject(3, this.durationminimum(item));
 					stmt.setObject(4, this.durationmaximum(item));
 					stmt.addBatch();
-				} catch (final Exception ignore) {}
+				} catch (Exception ignore) {}
 			}
 			stmt.executeBatch();
 		}
 	}
 
 	@Override
-	protected void customDelete(final DeleteSet popItemSet) throws SQLException {
+	protected void customDelete(DeleteSet popItemSet) throws SQLException {
 		new H2QQ().push("DELETE FROM QD_FEMDURATION WHERE N IN (").push(popItemSet).push(")").update(this.owner);
 	}
 
 	@Override
-	protected FEMDurationBag customHaving(final H2QQ table) throws NullPointerException, IllegalArgumentException {
+	protected FEMDurationBag customHaving(H2QQ table) throws NullPointerException, IllegalArgumentException {
 		return new FEMDurationBag(this.owner, table, null);
 	}
 
 	@Override
-	protected void customHavingItemEQ(final H2QQ table, final FEMDuration item) throws NullPointerException, IllegalArgumentException {
+	protected void customHavingItemEQ(H2QQ table, FEMDuration item) throws NullPointerException, IllegalArgumentException {
 		table.push("DURATIONMINIMUM=").push(this.durationminimum(item)).push("AND DURATIONMAXIMUM=").push(this.durationmaximum(item));
 	}
 
 	@Override
-	protected void customHavingItemLT(final H2QQ table, final FEMDuration item) throws NullPointerException, IllegalArgumentException {
+	protected void customHavingItemLT(H2QQ table, FEMDuration item) throws NullPointerException, IllegalArgumentException {
 		table.push("DURATIONMAXIMUM<").push(this.durationminimum(item));
 	}
 
 	@Override
-	protected void customHavingItemGT(final H2QQ table, final FEMDuration item) throws NullPointerException, IllegalArgumentException {
+	protected void customHavingItemGT(H2QQ table, FEMDuration item) throws NullPointerException, IllegalArgumentException {
 		table.push("DURATIONMINIMUM>").push(this.durationmaximum(item));
 	}
 
-	private FEMDurationBag(final H2QS owner, final H2QQ table, final String cache) {
+	private FEMDurationBag(H2QS owner, H2QQ table, String cache) {
 		super(owner, table, cache);
 	}
 
-	private Long durationminimum(final FEMDuration item) {
+	private Long durationminimum(FEMDuration item) {
 		return (FEMDuration.minLengthOf(item.durationmonthsValue()) * 86400000L) + item.durationmillisValue();
 	}
 
-	private Long durationmaximum(final FEMDuration item) {
+	private Long durationmaximum(FEMDuration item) {
 		return (FEMDuration.maxLengthOf(item.durationmonthsValue()) * 86400000L) + item.durationmillisValue();
 	}
 

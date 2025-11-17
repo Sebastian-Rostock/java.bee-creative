@@ -22,7 +22,7 @@ public interface DC extends DN {
 	String IDENT_IsChangeWithNextChange = "DS:IsChangeWithNextChange";
 
 	default boolean isEmpty() {
-		return recordedPutEdges().isEmpty() && recordedPopEdges().isEmpty();
+		return this.recordedPutEdges().isEmpty() && this.recordedPopEdges().isEmpty();
 	}
 
 	default void undoChanges() {

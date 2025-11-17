@@ -9,12 +9,12 @@ import bee.creative.qs.h2.H2QS;
 
 public class FEMIntegerBag extends H2QIRangeBag<FEMInteger, FEMIntegerBag> {
 
-	public FEMIntegerBag(final H2QS owner) {
+	public FEMIntegerBag(H2QS owner) {
 		this(owner, new H2QQ().push("SELECT * FROM QD_FEMINTEGER"), "QI_FEMINTEGER");
 	}
 
 	@Override
-	protected FEMInteger customItem(final ResultSet next) throws SQLException {
+	protected FEMInteger customItem(ResultSet next) throws SQLException {
 		return FEMInteger.from(next.getLong(2));
 	}
 
@@ -25,46 +25,46 @@ public class FEMIntegerBag extends H2QIRangeBag<FEMInteger, FEMIntegerBag> {
 	}
 
 	@Override
-	protected void customInsert(final InsertSet putItemSet) throws SQLException {
-		try (final var stmt = new H2QQ().push("MERGE INTO QD_FEMINTEGER (N, INTEGERVALUE) VALUES (?, ?)").prepare(this.owner)) {
-			for (final var entry: putItemSet) {
+	protected void customInsert(InsertSet putItemSet) throws SQLException {
+		try (var stmt = new H2QQ().push("MERGE INTO QD_FEMINTEGER (N, INTEGERVALUE) VALUES (?, ?)").prepare(this.owner)) {
+			for (var entry: putItemSet) {
 				try {
-					final Long item = Long.valueOf(entry.getValue());
+					var item = Long.valueOf(entry.getValue());
 					stmt.setObject(1, entry.getKey());
 					stmt.setObject(2, item);
 					stmt.addBatch();
-				} catch (final Exception ignore) {}
+				} catch (Exception ignore) {}
 			}
 			stmt.executeBatch();
 		}
 	}
 
 	@Override
-	protected void customDelete(final DeleteSet popItemSet) throws SQLException {
+	protected void customDelete(DeleteSet popItemSet) throws SQLException {
 		new H2QQ().push("DELETE FROM QD_FEMINTEGER WHERE N IN (").push(popItemSet).push(")").update(this.owner);
 	}
 
 	@Override
-	protected FEMIntegerBag customHaving(final H2QQ table) throws NullPointerException, IllegalArgumentException {
+	protected FEMIntegerBag customHaving(H2QQ table) throws NullPointerException, IllegalArgumentException {
 		return new FEMIntegerBag(this.owner, table, null);
 	}
 
 	@Override
-	protected void customHavingItemEQ(final H2QQ table, final FEMInteger item) throws NullPointerException, IllegalArgumentException {
+	protected void customHavingItemEQ(H2QQ table, FEMInteger item) throws NullPointerException, IllegalArgumentException {
 		table.push("INTEGERVALUE=").push(item);
 	}
 
 	@Override
-	protected void customHavingItemLT(final H2QQ table, final FEMInteger item) throws NullPointerException, IllegalArgumentException {
+	protected void customHavingItemLT(H2QQ table, FEMInteger item) throws NullPointerException, IllegalArgumentException {
 		table.push("INTEGERVALUE<").push(item);
 	}
 
 	@Override
-	protected void customHavingItemGT(final H2QQ table, final FEMInteger item) throws NullPointerException, IllegalArgumentException {
+	protected void customHavingItemGT(H2QQ table, FEMInteger item) throws NullPointerException, IllegalArgumentException {
 		table.push("INTEGERVALUE>").push(item);
 	}
 
-	private FEMIntegerBag(final H2QS owner, final H2QQ table, final String cache) {
+	private FEMIntegerBag(H2QS owner, H2QQ table, String cache) {
 		super(owner, table, cache);
 	}
 

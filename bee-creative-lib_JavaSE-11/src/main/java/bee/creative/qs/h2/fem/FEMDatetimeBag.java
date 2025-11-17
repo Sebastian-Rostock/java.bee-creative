@@ -9,12 +9,12 @@ import bee.creative.qs.h2.H2QS;
 
 public class FEMDatetimeBag extends H2QIRangeBag<FEMDatetime, FEMDatetimeBag> {
 
-	public FEMDatetimeBag(final H2QS owner) {
+	public FEMDatetimeBag(H2QS owner) {
 		this(owner, new H2QQ().push("SELECT * FROM QD_FEMDATETIME"), "QI_FEMDATETIME");
 	}
 
 	@Override
-	protected FEMDatetime customItem(final ResultSet next) throws SQLException {
+	protected FEMDatetime customItem(ResultSet next) throws SQLException {
 		return new FEMDatetime(next.getLong(2));
 	}
 
@@ -29,12 +29,12 @@ public class FEMDatetimeBag extends H2QIRangeBag<FEMDatetime, FEMDatetimeBag> {
 	}
 
 	@Override
-	protected void customInsert(final InsertSet putItemSet) throws SQLException {
-		try (final var stmt = new H2QQ()
+	protected void customInsert(InsertSet putItemSet) throws SQLException {
+		try (var stmt = new H2QQ()
 			.push("MERGE INTO QD_FEMDATETIME (N, DATETIMEVALUE, DATEMINIMUM, DATEMAXIMUM, TIMEMINIMUM, TIMEMAXIMUM) VALUES (?, ?, ?, ?, ?, ?)").prepare(this.owner)) {
-			for (final var entry: putItemSet) {
+			for (var entry: putItemSet) {
 				try {
-					final var item = FEMDatetime.from(entry.getValue());
+					var item = FEMDatetime.from(entry.getValue());
 					if (item.hasDate() || item.hasTime()) {
 						stmt.setObject(1, entry.getKey());
 						stmt.setLong(2, item.value());
@@ -44,24 +44,24 @@ public class FEMDatetimeBag extends H2QIRangeBag<FEMDatetime, FEMDatetimeBag> {
 						stmt.setObject(6, this.timemaximum(item));
 						stmt.addBatch();
 					}
-				} catch (final Exception ignore) {}
+				} catch (Exception ignore) {}
 			}
 			stmt.executeBatch();
 		}
 	}
 
 	@Override
-	protected void customDelete(final DeleteSet popItemSet) throws SQLException {
+	protected void customDelete(DeleteSet popItemSet) throws SQLException {
 		new H2QQ().push("DELETE FROM QD_FEMDATETIME WHERE N IN (").push(popItemSet).push(")").update(this.owner);
 	}
 
 	@Override
-	protected FEMDatetimeBag customHaving(final H2QQ table) throws NullPointerException, IllegalArgumentException {
+	protected FEMDatetimeBag customHaving(H2QQ table) throws NullPointerException, IllegalArgumentException {
 		return new FEMDatetimeBag(this.owner, table, null);
 	}
 
 	@Override
-	protected void customHavingItemEQ(final H2QQ table, final FEMDatetime item) throws NullPointerException, IllegalArgumentException {
+	protected void customHavingItemEQ(H2QQ table, FEMDatetime item) throws NullPointerException, IllegalArgumentException {
 		if (item.hasDate()) {
 			table.push("DATEMINIMUM=").push(this.dateminimum(item)).push("AND DATEMAXIMUM=").push(this.datemaximum(item));
 		} else if (item.hasTime()) {
@@ -70,7 +70,7 @@ public class FEMDatetimeBag extends H2QIRangeBag<FEMDatetime, FEMDatetimeBag> {
 	}
 
 	@Override
-	protected void customHavingItemLT(final H2QQ table, final FEMDatetime item) throws NullPointerException, IllegalArgumentException {
+	protected void customHavingItemLT(H2QQ table, FEMDatetime item) throws NullPointerException, IllegalArgumentException {
 		if (item.hasDate()) {
 			table.push("DATEMAXIMUM<").push(this.dateminimum(item));
 		} else if (item.hasTime()) {
@@ -79,7 +79,7 @@ public class FEMDatetimeBag extends H2QIRangeBag<FEMDatetime, FEMDatetimeBag> {
 	}
 
 	@Override
-	protected void customHavingItemGT(final H2QQ table, final FEMDatetime item) throws NullPointerException, IllegalArgumentException {
+	protected void customHavingItemGT(H2QQ table, FEMDatetime item) throws NullPointerException, IllegalArgumentException {
 		if (item.hasDate()) {
 			table.push("DATEMINIMUM>").push(this.datemaximum(item));
 		} else if (item.hasTime()) {
@@ -87,35 +87,35 @@ public class FEMDatetimeBag extends H2QIRangeBag<FEMDatetime, FEMDatetimeBag> {
 		} else throw new IllegalArgumentException();
 	}
 
-	private FEMDatetimeBag(final H2QS owner, final H2QQ table, final String cache) {
+	private FEMDatetimeBag(H2QS owner, H2QQ table, String cache) {
 		super(owner, table, cache);
 	}
 
-	private Long dateminimum(final FEMDatetime item) {
+	private Long dateminimum(FEMDatetime item) {
 		return item.hasDate() ? this.datemillis(item) + this.timemillis(item, 0) + this.zonemillis(item, -50400000) : null;
 	}
 
-	private Long datemaximum(final FEMDatetime item) {
+	private Long datemaximum(FEMDatetime item) {
 		return item.hasDate() ? this.datemillis(item) + this.timemillis(item, 86400000) + this.zonemillis(item, +50400000) : null;
 	}
 
-	private Integer timeminimum(final FEMDatetime item) {
+	private Integer timeminimum(FEMDatetime item) {
 		return item.hasTime() ? item.daymillisValue() + this.zonemillis(item, -50400000) : null;
 	}
 
-	private Integer timemaximum(final FEMDatetime item) {
+	private Integer timemaximum(FEMDatetime item) {
 		return item.hasTime() ? item.daymillisValue() + this.zonemillis(item, +50400000) : null;
 	}
 
-	private long datemillis(final FEMDatetime item) {
+	private long datemillis(FEMDatetime item) {
 		return item.calendardayValue() * 86400000L;
 	}
 
-	private int timemillis(final FEMDatetime item, final int undefined) {
+	private int timemillis(FEMDatetime item, int undefined) {
 		return item.hasTime() ? item.daymillisValue() : undefined;
 	}
 
-	private int zonemillis(final FEMDatetime item, final int undefined) {
+	private int zonemillis(FEMDatetime item, int undefined) {
 		return item.hasZone() ? -item.zoneValue() : undefined;
 	}
 

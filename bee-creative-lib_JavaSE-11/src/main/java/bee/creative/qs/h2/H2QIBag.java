@@ -11,10 +11,10 @@ import bee.creative.qs.QS;
 import bee.creative.util.Entries;
 import bee.creative.util.Setter;
 
-public abstract class H2QIBag<GI, GIBag> extends H2QISet<GI> implements QIBag<GI, GIBag> {
+public abstract class H2QIBag<E, GIBag> extends H2QISet<E> implements QIBag<E, GIBag> {
 
 	@Override
-	public void items(Setter<? super QN, ? super GI> items) {
+	public void items(Setter<? super QN, ? super E> items) {
 		try (var rset = this.table.select(this.owner)) {
 			while (rset.next()) {
 				items.set(this.owner.newNode(rset.getLong(1)), this.customItem(rset));

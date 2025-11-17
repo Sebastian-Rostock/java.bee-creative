@@ -10,8 +10,8 @@ import bee.creative.util.Iterator3;
 /** Diese Klasse implementiert ein {@link QISet} als Sicht auf das ergebnis einer SQL-Anfrage.
  *
  * @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GI> Typ der Einträge. */
-public abstract class H2QISet<GI> implements QISet<GI> {
+ * @param <E> Typ der Einträge. */
+public abstract class H2QISet<E> implements QISet<E> {
 
 	/** Dieses Feld speichert den Graphspeicher mit {@link H2QS#conn Datenbankverbindung}. */
 	public final H2QS owner;
@@ -31,7 +31,7 @@ public abstract class H2QISet<GI> implements QISet<GI> {
 	}
 
 	@Override
-	public GI first() {
+	public E first() {
 		try (var rset = new H2QQ().push("SELECT TOP 1 * FROM (").push(this).push(")").select(this.owner)) {
 			return rset.next() ? this.customItem(rset) : null;
 		} catch (SQLException cause) {
@@ -49,7 +49,7 @@ public abstract class H2QISet<GI> implements QISet<GI> {
 	}
 
 	@Override
-	public Iterator3<GI> iterator() {
+	public Iterator3<E> iterator() {
 		return new Iter();
 	}
 
@@ -69,9 +69,9 @@ public abstract class H2QISet<GI> implements QISet<GI> {
 	}
 
 	/** Diese Methode liefert den Eintrag zum gegebenen {@link ResultSet}. */
-	protected abstract GI customItem(ResultSet next) throws SQLException;
+	protected abstract E customItem(ResultSet next) throws SQLException;
 
-	private class Iter extends AbstractIterator<GI> {
+	private class Iter extends AbstractIterator<E> {
 
 		public Iter() {
 			try {
@@ -92,7 +92,7 @@ public abstract class H2QISet<GI> implements QISet<GI> {
 		}
 
 		@Override
-		public GI next() {
+		public E next() {
 			try {
 				var item = H2QISet.this.customItem(this.item);
 				this.next = this.item.next();

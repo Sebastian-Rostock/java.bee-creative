@@ -58,12 +58,13 @@ public final class H2QQ {
 	}
 
 	public H2QQ push(boolean test, Consumer<H2QQ> token) throws NullPointerException {
-		return test ? push(token) : this;
+		return test ? this.push(token) : this;
 	}
 
 	public H2QQ push(int incl, int excl, Setter<H2QQ, Integer> token) throws NullPointerException {
-		while (incl < excl)
+		while (incl < excl) {
 			token.set(this, incl++);
+		}
 		return this;
 	}
 

@@ -5,15 +5,15 @@ import bee.creative.util.Setter;
 /** Diese Schnittstelle definiert eine beliebig große Sicht auf eine Sammlung von Elementen mit Bezug zu einem {@link #owner() Graphspeicher}.
  *
  * @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <ITEM> Typ der Elemente.
- * @param <THIS> Typ dieser Sammlung. */
-public interface QIBag<ITEM, THIS> extends QISet<ITEM> {
+ * @param <E> Typ der Elemente.
+ * @param <T> Typ dieser Sammlung. */
+public interface QIBag<E, T> extends QISet<E> {
 
 	/** Diese Methode ergänzt die gegebene Abbildung um die {@link QN Hyperknoten} dieser Sammlung, die einen Textwert {@link QN#value() besitzen}, der die
 	 * {@link Object#toString() Textdarstellung} eines Elements dieser Sammlung darstellt.
 	 *
 	 * @param items Abbildung von {@link QN Hyperknoten} auf Elemente. */
-	void items(Setter<? super QN, ? super ITEM> items);
+	void items(Setter<? super QN, ? super E> items);
 
 	/** Diese Methode liefert eine Mengensicht auf alle Hyperknoten, die einen Textwert {@link QN#value() besitzen}, der die {@link Object#toString()
 	 * Textdarstellung} eines Elements dieser Sammlung darstellt.
@@ -31,6 +31,6 @@ public interface QIBag<ITEM, THIS> extends QISet<ITEM> {
 	 *
 	 * @param nodes Hyperknoten.
 	 * @return Elemente der gegebenen Hyperknoten. */
-	THIS havingNodes(QNSet nodes) throws NullPointerException, IllegalArgumentException;
+	T havingNodes(QNSet nodes) throws NullPointerException, IllegalArgumentException;
 
 }

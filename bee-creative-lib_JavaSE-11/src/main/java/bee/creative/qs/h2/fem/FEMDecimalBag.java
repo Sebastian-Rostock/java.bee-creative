@@ -9,12 +9,12 @@ import bee.creative.qs.h2.H2QS;
 
 public class FEMDecimalBag extends H2QIRangeBag<FEMDecimal, FEMDecimalBag> {
 
-	public FEMDecimalBag(final H2QS owner) {
+	public FEMDecimalBag(H2QS owner) {
 		this(owner, new H2QQ().push("SELECT * FROM QD_FEMDECIMAL"), "QI_FEMDECIMAL");
 	}
 
 	@Override
-	protected FEMDecimal customItem(final ResultSet next) throws SQLException {
+	protected FEMDecimal customItem(ResultSet next) throws SQLException {
 		return FEMDecimal.from(next.getDouble(2));
 	}
 
@@ -25,46 +25,46 @@ public class FEMDecimalBag extends H2QIRangeBag<FEMDecimal, FEMDecimalBag> {
 	}
 
 	@Override
-	protected void customInsert(final InsertSet putItemSet) throws SQLException {
-		try (final var stmt = new H2QQ().push("MERGE INTO QD_FEMDECIMAL (N, DECIMALVALUE) VALUES (?, ?)").prepare(this.owner)) {
-			for (final var entry: putItemSet) {
+	protected void customInsert(InsertSet putItemSet) throws SQLException {
+		try (var stmt = new H2QQ().push("MERGE INTO QD_FEMDECIMAL (N, DECIMALVALUE) VALUES (?, ?)").prepare(this.owner)) {
+			for (var entry: putItemSet) {
 				try {
-					final Double item = Double.valueOf(entry.getValue());
+					var item = Double.valueOf(entry.getValue());
 					stmt.setObject(1, entry.getKey());
 					stmt.setObject(2, item);
 					stmt.addBatch();
-				} catch (final Exception ignore) {}
+				} catch (Exception ignore) {}
 			}
 			stmt.executeBatch();
 		}
 	}
 
 	@Override
-	protected void customDelete(final DeleteSet popItemSet) throws SQLException {
+	protected void customDelete(DeleteSet popItemSet) throws SQLException {
 		new H2QQ().push("DELETE FROM QD_FEMDECIMAL WHERE N IN (").push(popItemSet).push(")").update(this.owner);
 	}
 
 	@Override
-	protected FEMDecimalBag customHaving(final H2QQ table) throws NullPointerException, IllegalArgumentException {
+	protected FEMDecimalBag customHaving(H2QQ table) throws NullPointerException, IllegalArgumentException {
 		return new FEMDecimalBag(this.owner, table, null);
 	}
 
 	@Override
-	protected void customHavingItemEQ(final H2QQ table, final FEMDecimal item) throws NullPointerException, IllegalArgumentException {
+	protected void customHavingItemEQ(H2QQ table, FEMDecimal item) throws NullPointerException, IllegalArgumentException {
 		table.push("DECIMALVALUE=").push(item);
 	}
 
 	@Override
-	protected void customHavingItemLT(final H2QQ table, final FEMDecimal item) throws NullPointerException, IllegalArgumentException {
+	protected void customHavingItemLT(H2QQ table, FEMDecimal item) throws NullPointerException, IllegalArgumentException {
 		table.push("DECIMALVALUE<").push(item);
 	}
 
 	@Override
-	protected void customHavingItemGT(final H2QQ table, final FEMDecimal item) throws NullPointerException, IllegalArgumentException {
+	protected void customHavingItemGT(H2QQ table, FEMDecimal item) throws NullPointerException, IllegalArgumentException {
 		table.push("DECIMALVALUE>").push(item);
 	}
 
-	private FEMDecimalBag(final H2QS owner, final H2QQ table, final String cache) {
+	private FEMDecimalBag(H2QS owner, H2QQ table, String cache) {
 		super(owner, table, cache);
 	}
 

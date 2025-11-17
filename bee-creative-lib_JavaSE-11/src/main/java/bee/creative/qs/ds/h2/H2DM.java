@@ -85,7 +85,7 @@ public class H2DM implements DM {
 	}
 
 	public void install() {
-		getType(null);
+		this.getType(null);
 
 		this.installType(DT.IDENT_IsType, "domain-type");
 		this.installType(DL.IDENT_IsLink, "domain-link");

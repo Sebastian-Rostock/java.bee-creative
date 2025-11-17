@@ -22,7 +22,7 @@ public interface DS {
 	default Set2<DM> models() {
 		return this.modelsAsNodes().asTranslatedSet(this.modelTrans());
 	}
-	
+
 	default Set2<QN> modelsAsNodes() {
 		return this.installSet(DM.IDENT_IsModel);
 	}
@@ -42,7 +42,8 @@ public interface DS {
 	 * @return dem externen Hyperknoten zugeordnete interne Hyperknoten. */
 	Set2<QN> installSet(String ident) throws NullPointerException;
 
-	/** Diese Methode liefert den {@link Translators#optionalizedTranslator(Translator) optionalisierten} {@link DM#context() Kontextknoten}-{@link DM Datenmodell}-{@link Translator}. */
+	/** Diese Methode liefert den {@link Translators#optionalizedTranslator(Translator) optionalisierten} {@link DM#context() Kontextknoten}-{@link DM
+	 * Datenmodell}-{@link Translator}. */
 	Translator3<QN, DM> modelTrans();
 
 }
