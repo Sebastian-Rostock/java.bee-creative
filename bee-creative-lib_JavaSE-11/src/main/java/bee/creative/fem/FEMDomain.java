@@ -422,7 +422,7 @@ public class FEMDomain extends BaseObject {
 		for (final Token item: tok.children()) {
 			res.add(this.parseValueData(src.with(item)));
 		}
-		return FEMArray.from(res);
+		return FEMArray.femArrayFrom(res);
 	}
 
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} die {@link Token Abschnitte} einer Wertliste und gibt deren Elternabschnitt zurück. Als Abschnittstyp

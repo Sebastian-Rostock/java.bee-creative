@@ -35,7 +35,7 @@ public final class FEMVariable implements FEMValue, Property<FEMValue> {
 	/** Diese Methode setzt den aktuellen Wert der Variable, der über {@link #get()} gelesen werden kann.
 	 *
 	 * @param value aktuellen Wert.
-	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
+	 * @throws NullPointerException Wenn {@code value} {@code n ull} ist. */
 	@Override
 	public synchronized void set(FEMValue value) throws NullPointerException {
 		this.value = Objects.notNull(value);

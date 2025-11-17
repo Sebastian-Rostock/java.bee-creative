@@ -168,7 +168,7 @@ public class FEMContext extends BaseObject {
 		for (var i = 0; i < length; i++) {
 			values[i] = this.valueFrom(Array.get(data, i));
 		}
-		return FEMArray.from(values);
+		return FEMArray.femArrayFrom(values);
 	}
 
 	private Object[] objectFromImpl(FEMArray array) {

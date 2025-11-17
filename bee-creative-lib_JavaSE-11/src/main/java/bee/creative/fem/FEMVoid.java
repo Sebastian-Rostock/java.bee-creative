@@ -20,7 +20,7 @@ public final class FEMVoid implements FEMValue {
 	 * @return Leerwert.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist. */
-	public static FEMVoid from(String value) throws NullPointerException, IllegalArgumentException {
+	public static FEMVoid femVoidFrom(String value) throws NullPointerException, IllegalArgumentException {
 		if (value.equals("void")) return FEMVoid.INSTANCE;
 		throw new IllegalArgumentException();
 	}
