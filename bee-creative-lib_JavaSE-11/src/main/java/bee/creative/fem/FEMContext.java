@@ -115,7 +115,7 @@ public class FEMContext extends BaseObject {
 		if (object instanceof FEMFunction) return ((FEMFunction)object).toValue();
 		if (object instanceof char[]) return FEMString.from((char[])object);
 		if (object instanceof String) return FEMString.from((String)object);
-		if (object instanceof byte[]) return FEMBinary.from((byte[])object);
+		if (object instanceof byte[]) return FEMBinary.femBinaryFrom((byte[])object);
 		if ((object instanceof Float) || (object instanceof Double) || (object instanceof BigDecimal)) return FEMDecimal.from((Number)object);
 		if (object instanceof Number) return FEMInteger.from((Number)object);
 		if (object instanceof Boolean) return FEMBoolean.from((Boolean)object);

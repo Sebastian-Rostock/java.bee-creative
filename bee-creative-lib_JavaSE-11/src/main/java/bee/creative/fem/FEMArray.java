@@ -329,9 +329,9 @@ public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable<FE
 	}
 
 	/** Diese Methode gibt eine unveränderliche {@link Map} als Sicht auf die Schlüssel- und Wertlisten zurück, aus denen diese Wertliste besteht.<br>
-	 * Sie ist damit die Umkehroperation zu {@link #femArrayFrom(Map)}. Der {@link Entry#getKey() Schlüssel} eines {@link Entry Eintrags} befindet sich in {@code keys} an
-	 * der Position, an der sich in {@code values} der zugeordnete {@link Entry#getValue() Wert} befindet. Die Schlüssel sollten zur effizienten Suche
-	 * {@link #compact(boolean) indiziert} sein.
+	 * Sie ist damit die Umkehroperation zu {@link #femArrayFrom(Map)}. Der {@link Entry#getKey() Schlüssel} eines {@link Entry Eintrags} befindet sich in
+	 * {@code keys} an der Position, an der sich in {@code values} der zugeordnete {@link Entry#getValue() Wert} befindet. Die Schlüssel sollten zur effizienten
+	 * Suche {@link #compact(boolean) indiziert} sein.
 	 *
 	 * @return {@link Map}-Sicht.
 	 * @throws IllegalArgumentException Wenn diese Wertliste nicth aus zwei Wertlisten besteht oder die Längen dieser Wertlisten ungleich sind. */
@@ -958,12 +958,6 @@ public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable<FE
 		return new SectionArray(this, offset, length);
 	}
 
-	static FEMArray concatAll(FEMArray[] values, int min, int max) throws NullPointerException {
-		if (min == max) return values[min];
-		var mid = (min + max) >> 1;
-		return concatAll(values, min, mid).concat(concatAll(values, mid + 1, max));
-	}
-
 	int findLast(Object key) {
 		if ((this.length == 0) || !(key instanceof FEMValue)) return -1;
 		return this.customFind((FEMValue)key, 0, this.length, false);
@@ -974,7 +968,13 @@ public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable<FE
 		return this.customFind((FEMValue)key, 0, this.length, true);
 	}
 
-	static class ItemMap implements Map3<FEMValue, FEMValue>, Emuable {
+	private static FEMArray concatAll(FEMArray[] values, int min, int max) throws NullPointerException {
+		if (min == max) return values[min];
+		var mid = (min + max) >> 1;
+		return concatAll(values, min, mid).concat(concatAll(values, mid + 1, max));
+	}
+
+	private static class ItemMap implements Map3<FEMValue, FEMValue>, Emuable {
 
 		public final FEMArray keys;
 
@@ -1173,7 +1173,7 @@ public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable<FE
 
 	}
 
-	static class ItemList extends AbstractList2<FEMValue> implements RandomAccess, Emuable {
+	private static class ItemList extends AbstractList2<FEMValue> implements RandomAccess, Emuable {
 
 		public final FEMArray items;
 
@@ -1223,7 +1223,7 @@ public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable<FE
 
 	}
 
-	static class ItemFinder implements Collector {
+	private static class ItemFinder implements Collector {
 
 		public final FEMValue value;
 
@@ -1242,7 +1242,7 @@ public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable<FE
 
 	}
 
-	static class HashCollector implements Collector {
+	private static class HashCollector implements Collector {
 
 		public int hash = Objects.hashInit();
 
@@ -1254,7 +1254,7 @@ public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable<FE
 
 	}
 
-	static class ValueCollector implements Collector {
+	private static class ValueCollector implements Collector {
 
 		public final FEMValue[] array;
 
@@ -1273,7 +1273,7 @@ public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable<FE
 
 	}
 
-	static class UniformCollector implements Collector {
+	private static class UniformCollector implements Collector {
 
 		public FEMValue value;
 

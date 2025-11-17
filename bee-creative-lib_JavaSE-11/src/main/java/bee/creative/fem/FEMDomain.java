@@ -773,7 +773,7 @@ public class FEMDomain extends BaseObject {
 		if (ref.equals("null")) return FEMVoid.INSTANCE;
 		if (ref.equals("true")) return FEMBoolean.TRUE;
 		if (ref.equals("false")) return FEMBoolean.FALSE;
-		if (ref.startsWith("0x")) return FEMBinary.from(ref);
+		if (ref.startsWith("0x")) return FEMBinary.femBinaryFrom(ref);
 		if (ref.startsWith("P") || ref.startsWith("-P")) return FEMDuration.from(ref);
 		try {
 			return FEMInteger.from(ref);

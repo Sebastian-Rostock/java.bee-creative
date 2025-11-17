@@ -1012,7 +1012,7 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 
 	/** Diese Methode gibt die Bytefolge mit den gegebenen Daten ({@code item: 8}) zurück. */
 	protected FEMBinary getBinaryByData(final long data) {
-		return FEMBinary.from(Integers.toIntL(data), (byte)Integers.toIntH(data));
+		return FEMBinary.femBinaryFrom(Integers.toIntL(data), (byte)Integers.toIntH(data));
 	}
 
 	/** Diese Methode gibt die im gegebenen Speicherbereich ({@code length: int, hash: int, item: byte[length]}) enthaltene Bytefolge zurück. */

@@ -18,7 +18,7 @@ public final class FEMBinaryAdapter extends XmlAdapter<String, FEMBinary> {
 	@Override
 	public FEMBinary unmarshal(String value) throws Exception {
 		if (value == null) return null;
-		return FEMBinary.from(false, value);
+		return FEMBinary.femBinaryFrom(false, value);
 	}
 
 }
