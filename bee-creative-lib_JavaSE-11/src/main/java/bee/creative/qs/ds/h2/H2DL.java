@@ -1,4 +1,4 @@
-package bee.creative.qs.h2.ds;
+package bee.creative.qs.ds.h2;
 
 import bee.creative.qs.QN;
 import bee.creative.qs.ds.DL;

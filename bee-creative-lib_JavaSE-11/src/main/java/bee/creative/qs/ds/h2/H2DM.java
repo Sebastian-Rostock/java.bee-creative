@@ -1,9 +1,10 @@
-package bee.creative.qs.h2.ds;
+package bee.creative.qs.ds.h2;
 
 import static bee.creative.qs.ds.DL.Handling.handlingTrans;
 import static bee.creative.qs.ds.DL.Multiplicity.multiplicityTrans;
 import static bee.creative.util.Translators.translatorFromClass;
 import bee.creative.qs.QN;
+import bee.creative.qs.ds.DC;
 import bee.creative.qs.ds.DE;
 import bee.creative.qs.ds.DH;
 import bee.creative.qs.ds.DL;
@@ -134,12 +135,21 @@ public class H2DM implements DM {
 		return this.typeTrans == null ? this.typeTrans = translatorFromClass(QN.class, DT.class, this::asType, DT::node).optionalize() : this.typeTrans;
 	}
 
+	@Override
+	public Translator3<QN, DC> changeTrans() {
+		return this.changeTrans == null ? this.changeTrans = translatorFromClass(QN.class, DC.class, this::asChange, DC::node).optionalize() : this.changeTrans;
+	}
+
 	protected H2DL asLink(QN node) {
 		return new H2DL(this, this.context.owner.asQN(node));
 	}
 
 	protected H2DT asType(QN node) {
 		return new H2DT(this, this.context.owner.asQN(node));
+	}
+
+	protected H2DC asChange(QN node) {
+		return new H2DC(this, this.context.owner.asQN(node));
 	}
 
 	/** Diese Methode liefert den unter dem gegebenen {@link DL#idents() Erkennungstextwert} in der {@link #linkMap} hinterlegten {@link DL Datentyp} und
@@ -175,17 +185,17 @@ public class H2DM implements DM {
 		return link;
 	}
 
-	protected H2DLTSet installTargets(String linkIdent, H2DE source) {
+	protected H2DLTSet installTargets(String linkIdent, H2DN source) {
 		return this.installLink(linkIdent).getObjects(source.node);
 	}
 
-	protected H2DLSSet installSources(String linkIdent, H2DE target) {
+	protected H2DLSSet installSources(String linkIdent, H2DN target) {
 		return this.installLink(linkIdent).getSubjects(target.node);
 	}
 
-	protected void installInstances(String typeIdent, Iterable<? extends H2DE> instances) {
+	protected void installInstances(String typeIdent, Iterable<? extends H2DN> instances) {
 		var typeMap = new HashMap2<QN, QN>();
-		typeMap.putAll(instances, H2DE::node, Getters.getterFromValue(this.installType(typeIdent).node));
+		typeMap.putAll(instances, H2DN::node, Getters.getterFromValue(this.installType(typeIdent).node));
 		this.installLink(DT.IDENT_IsTypeWithInstance).setSubjectMap(typeMap);
 	}
 
@@ -212,5 +222,7 @@ public class H2DM implements DM {
 	private HashMap2<String, H2DT> typeMap;
 
 	private Translator3<QN, DT> typeTrans;
+
+	private Translator3<QN, DC> changeTrans;
 
 }

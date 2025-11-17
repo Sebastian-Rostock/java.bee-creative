@@ -1,11 +1,11 @@
-package bee.creative.qs.h2.ds;
+package bee.creative.qs.ds.h2;
 
 import bee.creative.lang.Objects;
-import bee.creative.qs.ds.DE;
+import bee.creative.qs.ds.DN;
 import bee.creative.qs.h2.H2QN;
 import bee.creative.qs.h2.H2QS;
 
-public abstract class H2DE implements DE {
+public abstract class H2DN implements DN {
 
 	public final H2QN node;
 
@@ -34,17 +34,17 @@ public abstract class H2DE implements DE {
 	@Override
 	public boolean equals(Object object) {
 		if (object == this) return true;
-		if (!(object instanceof H2DE)) return false;
-		var that = (H2DE)object;
+		if (!(object instanceof H2DN)) return false;
+		var that = (H2DN)object;
 		return Objects.equals(this.node, that.node);
 	}
 
 	@Override
 	public String toString() {
-		return this.label().get();
+		return this.node().toString();
 	}
 
-	protected H2DE(H2DM parent, H2QN node) {
+	protected H2DN(H2DM parent, H2QN node) {
 		this.node = node;
 		this.parent = parent;
 	}

@@ -120,4 +120,8 @@ public interface DM extends QO {
 	 * Datentyp}-{@link Translator}. */
 	Translator3<QN, DT> typeTrans();
 
+	/** Diese Methode liefert den {@link Translators#optionalizedTranslator(Translator) optionalisierten} {@link DC#node() Änderungsknoten}-{@link DC
+	 * Domänenänderung}-{@link Translator}. */
+	Translator3<QN, DC> changeTrans();
+
 }

@@ -5,24 +5,11 @@ import bee.creative.qs.QS;
 import bee.creative.util.Property3;
 import bee.creative.util.Set2;
 
-/** Diese Schnittstelle definiert ein Domänenkonstante (Domain-Enum) als {@link #node() Hyperknoten} mit Bezug zu einem {@link #parent() Domänenmodell}, einer
+/** Diese Schnittstelle definiert ein Domänenkonstante (eomain-entity) als {@link #node() Hyperknoten} mit Bezug zu einem {@link #parent() Domänenmodell}, einer
  * {@link #labelAsNode() Beschriftung} und {@link #identsAsNodes() Erkennungsmerkmalen}.
  *
  * @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public interface DE extends DO {
-
-	/** Diese Methode liefert den dieses Objekt repräsentierenden Hyperknoten.
-	 *
-	 * @return Hyperknoten, über den der Zustand dieses Objets gespeichert ist. */
-	QN node();
-
-	/** Diese Methode liefet den Graphspeicher des {@link #node() Hyperknoten}.
-	 *
-	 * @return Graphspeicher. */
-	@Override
-	default QS owner() {
-		return this.parent().owner();
-	}
+public interface DE extends DN {
 
 	/** Diese Methode erlaubt Zugriff auf den {@link QN#value() Textwert} der {@link #labelAsNode() Beschriftung} dieses Objekts.
 	 *

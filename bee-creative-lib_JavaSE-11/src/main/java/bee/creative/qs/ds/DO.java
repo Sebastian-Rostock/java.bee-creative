@@ -1,6 +1,7 @@
 package bee.creative.qs.ds;
 
 import bee.creative.qs.QO;
+import bee.creative.qs.QS;
 
 /** Diese Schnittstelle definiert ein Domänenobjekt (domain-object) mit Bezug zu einem {@link #parent() Domänenmodell}.
  *
@@ -11,5 +12,10 @@ public interface DO extends QO {
 	 *
 	 * @return Domänenmodell. */
 	DM parent();
+
+	@Override
+	default QS owner() {
+		return this.parent().owner();
+	}
 
 }

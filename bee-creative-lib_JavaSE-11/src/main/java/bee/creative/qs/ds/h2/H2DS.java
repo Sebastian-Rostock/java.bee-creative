@@ -1,4 +1,4 @@
-package bee.creative.qs.h2.ds;
+package bee.creative.qs.ds.h2;
 
 import static bee.creative.lang.Objects.notNull;
 import static bee.creative.util.Translators.translatorFromClass;

@@ -7,7 +7,7 @@ import bee.creative.util.Property3;
 /** Diese Schnittstelle definiert eine Domänenänderung (domain-change).
  *
  * @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public interface DC extends DO {
+public interface DC extends DN {
 
 	/** Dieses Feld speichert den Textwert eines {@link DE#identsAsNodes() Erkennungsknoten} für den {@link DT Datentyp} von {@link DC}. */
 	String IDENT_IsChange = "DS:IsChange";
@@ -21,26 +21,24 @@ public interface DC extends DO {
 	/** Dieses Feld speichert den Textwert eines {@link DE#identsAsNodes() Erkennungsknoten} für das {@link #nextChangeAsNode()}-{@link DL Datenfeld}. */
 	String IDENT_IsChangeWithNextChange = "DS:IsChangeWithNextChange";
 
-	QN node();
+	default boolean isEmpty() {
+		return recordedPutEdges().isEmpty() && recordedPopEdges().isEmpty();
+	}
 
-	default void undo() {
+	default void undoChanges() {
 		var parent = this.parent();
 		parent.putEdges(this.recordedPopEdges());
 		parent.popEdges(this.recordedPutEdges());
 	}
 
-	default void redo() {
+	default void redoChanges() {
 		var parent = this.parent();
 		parent.putEdges(this.recordedPutEdges());
 		parent.popEdges(this.recordedPopEdges());
 	}
 
-	default DH history() {
-		return this.parent().history();
-	}
-
 	default Property3<DC> nextChange() {
-		return this.nextChangeAsNode().translate(this.history().changeTrans());
+		return this.nextChangeAsNode().translate(this.parent().changeTrans());
 	}
 
 	default Property3<QN> nextChangeAsNode() {
@@ -48,7 +46,7 @@ public interface DC extends DO {
 	}
 
 	default Property3<DC> prevChange() {
-		return this.prevChangeAsNode().translate(this.history().changeTrans());
+		return this.prevChangeAsNode().translate(this.parent().changeTrans());
 	}
 
 	default Property3<QN> prevChangeAsNode() {
