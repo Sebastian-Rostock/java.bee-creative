@@ -23,11 +23,11 @@ import bee.creative.util.Comparators;
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMDuration implements FEMValue, Comparable<FEMDuration> {
 
-	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
-	public static final int ID = 8;
-
 	/** Dieses Feld speichert den {@link #type() Datentyp}. */
-	public static final FEMType<FEMDuration> TYPE = new FEMType<>(FEMDuration.ID);
+	public static final FEMType<FEMDuration> TYPE = new FEMType<>(FEMDuration.TYPE_ID);
+
+	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
+	public static final int TYPE_ID = 8;
 
 	/** Dieses Feld speichert die leere Zeitspanne, deren Komponenten {@code 0} sind. */
 	public static final FEMDuration EMPTY = new FEMDuration(0, 0);
@@ -46,7 +46,7 @@ public final class FEMDuration implements FEMValue, Comparable<FEMDuration> {
 	 * @return Zeitspanne.
 	 * @throws NullPointerException Wenn {@code string} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist. */
-	public static FEMDuration from(final String string) throws NullPointerException, IllegalArgumentException {
+	public static FEMDuration from(String string) throws NullPointerException, IllegalArgumentException {
 		int size, offset, symbol;
 
 		final int length;
@@ -241,8 +241,7 @@ public final class FEMDuration implements FEMValue, Comparable<FEMDuration> {
 	 * @param milliseconds Anzahl der Millisekunden.
 	 * @return Zeitspanne.
 	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen zu einer ungültigen Zeitspanne führen würden. */
-	public static FEMDuration from(final int years, final int months, final int days, final int hours, final int minutes, final int seconds,
-		final int milliseconds) throws IllegalArgumentException {
+	public static FEMDuration from(int years, int months, int days, int hours, int minutes, int seconds, final int milliseconds) throws IllegalArgumentException {
 		return FEMDuration.EMPTY.move(years, months, days, hours, minutes, seconds, milliseconds);
 	}
 
@@ -260,8 +259,8 @@ public final class FEMDuration implements FEMValue, Comparable<FEMDuration> {
 	 * @param milliseconds Anzahl der Millisekunden ({@code -315569519999999..315569519999999}).
 	 * @return Zeitspanne.
 	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen zu einer ungültigen Zeitspanne führen würden. */
-	public static FEMDuration from(final int years, final int months, final int days, final int hours, final long minutes, final long seconds,
-		final long milliseconds) throws IllegalArgumentException {
+	public static FEMDuration from(int years, int months, int days, int hours, long minutes, long seconds, final long milliseconds)
+		throws IllegalArgumentException {
 		return FEMDuration.EMPTY.move(years, months, days, hours, minutes, seconds, milliseconds);
 	}
 
@@ -273,7 +272,7 @@ public final class FEMDuration implements FEMValue, Comparable<FEMDuration> {
 	 * @return Zeitspanne von der ersten zur zweiten Zeitangabe.
 	 * @throws NullPointerException Wenn {@code datetime1} bzw. {@code datetime2} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn nur eine der Zeitangaben ein Datum bzw eine Uhrzeit besitzt. */
-	public static FEMDuration between(final FEMDatetime datetime1, final FEMDatetime datetime2) throws NullPointerException, IllegalArgumentException {
+	public static FEMDuration between(FEMDatetime datetime1, FEMDatetime datetime2) throws NullPointerException, IllegalArgumentException {
 		if (datetime1.hasDate()) {
 			if (!datetime2.hasDate()) throw new IllegalArgumentException();
 			if (datetime1.hasTime()) {
@@ -304,7 +303,7 @@ public final class FEMDuration implements FEMValue, Comparable<FEMDuration> {
 	 * @param months Anzahl der Monate ({@code 0..119999}).
 	 * @return minimale Anzahl an Tagen in den gegebenen Monaten.
 	 * @throws IllegalArgumentException Wenn {@code months} ungültig ist. */
-	public static int minLengthOf(final int months) throws IllegalArgumentException {
+	public static int minLengthOf(int months) throws IllegalArgumentException {
 		FEMDuration.checkMonths(months);
 		FEMDuration.checkPositive(months);
 		return FEMDuration.lengthOf(months) - ((FEMDuration.rangeOf(months) >> 0) & 0x0F);
@@ -316,7 +315,7 @@ public final class FEMDuration implements FEMValue, Comparable<FEMDuration> {
 	 * @param months Anzahl der Monate ({@code 0..119999}).
 	 * @return maximale Anzahl an Tagen in den gegebenen Monaten.
 	 * @throws IllegalArgumentException Wenn {@code months} ungültig ist. */
-	public static int maxLengthOf(final int months) throws IllegalArgumentException {
+	public static int maxLengthOf(int months) throws IllegalArgumentException {
 		FEMDuration.checkMonths(months);
 		FEMDuration.checkPositive(months);
 		return FEMDuration.lengthOf(months) + ((FEMDuration.rangeOf(months) >> 4) & 0x0F);
@@ -331,8 +330,7 @@ public final class FEMDuration implements FEMValue, Comparable<FEMDuration> {
 	 * @param milliseconds Anzahl der Millisekunden.
 	 * @return die Gesamtanzahl der Millisekunden.
 	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen ungültig sind oder zu einer ungültigen Gesamtanzahl führen würde. */
-	public static long durationmillisOf(final int days, final int hours, final int minutes, final int seconds, final int milliseconds)
-		throws IllegalArgumentException {
+	public static long durationmillisOf(int days, int hours, int minutes, int seconds, int milliseconds) throws IllegalArgumentException {
 		FEMDuration.checkDays(+days);
 		FEMDuration.checkDays(-days);
 		FEMDuration.checkHours(+hours);
@@ -352,8 +350,7 @@ public final class FEMDuration implements FEMValue, Comparable<FEMDuration> {
 	 * @param milliseconds Anzahl der Millisekunden ({@code -315569519999999..315569519999999}).
 	 * @return die Gesamtanzahl der Millisekunden ({@code -315569519999999..315569519999999}).
 	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen ungültig sind oder zu einer ungültigen Gesamtanzahl führen würde. */
-	public static long durationmillisOf(final int days, final int hours, final long minutes, final long seconds, final long milliseconds)
-		throws IllegalArgumentException {
+	public static long durationmillisOf(int days, int hours, long minutes, long seconds, long milliseconds) throws IllegalArgumentException {
 		FEMDuration.checkDays(+days);
 		FEMDuration.checkDays(-days);
 		FEMDuration.checkHours(+hours);
@@ -374,7 +371,7 @@ public final class FEMDuration implements FEMValue, Comparable<FEMDuration> {
 	 * @param months Anzahl der Monate ({@code -119999..119999}).
 	 * @return Gesamtanzahl der Monate ({@code -119999..119999}).
 	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen ungültig sind oder zu einer ungültigen Gesamtanzahl führen würde. */
-	public static int durationmonthsOf(final int years, final int months) throws IllegalArgumentException {
+	public static int durationmonthsOf(int years, int months) throws IllegalArgumentException {
 		FEMDuration.checkYears(+years);
 		FEMDuration.checkYears(-years);
 		FEMDuration.checkMonths(-months);
@@ -390,7 +387,7 @@ public final class FEMDuration implements FEMValue, Comparable<FEMDuration> {
 	 * @see #value()
 	 * @param value interne Darstellung der Zeitspanne.
 	 * @throws IllegalArgumentException Wenn {@code value} ungültig ist. */
-	public FEMDuration(final long value) throws IllegalArgumentException {
+	public FEMDuration(long value) throws IllegalArgumentException {
 		this(Integers.toIntH(value), Integers.toIntL(value));
 		FEMDuration.checkYears(this.yearsValue());
 		if ((this.monthsValue() > 11) || (this.daysValue() > 146096) || (this.hoursValue() > 23) || (this.minutesValue() > 59) || (this.secondsValue() > 59)
@@ -515,7 +512,7 @@ public final class FEMDuration implements FEMValue, Comparable<FEMDuration> {
 	 * @param durationmillis Gesamtanzahl der Millisekunden.
 	 * @return verschobene Zeitspanne.
 	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen zu einer ungültigen Zeitspanne führen würden. */
-	public FEMDuration move(final int durationmonths, final int durationmillis) throws IllegalArgumentException {
+	public FEMDuration move(int durationmonths, int durationmillis) throws IllegalArgumentException {
 		FEMDuration.checkMonths(-durationmonths);
 		FEMDuration.checkMonths(+durationmonths);
 		return this.moveImpl(durationmonths, durationmillis);
@@ -527,7 +524,7 @@ public final class FEMDuration implements FEMValue, Comparable<FEMDuration> {
 	 * @param durationmillis Gesamtanzahl der Millisekunden ({@code -315569519999999..315569519999999}).
 	 * @return verschobene Zeitspanne.
 	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen zu einer ungültigen Zeitspanne führen würden. */
-	public FEMDuration move(final int durationmonths, final long durationmillis) throws IllegalArgumentException {
+	public FEMDuration move(int durationmonths, long durationmillis) throws IllegalArgumentException {
 		FEMDuration.checkMonths(-durationmonths);
 		FEMDuration.checkMonths(+durationmonths);
 		FEMDuration.checkMilliseconds(+durationmillis);
@@ -549,8 +546,7 @@ public final class FEMDuration implements FEMValue, Comparable<FEMDuration> {
 	 * @param milliseconds Anzahl der Millisekunden.
 	 * @return verschobene Zeitspanne.
 	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen zu einer ungültigen Zeitspanne führen würden. */
-	public FEMDuration move(final int years, final int months, final int days, final int hours, final int minutes, final int seconds, final int milliseconds)
-		throws IllegalArgumentException {
+	public FEMDuration move(int years, int months, int days, int hours, int minutes, int seconds, int milliseconds) throws IllegalArgumentException {
 		return this.moveImpl(FEMDuration.durationmonthsOf(years, months), FEMDuration.durationmillisOf(days, hours, minutes, seconds, milliseconds));
 	}
 
@@ -568,8 +564,7 @@ public final class FEMDuration implements FEMValue, Comparable<FEMDuration> {
 	 * @param milliseconds Anzahl der Millisekunden ({@code -315569519999999..315569519999999}).
 	 * @return verschobene Zeitspanne.
 	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen zu einer ungültigen Zeitspanne führen würden. */
-	public FEMDuration move(final int years, final int months, final int days, final int hours, final long minutes, final long seconds, final long milliseconds)
-		throws IllegalArgumentException {
+	public FEMDuration move(int years, int months, int days, int hours, long minutes, long seconds, long milliseconds) throws IllegalArgumentException {
 		return this.moveImpl(FEMDuration.durationmonthsOf(years, months), FEMDuration.durationmillisOf(days, hours, minutes, seconds, milliseconds));
 	}
 
@@ -580,7 +575,7 @@ public final class FEMDuration implements FEMValue, Comparable<FEMDuration> {
 	 * @return verschobene Zeitspanne.
 	 * @throws NullPointerException Wenn {@code duration} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen zu einer ungültigen Zeitspanne führen würden. */
-	public FEMDuration move(final FEMDuration duration, final boolean negate) throws NullPointerException, IllegalArgumentException {
+	public FEMDuration move(FEMDuration duration, boolean negate) throws NullPointerException, IllegalArgumentException {
 		if ((duration.signValue() > 0) == negate) return this.move(-duration.durationmonthsValue(), -duration.durationmillisValue());
 		return this.move(duration.durationmonthsValue(), duration.durationmillisValue());
 	}
@@ -591,7 +586,7 @@ public final class FEMDuration implements FEMValue, Comparable<FEMDuration> {
 	 * @param factor Faktor.
 	 * @return Multiplizierte Zeitspanne.
 	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen zu einer ungültigen Zeitspanne führen würden. */
-	public FEMDuration multiply(final int factor) throws IllegalArgumentException {
+	public FEMDuration multiply(int factor) throws IllegalArgumentException {
 		return FEMDuration.from(this.durationmonthsValue() * factor, this.durationmillisValue() * factor);
 	}
 
@@ -602,7 +597,7 @@ public final class FEMDuration implements FEMValue, Comparable<FEMDuration> {
 	 * @param denominator Nenner.
 	 * @return Multiplizierte Zeitspanne.
 	 * @throws IllegalArgumentException Wenn der Nenner {@code 0} ist oder die gegebenen Anzahlen zu einer ungültigen Zeitspanne führen würden. */
-	public FEMDuration multiply(final int numerator, final int denominator) throws IllegalArgumentException {
+	public FEMDuration multiply(int numerator, int denominator) throws IllegalArgumentException {
 		if (denominator == 0) throw new IllegalArgumentException();
 		return FEMDuration.from((this.durationmonthsValue() * numerator) / denominator, (this.durationmillisValue() * numerator) / denominator);
 	}
@@ -625,7 +620,7 @@ public final class FEMDuration implements FEMValue, Comparable<FEMDuration> {
 	}
 
 	@Override
-	public int compareTo(final FEMDuration that) {
+	public int compareTo(FEMDuration that) {
 		return this.compareTo(that, 0);
 	}
 
@@ -636,7 +631,7 @@ public final class FEMDuration implements FEMValue, Comparable<FEMDuration> {
 	 * @param undefined Rückgabewert für nicht vergleichbare Zeitspannen.
 	 * @return Vergleichswert oder {@code undefined}.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-	public int compareTo(final FEMDuration that, final int undefined) {
+	public int compareTo(FEMDuration that, int undefined) {
 		final int thisSign = this.signValue(), thatSign = that.signValue();
 		if (thatSign > 0) return thisSign > 0 ? this.compareImpl(that, undefined) : -1;
 		if (thatSign < 0) return thisSign < 0 ? that.compareImpl(this, undefined) : +1;
@@ -715,12 +710,11 @@ public final class FEMDuration implements FEMValue, Comparable<FEMDuration> {
 		return new String(buffer, 0, offset);
 	}
 
-	static long durationmillisOfImpl(final int days, final int hours, final long minutes, final long seconds, final long milliseconds)
-		throws IllegalArgumentException {
+	static long durationmillisOfImpl(int days, int hours, long minutes, long seconds, long milliseconds) throws IllegalArgumentException {
 		return (days * 86400000L) + (hours * 3600000L) + (minutes * 60000L) + (seconds * 1000L) + milliseconds;
 	}
 
-	static int durationmonthsOfImpl(final int years, final int months) {
+	static int durationmonthsOfImpl(int years, int months) {
 		return (years * 12) + months;
 	}
 
@@ -850,35 +844,35 @@ public final class FEMDuration implements FEMValue, Comparable<FEMDuration> {
 		64, 49, 64, 16, 34, 49, 34, 49, 34, 49, 49, 49, 64, 49, 64, 16, 34, 34, 34, 34, 34, 49, 49, 49, 49, 49, 49, 16, 34, 34, 34, 34, 34, 34, 49, 34, 49, 49, 49,
 		16, 18, 33, 18, 33, 33, 33, 48, 33, 48, 33, 48};
 
-	private static void checkDays(final int days) throws IllegalArgumentException {
+	private static void checkDays(int days) throws IllegalArgumentException {
 		if (days > 3652424) throw new IllegalArgumentException();
 	}
 
-	private static void checkYears(final int years) throws IllegalArgumentException {
+	private static void checkYears(int years) throws IllegalArgumentException {
 		if (years > 9999) throw new IllegalArgumentException();
 	}
 
-	private static void checkMonths(final int months) throws IllegalArgumentException {
+	private static void checkMonths(int months) throws IllegalArgumentException {
 		if (months > 119999) throw new IllegalArgumentException();
 	}
 
-	private static void checkHours(final int hours) throws IllegalArgumentException {
+	private static void checkHours(int hours) throws IllegalArgumentException {
 		if (hours > 87658199) throw new IllegalArgumentException();
 	}
 
-	private static void checkMinutes(final long minutes) throws IllegalArgumentException {
+	private static void checkMinutes(long minutes) throws IllegalArgumentException {
 		if (minutes > 5259491999L) throw new IllegalArgumentException();
 	}
 
-	private static void checkSeconds(final long seconds) throws IllegalArgumentException {
+	private static void checkSeconds(long seconds) throws IllegalArgumentException {
 		if (seconds > 315569519999L) throw new IllegalArgumentException();
 	}
 
-	private static void checkMilliseconds(final long milliseconds) throws IllegalArgumentException {
+	private static void checkMilliseconds(long milliseconds) throws IllegalArgumentException {
 		if (milliseconds > 315569519999999L) throw new IllegalArgumentException();
 	}
 
-	private static void checkPositive(final int value) throws IllegalArgumentException {
+	private static void checkPositive(int value) throws IllegalArgumentException {
 		if (value < 0) throw new IllegalArgumentException();
 	}
 
@@ -890,7 +884,7 @@ public final class FEMDuration implements FEMValue, Comparable<FEMDuration> {
 	 *
 	 * @param months Anzahl an Monaten ({@code 0..119999}).
 	 * @return Min-Max-Paar. */
-	private static int rangeOf(final int months) {
+	private static int rangeOf(int months) {
 		return FEMDuration.ranges[months % 4800];
 	}
 
@@ -898,7 +892,7 @@ public final class FEMDuration implements FEMValue, Comparable<FEMDuration> {
 	 *
 	 * @param months Anzahl der Monate ({@code 0..119999}).
 	 * @return mittlere Anzahl an Tagen in den gegebenen Monaten. */
-	private static int lengthOf(final int months) {
+	private static int lengthOf(int months) {
 		return (months * 146097) / 4800;
 	}
 
@@ -926,17 +920,17 @@ public final class FEMDuration implements FEMValue, Comparable<FEMDuration> {
 	 */
 	private final int valueH;
 
-	private FEMDuration(final int valueH, final int valueL) {
+	private FEMDuration(int valueH, int valueL) {
 		this.valueH = valueH;
 		this.valueL = valueL;
 	}
 
-	private FEMDuration moveImpl(final int durationmonths, final long durationmillis) throws IllegalArgumentException {
+	private FEMDuration moveImpl(int durationmonths, long durationmillis) throws IllegalArgumentException {
 		if (this.signValue() < 0) return FEMDuration.from(durationmonths - this.durationmonthsValue(), durationmillis - this.durationmillisValue());
 		return FEMDuration.from(durationmonths + this.durationmonthsValue(), durationmillis + this.durationmillisValue());
 	}
 
-	private int compareImpl(final FEMDuration that, final int undefined) {
+	private int compareImpl(FEMDuration that, int undefined) {
 		final int thisMonths = this.durationmonthsValue(), thatMonths = that.durationmonthsValue();
 		final long thisMillis = this.durationmillisValue(), thatMillis = that.durationmillisValue();
 		if (thisMonths == thatMonths) return Comparators.compare(thisMillis, thatMillis);

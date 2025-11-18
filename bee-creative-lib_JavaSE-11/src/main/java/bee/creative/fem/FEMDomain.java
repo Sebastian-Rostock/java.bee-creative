@@ -1230,9 +1230,9 @@ public class FEMDomain extends BaseObject {
 				this.printBinary(res, (FEMBinary)src.data());
 			} else if (id == FEMInteger.ID) {
 				this.printInteger(res, (FEMInteger)src.data());
-			} else if (id == FEMDecimal.ID) {
+			} else if (id == FEMDecimal.TYPE_ID) {
 				this.printDecimal(res, (FEMDecimal)src.data());
-			} else if (id == FEMDuration.ID) {
+			} else if (id == FEMDuration.TYPE_ID) {
 				this.printDuration(res, (FEMDuration)src.data());
 			} else if (id == FEMDatetime.TYPE_ID) {
 				this.printDatetime(res, (FEMDatetime)src.data());

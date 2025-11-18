@@ -151,7 +151,7 @@ public class FEMContext extends BaseObject {
 				return ((FEMString)value.data()).toString();
 			case FEMInteger.ID:
 				return ((FEMInteger)value.data()).toNumber();
-			case FEMDecimal.ID:
+			case FEMDecimal.TYPE_ID:
 				return ((FEMDecimal)value.data()).toNumber();
 			case FEMDatetime.TYPE_ID:
 				return ((FEMDatetime)value.data()).toCalendar();

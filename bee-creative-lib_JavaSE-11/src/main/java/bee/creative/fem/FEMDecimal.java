@@ -7,11 +7,11 @@ import bee.creative.lang.Integers;
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMDecimal implements FEMValue, Comparable<FEMDecimal> {
 
-	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
-	public static final int ID = 7;
-
 	/** Dieses Feld speichert den {@link #type() Datentyp}. */
-	public static final FEMType<FEMDecimal> TYPE = new FEMType<>(FEMDecimal.ID);
+	public static final FEMType<FEMDecimal> TYPE = new FEMType<>(FEMDecimal.TYPE_ID);
+
+	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
+	public static final int TYPE_ID = 7;
 
 	/** Dieses Feld speichert den Dezimalbruch {@code NaN}. */
 	public static final FEMDecimal EMPTY = new FEMDecimal(Double.NaN);
@@ -36,7 +36,7 @@ public final class FEMDecimal implements FEMValue, Comparable<FEMDecimal> {
 	 * @return Dezimalbruch.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
 	public static FEMDecimal from(Number value) throws NullPointerException {
-		return FEMDecimal.from(value.doubleValue());
+		return from(value.doubleValue());
 	}
 
 	/** Diese Methode gibt einen neuen Dezimalbruch mit dem in der gegebenen Zeichenkette kodierten Wert zurück. Das Format der Zeichenkette entspricht dem der
@@ -50,7 +50,7 @@ public final class FEMDecimal implements FEMValue, Comparable<FEMDecimal> {
 	 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist. */
 	public static FEMDecimal from(String value) throws NullPointerException, IllegalArgumentException {
 		try {
-			return FEMDecimal.from(Double.parseDouble(value));
+			return from(Double.parseDouble(value));
 		} catch (NumberFormatException cause) {
 			throw new IllegalArgumentException(cause);
 		}
@@ -64,7 +64,7 @@ public final class FEMDecimal implements FEMValue, Comparable<FEMDecimal> {
 
 	@Override
 	public FEMType<FEMDecimal> type() {
-		return FEMDecimal.TYPE;
+		return TYPE;
 	}
 
 	/** Diese Methode gibt die interne Darstellung des Dezimalbruchs zurück.
