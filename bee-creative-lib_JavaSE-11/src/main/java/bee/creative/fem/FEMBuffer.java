@@ -827,7 +827,7 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	protected FEMFunction customGet(final int head, final long body) {
 		switch (head) {
 			case TYPE_VOID_DATA:
-				return FEMVoid.INSTANCE;
+				return FEMVoid.VALUE;
 			case TYPE_ARRAY_DATA:
 				return FEMArray.EMPTY;
 			case TYPE_ARRAY_ADDR:
@@ -913,7 +913,7 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 		throw new IllegalArgumentException();
 	}
 
-	/** Diese Methode gibt die Referenz auf {@link FEMVoid#INSTANCE} zurück. */
+	/** Diese Methode gibt die Referenz auf {@link FEMVoid#VALUE} zurück. */
 	protected long putVoidAsRef() {
 		return this.getRef(FEMBuffer.TYPE_VOID_DATA, 1);
 	}
@@ -1012,7 +1012,7 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 
 	/** Diese Methode gibt die Bytefolge mit den gegebenen Daten ({@code item: 8}) zurück. */
 	protected FEMBinary getBinaryByData(final long data) {
-		return FEMBinary.femBinaryFrom(Integers.toIntL(data), (byte)Integers.toIntH(data));
+		return FEMBinary.from(Integers.toIntL(data), (byte)Integers.toIntH(data));
 	}
 
 	/** Diese Methode gibt die im gegebenen Speicherbereich ({@code length: int, hash: int, item: byte[length]}) enthaltene Bytefolge zurück. */
@@ -1037,17 +1037,17 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 
 	/** Diese Methode gibt die Dezimalzahl mit den gegebenen Daten ({@code +value: 58}) zurück. */
 	protected FEMInteger getIntegerByData1(final long data) throws IllegalArgumentException {
-		return FEMInteger.from(+data);
+		return FEMInteger.femIntegerFrom(+data);
 	}
 
 	/** Diese Methode gibt die Dezimalzahl mit den gegebenen Daten ({@code -value: 58}) zurück. */
 	protected FEMInteger getIntegerByData2(final long data) throws IllegalArgumentException {
-		return FEMInteger.from(-data);
+		return FEMInteger.femIntegerFrom(-data);
 	}
 
 	/** Diese Methode gibt die im gegebenen Speicherbereich ({@code value: long}) enthaltene Dezimalzahl zurück. */
 	protected FEMInteger getIntegerByAddr(final long addr) throws IllegalArgumentException {
-		return FEMInteger.from(this.buffer.getLong(addr));
+		return FEMInteger.femIntegerFrom(this.buffer.getLong(addr));
 	}
 
 	/** Diese Methode fügt die gegebene Dezimalzahl in den Puffer ein und gibt die Referenz darauf zurück. */

@@ -110,14 +110,14 @@ public class FEMContext extends BaseObject {
 	 * @return Wert mit den gegebenen Nutzdaten.
 	 * @throws IllegalArgumentException Wenn kein Wert mit den gegebenen Nutzdaten erzeugt werden kann. */
 	public FEMValue valueFrom(Object object) throws IllegalArgumentException {
-		if (object == null) return FEMVoid.INSTANCE;
+		if (object == null) return FEMVoid.VALUE;
 		if (object instanceof FEMValue) return (FEMValue)object;
 		if (object instanceof FEMFunction) return ((FEMFunction)object).toValue();
 		if (object instanceof char[]) return FEMString.from((char[])object);
 		if (object instanceof String) return FEMString.from((String)object);
-		if (object instanceof byte[]) return FEMBinary.femBinaryFrom((byte[])object);
+		if (object instanceof byte[]) return FEMBinary.from((byte[])object);
 		if ((object instanceof Float) || (object instanceof Double) || (object instanceof BigDecimal)) return FEMDecimal.from((Number)object);
-		if (object instanceof Number) return FEMInteger.from((Number)object);
+		if (object instanceof Number) return FEMInteger.femIntegerFrom((Number)object);
 		if (object instanceof Boolean) return FEMBoolean.from((Boolean)object);
 		if (object instanceof Calendar) return FEMDatetime.from((Calendar)object);
 		return this.arrayFrom(object);
@@ -141,21 +141,21 @@ public class FEMContext extends BaseObject {
 	 * @throws IllegalArgumentException Wenn {@code value} ungültig ist. */
 	public Object objectFrom(FEMValue value) throws NullPointerException, IllegalArgumentException {
 		switch (value.type().id()) {
-			case FEMVoid.ID:
+			case FEMVoid.TYPE_ID:
 				return null;
-			case FEMArray.ID:
+			case FEMArray.TYPE_ID:
 				return this.objectFromImpl((FEMArray)value.data());
 			case FEMBinary.ID:
 				return ((FEMBinary)value.data()).value();
-			case FEMString.ID:
+			case FEMString.TYPE_ID:
 				return ((FEMString)value.data()).toString();
 			case FEMInteger.ID:
 				return ((FEMInteger)value.data()).toNumber();
 			case FEMDecimal.ID:
 				return ((FEMDecimal)value.data()).toNumber();
-			case FEMDatetime.ID:
+			case FEMDatetime.TYPE_ID:
 				return ((FEMDatetime)value.data()).toCalendar();
-			case FEMBoolean.ID:
+			case FEMBoolean.TYPE_ID:
 				return ((FEMBoolean)value.data()).toBoolean();
 		}
 		return value.data();
@@ -168,7 +168,7 @@ public class FEMContext extends BaseObject {
 		for (var i = 0; i < length; i++) {
 			values[i] = this.valueFrom(Array.get(data, i));
 		}
-		return FEMArray.femArrayFrom(values);
+		return FEMArray.from(values);
 	}
 
 	private Object[] objectFromImpl(FEMArray array) {

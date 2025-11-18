@@ -422,7 +422,7 @@ public class FEMDomain extends BaseObject {
 		for (final Token item: tok.children()) {
 			res.add(this.parseValueData(src.with(item)));
 		}
-		return FEMArray.femArrayFrom(res);
+		return FEMArray.from(res);
 	}
 
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} die {@link Token Abschnitte} einer Wertliste und gibt deren Elternabschnitt zurück. Als Abschnittstyp
@@ -770,13 +770,13 @@ public class FEMDomain extends BaseObject {
 	 * @param ref Kennung bzw. Textdarstellung einer Konstanten.
 	 * @return Wert der Konstanten oder {@code null}. */
 	protected FEMValue parseValueData(final FEMToken src, final String ref) throws NullPointerException {
-		if (ref.equals("null")) return FEMVoid.INSTANCE;
+		if (ref.equals("null")) return FEMVoid.VALUE;
 		if (ref.equals("true")) return FEMBoolean.TRUE;
 		if (ref.equals("false")) return FEMBoolean.FALSE;
-		if (ref.startsWith("0x")) return FEMBinary.femBinaryFrom(ref);
+		if (ref.startsWith("0x")) return FEMBinary.from(ref);
 		if (ref.startsWith("P") || ref.startsWith("-P")) return FEMDuration.from(ref);
 		try {
-			return FEMInteger.from(ref);
+			return FEMInteger.femIntegerFrom(ref);
 		} catch (final IllegalArgumentException cause) {}
 		try {
 			return FEMDecimal.from(ref);
@@ -842,9 +842,7 @@ public class FEMDomain extends BaseObject {
 	 * @param ref Kennung bzw. Textdarstellung einer Konstanten.
 	 * @return Funktion der Konstanten oder {@code null}. */
 	protected FEMFunction parseFunctionData(final FEMToken src, final String ref) {
-		final var res = src.proxies().get(ref);
-		if (res != null) return res;
-		return FEMUtil.get(ref);
+		return src.proxies().get(ref);
 	}
 
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} den {@link Token Abschnitt} einer Funktion und gibt ihn zurück. Wenn ein Parameter bzw. Wert von einer
@@ -1218,15 +1216,15 @@ public class FEMDomain extends BaseObject {
 			final var id = src.type().id();
 			if (id == FEMNative.ID) {
 				this.printNative(res, src.data());
-			} else if (id == FEMVoid.ID) {
+			} else if (id == FEMVoid.TYPE_ID) {
 				this.printVoid(res, (FEMVoid)src.data());
-			} else if (id == FEMArray.ID) {
+			} else if (id == FEMArray.TYPE_ID) {
 				this.printArray(res, (FEMArray)src.data());
 			} else if (id == FEMHandler.ID) {
 				this.printHandler(res, (FEMHandler)src.data());
-			} else if (id == FEMBoolean.ID) {
+			} else if (id == FEMBoolean.TYPE_ID) {
 				this.printBoolean(res, (FEMBoolean)src.data());
-			} else if (id == FEMString.ID) {
+			} else if (id == FEMString.TYPE_ID) {
 				this.printString(res, (FEMString)src.data());
 			} else if (id == FEMBinary.ID) {
 				this.printBinary(res, (FEMBinary)src.data());
@@ -1236,9 +1234,9 @@ public class FEMDomain extends BaseObject {
 				this.printDecimal(res, (FEMDecimal)src.data());
 			} else if (id == FEMDuration.ID) {
 				this.printDuration(res, (FEMDuration)src.data());
-			} else if (id == FEMDatetime.ID) {
+			} else if (id == FEMDatetime.TYPE_ID) {
 				this.printDatetime(res, (FEMDatetime)src.data());
-			} else if (id == FEMObject.ID) {
+			} else if (id == FEMObject.TYPE_ID) {
 				this.printObject(res, (FEMObject)src.data());
 			} else {
 				this.printConst(res, src);

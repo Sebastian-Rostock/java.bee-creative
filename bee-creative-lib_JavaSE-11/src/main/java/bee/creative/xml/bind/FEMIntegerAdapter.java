@@ -18,7 +18,7 @@ public final class FEMIntegerAdapter extends XmlAdapter<String, FEMInteger> {
 	@Override
 	public FEMInteger unmarshal(String value) throws Exception {
 		if (value == null) return null;
-		return FEMInteger.from(value);
+		return FEMInteger.femIntegerFrom(value);
 	}
 
 }

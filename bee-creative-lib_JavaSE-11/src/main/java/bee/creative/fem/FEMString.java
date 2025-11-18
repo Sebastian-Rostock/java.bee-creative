@@ -33,11 +33,11 @@ import bee.creative.util.Iterables;
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparable<FEMString>, UseToString {
 
-	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
-	public static final int ID = 4;
-
 	/** Dieses Feld speichert den {@link #type() Datentyp}. */
-	public static final FEMType<FEMString> TYPE = FEMType.from(FEMString.ID);
+	public static final FEMType<FEMString> TYPE = new FEMType<>(FEMString.TYPE_ID);
+
+	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
+	public static final int TYPE_ID = 4;
 
 	/** Dieses Feld speichert die leere Zeichenkette. */
 	public static final FEMString EMPTY = new UniformString(0, 0);
@@ -49,20 +49,20 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 	 * @return Zeichenkette.
 	 * @throws IllegalArgumentException Wenn {@code length < 0} ist. */
 	public static FEMString from(int length, int item) throws IllegalArgumentException {
-		if (length == 0) return FEMString.EMPTY;
+		if (length == 0) return EMPTY;
 		return new UniformString(length, item);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, int[], int, int) FEMString.from(true, items, 0, items.length)}.
+	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, int[], int, int) from(true, items, 0, items.length)}.
 	 *
 	 * @param items Codepoints.
 	 * @return Zeichenkette.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
 	public static FEMString from(int[] items) throws NullPointerException {
-		return FEMString.from(true, items, 0, items.length);
+		return from(true, items, 0, items.length);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, int[], int, int) FEMString.from(true, items, offset, length)}.
+	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, int[], int, int) from(true, items, offset, length)}.
 	 *
 	 * @param items Codepoints.
 	 * @param offset Beginn des Abschnitts.
@@ -71,17 +71,17 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn der Abschnitt ungültig ist. */
 	public static FEMString from(int[] items, int offset, int length) throws NullPointerException, IllegalArgumentException {
-		return FEMString.from(true, items, offset, length);
+		return from(true, items, offset, length);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, int[], int, int) FEMString.from(copy, items, 0, items.length)}.
+	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, int[], int, int) from(copy, items, 0, items.length)}.
 	 *
 	 * @param copy {@code true}, wenn das gegebene Array falls nötig kopiert werden soll.
 	 * @param items Codepoints.
 	 * @return Zeichenkette.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
 	public static FEMString from(boolean copy, int[] items) throws NullPointerException {
-		return FEMString.from(copy, items, 0, items.length);
+		return from(copy, items, 0, items.length);
 	}
 
 	/** Diese Methode gibt eine Zeichenkette mit den Codepoints im gegebenen Abschnitt zurück.
@@ -95,7 +95,7 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 	 * @throws IllegalArgumentException Wenn der Abschnitt ungültig ist. */
 	public static FEMString from(boolean copy, int[] items, int offset, int length) throws NullPointerException, IllegalArgumentException {
 		if ((offset < 0) || (length < 0) || ((offset + length) > items.length)) throw new IllegalArgumentException();
-		if (length == 0) return FEMString.EMPTY;
+		if (length == 0) return EMPTY;
 		if (length == 1) return new UniformString(1, items[offset]);
 		if (!copy) return new CompactStringINT32(0, items, offset, length);
 		var items2 = new int[length];
@@ -103,17 +103,17 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 		return new CompactStringINT32(0, items2, 0, length);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, boolean, byte[], int, int) FEMString.from(true, false, items, 0, items.length)}.
+	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, boolean, byte[], int, int) from(true, false, items, 0, items.length)}.
 	 *
 	 * @param items 8-Bit-kodierte Codepoints.
 	 * @return Zeichenkette.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
 	public static FEMString from(byte[] items) throws NullPointerException, IllegalArgumentException {
-		return FEMString.from(true, false, items, 0, items.length);
+		return from(true, false, items, 0, items.length);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, boolean, byte[], int, int) FEMString.from(true, false, items, offset, length)}.
+	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, boolean, byte[], int, int) from(true, false, items, offset, length)}.
 	 *
 	 * @param items 8-Bit-kodierte Codepoints.
 	 * @param offset Beginn des Abschnitts.
@@ -122,10 +122,10 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn der Abschnitt ungültig ist. */
 	public static FEMString from(byte[] items, int offset, int length) throws NullPointerException, IllegalArgumentException {
-		return FEMString.from(true, false, items, offset, length);
+		return from(true, false, items, offset, length);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, boolean, byte[], int, int) FEMString.from(copy, false, items, 0, items.length)}.
+	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, boolean, byte[], int, int) from(copy, false, items, 0, items.length)}.
 	 *
 	 * @param copy {@code true}, wenn das gegebene Array falls nötig kopiert werden soll.
 	 * @param items 8-Bit-kodierte Codepoints.
@@ -133,10 +133,10 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn der Abschnitt ungültig ist. */
 	public static FEMString from(boolean copy, byte[] items) throws NullPointerException, IllegalArgumentException {
-		return FEMString.from(copy, false, items, 0, items.length);
+		return from(copy, false, items, 0, items.length);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, boolean, byte[], int, int) FEMString.from(copy, false, items, offset, length)}.
+	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, boolean, byte[], int, int) from(copy, false, items, offset, length)}.
 	 *
 	 * @param copy {@code true}, wenn das gegebene Array falls nötig kopiert werden soll.
 	 * @param items 8-Bit-kodierte Codepoints.
@@ -146,10 +146,10 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn der Abschnitt ungültig ist. */
 	public static FEMString from(boolean copy, byte[] items, int offset, int length) throws NullPointerException, IllegalArgumentException {
-		return FEMString.from(copy, false, items, offset, length);
+		return from(copy, false, items, offset, length);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, boolean, byte[], int, int) FEMString.from(copy, asUTF8, items, 0, items.length)}.
+	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, boolean, byte[], int, int) from(copy, asUTF8, items, 0, items.length)}.
 	 *
 	 * @param copy {@code true}, wenn das gegebene Array falls nötig kopiert werden soll.
 	 * @param asUTF8 {@code true}, wenn die Codepoints mehrwertkodiert sind. {@code false}, wenn die Codepoints einzelwertkodiert sind.
@@ -158,7 +158,7 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn der Abschnitt ungültig ist. */
 	public static FEMString from(boolean copy, boolean asUTF8, byte[] items) {
-		return FEMString.from(copy, asUTF8, items, 0, items.length);
+		return from(copy, asUTF8, items, 0, items.length);
 	}
 
 	/** Diese Methode gibt eine Zeichenkette mit den 8-Bit-kodierten Codepoints im gegebenen Abschnitt zurück.
@@ -173,10 +173,10 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 	 * @throws IllegalArgumentException Wenn der Abschnitt bzw. die Kodierung ungültig ist. */
 	public static FEMString from(boolean copy, boolean asUTF8, byte[] items, int offset, int length) throws NullPointerException, IllegalArgumentException {
 		if ((offset < 0) || (length < 0) || ((offset + length) > items.length)) throw new IllegalArgumentException();
-		if (length == 0) return FEMString.EMPTY;
+		if (length == 0) return EMPTY;
 		if (asUTF8) {
-			var count = FEMString.utf8Count(items, offset, length);
-			if (count == 1) return new UniformString(1, FEMString.utf8Value(items, offset));
+			var count = utf8Count(items, offset, length);
+			if (count == 1) return new UniformString(1, utf8Value(items, offset));
 			if (!copy) return new CompactStringUTF8(0, items, offset, count);
 			var items2 = new byte[length];
 			System.arraycopy(items, offset, items2, 0, length);
@@ -190,17 +190,17 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 		}
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, short[], int, int) FEMString.from(true, items, 0, items.length)}.
+	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, short[], int, int) from(true, items, 0, items.length)}.
 	 *
 	 * @param items 16-Bit-kodierte Codepoints.
 	 * @return Zeichenkette.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
 	public static FEMString from(short[] items) throws NullPointerException, IllegalArgumentException {
-		return FEMString.from(true, items, 0, items.length);
+		return from(true, items, 0, items.length);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, short[], int, int) FEMString.from(true, items, offset, length)}. *
+	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, short[], int, int) from(true, items, offset, length)}. *
 	 *
 	 * @param items 16-Bit-kodierte Codepoints.
 	 * @param offset Beginn des Abschnitts.
@@ -209,10 +209,10 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn der Abschnitt ungültig ist. */
 	public static FEMString from(short[] items, int offset, int length) throws NullPointerException, IllegalArgumentException {
-		return FEMString.from(true, items, offset, length);
+		return from(true, items, offset, length);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, short[], int, int) FEMString.from(copy, items, 0, items.length)}.
+	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, short[], int, int) from(copy, items, 0, items.length)}.
 	 *
 	 * @param copy {@code true}, wenn das gegebene Array falls nötig kopiert werden soll.
 	 * @param items 16-Bit-kodierte Codepoints.
@@ -220,7 +220,7 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn der Abschnitt ungültig ist. */
 	public static FEMString from(boolean copy, short[] items) throws NullPointerException, IllegalArgumentException {
-		return FEMString.from(copy, items, 0, items.length);
+		return from(copy, items, 0, items.length);
 	}
 
 	/** Diese Methode gibt eine Zeichenkette mit den 16-Bit-kodierten Codepoints im gegebenen Abschnitt zurück.
@@ -234,7 +234,7 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 	 * @throws IllegalArgumentException Wenn der Abschnitt bzw. die Kodierung ungültig ist. */
 	public static FEMString from(boolean copy, short[] items, int offset, int length) throws NullPointerException, IllegalArgumentException {
 		if ((offset < 0) || (length < 0) || ((offset + length) > items.length)) throw new IllegalArgumentException();
-		if (length == 0) return FEMString.EMPTY;
+		if (length == 0) return EMPTY;
 		if (length == 1) return new UniformString(1, items[offset] & 65535);
 		if (!copy) return new CompactStringINT16(0, items, offset, length);
 		var items2 = new short[length];
@@ -242,24 +242,24 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 		return new CompactStringINT16(0, items2, 0, length);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, char[]) FEMString.from(false, string.toCharArray())}.
+	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, char[]) from(false, string.toCharArray())}.
 	 *
 	 * @param string Codepoints.
 	 * @return Zeichenkette.
 	 * @throws NullPointerException Wenn {@code string} {@code null} ist. */
 	public static FEMString from(String string) throws NullPointerException {
-		if (string.isEmpty()) return FEMString.EMPTY;
-		return FEMString.from(false, string.toCharArray());
+		if (string.isEmpty()) return EMPTY;
+		return from(false, string.toCharArray());
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, char[], int, int) FEMString.from(true, items, 0, items.length)}.
+	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, char[], int, int) from(true, items, 0, items.length)}.
 	 *
 	 * @param items UTF16-kodierte Codepoints.
 	 * @return Zeichenkette.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
 	public static FEMString from(char[] items) throws NullPointerException, IllegalArgumentException {
-		return FEMString.from(true, items, 0, items.length);
+		return from(true, items, 0, items.length);
 	}
 
 	/** Diese Methode gibt eine Zeichenkette mit den UTF16-kodierten Codepoints im gegebenen Abschnitt zurück.
@@ -271,18 +271,18 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn der Abschnitt ungültig ist. */
 	public static FEMString from(char[] items, int offset, int length) throws NullPointerException, IllegalArgumentException {
-		return FEMString.from(true, items, offset, length);
+		return from(true, items, offset, length);
 	}
 
 	public static FEMString from(boolean copy, char[] items) throws NullPointerException, IllegalArgumentException {
-		return FEMString.from(copy, items, 0, items.length);
+		return from(copy, items, 0, items.length);
 	}
 
 	public static FEMString from(boolean copy, char[] items, int offset, int length) throws NullPointerException, IllegalArgumentException {
 		if ((offset < 0) || (length < 0) || ((offset + length) > items.length)) throw new IllegalArgumentException();
-		if (length == 0) return FEMString.EMPTY;
-		var count = FEMString.utf16Count(items, offset, length);
-		if (count == 1) return new UniformString(1, FEMString.utf16Value(items, offset));
+		if (length == 0) return EMPTY;
+		var count = utf16Count(items, offset, length);
+		if (count == 1) return new UniformString(1, utf16Value(items, offset));
 		if (!copy) return new CompactStringUTF16(0, items, offset, count);
 		var items2 = new char[length];
 		System.arraycopy(items, offset, items2, 0, length);
@@ -298,13 +298,13 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist oder enthält. */
 	public static FEMString from(List<? extends Number> items) throws NullPointerException {
 		final var length = items.size();
-		if (length == 0) return FEMString.EMPTY;
+		if (length == 0) return EMPTY;
 		if (length == 1) return new UniformString(1, items.get(0).intValue());
 		var items2 = new int[length];
 		for (var i = 0; i < length; i++) {
 			items2[i] = items.get(i).intValue();
 		}
-		return FEMString.from(false, items2);
+		return from(false, items2);
 	}
 
 	/** Diese Methode konvertiert die gegebenen Codepoints in eine Zeichenkette und gibt diese zurück.
@@ -316,7 +316,7 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist oder enthält. */
 	public static FEMString from(Iterable<? extends Number> items) throws NullPointerException {
 		if (items instanceof FEMString) return (FEMString)items;
-		return FEMString.from(Iterables.toList(items));
+		return from(Iterables.toList(items));
 	}
 
 	/** Diese Methode gibt die Verkettung der gegebenen Zeichenketten zurück.
@@ -327,9 +327,9 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 	 * @throws NullPointerException Wenn {@code values} {@code null} ist oder enthält. */
 	public static FEMString concatAll(FEMString... values) throws NullPointerException {
 		var length = values.length;
-		if (length == 0) return FEMString.EMPTY;
+		if (length == 0) return EMPTY;
 		if (length == 1) return values[0].data();
-		return FEMString.concatAll(values, 0, length - 1);
+		return concatAll(values, 0, length - 1);
 	}
 
 	/** Diese Methode gibt {@code this} zurück. */
@@ -340,7 +340,7 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 
 	@Override
 	public final FEMType<FEMString> type() {
-		return FEMString.TYPE;
+		return TYPE;
 	}
 
 	/** Diese Methode gibt die Codepoint zurück.
@@ -376,7 +376,7 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 	public final FEMString concat(FEMString that) throws NullPointerException {
 		if (that.length == 0) return this;
 		if (this.length == 0) return that;
-		return ConcatString.from(this, that);
+		return ConcatString.concat(this, that);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #section(int, int) this.section(offset, this.length() - offset)}.
@@ -395,7 +395,7 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 	public final FEMString section(int offset, int length) throws IllegalArgumentException {
 		if ((offset == 0) && (length == this.length)) return this;
 		if ((offset < 0) || ((offset + length) > this.length)) throw new IllegalArgumentException();
-		if (length == 0) return FEMString.EMPTY;
+		if (length == 0) return EMPTY;
 		return this.customSection(offset, length);
 	}
 
@@ -413,7 +413,7 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 	 *
 	 * @return performantere Zeichenkette oder {@code this}. */
 	public FEMString compact() {
-		if (this.isEmpty()) return FEMString.EMPTY;
+		if (this.isEmpty()) return EMPTY;
 		if (this.isUniform()) return new UniformString(this.length, this.customGet(0));
 		var collector = new GetRange();
 		this.collect(collector);
@@ -428,7 +428,7 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 	 * @see #toBytes()
 	 * @return Zeichenkette in 8-Bit-Einzelwertkodierung. */
 	public FEMString compactINT8() {
-		return FEMString.from(false, this.toBytes());
+		return from(false, this.toBytes());
 	}
 
 	/** Diese Methode gibt diese Zeichenkette mit 16-Bit Einzelwertkodierung zurück. Codepoints größer als {@code 65535} werden bei dieser Kodierung zu {@code 0}.
@@ -437,7 +437,7 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 	 * @see #toShorts()
 	 * @return Zeichenkette in 16-Bit-Einzelwertkodierung. */
 	public FEMString compactINT16() {
-		return FEMString.from(false, this.toShorts());
+		return from(false, this.toShorts());
 	}
 
 	/** Diese Methode gibt diese Zeichenkette mit 32-Bit Einzelwertkodierung zurück.
@@ -446,7 +446,7 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 	 * @see #toInts()
 	 * @return Zeichenkette in 32-Bit-Einzelwertkodierung. */
 	public FEMString compactINT32() {
-		return FEMString.from(false, this.toInts());
+		return from(false, this.toInts());
 	}
 
 	/** Diese Methode gibt die Position des ersten Vorkommens des gegebenen Zeichens innerhalb dieser Zeichenkette zurück. Die Suche beginnt an der gegebenen
@@ -678,36 +678,6 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 
 	public static class ConcatString extends HashString implements Emuable {
 
-		public static ConcatString from(FEMString string1, FEMString string2) throws IllegalArgumentException {
-			var size1 = ConcatString.size(string1);
-			var size2 = ConcatString.size(string2);
-			if ((size1 + 1) < size2) {
-				var cs2 = (ConcatString)string2;
-				if (!(cs2 instanceof ConcatString1)) return ConcatString.from(ConcatString.from(string1, cs2.string1), cs2.string2);
-				var cs21 = (ConcatString)cs2.string1;
-				return ConcatString.from(ConcatString.from(string1, cs21.string1), ConcatString.from(cs21.string2, cs2.string2));
-			}
-			if ((size2 + 1) < size1) {
-				var cs1 = (ConcatString)string1;
-				if (!(cs1 instanceof ConcatString2)) return ConcatString.from(cs1.string1, ConcatString.from(cs1.string2, string2));
-				var cs12 = (ConcatString)cs1.string2;
-				return ConcatString.from(ConcatString.from(cs1.string1, cs12.string1), ConcatString.from(cs12.string2, string2));
-			}
-			if (size1 > size2) return new ConcatString1(string1, string2);
-			if (size1 < size2) return new ConcatString2(string1, string2);
-			return new ConcatString(string1, string2);
-		}
-
-		public final FEMString string1;
-
-		public final FEMString string2;
-
-		public ConcatString(FEMString string1, FEMString string2) throws IllegalArgumentException {
-			super(string1.length + string2.length);
-			this.string1 = string1;
-			this.string2 = string2;
-		}
-
 		@Override
 		public long emu() {
 			return EMU.fromObject(this) + EMU.from(this.string1) + EMU.from(this.string2);
@@ -743,7 +713,7 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 			return this.string1.section(offset, -offset2).concat(this.string2.section(0, length2));
 		}
 
-		private static int size(FEMString string) {
+		static int size(FEMString string) {
 			for (var size = 0; true; size++) {
 				if (string instanceof ConcatString2) {
 					string = ((ConcatString)string).string2;
@@ -753,11 +723,41 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 			}
 		}
 
+		static ConcatString concat(FEMString string1, FEMString string2) throws IllegalArgumentException {
+			var size1 = size(string1);
+			var size2 = size(string2);
+			if ((size1 + 1) < size2) {
+				var cs2 = (ConcatString)string2;
+				if (!(cs2 instanceof ConcatString1)) return concat(concat(string1, cs2.string1), cs2.string2);
+				var cs21 = (ConcatString)cs2.string1;
+				return concat(concat(string1, cs21.string1), concat(cs21.string2, cs2.string2));
+			}
+			if ((size2 + 1) < size1) {
+				var cs1 = (ConcatString)string1;
+				if (!(cs1 instanceof ConcatString2)) return concat(cs1.string1, concat(cs1.string2, string2));
+				var cs12 = (ConcatString)cs1.string2;
+				return concat(concat(cs1.string1, cs12.string1), concat(cs12.string2, string2));
+			}
+			if (size1 > size2) return new ConcatString1(string1, string2);
+			if (size1 < size2) return new ConcatString2(string1, string2);
+			return new ConcatString(string1, string2);
+		}
+
+		final FEMString string1;
+
+		final FEMString string2;
+
+		ConcatString(FEMString string1, FEMString string2) throws IllegalArgumentException {
+			super(string1.length + string2.length);
+			this.string1 = string1;
+			this.string2 = string2;
+		}
+
 	}
 
 	public static final class ConcatString1 extends ConcatString {
 
-		public ConcatString1(FEMString string1, FEMString string2) throws IllegalArgumentException {
+		ConcatString1(FEMString string1, FEMString string2) throws IllegalArgumentException {
 			super(string1, string2);
 		}
 
@@ -765,7 +765,7 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 
 	public static final class ConcatString2 extends ConcatString {
 
-		public ConcatString2(FEMString string1, FEMString string2) throws IllegalArgumentException {
+		ConcatString2(FEMString string1, FEMString string2) throws IllegalArgumentException {
 			super(string1, string2);
 		}
 
@@ -773,19 +773,9 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 
 	public static final class SectionString extends HashString implements Emuable {
 
-		public final FEMString string;
-
-		public final int offset;
-
 		@Override
 		public long emu() {
 			return EMU.fromObject(this) + EMU.from(this.string);
-		}
-
-		public SectionString(FEMString string, int offset, int length) throws IllegalArgumentException {
-			super(length);
-			this.string = string;
-			this.offset = offset;
 		}
 
 		@Override
@@ -809,16 +799,19 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 			return this.string.section(this.offset + offset2, length2);
 		}
 
+		final FEMString string;
+
+		final int offset;
+
+		SectionString(FEMString string, int offset, int length) throws IllegalArgumentException {
+			super(length);
+			this.string = string;
+			this.offset = offset;
+		}
+
 	}
 
 	public static final class ReverseString extends HashString implements Emuable {
-
-		public final FEMString string;
-
-		public ReverseString(FEMString string) throws IllegalArgumentException {
-			super(string.length);
-			this.string = string;
-		}
 
 		@Override
 		public long emu() {
@@ -856,16 +849,16 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 			return this.string.section(this.length - offset2 - length2, length2).reverse();
 		}
 
+		final FEMString string;
+
+		ReverseString(FEMString string) throws IllegalArgumentException {
+			super(string.length);
+			this.string = string;
+		}
+
 	}
 
 	public static final class UniformString extends HashString {
-
-		public final int item;
-
-		public UniformString(int length, int value) throws IllegalArgumentException {
-			super(length);
-			this.item = value;
-		}
 
 		@Override
 		public FEMString reverse() {
@@ -911,16 +904,16 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 			return new UniformString(length, this.item);
 		}
 
+		final int item;
+
+		UniformString(int length, int value) throws IllegalArgumentException {
+			super(length);
+			this.item = value;
+		}
+
 	}
 
 	public static final class CompactStringINT8 extends HashString implements Emuable {
-
-		public CompactStringINT8(int hash, byte[] items, int offset, int length) throws IllegalArgumentException {
-			super(length);
-			this.items = Objects.notNull(items);
-			this.offset = offset;
-			this.hash = hash;
-		}
 
 		@Override
 		public long emu() {
@@ -952,9 +945,16 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 			return new CompactStringINT8(0, this.items, this.offset + offset, length);
 		}
 
-		private final byte[] items;
+		final byte[] items;
 
-		private final int offset;
+		final int offset;
+
+		CompactStringINT8(int hash, byte[] items, int offset, int length) throws IllegalArgumentException {
+			super(length);
+			this.items = Objects.notNull(items);
+			this.offset = offset;
+			this.hash = hash;
+		}
 
 	}
 
@@ -1079,25 +1079,25 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 
 		@Override
 		protected int customGet(int index) throws IndexOutOfBoundsException {
-			return FEMString.utf8Value(this.items, FEMString.utf8Offset(this.items, this.offset, index));
+			return utf8Value(this.items, utf8Offset(this.items, this.offset, index));
 		}
 
 		@Override
 		protected boolean customCollect(Collector target, int offset, int length, boolean foreward) {
 			if (foreward) {
-				var offset2 = FEMString.utf8Offset(this.items, this.offset, offset);
+				var offset2 = utf8Offset(this.items, this.offset, offset);
 				var length2 = length;
 				while (length2 > 0) {
-					if (!target.push(FEMString.utf8Value(this.items, offset2))) return false;
+					if (!target.push(utf8Value(this.items, offset2))) return false;
 					length2--;
-					offset2 += FEMString.utf8Size(this.items[offset2]);
+					offset2 += utf8Size(this.items[offset2]);
 				}
 			} else {
-				var offset2 = FEMString.utf8Offset(this.items, this.offset, offset + length);
+				var offset2 = utf8Offset(this.items, this.offset, offset + length);
 				var length2 = length;
 				while (length2 > 0) {
-					while (!FEMString.utf8Header(this.items[--offset2])) {
-						if (!target.push(FEMString.utf8Value(this.items, offset2))) return false;
+					while (!utf8Header(this.items[--offset2])) {
+						if (!target.push(utf8Value(this.items, offset2))) return false;
 					}
 					length2--;
 				}
@@ -1107,7 +1107,7 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 
 		@Override
 		protected FEMString customSection(int offset, int length) {
-			return new CompactStringUTF8(0, this.items, FEMString.utf8Offset(this.items, this.offset, offset), length);
+			return new CompactStringUTF8(0, this.items, utf8Offset(this.items, this.offset, offset), length);
 		}
 
 		private final byte[] items;
@@ -1137,25 +1137,25 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 
 		@Override
 		protected int customGet(int index) throws IndexOutOfBoundsException {
-			return FEMString.utf16Value(this.items, FEMString.utf16Offset(this.items, this.offset, index));
+			return utf16Value(this.items, utf16Offset(this.items, this.offset, index));
 		}
 
 		@Override
 		protected boolean customCollect(Collector target, int offset, int length, boolean foreward) {
 			if (foreward) {
-				var offset2 = FEMString.utf16Offset(this.items, this.offset, offset);
+				var offset2 = utf16Offset(this.items, this.offset, offset);
 				var length2 = length;
 				while (length2 > 0) {
-					if (!target.push(FEMString.utf16Value(this.items, offset2))) return false;
+					if (!target.push(utf16Value(this.items, offset2))) return false;
 					length2--;
-					offset2 += FEMString.utf16Size(this.items[offset2]);
+					offset2 += utf16Size(this.items[offset2]);
 				}
 			} else {
-				var offset2 = FEMString.utf16Offset(this.items, this.offset, offset + length);
+				var offset2 = utf16Offset(this.items, this.offset, offset + length);
 				var length2 = length;
 				while (length2 > 0) {
-					while (!FEMString.utf16Header(this.items[--offset2])) {
-						if (!target.push(FEMString.utf16Value(this.items, offset2))) return false;
+					while (!utf16Header(this.items[--offset2])) {
+						if (!target.push(utf16Value(this.items, offset2))) return false;
 					}
 					length2--;
 				}
@@ -1165,7 +1165,7 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 
 		@Override
 		protected FEMString customSection(int offset, int length) {
-			return new CompactStringUTF16(0, this.items, FEMString.utf16Offset(this.items, this.offset, offset), length);
+			return new CompactStringUTF16(0, this.items, utf16Offset(this.items, this.offset, offset), length);
 		}
 
 		private final char[] items;
@@ -1336,7 +1336,7 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 	private static int utf8Offset(byte[] items, int offset, int count) throws IllegalArgumentException {
 		while (count > 0) {
 			count--;
-			offset += FEMString.utf8Size(items[offset]);
+			offset += utf8Size(items[offset]);
 		}
 		return offset;
 	}
@@ -1353,7 +1353,7 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 		var length2 = offset + length;
 		while (offset2 < length2) {
 			result++;
-			offset2 += FEMString.utf8Size(items[offset2]);
+			offset2 += utf8Size(items[offset2]);
 		}
 		if (offset2 != length2) throw new IllegalArgumentException();
 		return result;
@@ -1403,7 +1403,7 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 	private static int utf16Offset(char[] items, int offset, int count) throws IllegalArgumentException {
 		while (count > 0) {
 			count--;
-			offset += FEMString.utf16Size(items[offset]);
+			offset += utf16Size(items[offset]);
 		}
 		return offset;
 	}
@@ -1421,7 +1421,7 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 		var length2 = offset + length;
 		while (offset2 < length2) {
 			result++;
-			offset2 += FEMString.utf16Size(items[offset2]);
+			offset2 += utf16Size(items[offset2]);
 		}
 		if (offset2 != length2) throw new IllegalArgumentException();
 		return result;
@@ -1439,7 +1439,7 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 	private static FEMString concatAll(FEMString[] values, int min, int max) throws NullPointerException {
 		if (min == max) return values[min];
 		var mid = (min + max) >> 1;
-		return FEMString.concatAll(values, min, mid).concat(FEMString.concatAll(values, mid + 1, max));
+		return concatAll(values, min, mid).concat(concatAll(values, mid + 1, max));
 	}
 
 	private final class ItemIter extends AbstractIterator<Integer> {

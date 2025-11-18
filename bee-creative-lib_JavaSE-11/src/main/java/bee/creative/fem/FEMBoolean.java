@@ -5,11 +5,11 @@ package bee.creative.fem;
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMBoolean implements FEMValue, Comparable<FEMBoolean> {
 
-	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
-	public static final int ID = 3;
-
 	/** Dieses Feld speichert den {@link #type() Datentyp}. */
-	public static final FEMType<FEMBoolean> TYPE = FEMType.from(FEMBoolean.ID);
+	public static final FEMType<FEMBoolean> TYPE = new FEMType<>(FEMBoolean.TYPE_ID);
+
+	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
+	public static final int TYPE_ID = 3;
 
 	/** Dieses Feld speichert den Wahrheitswert {@code true}. */
 	public static final FEMBoolean TRUE = new FEMBoolean(true);
@@ -22,7 +22,7 @@ public final class FEMBoolean implements FEMValue, Comparable<FEMBoolean> {
 	 * @param data Wert.
 	 * @return Wahrheitswert. */
 	public static FEMBoolean from(boolean data) {
-		return data ? FEMBoolean.TRUE : FEMBoolean.FALSE;
+		return data ? TRUE : FALSE;
 	}
 
 	/** Diese Methode gibt einen neuen Wahrheitswert mit dem gegebenen Wert zurück.
@@ -33,7 +33,7 @@ public final class FEMBoolean implements FEMValue, Comparable<FEMBoolean> {
 	 * @return Wahrheitswert.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
 	public static FEMBoolean from(Boolean data) throws NullPointerException {
-		return FEMBoolean.from(data.booleanValue());
+		return from(data.booleanValue());
 	}
 
 	/** Diese Methode gibt einen neuen Wahrheitswert mit dem in der gegebenen Zeichenkette kodierten Wert zurück.
@@ -43,8 +43,8 @@ public final class FEMBoolean implements FEMValue, Comparable<FEMBoolean> {
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist. */
 	public static FEMBoolean from(String value) throws NullPointerException, IllegalArgumentException {
-		if (value.equals("true")) return FEMBoolean.TRUE;
-		if (value.equals("false")) return FEMBoolean.FALSE;
+		if (value.equals("true")) return TRUE;
+		if (value.equals("false")) return FALSE;
 		throw new IllegalArgumentException();
 	}
 
@@ -56,7 +56,7 @@ public final class FEMBoolean implements FEMValue, Comparable<FEMBoolean> {
 
 	@Override
 	public FEMType<FEMBoolean> type() {
-		return FEMBoolean.TYPE;
+		return TYPE;
 	}
 
 	/** Diese Methode gibt die interne Darstellung des Wahrheitswerts zurück. Diese ist ein {@code boolean}.

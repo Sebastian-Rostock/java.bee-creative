@@ -11,7 +11,7 @@ public final class FEMNative implements FEMValue {
 	public static final int ID = -1;
 
 	/** Dieses Feld speichert den {@link #type() Datentyp}. */
-	public static final FEMType<Object> TYPE = FEMType.from(FEMNative.ID);
+	public static final FEMType<Object> TYPE = new FEMType<>(FEMNative.ID);
 
 	/** Dieses Feld speichert den Wert zu {@code null}. */
 	public static final FEMNative NULL = new FEMNative(null);

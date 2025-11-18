@@ -12,10 +12,10 @@ public final class FEMHandler implements FEMValue {
 	public static final int ID = 2;
 
 	/** Dieses Feld speichert den {@link #type() Datentyp}. */
-	public static final FEMType<FEMHandler> TYPE = FEMType.from(FEMHandler.ID);
+	public static final FEMType<FEMHandler> TYPE = new FEMType<>(FEMHandler.ID);
 
-	/** Dieses Feld speichert den Funktionszeiger auf {@link FEMVoid#INSTANCE}. */
-	public static final FEMHandler EMPTY = new FEMHandler(FEMVoid.INSTANCE);
+	/** Dieses Feld speichert den Funktionszeiger auf {@link FEMVoid#VALUE}. */
+	public static final FEMHandler EMPTY = new FEMHandler(FEMVoid.VALUE);
 
 	/** Diese Methode gibt die gegebene Funktion als Funktionszeiger zurück.
 	 *

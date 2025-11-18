@@ -1,6 +1,6 @@
 package bee.creative.fem;
 
-import bee.creative.lang.Objects;
+import static bee.creative.lang.Objects.notNull;
 
 /** Diese Schnittstelle definiert einen Wert, der als Ergebnis der {@link FEMFunction#invoke(FEMFrame) Auswertung} einer {@link FEMFunction Funktion} oder als
  * {@link FEMFrame#get(int) Parameterwert} in einem {@link FEMFrame Stapelrahmen} zur Auswertung einer Funktion verwendet werden kann.
@@ -48,13 +48,13 @@ public interface FEMValue extends FEMFunction {
 
 	@Override
 	default FEMValue invoke(FEMFrame frame) throws NullPointerException {
-		Objects.notNull(frame);
+		notNull(frame);
 		return this;
 	}
 
 	@Override
 	default FEMFunction compose(FEMFunction... params) throws NullPointerException {
-		Objects.notNull(params);
+		notNull(params);
 		return this;
 	}
 
@@ -70,7 +70,7 @@ public interface FEMValue extends FEMFunction {
 
 	@Override
 	default FEMValue toFuture(FEMFrame frame) throws NullPointerException {
-		Objects.notNull(frame);
+		notNull(frame);
 		return this;
 	}
 

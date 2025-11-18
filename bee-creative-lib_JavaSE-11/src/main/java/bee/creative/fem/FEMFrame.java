@@ -99,16 +99,16 @@ public abstract class FEMFrame implements Array2<FEMValue>, UseToString {
 
 	/** Diese Methode ist eine Abkürzung für {@link #newFrame(FEMArray) this.newFrame(FEMArray.from(params))}.
 	 *
-	 * @see FEMArray#femArrayFrom(FEMValue...) */
+	 * @see FEMArray#from(FEMValue...) */
 	public final FEMFrame newFrame(FEMValue... params) throws NullPointerException {
-		return this.newFrame(FEMArray.femArrayFrom(params));
+		return this.newFrame(FEMArray.from(params));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #newFrame(FEMArray) this.newFrame(FEMArray.from(params))}.
 	 *
-	 * @see FEMArray#femArrayFrom(Iterable) */
+	 * @see FEMArray#from(Iterable) */
 	public final FEMFrame newFrame(Iterable<? extends FEMValue> params) throws NullPointerException {
-		return this.newFrame(FEMArray.femArrayFrom(params));
+		return this.newFrame(FEMArray.from(params));
 	}
 
 	/** Diese Methode gibt einen neuen Stapelrahmen zurück, welcher die gegebenen Parameterfunktionen zur Berechnung der {@link #params() zugesicherten
@@ -142,16 +142,16 @@ public abstract class FEMFrame implements Array2<FEMValue>, UseToString {
 
 	/** Diese Methode ist eine Abkürzung für {@link #withParams(FEMArray) this.withParams(FEMArray.from(params))}.
 	 *
-	 * @see FEMArray#femArrayFrom(FEMValue...) */
+	 * @see FEMArray#from(FEMValue...) */
 	public final FEMFrame withParams(FEMValue... params) throws NullPointerException {
-		return this.withParams(FEMArray.femArrayFrom(params));
+		return this.withParams(FEMArray.from(params));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #withParams(FEMArray) this.withParams(FEMArray.from(params))}.
 	 *
-	 * @see FEMArray#femArrayFrom(Iterable) */
+	 * @see FEMArray#from(Iterable) */
 	public final FEMFrame withParams(Iterable<? extends FEMValue> params) throws NullPointerException {
-		return this.withParams(FEMArray.femArrayFrom(params));
+		return this.withParams(FEMArray.from(params));
 	}
 
 	/** Diese Methode gibt diesen Stapelrahmen mit den gegebenen Parameterfunktionen zur Berechnung der {@link #params() zugesicherten Parameterwerte} zurück. Sie

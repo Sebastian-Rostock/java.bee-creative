@@ -1,6 +1,8 @@
 package bee.creative.fem;
 
+import static bee.creative.fem.FEMVoid.VALUE;
 import static bee.creative.lang.Objects.notNull;
+import static bee.creative.util.Iterators.iteratorFromArray;
 import java.util.AbstractMap;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.ArrayList;
@@ -19,25 +21,25 @@ import bee.creative.util.AbstractIterator;
 import bee.creative.util.AbstractList2;
 import bee.creative.util.AbstractSet2;
 import bee.creative.util.Comparators;
+import bee.creative.util.Iterable2;
 import bee.creative.util.Iterables;
 import bee.creative.util.Iterator3;
-import bee.creative.util.Iterators;
 import bee.creative.util.List2;
 import bee.creative.util.Map3;
 
 /** Diese Klasse implementiert eine unveränderliche Auflistung von Werten sowie Methoden zur Erzeugung solcher Wertlisten.
  *
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable<FEMValue>, UseToString {
-
-	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
-	public static final int ID = 1;
+public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable2<FEMValue>, UseToString {
 
 	/** Dieses Feld speichert den {@link #type() Datentyp}. */
-	public static final FEMType<FEMArray> TYPE = FEMType.from(ID);
+	public static final FEMType<FEMArray> TYPE = new FEMType<>(FEMArray.TYPE_ID);
+
+	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
+	public static final int TYPE_ID = 1;
 
 	/** Dieses Feld speichert die leere Wertliste. */
-	public static final FEMArray EMPTY = new UniformArray2(0, FEMVoid.INSTANCE);
+	public static final FEMArray EMPTY = new UniformArray2(0, VALUE);
 
 	/** Diese Methode gibt eine uniforme Wertliste mit der gegebenen Länge zurück, deren Werte alle gleich dem gegebenen sind.
 	 *
@@ -46,20 +48,20 @@ public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable<FE
 	 * @return Wertliste.
 	 * @throws NullPointerException Wenn {@code item} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code length < 0} ist. */
-	public static FEMArray femArrayFrom(int length, FEMValue item) throws NullPointerException, IllegalArgumentException {
+	public static FEMArray from(int length, FEMValue item) throws NullPointerException, IllegalArgumentException {
 		notNull(item);
 		if (length == 0) return EMPTY;
 		return new UniformArray(length, item);
 	}
 
-	/** Diese Methode konvertiert die gegebenen Werte in eine Wertliste und gibt diese zurück und ist eine Abkürzung für
-	 * {@link #femArrayFrom(boolean, FEMValue...) FEMArray.from(true, items)}
+	/** Diese Methode konvertiert die gegebenen Werte in eine Wertliste und gibt diese zurück und ist eine Abkürzung für {@link #from(boolean, FEMValue...)
+	 * FEMArray.from(true, items)}
 	 *
 	 * @param items Werte.
 	 * @return Wertliste.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist oder enthält. */
-	public static FEMArray femArrayFrom(FEMValue... items) throws NullPointerException {
-		return femArrayFrom(true, items);
+	public static FEMArray from(FEMValue... items) throws NullPointerException {
+		return from(true, items);
 	}
 
 	/** Diese Methode konvertiert die gegebenen Werte in eine Wertliste und gibt diese zurück.
@@ -68,7 +70,7 @@ public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable<FE
 	 * @param items Werte.
 	 * @return Wertliste.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist oder enthält. */
-	public static FEMArray femArrayFrom(boolean copy, FEMValue... items) throws NullPointerException {
+	public static FEMArray from(boolean copy, FEMValue... items) throws NullPointerException {
 		if (items.length == 0) return FEMArray.EMPTY;
 		if (items.length == 1) return new UniformArray(1, items[0]);
 		return new CompactArray(copy ? items.clone() : items);
@@ -82,7 +84,7 @@ public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable<FE
 	 * @return Wertliste.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist oder der Abschnitt {@code null} enthält.
 	 * @throws IllegalArgumentException Wenn der Abschnitt ungültig ist. */
-	public static FEMArray femArrayFrom(FEMValue[] items, int offset, int length) throws NullPointerException, IllegalArgumentException {
+	public static FEMArray from(FEMValue[] items, int offset, int length) throws NullPointerException, IllegalArgumentException {
 		if ((offset < 0) || (length < 0) || ((offset + length) > items.length)) throw new IllegalArgumentException();
 		if (length == 0) return FEMArray.EMPTY;
 		if (length == 1) return new UniformArray(1, notNull(items[offset]));
@@ -93,14 +95,14 @@ public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable<FE
 
 	/** Diese Methode konvertiert die gegebenen Werte in eine Wertliste und gibt diese zurück.
 	 *
-	 * @see #femArrayFrom(FEMValue...)
+	 * @see #from(FEMValue...)
 	 * @see Iterables#toArray(Iterable, Object[])
 	 * @param items Werte.
 	 * @return Wertliste.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
-	public static FEMArray femArrayFrom(Iterable<? extends FEMValue> items) throws NullPointerException {
+	public static FEMArray from(Iterable<? extends FEMValue> items) throws NullPointerException {
 		if (items instanceof FEMArray) return (FEMArray)items;
-		return femArrayFrom(Iterables.toArray(items, new FEMValue[0]));
+		return from(Iterables.toArray(items, new FEMValue[0]));
 	}
 
 	/** Diese Methode überführt die {@link Entry Einträge} der gegebenen {@link Map Abbildung} in eine {@link #compact(boolean) indizierte Schlüsselliste} sowie
@@ -110,7 +112,7 @@ public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable<FE
 	 * @param entries Abbildung.
 	 * @return Wertliste mit Schlüsselliste und Wertliste.
 	 * @throws NullPointerException Wenn {@code entries} {@code null} ist. */
-	public static FEMArray femArrayFrom(Map<? extends FEMValue, ? extends FEMValue> entries) throws NullPointerException {
+	public static FEMArray from(Map<? extends FEMValue, ? extends FEMValue> entries) throws NullPointerException {
 		if (entries instanceof ItemMap) return ((ItemMap)entries).toArray();
 		var keys = new ArrayList<FEMValue>();
 		var values = new ArrayList<FEMValue>();
@@ -118,7 +120,7 @@ public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable<FE
 			keys.add(entry.getKey());
 			values.add(entry.getValue());
 		}
-		return femArrayFrom(femArrayFrom(keys).compact(true), femArrayFrom(values).compact());
+		return from(from(keys).compact(true), from(values).compact());
 	}
 
 	/** Diese Methode gibt die Verkettung der gegebenen Wertlisten zurück.
@@ -149,7 +151,7 @@ public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable<FE
 	 *
 	 * @return Array mit den Werten dieser Wertliste. */
 	public FEMValue[] value() {
-		final var target = new ValueCollector(new FEMValue[this.length], 0);
+		final var target = new GetValue(new FEMValue[this.length], 0);
 		this.extract(target);
 		return target.array;
 	}
@@ -208,9 +210,9 @@ public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable<FE
 	}
 
 	/** Diese Methode gibt diese Wertliste mit optimierter Leistungsfähigkeit des {@link #get(int) Wertzugriffs} zurück. Wenn die Wertliste diesbezüglich
-	 * optimiert werden kann, wird grundsätzlich eine Abschrift der {@link #value() Werte} dieser Wertliste analog zu {@link #femArrayFrom(FEMValue...)
-	 * from(values())} geliefert. Wenn die Indizierung aktiviert ist, wird auch die Leistungsfähigkeit der {@link #find(FEMValue, int) Wertsuche} optimiert.
-	 * Hierbei wird grundsätzlich eine Streuwerttabelle angelegt, welche den Speicherverbrauch der Wertliste vervierfachen kann.
+	 * optimiert werden kann, wird grundsätzlich eine Abschrift der {@link #value() Werte} dieser Wertliste analog zu {@link #from(FEMValue...) from(values())}
+	 * geliefert. Wenn die Indizierung aktiviert ist, wird auch die Leistungsfähigkeit der {@link #find(FEMValue, int) Wertsuche} optimiert. Hierbei wird
+	 * grundsätzlich eine Streuwerttabelle angelegt, welche den Speicherverbrauch der Wertliste vervierfachen kann.
 	 *
 	 * @param index {@code true}, wenn die Einzelwertsuche beschleunigt werden sollen.
 	 * @return performantere Wertliste oder {@code this}. */
@@ -272,7 +274,7 @@ public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable<FE
 	 * @throws IllegalArgumentException Wenn der Abschitt außerhalb des gegebenen Arrays liegt. */
 	public final void extract(FEMValue[] result, int offset) throws NullPointerException, IllegalArgumentException {
 		if ((offset < 0) || ((offset + this.length) > result.length)) throw new IllegalArgumentException();
-		this.extract(new ValueCollector(result, offset));
+		this.extract(new GetValue(result, offset));
 	}
 
 	/** Diese Methode gibt den {@code index}-ten Wert zurück. */
@@ -289,7 +291,7 @@ public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable<FE
 
 	@Override
 	public int hashCode() {
-		var collector = new HashCollector();
+		var collector = new GetHash();
 		this.extract(collector);
 		var result = collector.hash;
 		return result != 0 ? result : -1;
@@ -308,7 +310,7 @@ public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable<FE
 
 	@Override
 	public Iterator3<FEMValue> iterator() {
-		return Iterators.iteratorFromArray(this, 0, this.length);
+		return iteratorFromArray(this, 0, this.length);
 	}
 
 	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn die lexikographische Ordnung dieser Wertliste kleiner, gleich oder größer als die
@@ -329,9 +331,9 @@ public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable<FE
 	}
 
 	/** Diese Methode gibt eine unveränderliche {@link Map} als Sicht auf die Schlüssel- und Wertlisten zurück, aus denen diese Wertliste besteht.<br>
-	 * Sie ist damit die Umkehroperation zu {@link #femArrayFrom(Map)}. Der {@link Entry#getKey() Schlüssel} eines {@link Entry Eintrags} befindet sich in
-	 * {@code keys} an der Position, an der sich in {@code values} der zugeordnete {@link Entry#getValue() Wert} befindet. Die Schlüssel sollten zur effizienten
-	 * Suche {@link #compact(boolean) indiziert} sein.
+	 * Sie ist damit die Umkehroperation zu {@link #from(Map)}. Der {@link Entry#getKey() Schlüssel} eines {@link Entry Eintrags} befindet sich in {@code keys} an
+	 * der Position, an der sich in {@code values} der zugeordnete {@link Entry#getValue() Wert} befindet. Die Schlüssel sollten zur effizienten Suche
+	 * {@link #compact(boolean) indiziert} sein.
 	 *
 	 * @return {@link Map}-Sicht.
 	 * @throws IllegalArgumentException Wenn diese Wertliste nicth aus zwei Wertlisten besteht oder die Längen dieser Wertlisten ungleich sind. */
@@ -384,7 +386,7 @@ public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable<FE
 	 *
 	 * @return {@code true} bei Uniformität. */
 	public boolean isUniform() {
-		return this.isEmpty() || this.extract(new UniformCollector(this.customGet(0)));
+		return this.isEmpty() || this.extract(new GetUniform(this.customGet(0)));
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn die Kompaktierung aktiviert, d.h die Leistungsfähigkeit des {@link #get(int) Wertzugriffs} optimiert
@@ -431,7 +433,118 @@ public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable<FE
 
 	}
 
-	public static class ConcatArray extends HashArray implements Emuable {
+	/** Dieses Feld speichert die Länge. */
+	protected final int length;
+
+	/** Dieser Konstruktor initialisiert die Länge.
+	 *
+	 * @param length Länge.
+	 * @throws IllegalArgumentException Wenn {@code length < 0} ist. */
+	protected FEMArray(int length) throws IllegalArgumentException {
+		if (length < 0) throw new IllegalArgumentException();
+		this.length = length;
+	}
+
+	/** Diese Methode gibt den {@code index}-ten Wert zurück.
+	 *
+	 * @param index Index.
+	 * @return {@code index}-ter Wert. */
+	protected abstract FEMValue customGet(int index);
+
+	/** Diese Methode gibt die Position des ersten Vorkommens der gegebenen Wertliste innerhalb dieser Wertliste zurück. Sie Implementiert
+	 * {@link #find(FEMArray, int)} ohne Wertebereichsprüfung.
+	 *
+	 * @param that nicht leere gesuchte Wertliste.
+	 * @param offset Position, an der die Suche beginnt ({@code 0..this.length()}).
+	 * @return Position des ersten Vorkommens der gegebene Wertliste ({@code offset..this.length()-that.length()}) oder {@code -1}.
+	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
+	protected int customFind(FEMArray that, int offset) {
+		var value = that.customGet(0);
+		var count = (this.length - that.length) + 1;
+		for (var result = offset; true; result++) {
+			result = this.customFind(value, result, count - result, true);
+			if (result < 0) return -1;
+			if (this.customEquals(that, result)) return result;
+		}
+	}
+
+	/** Diese Methode gibt die Position des ersten Vorkommens des gegebenen Werts im gegebenen Abschnitt zurück. Sie Implementiert {@link #find(FEMValue, int)}
+	 * ohne Wertebereichsprüfung.
+	 *
+	 * @param that gesuchter Wert.
+	 * @param offset Position, an welcher der Abschnitt beginnt.
+	 * @param length Anzahl der Werte im Abschnitt.
+	 * @return Position des ersten Vorkommens des gegebenen Werts oder {@code -1}.
+	 * @param foreward {@code true}, wenn die Reihenfolge vorwärts ist, bzw. {@code false}, wenn sie rückwärts ist. */
+	protected int customFind(FEMValue that, int offset, int length, boolean foreward) {
+		var finder = new ItemFinder(that);
+		if (this.customExtract(finder, offset, length, foreward)) return -1;
+		return foreward ? (finder.index + offset) : (length - finder.index - 1);
+	}
+
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Wertliste gleich der gegebenen ist. Sie Implementiert {@link #equals(Object)}. **/
+	protected boolean customEquals(FEMArray that) throws NullPointerException {
+		if (this == that) return true;
+		if ((this.length != that.length) || (this.hashCode() != that.hashCode())) return false;
+		return this.customEquals(that, 0);
+	}
+
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn die gegebenen Wertliste an der gegebenen Position in dieser Wertliste liegt. */
+	protected boolean customEquals(FEMArray that, int offset) {
+		var length = that.length;
+		for (var i = 0; i < length; i++) {
+			if (!this.customGet(offset + i).equals(that.customGet(i))) return false;
+		}
+		return true;
+	}
+
+	/** Diese Methode fügt alle Werte im gegebenen Abschnitt in der gegebenen Reihenfolge geordnet an den gegebenen {@link Collector} an. Das Anfügen wird
+	 * vorzeitig abgebrochen, wenn {@link Collector#push(FEMValue)} {@code false} liefert.
+	 *
+	 * @param target {@link Collector}, an den die Werte geordnet angefügt werden.
+	 * @param offset Position, an welcher der Abschnitt beginnt.
+	 * @param length Anzahl der Werte im Abschnitt.
+	 * @param foreward {@code true}, wenn die Reihenfolge vorwärts ist, bzw. {@code false}, wenn sie rückwärts ist.
+	 * @return {@code false}, wenn das Anfügen vorzeitig abgebrochen wurde. */
+	protected boolean customExtract(Collector target, int offset, int length, boolean foreward) {
+		if (foreward) {
+			for (length += offset; offset < length; offset++) {
+				if (!target.push(this.customGet(offset))) return false;
+			}
+		} else {
+			for (length += offset - 1; offset <= length; length--) {
+				if (!target.push(this.customGet(length))) return false;
+			}
+		}
+		return true;
+	}
+
+	/** Diese Methode gibt eine Sicht auf einen Abschnitt dieser Wertliste zurück. Sie Implementiert {@link #section(int, int)} ohne Wertebereichsprüfung.
+	 *
+	 * @param offset Position, an welcher der Abschnitt beginnt.
+	 * @param length Anzahl der Werte im Abschnitt.
+	 * @return {@link FEMArray}-Sicht auf einen Abschnitt dieser Wertliste. */
+	protected FEMArray customSection(int offset, int length) {
+		return new SectionArray(this, offset, length);
+	}
+
+	static FEMArray concatAll(FEMArray[] values, int min, int max) throws NullPointerException {
+		if (min == max) return values[min];
+		var mid = (min + max) >> 1;
+		return concatAll(values, min, mid).concat(concatAll(values, mid + 1, max));
+	}
+
+	int findLast(Object key) {
+		if ((this.length == 0) || !(key instanceof FEMValue)) return -1;
+		return this.customFind((FEMValue)key, 0, this.length, false);
+	}
+
+	int findFirst(Object key) {
+		if ((this.length == 0) || !(key instanceof FEMValue)) return -1;
+		return this.customFind((FEMValue)key, 0, this.length, true);
+	}
+
+	static class ConcatArray extends HashArray implements Emuable {
 
 		@Override
 		public long emu() {
@@ -535,7 +648,7 @@ public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable<FE
 
 	}
 
-	public static class ConcatArray1 extends ConcatArray {
+	static class ConcatArray1 extends ConcatArray {
 
 		ConcatArray1(FEMArray array1, FEMArray array2) throws IllegalArgumentException {
 			super(array1, array2);
@@ -543,7 +656,7 @@ public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable<FE
 
 	}
 
-	public static class ConcatArray2 extends ConcatArray {
+	static class ConcatArray2 extends ConcatArray {
 
 		ConcatArray2(FEMArray array1, FEMArray array2) throws IllegalArgumentException {
 			super(array1, array2);
@@ -551,7 +664,7 @@ public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable<FE
 
 	}
 
-	public static class SectionArray extends HashArray implements Emuable {
+	static class SectionArray extends HashArray implements Emuable {
 
 		@Override
 		public long emu() {
@@ -596,7 +709,7 @@ public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable<FE
 
 	}
 
-	public static class ReverseArray extends HashArray implements Emuable {
+	static class ReverseArray extends HashArray implements Emuable {
 
 		@Override
 		public long emu() {
@@ -648,7 +761,7 @@ public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable<FE
 
 	}
 
-	public static class UniformArray extends HashArray {
+	static class UniformArray extends HashArray {
 
 		@Override
 		public FEMArray reverse() {
@@ -708,7 +821,7 @@ public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable<FE
 
 	}
 
-	public static class UniformArray2 extends UniformArray {
+	static class UniformArray2 extends UniformArray {
 
 		@Override
 		public FEMArray result(boolean deep) {
@@ -721,7 +834,7 @@ public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable<FE
 
 	}
 
-	public static class CompactArray extends HashArray implements Emuable {
+	static class CompactArray extends HashArray implements Emuable {
 
 		@Override
 		public long emu() {
@@ -772,7 +885,7 @@ public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable<FE
 
 	}
 
-	public static class CompactArray2 extends CompactArray {
+	static class CompactArray2 extends CompactArray {
 
 		@Override
 		public FEMArray result(boolean deep) {
@@ -788,7 +901,7 @@ public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable<FE
 
 	}
 
-	public static class CompactArray3 extends CompactArray2 {
+	static class CompactArray3 extends CompactArray2 {
 
 		@Override
 		public long emu() {
@@ -863,118 +976,7 @@ public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable<FE
 
 	}
 
-	/** Dieses Feld speichert die Länge. */
-	protected final int length;
-
-	/** Dieser Konstruktor initialisiert die Länge.
-	 *
-	 * @param length Länge.
-	 * @throws IllegalArgumentException Wenn {@code length < 0} ist. */
-	protected FEMArray(int length) throws IllegalArgumentException {
-		if (length < 0) throw new IllegalArgumentException();
-		this.length = length;
-	}
-
-	/** Diese Methode gibt den {@code index}-ten Wert zurück.
-	 *
-	 * @param index Index.
-	 * @return {@code index}-ter Wert. */
-	protected abstract FEMValue customGet(int index);
-
-	/** Diese Methode gibt die Position des ersten Vorkommens der gegebenen Wertliste innerhalb dieser Wertliste zurück. Sie Implementiert
-	 * {@link #find(FEMArray, int)} ohne Wertebereichsprüfung.
-	 *
-	 * @param that nicht leere gesuchte Wertliste.
-	 * @param offset Position, an der die Suche beginnt ({@code 0..this.length()}).
-	 * @return Position des ersten Vorkommens der gegebene Wertliste ({@code offset..this.length()-that.length()}) oder {@code -1}.
-	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
-	protected int customFind(FEMArray that, int offset) {
-		var value = that.customGet(0);
-		var count = (this.length - that.length) + 1;
-		for (var result = offset; true; result++) {
-			result = this.customFind(value, result, count - result, true);
-			if (result < 0) return -1;
-			if (this.customEquals(that, result)) return result;
-		}
-	}
-
-	/** Diese Methode gibt die Position des ersten Vorkommens des gegebenen Werts im gegebenen Abschnitt zurück. Sie Implementiert {@link #find(FEMValue, int)}
-	 * ohne Wertebereichsprüfung.
-	 *
-	 * @param that gesuchter Wert.
-	 * @param offset Position, an welcher der Abschnitt beginnt.
-	 * @param length Anzahl der Werte im Abschnitt.
-	 * @return Position des ersten Vorkommens des gegebenen Werts oder {@code -1}.
-	 * @param foreward {@code true}, wenn die Reihenfolge vorwärts ist, bzw. {@code false}, wenn sie rückwärts ist. */
-	protected int customFind(FEMValue that, int offset, int length, boolean foreward) {
-		var finder = new ItemFinder(that);
-		if (this.customExtract(finder, offset, length, foreward)) return -1;
-		return foreward ? (finder.index + offset) : (length - finder.index - 1);
-	}
-
-	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Wertliste gleich der gegebenen ist. Sie Implementiert {@link #equals(Object)}. **/
-	protected boolean customEquals(FEMArray that) throws NullPointerException {
-		if (this == that) return true;
-		if ((this.length != that.length) || (this.hashCode() != that.hashCode())) return false;
-		return this.customEquals(that, 0);
-	}
-
-	/** Diese Methode gibt nur dann {@code true} zurück, wenn die gegebenen Wertliste an der gegebenen Position in dieser Wertliste liegt. */
-	protected boolean customEquals(FEMArray that, int offset) {
-		var length = that.length;
-		for (var i = 0; i < length; i++) {
-			if (!this.customGet(offset + i).equals(that.customGet(i))) return false;
-		}
-		return true;
-	}
-
-	/** Diese Methode fügt alle Werte im gegebenen Abschnitt in der gegebenen Reihenfolge geordnet an den gegebenen {@link Collector} an. Das Anfügen wird
-	 * vorzeitig abgebrochen, wenn {@link Collector#push(FEMValue)} {@code false} liefert.
-	 *
-	 * @param target {@link Collector}, an den die Werte geordnet angefügt werden.
-	 * @param offset Position, an welcher der Abschnitt beginnt.
-	 * @param length Anzahl der Werte im Abschnitt.
-	 * @param foreward {@code true}, wenn die Reihenfolge vorwärts ist, bzw. {@code false}, wenn sie rückwärts ist.
-	 * @return {@code false}, wenn das Anfügen vorzeitig abgebrochen wurde. */
-	protected boolean customExtract(Collector target, int offset, int length, boolean foreward) {
-		if (foreward) {
-			for (length += offset; offset < length; offset++) {
-				if (!target.push(this.customGet(offset))) return false;
-			}
-		} else {
-			for (length += offset - 1; offset <= length; length--) {
-				if (!target.push(this.customGet(length))) return false;
-			}
-		}
-		return true;
-	}
-
-	/** Diese Methode gibt eine Sicht auf einen Abschnitt dieser Wertliste zurück. Sie Implementiert {@link #section(int, int)} ohne Wertebereichsprüfung.
-	 *
-	 * @param offset Position, an welcher der Abschnitt beginnt.
-	 * @param length Anzahl der Werte im Abschnitt.
-	 * @return {@link FEMArray}-Sicht auf einen Abschnitt dieser Wertliste. */
-	protected FEMArray customSection(int offset, int length) {
-		return new SectionArray(this, offset, length);
-	}
-
-	int findLast(Object key) {
-		if ((this.length == 0) || !(key instanceof FEMValue)) return -1;
-		return this.customFind((FEMValue)key, 0, this.length, false);
-	}
-
-	int findFirst(Object key) {
-		if ((this.length == 0) || !(key instanceof FEMValue)) return -1;
-		return this.customFind((FEMValue)key, 0, this.length, true);
-	}
-
-	private static FEMArray concatAll(FEMArray[] values, int min, int max) throws NullPointerException {
-		if (min == max) return values[min];
-		var mid = (min + max) >> 1;
-		return concatAll(values, min, mid).concat(concatAll(values, mid + 1, max));
-	}
-
-	private static class ItemMap implements Map3<FEMValue, FEMValue>, Emuable {
+	static class ItemMap implements Map3<FEMValue, FEMValue>, Emuable {
 
 		public final FEMArray keys;
 
@@ -1064,7 +1066,7 @@ public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable<FE
 		}
 
 		public FEMArray toArray() {
-			return femArrayFrom(this.keys, this.values);
+			return from(this.keys, this.values);
 		}
 
 		@Override
@@ -1173,7 +1175,7 @@ public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable<FE
 
 	}
 
-	private static class ItemList extends AbstractList2<FEMValue> implements RandomAccess, Emuable {
+	static class ItemList extends AbstractList2<FEMValue> implements RandomAccess, Emuable {
 
 		public final FEMArray items;
 
@@ -1223,7 +1225,7 @@ public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable<FE
 
 	}
 
-	private static class ItemFinder implements Collector {
+	static class ItemFinder implements Collector {
 
 		public final FEMValue value;
 
@@ -1242,7 +1244,7 @@ public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable<FE
 
 	}
 
-	private static class HashCollector implements Collector {
+	static class GetHash implements Collector {
 
 		public int hash = Objects.hashInit();
 
@@ -1254,13 +1256,13 @@ public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable<FE
 
 	}
 
-	private static class ValueCollector implements Collector {
+	static class GetValue implements Collector {
 
 		public final FEMValue[] array;
 
 		public int index;
 
-		public ValueCollector(FEMValue[] array, int index) {
+		public GetValue(FEMValue[] array, int index) {
 			this.array = array;
 			this.index = index;
 		}
@@ -1273,11 +1275,11 @@ public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable<FE
 
 	}
 
-	private static class UniformCollector implements Collector {
+	static class GetUniform implements Collector {
 
 		public FEMValue value;
 
-		public UniformCollector(FEMValue value) {
+		public GetUniform(FEMValue value) {
 			this.value = value;
 		}
 

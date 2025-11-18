@@ -1,5 +1,6 @@
 package bee.creative.fem;
 
+import static bee.creative.lang.Objects.notNull;
 import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert ein Überwachungsobjekt zur Verwaltung der Zustandsdaten bei der Verfolgung und Überwachung der Verarbeitung von Funktionen.
@@ -51,7 +52,7 @@ public final class FEMTracer {
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
 	public FEMTracer useListener(Listener value) throws NullPointerException {
-		this.listener = Objects.notNull(value);
+		this.listener = notNull(value);
 		return this;
 	}
 
@@ -62,7 +63,7 @@ public final class FEMTracer {
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
 	public FEMTracer useResult(FEMValue value) throws NullPointerException {
-		this.result = Objects.notNull(value);
+		this.result = notNull(value);
 		this.exception = null;
 		return this;
 	}
@@ -74,7 +75,7 @@ public final class FEMTracer {
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
 	public FEMTracer useFrame(FEMFrame value) throws NullPointerException {
-		this.frame = Objects.notNull(value);
+		this.frame = notNull(value);
 		return this;
 	}
 
@@ -84,7 +85,7 @@ public final class FEMTracer {
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
 	public FEMTracer useFunction(FEMFunction value) throws NullPointerException {
-		this.function = Objects.notNull(value);
+		this.function = notNull(value);
 		return this;
 	}
 
@@ -95,7 +96,7 @@ public final class FEMTracer {
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
 	public FEMTracer useException(RuntimeException value) throws NullPointerException {
-		this.exception = Objects.notNull(value);
+		this.exception = notNull(value);
 		this.result = null;
 		return this;
 	}

@@ -12,7 +12,7 @@ public final class FEMInteger implements FEMValue, Comparable<FEMInteger> {
 	public static final int ID = 6;
 
 	/** Dieses Feld speichert den {@link #type() Datentyp}. */
-	public static final FEMType<FEMInteger> TYPE = FEMType.from(FEMInteger.ID);
+	public static final FEMType<FEMInteger> TYPE = new FEMType<>(FEMInteger.ID);
 
 	/** Dieses Feld speichert die Dezimalzahl {@code 0}. */
 	public static final FEMInteger EMPTY = new FEMInteger(0);
@@ -27,7 +27,7 @@ public final class FEMInteger implements FEMValue, Comparable<FEMInteger> {
 	 *
 	 * @param value Wert.
 	 * @return Dezimalzahl. */
-	public static FEMInteger from(long value) {
+	public static FEMInteger femIntegerFrom(long value) {
 		return new FEMInteger(value);
 	}
 
@@ -36,8 +36,8 @@ public final class FEMInteger implements FEMValue, Comparable<FEMInteger> {
 	 * @param value Wert.
 	 * @return Dezimalzahl.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-	public static FEMInteger from(Number value) throws NullPointerException {
-		return new FEMInteger(value.longValue());
+	public static FEMInteger femIntegerFrom(Number value) throws NullPointerException {
+		return femIntegerFrom(value.longValue());
 	}
 
 	/** Diese Methode gibt eine neue Dezimalzahl mit dem in der gegebenen Zeichenkette kodierten Wert zurück. Das Format der Zeichenkette entspricht dem der
@@ -49,9 +49,9 @@ public final class FEMInteger implements FEMValue, Comparable<FEMInteger> {
 	 * @return Dezimalzahl.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist. */
-	public static FEMInteger from(String value) throws NullPointerException, IllegalArgumentException {
+	public static FEMInteger femIntegerFrom(String value) throws NullPointerException, IllegalArgumentException {
 		try {
-			return FEMInteger.from(Long.parseLong(value));
+			return femIntegerFrom(Long.parseLong(value));
 		} catch (NumberFormatException cause) {
 			throw new IllegalArgumentException(cause);
 		}
@@ -65,7 +65,7 @@ public final class FEMInteger implements FEMValue, Comparable<FEMInteger> {
 
 	@Override
 	public FEMType<FEMInteger> type() {
-		return FEMInteger.TYPE;
+		return TYPE;
 	}
 
 	/** Diese Methode gibt die interne Darstellung der Dezimalzahl zurück.

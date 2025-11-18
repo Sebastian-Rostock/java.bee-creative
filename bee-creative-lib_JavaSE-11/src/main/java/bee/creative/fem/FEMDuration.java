@@ -27,7 +27,7 @@ public final class FEMDuration implements FEMValue, Comparable<FEMDuration> {
 	public static final int ID = 8;
 
 	/** Dieses Feld speichert den {@link #type() Datentyp}. */
-	public static final FEMType<FEMDuration> TYPE = FEMType.from(FEMDuration.ID);
+	public static final FEMType<FEMDuration> TYPE = new FEMType<>(FEMDuration.ID);
 
 	/** Dieses Feld speichert die leere Zeitspanne, deren Komponenten {@code 0} sind. */
 	public static final FEMDuration EMPTY = new FEMDuration(0, 0);

@@ -11,7 +11,7 @@ public final class FEMDecimal implements FEMValue, Comparable<FEMDecimal> {
 	public static final int ID = 7;
 
 	/** Dieses Feld speichert den {@link #type() Datentyp}. */
-	public static final FEMType<FEMDecimal> TYPE = FEMType.from(FEMDecimal.ID);
+	public static final FEMType<FEMDecimal> TYPE = new FEMType<>(FEMDecimal.ID);
 
 	/** Dieses Feld speichert den Dezimalbruch {@code NaN}. */
 	public static final FEMDecimal EMPTY = new FEMDecimal(Double.NaN);

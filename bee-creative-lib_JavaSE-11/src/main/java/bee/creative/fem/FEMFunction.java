@@ -1,5 +1,6 @@
 package bee.creative.fem;
 
+import static bee.creative.lang.Objects.notNull;
 import bee.creative.lang.Objects;
 import bee.creative.util.Iterables;
 
@@ -160,7 +161,7 @@ public interface FEMFunction {
 		final FEMFunction target;
 
 		TraceFunction(FEMTracer tracer, FEMFunction target) throws NullPointerException {
-			this.tracer = Objects.notNull(tracer);
+			this.tracer = notNull(tracer);
 			this.target = target;
 		}
 

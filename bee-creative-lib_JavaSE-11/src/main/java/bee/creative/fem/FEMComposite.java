@@ -1,13 +1,12 @@
 package bee.creative.fem;
 
-import java.util.Iterator;
+import static bee.creative.lang.Objects.notNull;
 import bee.creative.emu.EMU;
 import bee.creative.emu.Emuable;
 import bee.creative.fem.FEMFunction.BaseFunction;
 import bee.creative.lang.Array2;
 import bee.creative.lang.Objects;
 import bee.creative.lang.Objects.UseToString;
-import bee.creative.util.Iterators;
 
 /** Diese Klasse implementiert eine komponierte Funktion, welche eine {@link #target() gegebene Funktion} mit den {@link #params() gegebenen
  * Parameterfunktionen} aufruft. Der Ergebniswert der komponierten Funktion zu einem gegebenen {@link FEMFrame Stapelrahmen} {@code frame} ist dazu von der
@@ -27,10 +26,10 @@ public abstract class FEMComposite extends BaseFunction implements Emuable, Arra
 	 * @param params Parameterfunktionen.
 	 * @return komponierte Funktion. */
 	public static FEMComposite from(boolean concat, FEMFunction target, FEMFunction[] params) throws NullPointerException {
-		return concat ? new FEMCompositeT(target, params) : new FEMCompositeF(target, params);
+		return concat ? new FEMCompositeT(notNull(target), params.clone()) : new FEMCompositeF(notNull(target), params.clone());
 	}
 
-	/** Diese Methode gibt den {@code index}-ten Kindabschnitt zurück. */
+	/** Diese Methode liefert die {@code index}-te Parameterfunktion. */
 	@Override
 	public final FEMFunction get(int index) throws IndexOutOfBoundsException {
 		return this.params[index];
@@ -70,16 +69,17 @@ public abstract class FEMComposite extends BaseFunction implements Emuable, Arra
 
 	@Override
 	public final FEMComposite trace(FEMTracer tracer) throws NullPointerException {
-		var params = this.params.clone();
+		var result = from(this.isConcat(), this.target.trace(tracer), this.params);
+		var params = result.params;
 		for (var i = 0; i < params.length; i++) {
 			params[i] = params[i].trace(tracer);
 		}
-		return FEMComposite.from(this.isConcat(), this.target.trace(tracer), params);
+		return result;
 	}
 
 	@Override
 	public final FEMFunction compose(FEMFunction... params) throws NullPointerException {
-		return FEMComposite.from(true, this, params.clone());
+		return new FEMCompositeT(this, params.clone());
 	}
 
 	@Override
@@ -99,15 +99,15 @@ public abstract class FEMComposite extends BaseFunction implements Emuable, Arra
 			&& Objects.equals(this.params, that.params);
 	}
 
+	int hash;
+
 	final FEMFunction target;
 
 	final FEMFunction[] params;
 
-	int hash;
-
 	FEMComposite(FEMFunction target, FEMFunction[] params) {
-		this.target = Objects.notNull(target);
-		this.params = params.clone();
+		this.target = target;
+		this.params = params;
 	}
 
 	static final class FEMCompositeF extends FEMComposite {

@@ -3,6 +3,7 @@ package bee.creative.fem;
 import static bee.creative.lang.Integers.toInt;
 import static bee.creative.lang.Integers.toLong;
 import static bee.creative.lang.Integers.toShort;
+import static bee.creative.util.Iterators.iteratorFromArray;
 import java.nio.ByteOrder;
 import java.util.AbstractList;
 import java.util.Iterator;
@@ -12,20 +13,20 @@ import bee.creative.emu.EMU;
 import bee.creative.emu.Emuable;
 import bee.creative.lang.Objects;
 import bee.creative.lang.Objects.UseToString;
-import bee.creative.util.AbstractIterator;
 import bee.creative.util.Comparators;
+import bee.creative.util.Iterable2;
 import bee.creative.util.Iterables;
 
 /** Diese Klasse implementiert eine unveränderliche Bytefolge sowie Methoden zur Erzeugung solcher Bytefolgen aus nativen Arrays.
  *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public abstract class FEMBinary implements FEMValue, Iterable<Byte>, Comparable<FEMBinary>, UseToString {
+public abstract class FEMBinary implements FEMValue, Iterable2<Byte>, Comparable<FEMBinary>, UseToString {
 
 	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
 	public static final int ID = 5;
 
 	/** Dieses Feld speichert den {@link #type() Datentyp}. */
-	public static final FEMType<FEMBinary> TYPE = FEMType.from(ID);
+	public static final FEMType<FEMBinary> TYPE = new FEMType<>(ID);
 
 	/** Dieses Feld speichert die leere Bytefolge. */
 	public static final FEMBinary EMPTY = new UniformBinary(0, (byte)0);
@@ -36,21 +37,21 @@ public abstract class FEMBinary implements FEMValue, Iterable<Byte>, Comparable<
 	 * @param item Wert jedes Byte der Bytefolge.
 	 * @return Bytefolge.
 	 * @throws IllegalArgumentException Wenn {@code length < 0} ist. */
-	public static FEMBinary femBinaryFrom(int length, byte item) throws IllegalArgumentException {
+	public static FEMBinary from(int length, byte item) throws IllegalArgumentException {
 		if (length == 0) return EMPTY;
 		return new UniformBinary(length, item);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #femBinaryFrom(boolean, byte[], int, int) FEMBinary.from(true, items, 0, items.length)}.
+	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, byte[], int, int) FEMBinary.from(true, items, 0, items.length)}.
 	 *
 	 * @param items Bytes.
 	 * @return Bytefolge.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
-	public static FEMBinary femBinaryFrom(byte[] items) throws NullPointerException {
-		return femBinaryFrom(true, items, 0, items.length);
+	public static FEMBinary from(byte[] items) throws NullPointerException {
+		return from(true, items, 0, items.length);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #femBinaryFrom(boolean, byte[], int, int) FEMBinary.from(true, items, offset, length)}.
+	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, byte[], int, int) FEMBinary.from(true, items, offset, length)}.
 	 *
 	 * @param items Bytes.
 	 * @param offset Beginn des Abschnitts.
@@ -58,18 +59,18 @@ public abstract class FEMBinary implements FEMValue, Iterable<Byte>, Comparable<
 	 * @return Bytefolge.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn der Abschnitt ungültig ist. */
-	public static FEMBinary femBinaryFrom(byte[] items, int offset, int length) throws NullPointerException, IllegalArgumentException {
-		return femBinaryFrom(true, items, offset, length);
+	public static FEMBinary from(byte[] items, int offset, int length) throws NullPointerException, IllegalArgumentException {
+		return from(true, items, offset, length);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #femBinaryFrom(boolean, byte[], int, int) FEMBinary.from(copy, items, offset, length)}.
+	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, byte[], int, int) FEMBinary.from(copy, items, offset, length)}.
 	 *
 	 * @param copy {@code true}, wenn das gegebene Array kopiert werden soll.
 	 * @param items Bytes.
 	 * @return Bytefolge.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
-	public static FEMBinary femBinaryFrom(boolean copy, byte[] items) throws NullPointerException {
-		return femBinaryFrom(copy, items, 0, items.length);
+	public static FEMBinary from(boolean copy, byte[] items) throws NullPointerException {
+		return from(copy, items, 0, items.length);
 	}
 
 	/** Diese Methode gibt eine Bytefolge mit den Bytes im gegebenen Abschnitt zurück. Der gegebene Abschnitt wird falls nötig kopiert.
@@ -80,7 +81,7 @@ public abstract class FEMBinary implements FEMValue, Iterable<Byte>, Comparable<
 	 * @return Bytefolge.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn der Abschnitt ungültig ist. */
-	public static FEMBinary femBinaryFrom(boolean copy, byte[] items, int offset, int length) throws NullPointerException, IllegalArgumentException {
+	public static FEMBinary from(boolean copy, byte[] items, int offset, int length) throws NullPointerException, IllegalArgumentException {
 		if ((offset < 0) || (length < 0) || ((offset + length) > items.length)) throw new IllegalArgumentException();
 		if (length == 0) return EMPTY;
 		if (length == 1) return new UniformBinary(1, items[offset]);
@@ -98,8 +99,8 @@ public abstract class FEMBinary implements FEMValue, Iterable<Byte>, Comparable<
 	 * @return Bytefolge.
 	 * @throws NullPointerException Wenn {@code string} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist. */
-	public static FEMBinary femBinaryFrom(String string) throws NullPointerException, IllegalArgumentException {
-		return femBinaryFrom(true, string);
+	public static FEMBinary from(String string) throws NullPointerException, IllegalArgumentException {
+		return from(true, string);
 	}
 
 	/** Diese Methode gibt eine neue Bytefolge mit dem in der gegebenen Zeichenkette kodierten Wert zurück. Das Format der Zeichenkette entspricht dem der
@@ -111,7 +112,7 @@ public abstract class FEMBinary implements FEMValue, Iterable<Byte>, Comparable<
 	 * @return Bytefolge.
 	 * @throws NullPointerException Wenn {@code string} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist. */
-	public static FEMBinary femBinaryFrom(boolean header, String string) throws NullPointerException, IllegalArgumentException {
+	public static FEMBinary from(boolean header, String string) throws NullPointerException, IllegalArgumentException {
 		var count = string.length();
 		if ((count & 1) != 0) throw new IllegalArgumentException();
 		var index = 0;
@@ -126,7 +127,7 @@ public abstract class FEMBinary implements FEMValue, Iterable<Byte>, Comparable<
 		for (var i = 0; i < count; i++, index += 2) {
 			items[i] = (byte)((toDigit(string.charAt(index + 0)) << 4) | (toDigit(string.charAt(index + 1)) << 0));
 		}
-		return femBinaryFrom(false, items);
+		return from(false, items);
 	}
 
 	/** Diese Methode überführt die gegebene Dezimalzahl als Binärzahl interpretiert in eine Bytefolge mit der gegebenen Länge sowie Bytereihenfolge und gibt
@@ -139,7 +140,7 @@ public abstract class FEMBinary implements FEMValue, Iterable<Byte>, Comparable<
 	 * @param bigEndian {@code true} für {@link ByteOrder#BIG_ENDIAN big-endian}; {@code false} für {@link ByteOrder#LITTLE_ENDIAN little-endian}.
 	 * @return Bytefolge.
 	 * @throws IllegalArgumentException Wenn die Länge ungültig ist. */
-	public static FEMBinary femBinaryFrom(long value, int length, boolean bigEndian) throws IllegalArgumentException {
+	public static FEMBinary from(long value, int length, boolean bigEndian) throws IllegalArgumentException {
 		if ((length < 0) || (length > 8)) throw new IllegalArgumentException();
 		if (length == 0) return EMPTY;
 		return bigEndian ? new IntegerBinaryBE(length, value) : new IntegerBinaryLE(length, value);
@@ -147,32 +148,32 @@ public abstract class FEMBinary implements FEMValue, Iterable<Byte>, Comparable<
 
 	/** Diese Methode konvertiert die gegebenen Zahlen in eine Bytefolge und gibt diese zurück.
 	 *
-	 * @see #femBinaryFrom(byte[])
+	 * @see #from(byte[])
 	 * @see Number#byteValue()
 	 * @param items Zahlen.
 	 * @return Bytefolge.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist oder enthält. */
-	public static FEMBinary femBinaryFrom(List<? extends Number> items) throws NullPointerException {
+	public static FEMBinary from(List<? extends Number> items) throws NullPointerException {
 		var length = items.size();
 		if (length == 0) return EMPTY;
-		if (length == 1) return femBinaryFrom(1, items.get(0).byteValue());
+		if (length == 1) return from(1, items.get(0).byteValue());
 		var result = new byte[length];
 		for (var i = 0; i < length; i++) {
 			result[i] = items.get(i).byteValue();
 		}
-		return femBinaryFrom(false, result);
+		return from(false, result);
 	}
 
 	/** Diese Methode konvertiert die gegebenen Zahlen in eine Bytefolge und gibt diese zurück.
 	 *
-	 * @see #femBinaryFrom(List)
+	 * @see #from(List)
 	 * @see Iterables#toList(Iterable)
 	 * @param items Zahlen.
 	 * @return Bytefolge.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist oder enthält. */
-	public static FEMBinary femBinaryFrom(Iterable<? extends Number> items) throws NullPointerException {
+	public static FEMBinary from(Iterable<? extends Number> items) throws NullPointerException {
 		if (items instanceof FEMBinary) return (FEMBinary)items;
-		return femBinaryFrom(Iterables.toList(items));
+		return from(Iterables.toList(items));
 	}
 
 	/** Diese Methode gibt die Verkettung der gegebenen Bytefolgen zurück.
@@ -218,8 +219,6 @@ public abstract class FEMBinary implements FEMValue, Iterable<Byte>, Comparable<
 		if (upper <= 5) return upper + 10;
 		throw new IllegalArgumentException("'F' < hexChar < 'a'");
 	}
-
-	int TODO;
 
 	/** Diese Methode gibt {@code this} zurück. */
 	@Override
@@ -297,14 +296,14 @@ public abstract class FEMBinary implements FEMValue, Iterable<Byte>, Comparable<
 	}
 
 	/** Diese Methode gibt diese Bytefolge mit optimierter Leistungsfähigkeit des {@link #get(int) Bytezugriffs} zurück. Wenn die Bytefolge diesbezüglich
-	 * optimiert werden kann, wird grundsätzlich eine Abschrift der {@link #value() Bytes} dieser Bytefolge analog zu {@link #femBinaryFrom(byte[])
-	 * from(values())} geliefert.
+	 * optimiert werden kann, wird grundsätzlich eine Abschrift der {@link #value() Bytes} dieser Bytefolge analog zu {@link #from(byte[]) from(values())}
+	 * geliefert.
 	 *
 	 * @return performantere Bytefolge oder {@code this}. */
 	public FEMBinary compact() {
 		if (this.isEmpty()) return EMPTY;
 		if (this.isUniform()) return new UniformBinary(this.length, this.customGet(0));
-		return femBinaryFrom(false, this.value());
+		return from(false, this.value());
 	}
 
 	/** Diese Methode gibt die Position des ersten Vorkommens des gegebenen Bytewerts innerhalb dieser Bytefolge zurück. Die Suche beginnt an der gegebenen
@@ -373,7 +372,7 @@ public abstract class FEMBinary implements FEMValue, Iterable<Byte>, Comparable<
 
 	@Override
 	public final Iterator<Byte> iterator() {
-		return new ItemIter();
+		return iteratorFromArray(this::customGet, 0, this.length);
 	}
 
 	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn die lexikographische Ordnung dieser Bytefolge kleiner, gleich oder größer als die
@@ -420,7 +419,7 @@ public abstract class FEMBinary implements FEMValue, Iterable<Byte>, Comparable<
 	 * @see #length()
 	 * @return {@link List}-Sicht. */
 	public final List<Byte> toList() {
-		return new ItemList();
+		return new ItemList(this);
 	}
 
 	/** Diese Methode gibt die 8-Bit-einzelwertkodierten Codepoint zurück. Codepoint größer als {@code 255} werden zu {@code 0}.
@@ -462,7 +461,7 @@ public abstract class FEMBinary implements FEMValue, Iterable<Byte>, Comparable<
 
 	/** Diese Methode interpretiert diese Bytefolge als Binärzahl mit der gegebenen Bytereihenfolge und gibt diese als Dezimalzahl zurück.
 	 *
-	 * @see #femBinaryFrom(long, int, boolean)
+	 * @see #from(long, int, boolean)
 	 * @param bigEndian {@code true} für {@link ByteOrder#BIG_ENDIAN big-endian} und {@code false} für als {@link ByteOrder#LITTLE_ENDIAN little-endian}.
 	 * @return Dezimalzahl.
 	 * @throws IllegalStateException Wenn die Länge der Bytefolge größer als {@code 8} ist. */
@@ -549,340 +548,6 @@ public abstract class FEMBinary implements FEMValue, Iterable<Byte>, Comparable<
 		 * @throws IllegalArgumentException Wenn {@code length < 0} ist. */
 		protected HashBinary(int length) throws IllegalArgumentException {
 			super(length);
-		}
-
-	}
-
-	public static class ConcatBinary extends HashBinary implements Emuable {
-
-		@Override
-		public long emu() {
-			return EMU.fromObject(this) + EMU.from(this.binary1) + EMU.from(this.binary2);
-		}
-
-		@Override
-		protected byte customGet(int index) throws IndexOutOfBoundsException {
-			var index2 = index - this.binary1.length;
-			return index2 < 0 ? this.binary1.customGet(index) : this.binary2.customGet(index2);
-		}
-
-		@Override
-		protected boolean customCollect(Collector target, int offset, int length, boolean foreward) {
-			var offset2 = offset - this.binary1.length;
-			if (offset2 >= 0) return this.binary2.customCollect(target, offset2, length, foreward);
-			var length2 = offset2 + length;
-			if (length2 <= 0) return this.binary1.customCollect(target, offset, length, foreward);
-			if (foreward) {
-				if (!this.binary1.customCollect(target, offset, -offset2, foreward)) return false;
-				return this.binary2.customCollect(target, 0, length2, foreward);
-			} else {
-				if (!this.binary2.customCollect(target, 0, length2, foreward)) return false;
-				return this.binary1.customCollect(target, offset, -offset2, foreward);
-			}
-		}
-
-		@Override
-		protected FEMBinary customSection(int offset, int length) throws IllegalArgumentException {
-			var offset2 = offset - this.binary1.length;
-			if (offset2 >= 0) return this.binary2.section(offset2, length);
-			var length2 = offset2 + length;
-			if (length2 <= 0) return this.binary1.section(offset, length);
-			return this.binary1.section(offset, -offset2).concat(this.binary2.section(0, length2));
-		}
-
-		static int size(FEMBinary array) {
-			for (var size = 0; true; size++) {
-				if (array instanceof ConcatBinary2) {
-					array = ((ConcatBinary)array).binary2;
-				} else if (array instanceof ConcatBinary) {
-					array = ((ConcatBinary)array).binary1;
-				} else return size;
-			}
-		}
-
-		static ConcatBinary concat(FEMBinary binary1, FEMBinary binary2) throws IllegalArgumentException {
-			var size1 = ConcatBinary.size(binary1);
-			var size2 = ConcatBinary.size(binary2);
-			if ((size1 + 1) < size2) {
-				var cb2 = (ConcatBinary)binary2;
-				if (!(cb2 instanceof ConcatBinary1)) return concat(concat(binary1, cb2.binary1), cb2.binary2);
-				var cb21 = (ConcatBinary)cb2.binary1;
-				return concat(concat(binary1, cb21.binary1), concat(cb21.binary2, cb2.binary2));
-			}
-			if ((size2 + 1) < size1) {
-				var cb1 = (ConcatBinary)binary1;
-				if (!(cb1 instanceof ConcatBinary2)) return concat(cb1.binary1, concat(cb1.binary2, binary2));
-				var cb12 = (ConcatBinary)cb1.binary2;
-				return concat(concat(cb1.binary1, cb12.binary1), concat(cb12.binary2, binary2));
-			}
-			if (size1 > size2) return new ConcatBinary1(binary1, binary2);
-			if (size1 < size2) return new ConcatBinary2(binary1, binary2);
-			return new ConcatBinary(binary1, binary2);
-		}
-
-		final FEMBinary binary1;
-
-		final FEMBinary binary2;
-
-		ConcatBinary(FEMBinary binary1, FEMBinary binary2) throws IllegalArgumentException {
-			super(binary1.length + binary2.length);
-			this.binary1 = binary1;
-			this.binary2 = binary2;
-		}
-
-	}
-
-	public static final class ConcatBinary1 extends ConcatBinary {
-
-		ConcatBinary1(FEMBinary binary1, FEMBinary binary2) throws IllegalArgumentException {
-			super(binary1, binary2);
-		}
-
-	}
-
-	public static final class ConcatBinary2 extends ConcatBinary {
-
-		ConcatBinary2(FEMBinary binary1, FEMBinary binary2) throws IllegalArgumentException {
-			super(binary1, binary2);
-		}
-
-	}
-
-	public static final class SectionBinary extends HashBinary implements Emuable {
-
-		@Override
-		public long emu() {
-			return EMU.fromObject(this) + EMU.from(this.binary);
-		}
-
-		@Override
-		protected byte customGet(int index) throws IndexOutOfBoundsException {
-			return this.binary.customGet(index + this.offset);
-		}
-
-		@Override
-		protected int customFind(byte that, int offset, int length, boolean foreward) {
-			var result = this.binary.customFind(that, offset + this.offset, length, foreward);
-			return result >= 0 ? result - this.offset : -1;
-		}
-
-		@Override
-		protected boolean customCollect(Collector target, int offset2, int length2, final boolean foreward) {
-			return this.binary.customCollect(target, this.offset + offset2, length2, foreward);
-		}
-
-		@Override
-		protected FEMBinary customSection(int offset2, int length2) throws IllegalArgumentException {
-			return this.binary.section(this.offset + offset2, length2);
-		}
-
-		final FEMBinary binary;
-
-		final int offset;
-
-		SectionBinary(FEMBinary binary, int offset, int length) throws IllegalArgumentException {
-			super(length);
-			this.binary = binary;
-			this.offset = offset;
-		}
-
-	}
-
-	public static final class ReverseBinary extends HashBinary implements Emuable {
-
-		@Override
-		public long emu() {
-			return EMU.fromObject(this) + EMU.from(this.binary);
-		}
-
-		@Override
-		public FEMBinary reverse() {
-			return this.binary;
-		}
-
-		@Override
-		public boolean isUniform() {
-			return this.binary.isUniform();
-		}
-
-		@Override
-		protected byte customGet(int index) throws IndexOutOfBoundsException {
-			return this.binary.customGet(this.length - index - 1);
-		}
-
-		@Override
-		protected int customFind(byte that, int offset, int length, boolean foreward) {
-			var result = this.binary.customFind(that, this.length - offset - length, length, !foreward);
-			return result >= 0 ? this.length - result - 1 : -1;
-		}
-
-		@Override
-		protected boolean customCollect(Collector target, int offset, int length, boolean foreward) {
-			return this.binary.customCollect(target, this.length - offset - length, length, !foreward);
-		}
-
-		@Override
-		protected FEMBinary customSection(int offset, int length) throws IllegalArgumentException {
-			return this.binary.section(this.length - offset - length, length).reverse();
-		}
-
-		final FEMBinary binary;
-
-		ReverseBinary(FEMBinary binary) throws IllegalArgumentException {
-			super(binary.length);
-			this.binary = binary;
-		}
-
-	}
-
-	public static final class UniformBinary extends HashBinary {
-
-		@Override
-		public FEMBinary reverse() {
-			return this;
-		}
-
-		@Override
-		public FEMBinary compact() {
-			return this;
-		}
-
-		@Override
-		public boolean isUniform() {
-			return true;
-		}
-
-		@Override
-		public boolean isCompacted() {
-			return true;
-		}
-
-		@Override
-		protected byte customGet(int index) throws IndexOutOfBoundsException {
-			return this.item;
-		}
-
-		@Override
-		protected int customFind(byte that, int offset, int length, boolean foreward) {
-			return this.item == that ? offset : -1;
-		}
-
-		@Override
-		protected boolean customCollect(Collector target, int offset, int length, boolean foreward) {
-			while (length > 0) {
-				if (!target.push(this.item)) return false;
-				length--;
-			}
-			return true;
-		}
-
-		@Override
-		protected FEMBinary customSection(int offset, int length) {
-			return new UniformBinary(length, this.item);
-		}
-
-		final byte item;
-
-		UniformBinary(int length, byte value) throws IllegalArgumentException {
-			super(length);
-			this.item = value;
-		}
-
-	}
-
-	public static final class CompactBinary extends HashBinary implements Emuable {
-
-		@Override
-		public long emu() {
-			return EMU.fromObject(this) + ((this.offset == 0) && (this.length == this.items.length) ? EMU.from(this.items) : 0);
-		}
-
-		@Override
-		public void toBytes(byte[] items, int offset) throws NullPointerException, IllegalArgumentException {
-			System.arraycopy(this.items, this.offset, items, offset, this.length);
-		}
-
-		@Override
-		public FEMBinary compact() {
-			return this;
-		}
-
-		@Override
-		public boolean isCompacted() {
-			return true;
-		}
-
-		@Override
-		protected byte customGet(int index) throws IndexOutOfBoundsException {
-			return this.items[this.offset + index];
-		}
-
-		@Override
-		protected FEMBinary customSection(int offset, int length) {
-			return new CompactBinary(0, this.items, this.offset + offset, length);
-		}
-
-		final byte[] items;
-
-		final int offset;
-
-		CompactBinary(int hash, byte[] items, int offset, int length) throws IllegalArgumentException {
-			super(length);
-			this.items = Objects.notNull(items);
-			this.offset = offset;
-			this.hash = hash;
-		}
-
-	}
-
-	public static class IntegerBinaryBE extends FEMBinary {
-
-		@Override
-		public FEMBinary reverse() {
-			return new IntegerBinaryLE(this.length, this.value);
-		}
-
-		@Override
-		public FEMBinary compact() {
-			return this;
-		}
-
-		@Override
-		protected byte customGet(int index) throws IndexOutOfBoundsException {
-			return (byte)(this.value >> ((this.length - index - 1) << 3));
-		}
-
-		final long value;
-
-		IntegerBinaryBE(int length, long value) {
-			super(length);
-			this.value = value;
-		}
-
-	}
-
-	public static class IntegerBinaryLE extends FEMBinary {
-
-		@Override
-		public FEMBinary reverse() {
-			return new IntegerBinaryBE(this.length, this.value);
-		}
-
-		@Override
-		public FEMBinary compact() {
-			return this;
-		}
-
-		@Override
-		protected byte customGet(int index) throws IndexOutOfBoundsException {
-			return (byte)(this.value >> (index << 3));
-		}
-
-		final long value;
-
-		IntegerBinaryLE(int length, long value) {
-			super(length);
-			this.value = value;
 		}
 
 	}
@@ -984,43 +649,367 @@ public abstract class FEMBinary implements FEMValue, Iterable<Byte>, Comparable<
 		return new SectionBinary(this, offset, length);
 	}
 
-	private static FEMBinary concatAll(FEMBinary[] values, int min, int max) throws NullPointerException {
+	static FEMBinary concatAll(FEMBinary[] values, int min, int max) throws NullPointerException {
 		if (min == max) return values[min];
 		var mid = (min + max) >> 1;
 		return concatAll(values, min, mid).concat(concatAll(values, mid + 1, max));
 	}
 
-	private final class ItemIter extends AbstractIterator<Byte> {
+	static class ConcatBinary extends HashBinary implements Emuable {
 
 		@Override
-		public Byte next() {
-			return FEMBinary.this.customGet(this.index++);
+		public long emu() {
+			return EMU.fromObject(this) + EMU.from(this.binary1) + EMU.from(this.binary2);
 		}
 
 		@Override
-		public boolean hasNext() {
-			return this.index < FEMBinary.this.length;
+		protected byte customGet(int index) throws IndexOutOfBoundsException {
+			var index2 = index - this.binary1.length;
+			return index2 < 0 ? this.binary1.customGet(index) : this.binary2.customGet(index2);
 		}
 
-		int index = 0;
+		@Override
+		protected boolean customCollect(Collector target, int offset, int length, boolean foreward) {
+			var offset2 = offset - this.binary1.length;
+			if (offset2 >= 0) return this.binary2.customCollect(target, offset2, length, foreward);
+			var length2 = offset2 + length;
+			if (length2 <= 0) return this.binary1.customCollect(target, offset, length, foreward);
+			if (foreward) {
+				if (!this.binary1.customCollect(target, offset, -offset2, foreward)) return false;
+				return this.binary2.customCollect(target, 0, length2, foreward);
+			} else {
+				if (!this.binary2.customCollect(target, 0, length2, foreward)) return false;
+				return this.binary1.customCollect(target, offset, -offset2, foreward);
+			}
+		}
+
+		@Override
+		protected FEMBinary customSection(int offset, int length) throws IllegalArgumentException {
+			var offset2 = offset - this.binary1.length;
+			if (offset2 >= 0) return this.binary2.section(offset2, length);
+			var length2 = offset2 + length;
+			if (length2 <= 0) return this.binary1.section(offset, length);
+			return this.binary1.section(offset, -offset2).concat(this.binary2.section(0, length2));
+		}
+
+		static int size(FEMBinary array) {
+			for (var size = 0; true; size++) {
+				if (array instanceof ConcatBinary2) {
+					array = ((ConcatBinary)array).binary2;
+				} else if (array instanceof ConcatBinary) {
+					array = ((ConcatBinary)array).binary1;
+				} else return size;
+			}
+		}
+
+		static ConcatBinary concat(FEMBinary binary1, FEMBinary binary2) throws IllegalArgumentException {
+			var size1 = ConcatBinary.size(binary1);
+			var size2 = ConcatBinary.size(binary2);
+			if ((size1 + 1) < size2) {
+				var cb2 = (ConcatBinary)binary2;
+				if (!(cb2 instanceof ConcatBinary1)) return concat(concat(binary1, cb2.binary1), cb2.binary2);
+				var cb21 = (ConcatBinary)cb2.binary1;
+				return concat(concat(binary1, cb21.binary1), concat(cb21.binary2, cb2.binary2));
+			}
+			if ((size2 + 1) < size1) {
+				var cb1 = (ConcatBinary)binary1;
+				if (!(cb1 instanceof ConcatBinary2)) return concat(cb1.binary1, concat(cb1.binary2, binary2));
+				var cb12 = (ConcatBinary)cb1.binary2;
+				return concat(concat(cb1.binary1, cb12.binary1), concat(cb12.binary2, binary2));
+			}
+			if (size1 > size2) return new ConcatBinary1(binary1, binary2);
+			if (size1 < size2) return new ConcatBinary2(binary1, binary2);
+			return new ConcatBinary(binary1, binary2);
+		}
+
+		final FEMBinary binary1;
+
+		final FEMBinary binary2;
+
+		ConcatBinary(FEMBinary binary1, FEMBinary binary2) throws IllegalArgumentException {
+			super(binary1.length + binary2.length);
+			this.binary1 = binary1;
+			this.binary2 = binary2;
+		}
 
 	}
 
-	private final class ItemList extends AbstractList<Byte> implements RandomAccess {
+	static class ConcatBinary1 extends ConcatBinary {
+
+		ConcatBinary1(FEMBinary binary1, FEMBinary binary2) throws IllegalArgumentException {
+			super(binary1, binary2);
+		}
+
+	}
+
+	static class ConcatBinary2 extends ConcatBinary {
+
+		ConcatBinary2(FEMBinary binary1, FEMBinary binary2) throws IllegalArgumentException {
+			super(binary1, binary2);
+		}
+
+	}
+
+	static class SectionBinary extends HashBinary implements Emuable {
+
+		@Override
+		public long emu() {
+			return EMU.fromObject(this) + EMU.from(this.binary);
+		}
+
+		@Override
+		protected byte customGet(int index) throws IndexOutOfBoundsException {
+			return this.binary.customGet(index + this.offset);
+		}
+
+		@Override
+		protected int customFind(byte that, int offset, int length, boolean foreward) {
+			var result = this.binary.customFind(that, offset + this.offset, length, foreward);
+			return result >= 0 ? result - this.offset : -1;
+		}
+
+		@Override
+		protected boolean customCollect(Collector target, int offset2, int length2, final boolean foreward) {
+			return this.binary.customCollect(target, this.offset + offset2, length2, foreward);
+		}
+
+		@Override
+		protected FEMBinary customSection(int offset2, int length2) throws IllegalArgumentException {
+			return this.binary.section(this.offset + offset2, length2);
+		}
+
+		final FEMBinary binary;
+
+		final int offset;
+
+		SectionBinary(FEMBinary binary, int offset, int length) throws IllegalArgumentException {
+			super(length);
+			this.binary = binary;
+			this.offset = offset;
+		}
+
+	}
+
+	static class ReverseBinary extends HashBinary implements Emuable {
+
+		@Override
+		public long emu() {
+			return EMU.fromObject(this) + EMU.from(this.binary);
+		}
+
+		@Override
+		public FEMBinary reverse() {
+			return this.binary;
+		}
+
+		@Override
+		public boolean isUniform() {
+			return this.binary.isUniform();
+		}
+
+		@Override
+		protected byte customGet(int index) throws IndexOutOfBoundsException {
+			return this.binary.customGet(this.length - index - 1);
+		}
+
+		@Override
+		protected int customFind(byte that, int offset, int length, boolean foreward) {
+			var result = this.binary.customFind(that, this.length - offset - length, length, !foreward);
+			return result >= 0 ? this.length - result - 1 : -1;
+		}
+
+		@Override
+		protected boolean customCollect(Collector target, int offset, int length, boolean foreward) {
+			return this.binary.customCollect(target, this.length - offset - length, length, !foreward);
+		}
+
+		@Override
+		protected FEMBinary customSection(int offset, int length) throws IllegalArgumentException {
+			return this.binary.section(this.length - offset - length, length).reverse();
+		}
+
+		final FEMBinary binary;
+
+		ReverseBinary(FEMBinary binary) throws IllegalArgumentException {
+			super(binary.length);
+			this.binary = binary;
+		}
+
+	}
+
+	static class UniformBinary extends HashBinary {
+
+		@Override
+		public FEMBinary reverse() {
+			return this;
+		}
+
+		@Override
+		public FEMBinary compact() {
+			return this;
+		}
+
+		@Override
+		public boolean isUniform() {
+			return true;
+		}
+
+		@Override
+		public boolean isCompacted() {
+			return true;
+		}
+
+		@Override
+		protected byte customGet(int index) throws IndexOutOfBoundsException {
+			return this.item;
+		}
+
+		@Override
+		protected int customFind(byte that, int offset, int length, boolean foreward) {
+			return this.item == that ? offset : -1;
+		}
+
+		@Override
+		protected boolean customCollect(Collector target, int offset, int length, boolean foreward) {
+			while (length > 0) {
+				if (!target.push(this.item)) return false;
+				length--;
+			}
+			return true;
+		}
+
+		@Override
+		protected FEMBinary customSection(int offset, int length) {
+			return new UniformBinary(length, this.item);
+		}
+
+		final byte item;
+
+		UniformBinary(int length, byte value) throws IllegalArgumentException {
+			super(length);
+			this.item = value;
+		}
+
+	}
+
+	static class CompactBinary extends HashBinary implements Emuable {
+
+		@Override
+		public long emu() {
+			return EMU.fromObject(this) + ((this.offset == 0) && (this.length == this.items.length) ? EMU.from(this.items) : 0);
+		}
+
+		@Override
+		public void toBytes(byte[] items, int offset) throws NullPointerException, IllegalArgumentException {
+			System.arraycopy(this.items, this.offset, items, offset, this.length);
+		}
+
+		@Override
+		public FEMBinary compact() {
+			return this;
+		}
+
+		@Override
+		public boolean isCompacted() {
+			return true;
+		}
+
+		@Override
+		protected byte customGet(int index) throws IndexOutOfBoundsException {
+			return this.items[this.offset + index];
+		}
+
+		@Override
+		protected FEMBinary customSection(int offset, int length) {
+			return new CompactBinary(0, this.items, this.offset + offset, length);
+		}
+
+		final byte[] items;
+
+		final int offset;
+
+		CompactBinary(int hash, byte[] items, int offset, int length) throws IllegalArgumentException {
+			super(length);
+			this.items = Objects.notNull(items);
+			this.offset = offset;
+			this.hash = hash;
+		}
+
+	}
+
+	static class IntegerBinaryBE extends FEMBinary {
+
+		@Override
+		public FEMBinary reverse() {
+			return new IntegerBinaryLE(this.length, this.value);
+		}
+
+		@Override
+		public FEMBinary compact() {
+			return this;
+		}
+
+		@Override
+		protected byte customGet(int index) throws IndexOutOfBoundsException {
+			return (byte)(this.value >> ((this.length - index - 1) << 3));
+		}
+
+		final long value;
+
+		IntegerBinaryBE(int length, long value) {
+			super(length);
+			this.value = value;
+		}
+
+	}
+
+	static class IntegerBinaryLE extends FEMBinary {
+
+		@Override
+		public FEMBinary reverse() {
+			return new IntegerBinaryBE(this.length, this.value);
+		}
+
+		@Override
+		public FEMBinary compact() {
+			return this;
+		}
+
+		@Override
+		protected byte customGet(int index) throws IndexOutOfBoundsException {
+			return (byte)(this.value >> (index << 3));
+		}
+
+		final long value;
+
+		IntegerBinaryLE(int length, long value) {
+			super(length);
+			this.value = value;
+		}
+
+	}
+
+	static class ItemList extends AbstractList<Byte> implements RandomAccess {
+
+		public FEMBinary items;
+
+		public ItemList(FEMBinary items) {
+			this.items = items;
+		}
 
 		@Override
 		public Byte get(int index) {
-			return FEMBinary.this.get(index);
+			return this.items.get(index);
 		}
 
 		@Override
 		public int size() {
-			return FEMBinary.this.length;
+			return this.items.length;
 		}
 
 		@Override
 		public Iterator<Byte> iterator() {
-			return FEMBinary.this.iterator();
+			return this.items.iterator();
 		}
 
 		@Override
@@ -1030,24 +1019,24 @@ public abstract class FEMBinary implements FEMValue, Iterable<Byte>, Comparable<
 
 		@Override
 		public int indexOf(Object o) {
-			if ((FEMBinary.this.length == 0) || !(o instanceof Byte)) return -1;
-			return FEMBinary.this.customFind((Byte)o, 0, FEMBinary.this.length, true);
+			if ((this.items.length == 0) || !(o instanceof Byte)) return -1;
+			return this.items.customFind((Byte)o, 0, this.items.length, true);
 		}
 
 		@Override
 		public int lastIndexOf(Object o) {
-			if ((FEMBinary.this.length == 0) || !(o instanceof Byte)) return -1;
-			return FEMBinary.this.customFind((Byte)o, 0, FEMBinary.this.length, false);
+			if ((this.items.length == 0) || !(o instanceof Byte)) return -1;
+			return this.items.customFind((Byte)o, 0, this.items.length, false);
 		}
 
 		@Override
 		public List<Byte> subList(int fromIndex, int toIndex) {
-			return FEMBinary.this.section(fromIndex, toIndex - fromIndex).toList();
+			return this.items.section(fromIndex, toIndex - fromIndex).toList();
 		}
 
 	}
 
-	private static final class GetHash implements Collector {
+	static class GetHash implements Collector {
 
 		public int hash = Objects.hashInit();
 
@@ -1059,7 +1048,7 @@ public abstract class FEMBinary implements FEMValue, Iterable<Byte>, Comparable<
 
 	}
 
-	private static final class GetIndex implements Collector {
+	static class GetIndex implements Collector {
 
 		public final byte value;
 
@@ -1078,7 +1067,7 @@ public abstract class FEMBinary implements FEMValue, Iterable<Byte>, Comparable<
 
 	}
 
-	private static final class GetUniform implements Collector {
+	static class GetUniform implements Collector {
 
 		public byte value;
 
@@ -1093,7 +1082,7 @@ public abstract class FEMBinary implements FEMValue, Iterable<Byte>, Comparable<
 
 	}
 
-	private static final class INT8Encoder implements Collector {
+	static class INT8Encoder implements Collector {
 
 		public final byte[] items;
 
@@ -1112,7 +1101,7 @@ public abstract class FEMBinary implements FEMValue, Iterable<Byte>, Comparable<
 
 	}
 
-	private static final class UTF16Encoder implements Collector {
+	static class UTF16Encoder implements Collector {
 
 		public final char[] items;
 

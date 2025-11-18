@@ -1,5 +1,6 @@
 package bee.creative.fem;
 
+import static bee.creative.lang.Objects.notNull;
 import bee.creative.fem.FEMFunction.BaseFunction;
 import bee.creative.lang.Objects;
 
@@ -14,7 +15,7 @@ public final class FEMClosure extends BaseFunction {
 
 	/** Diese Methode gibt die gegebene Funktion als Parameterfunktion zurück. */
 	public static final FEMClosure from(FEMFunction target) throws NullPointerException {
-		return new FEMClosure(Objects.notNull(target));
+		return new FEMClosure(notNull(target));
 	}
 
 	/** Diese Methode gibt die beim Aufruf an den Stapelrahmen zu bindende Funktion zurück. */
@@ -24,7 +25,7 @@ public final class FEMClosure extends BaseFunction {
 
 	@Override
 	public FEMFunction trace(FEMTracer tracer) throws NullPointerException {
-		return FEMClosure.from(this.target.trace(tracer));
+		return from(this.target.trace(tracer));
 	}
 
 	@Override
@@ -46,7 +47,7 @@ public final class FEMClosure extends BaseFunction {
 	public boolean equals(Object object) {
 		if (object == this) return true;
 		if (!(object instanceof FEMClosure)) return false;
-		  var that = (FEMClosure)object;
+		var that = (FEMClosure)object;
 		return Objects.equals(this.target, that.target);
 	}
 

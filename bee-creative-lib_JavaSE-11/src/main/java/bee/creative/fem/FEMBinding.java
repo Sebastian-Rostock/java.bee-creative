@@ -1,5 +1,6 @@
 package bee.creative.fem;
 
+import static bee.creative.lang.Objects.notNull;
 import bee.creative.fem.FEMFunction.BaseFunction;
 import bee.creative.lang.Objects;
 
@@ -19,7 +20,7 @@ public final class FEMBinding extends BaseFunction {
 	 * @return {@link FEMFunction} mit gebundenem {@link FEMFrame Stapelrahmen}.
 	 * @throws NullPointerException Wenn {@code params} {@code null} ist. */
 	public static FEMBinding from(FEMFunction target, FEMFrame params) throws NullPointerException {
-		return new FEMBinding(Objects.notNull(target), Objects.notNull(params));
+		return new FEMBinding(notNull(target), notNull(params));
 	}
 
 	/** Diese Methode gibt die gebundene Funktion zurück, welche mit den gebundenen zusätzlichen Parameterwerten aufgerufen wird.

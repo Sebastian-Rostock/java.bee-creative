@@ -7,17 +7,12 @@ import bee.creative.lang.Objects;
  *
  * @see FEMValue#type()
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GData> Typ der von {@link FEMContext#dataFrom(FEMValue, FEMType)} gelieferten Nutzdaten. */
-public class FEMType<GData> {
+ * @param <D> Typ der von {@link FEMContext#dataFrom(FEMValue, FEMType)} gelieferten Nutzdaten. */
+public class FEMType<D> {
 
-	/** Diese Methode gibt einen einfachen Datentyp mit dem gegebenen Identifikator zurück.
-	 *
-	 * @see #id()
-	 * @param <GData> Typ des Werts.
-	 * @param id Identifikator für {@link #id()}.
-	 * @return {@code simple}-{@link FEMType}. */
-	public static <GData> FEMType<GData> from(int id) {
-		return new FEMType<>(id);
+	/** Dieser Konstruktor initialisiert den Identifikator. */
+	public FEMType(int id) {
+		this.id = id;
 	}
 
 	/** Diese Methode gibt den Identifikator dieses Datentyps zurück. Dieser sollte über eine statische Konstante definiert werden, um Fallunterscheidungen mit
@@ -63,9 +58,5 @@ public class FEMType<GData> {
 	}
 
 	private final int id;
-
-	private FEMType(int id) {
-		this.id = id;
-	}
 
 }
