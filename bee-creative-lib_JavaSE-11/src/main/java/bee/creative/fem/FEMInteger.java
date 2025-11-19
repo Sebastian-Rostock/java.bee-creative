@@ -27,7 +27,7 @@ public final class FEMInteger implements FEMValue, Comparable<FEMInteger> {
 	 *
 	 * @param value Wert.
 	 * @return Dezimalzahl. */
-	public static FEMInteger femIntegerFrom(long value) {
+	public static FEMInteger from(long value) {
 		return new FEMInteger(value);
 	}
 
@@ -37,7 +37,7 @@ public final class FEMInteger implements FEMValue, Comparable<FEMInteger> {
 	 * @return Dezimalzahl.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
 	public static FEMInteger femIntegerFrom(Number value) throws NullPointerException {
-		return femIntegerFrom(value.longValue());
+		return from(value.longValue());
 	}
 
 	/** Diese Methode gibt eine neue Dezimalzahl mit dem in der gegebenen Zeichenkette kodierten Wert zurück. Das Format der Zeichenkette entspricht dem der
@@ -49,9 +49,9 @@ public final class FEMInteger implements FEMValue, Comparable<FEMInteger> {
 	 * @return Dezimalzahl.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist. */
-	public static FEMInteger femIntegerFrom(String value) throws NullPointerException, IllegalArgumentException {
+	public static FEMInteger from(String value) throws NullPointerException, IllegalArgumentException {
 		try {
-			return femIntegerFrom(Long.parseLong(value));
+			return from(Long.parseLong(value));
 		} catch (NumberFormatException cause) {
 			throw new IllegalArgumentException(cause);
 		}

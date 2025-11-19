@@ -1,11 +1,9 @@
 package bee.creative.fem;
 
-import java.util.Iterator;
 import bee.creative.fem.FEMArray.HashArray;
 import bee.creative.lang.Array2;
 import bee.creative.lang.Objects;
 import bee.creative.lang.Objects.UseToString;
-import bee.creative.util.Iterators;
 
 /** Diese Klasse implementiert einen Stapelrahmen ({@code stack-frame}), über welchen einer Funktion eine Liste von Parameterwerten sowie ein Kontextobjekt zur
  * Verfügung gestellt werden. Über die {@link #size() Anzahl der zugesicherten Parameterwerte} hinaus können von der Methode {@link #get(int)} auch zusätzliche
@@ -46,7 +44,7 @@ public abstract class FEMFrame implements Array2<FEMValue>, UseToString {
 	 * @return neue Stapelrahmen.
 	 * @throws NullPointerException Wenn {@code context} {@code null} ist. */
 	public static FEMFrame from(FEMContext context) throws NullPointerException {
-		return FEMFrame.EMPTY.withContext(context);
+		return EMPTY.withContext(context);
 	}
 
 	/** Diese Methode gibt die Anzahl der Parameterwerte zurück, die zur Verwendung durch eine aufgerufene Funktion bestimmt sind. Über die Methode
@@ -227,7 +225,7 @@ public abstract class FEMFrame implements Array2<FEMValue>, UseToString {
 
 		@Override
 		public FEMValue get(int index) throws IndexOutOfBoundsException {
-			final var index2 = index - this.params.length;
+			var index2 = index - this.params.length;
 			return index2 >= 0 ? this.parent().get(index2) : this.params.customGet(index);
 		}
 
@@ -269,7 +267,7 @@ public abstract class FEMFrame implements Array2<FEMValue>, UseToString {
 
 		@Override
 		public FEMValue get(int index) throws IndexOutOfBoundsException {
-			final var index2 = index - this.params.length;
+			var index2 = index - this.params.length;
 			return index2 >= 0 ? this.parent().get(index2) : this.params.frameGet(index);
 		}
 

@@ -5,7 +5,6 @@ import java.util.NoSuchElementException;
 import bee.creative.emu.EMU;
 import bee.creative.emu.Emuator;
 import bee.creative.lang.Objects;
-import bee.creative.util.AbstractIterator;
 import bee.creative.util.HashMapII;
 import bee.creative.util.Iterator3;
 
@@ -347,7 +346,7 @@ public final class REFSET {
 	}
 
 	/** Diese Klasse implementiert {@link REFSET#iterator(int[], int[], int[])}. **/
-	public static final class ITER extends AbstractIterator<Integer> {
+	public static final class ITER implements Iterator3<Integer> {
 
 		/** Diese Methode liefert {@link #nextRef()}. */
 		@Override

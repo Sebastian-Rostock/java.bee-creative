@@ -4,7 +4,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import bee.creative.lang.Objects;
 import bee.creative.qs.QISet;
-import bee.creative.util.AbstractIterator;
 import bee.creative.util.Iterator3;
 
 /** Diese Klasse implementiert ein {@link QISet} als Sicht auf das ergebnis einer SQL-Anfrage.
@@ -71,7 +70,7 @@ public abstract class H2QISet<E> implements QISet<E> {
 	/** Diese Methode liefert den Eintrag zum gegebenen {@link ResultSet}. */
 	protected abstract E customItem(ResultSet next) throws SQLException;
 
-	private class Iter extends AbstractIterator<E> {
+	private class Iter implements Iterator3<E> {
 
 		public Iter() {
 			try {

@@ -1,8 +1,9 @@
 package bee.creative.log;
 
+import static bee.creative.lang.Objects.notNull;
 import java.util.Iterator;
-import bee.creative.lang.Objects;
-import bee.creative.util.AbstractIterator;
+import java.util.NoSuchElementException;
+import bee.creative.util.Iterable2;
 import bee.creative.util.Iterator3;
 import bee.creative.util.Iterators;
 
@@ -10,10 +11,10 @@ import bee.creative.util.Iterators;
  * entsprechend eingerückt dargestellt.
  *
  * @author [cc-by] 2019 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public class LOGBuilder implements Iterable<LOGEntry> {
+public class LOGBuilder implements Iterable2<LOGEntry> {
 
 	public void setPrinter(LOGPrinter printer) throws NullPointerException {
-		this.printer = Objects.notNull(printer);
+		this.printer = notNull(printer);
 	}
 
 	/** Diese Methode öffnet eine neue Protokollebene, wodurch alle danach erfassten Protokollzeilen um eins weiter eingerückt werden. */
@@ -27,7 +28,7 @@ public class LOGBuilder implements Iterable<LOGEntry> {
 	 * @param text Kopfzeile.
 	 * @throws NullPointerException Wenn {@code text} {@code null} ist. */
 	public void enterScope(Object text) throws NullPointerException {
-		this.enterScopeImpl(Objects.notNull(text), null);
+		this.enterScopeImpl(notNull(text), null);
 	}
 
 	/** Diese Methode öffnet eine neue Protokollebene mit der gegebenen Protokollzeilen als Kopfzeile, wodurch alle danach erfassten Protokollzeilen um eins
@@ -37,7 +38,7 @@ public class LOGBuilder implements Iterable<LOGEntry> {
 	 * @param args Formatargumente oder Textbausteine der Kopfzeile.
 	 * @throws NullPointerException Wenn {@code args} {@code null} ist. */
 	public void enterScope(String text, Object... args) throws NullPointerException {
-		this.enterScopeImpl(text, Objects.notNull(args));
+		this.enterScopeImpl(text, notNull(args));
 	}
 
 	/** Diese Methode verlässt die aktuelle Protokollebene, wodurch alle danach erfassten Protokollzeilen um eins weniger eingerückt werden. Sie entfernt die
@@ -54,7 +55,7 @@ public class LOGBuilder implements Iterable<LOGEntry> {
 	 * @param text Fußzeile.
 	 * @throws NullPointerException Wenn {@code text} {@code null} ist. */
 	public void leaveScope(Object text) throws NullPointerException {
-		this.leaveScopeImpl(Objects.notNull(text), null);
+		this.leaveScopeImpl(notNull(text), null);
 	}
 
 	/** Diese Methode verlässt die aktuelle Protokollebene mit der gegebenen Protokollzeilen als Fußzeile, wodurch alle danach erfassten Protokollzeilen um eins
@@ -65,7 +66,7 @@ public class LOGBuilder implements Iterable<LOGEntry> {
 	 * @param args Formatargumente oder Textbausteine der Fußzeile.
 	 * @throws NullPointerException Wenn {@code args} {@code null} ist. */
 	public void leaveScope(String text, Object... args) throws NullPointerException {
-		this.leaveScopeImpl(text, Objects.notNull(args));
+		this.leaveScopeImpl(text, notNull(args));
 	}
 
 	/** Diese Methode erfasst die gegebene Protokollzeile in der aktuellen Protokollebene. Wenn das gegebene Objekt ein {@link LOGBuilder} ist, werden dessen
@@ -75,7 +76,7 @@ public class LOGBuilder implements Iterable<LOGEntry> {
 	 * @param text Protokollzeile oder {@code null}.
 	 * @throws NullPointerException Wenn {@code text} {@code null} ist. */
 	public void pushEntry(Object text) throws NullPointerException {
-		this.pushEntryImpl(Objects.notNull(text), null);
+		this.pushEntryImpl(notNull(text), null);
 	}
 
 	/** Diese Methode erfasst die gegebene Protokollzeile in der aktuellen Protokollebene.
@@ -84,7 +85,7 @@ public class LOGBuilder implements Iterable<LOGEntry> {
 	 * @param args Formatargumente oder Textbausteine der Protokollzeile.
 	 * @throws NullPointerException Wenn {@code args} {@code null} ist. */
 	public void pushEntry(String text, Object... args) throws NullPointerException {
-		this.pushEntryImpl(text, Objects.notNull(args));
+		this.pushEntryImpl(text, notNull(args));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #pushEntry(Object) this.pushEntry(cause)}. */
@@ -99,7 +100,7 @@ public class LOGBuilder implements Iterable<LOGEntry> {
 	 * @param text Protokollzeile.
 	 * @throws NullPointerException Wenn {@code cause} bzw. {@code text} {@code null} ist. */
 	public void pushError(Throwable cause, Object text) throws NullPointerException {
-		this.pushErrorImpl(Objects.notNull(cause), Objects.notNull(text), null);
+		this.pushErrorImpl(notNull(cause), notNull(text), null);
 	}
 
 	/** Diese Methode erfasst die gegebene Protokollzeile in der aktuellen Protokollebene als Kopfzeile der gegebenen Fehlerursache. Die Protokollzeile zur
@@ -110,7 +111,7 @@ public class LOGBuilder implements Iterable<LOGEntry> {
 	 * @param args Formatargumente oder Textbausteine der Protokollzeile.
 	 * @throws NullPointerException Wenn {@code cause} bzw. {@code args} {@code null} ist. */
 	public void pushError(Throwable cause, String text, Object... args) throws NullPointerException {
-		this.pushErrorImpl(Objects.notNull(cause), text, Objects.notNull(args));
+		this.pushErrorImpl(notNull(cause), text, notNull(args));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #pushEntry(Object) this.pushEntry(logger)}. */
@@ -216,12 +217,12 @@ public class LOGBuilder implements Iterable<LOGEntry> {
 		}
 	}
 
-	private static final class ITER extends AbstractIterator<LOGEntry> {
+	private static final class ITER implements Iterator3<LOGEntry> {
 
 		@Override
 		public LOGEntry next() {
 			var next = this.next;
-			if (next == null) return super.next();
+			if (next == null) throw new NoSuchElementException();
 			this.next = this.seek();
 			return next;
 		}

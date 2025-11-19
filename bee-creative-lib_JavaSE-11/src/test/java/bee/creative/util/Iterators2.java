@@ -36,7 +36,7 @@ public class Iterators2 {
 	 *
 	 * @param <T> Typ der Elemente. */
 	
-	public static class UnionIterator<T> extends AbstractIterator<T> {
+	public static class UnionIterator<T> implements Iterator3<T> {
 	
 		public final Comparator<? super T> order;
 	
@@ -115,7 +115,7 @@ public class Iterators2 {
 	 *
 	 * @param <T> Typ der Elemente. */
 	
-	public static class ExceptIterator<T> extends AbstractIterator<T> {
+	public static class ExceptIterator<T> implements Iterator3<T> {
 	
 		public final Comparator<? super T> order;
 	
@@ -186,7 +186,7 @@ public class Iterators2 {
 	 *
 	 * @param <T> Typ der Elemente. */
 	
-	public static class IntersectIterator<T> extends AbstractIterator<T> {
+	public static class IntersectIterator<T> implements Iterator3<T> {
 	
 		public final Comparator<? super T> order;
 	

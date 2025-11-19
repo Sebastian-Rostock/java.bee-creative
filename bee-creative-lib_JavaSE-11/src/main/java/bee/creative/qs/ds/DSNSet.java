@@ -1,10 +1,12 @@
 package bee.creative.qs.ds;
 
+import static bee.creative.util.Iterables.emptyIterable;
+import static bee.creative.util.Iterables.filteredIterable;
+import static bee.creative.util.Iterables.iterableFromItem;
 import java.util.Collection;
 import bee.creative.qs.QN;
 import bee.creative.qs.QNSet;
 import bee.creative.qs.QS;
-import bee.creative.util.Iterables;
 import bee.creative.util.Iterator3;
 import bee.creative.util.Properties;
 import bee.creative.util.Property3;
@@ -25,7 +27,7 @@ public interface DSNSet extends QNSet {
 	 * @param node Hyperknoten oder {@code null}.
 	 * @return {@code true}, wenn die Menge verändert wurde. {@code false} sonst. */
 	default boolean setNode(QN node) throws IllegalArgumentException {
-		return this.setNodes(node != null ? Iterables.iterableFromItem(node) : Iterables.emptyIterable());
+		return this.setNodes(node != null ? iterableFromItem(node) : emptyIterable());
 	}
 
 	/** Diese Methode ersetzt alle Elemente dieser Menge mit den gegebenen {@link QN Hyperknoten}.
@@ -40,7 +42,7 @@ public interface DSNSet extends QNSet {
 	 * @param node Hyperknoten oder {@code null}.
 	 * @return {@code true}, wenn die Menge verändert wurde. {@code false} sonst. */
 	default boolean putNode(QN node) throws IllegalArgumentException {
-		return (node != null) && this.putNodes(Iterables.iterableFromItem(node));
+		return (node != null) && this.putNodes(iterableFromItem(node));
 	}
 
 	/** Diese Methode ergänzt diese Menge um die gegebenen {@link QN Hyperknoten}.
@@ -55,7 +57,7 @@ public interface DSNSet extends QNSet {
 	 * @param node Hyperknoten oder {@code null}.
 	 * @return {@code true}, wenn die Menge verändert wurde. {@code false} sonst. */
 	default boolean popNode(QN node) throws IllegalArgumentException {
-		return (node != null) && this.popNodes(Iterables.iterableFromItem(node));
+		return (node != null) && this.popNodes(iterableFromItem(node));
 	}
 
 	/** Diese Methode entfernt die gegebenen {@link QN Hyperknoten} aus dieser Menge.
@@ -96,7 +98,7 @@ public interface DSNSet extends QNSet {
 
 			@Override
 			public void clear() {
-				DSNSet.this.setNodes(Iterables.emptyIterable());
+				DSNSet.this.setNodes(emptyIterable());
 			}
 
 			@Override
@@ -117,7 +119,7 @@ public interface DSNSet extends QNSet {
 			@Override
 			public boolean removeAll(Collection<?> c) {
 				@SuppressWarnings ("unchecked")
-				var nodes = (Iterable<QN>)Iterables.filteredIterable(c, QN.class::isInstance);
+				var nodes = (Iterable<QN>)filteredIterable(c, QN.class::isInstance);
 				return DSNSet.this.popNodes(nodes);
 			}
 

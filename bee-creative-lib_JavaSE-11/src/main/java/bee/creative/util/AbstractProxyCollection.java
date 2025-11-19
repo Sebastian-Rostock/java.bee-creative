@@ -121,7 +121,7 @@ public abstract class AbstractProxyCollection<E, D extends Collection<E>> implem
 	 * @param items neuer Inhalt. */
 	protected abstract void setData(D items);
 
-	final class Iter extends AbstractIterator<E> {
+	final class Iter implements Iterator3<E> {
 
 		@Override
 		public boolean hasNext() {

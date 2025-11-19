@@ -44,7 +44,7 @@ public final class FEMObject implements FEMValue, Comparable<FEMObject> {
 	 * @return Referenz.
 	 * @throws NullPointerException Wenn {@code string} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist. */
-	public static FEMObject parse(String string) throws NullPointerException, IllegalArgumentException {
+	public static FEMObject from(String string) throws NullPointerException, IllegalArgumentException {
 		try {
 			var index1 = string.indexOf('.');
 			if (index1 < 0) throw new IllegalArgumentException();

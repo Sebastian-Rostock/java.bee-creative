@@ -17,7 +17,6 @@ import bee.creative.emu.Emuable;
 import bee.creative.lang.Array;
 import bee.creative.lang.Objects;
 import bee.creative.lang.Objects.UseToString;
-import bee.creative.util.AbstractIterator;
 import bee.creative.util.AbstractList2;
 import bee.creative.util.AbstractSet2;
 import bee.creative.util.Comparators;
@@ -1155,7 +1154,7 @@ public abstract class FEMArray implements FEMValue, Array<FEMValue>, Iterable2<F
 
 		}
 
-		class EntryIter extends AbstractIterator<Entry<FEMValue, FEMValue>> {
+		class EntryIter implements Iterator3<Entry<FEMValue, FEMValue>> {
 
 			@Override
 			public boolean hasNext() {

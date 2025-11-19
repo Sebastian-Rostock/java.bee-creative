@@ -1,12 +1,11 @@
 package bee.creative.iam;
 
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import bee.creative.emu.EMU;
 import bee.creative.emu.Emuable;
 import bee.creative.lang.Objects;
-import bee.creative.util.AbstractIterator;
+import bee.creative.util.Iterator3;
 
 /** Diese Klasse implementiert eine abstrakte Zahlenfolge, welche in einer Auflistung ({@link IAMListing}) für die Elemente sowie einer Abbildung
  * ({@link IAMMapping}) für die Schlüssel und Werte der Einträge ({@code IAMEntry}) verwendet wird.
@@ -248,7 +247,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 
 	}
 
-	
 	public static class ConcatArray extends IAMArray {
 
 		private static final byte[] MODES = { //
@@ -347,7 +345,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 
 	}
 
-	
 	public static class SectionArray extends IAMArray {
 
 		public final IAMArray array;
@@ -877,8 +874,8 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	}
 
 	@Override
-	public final Iterator<Integer> iterator() {
-		return new AbstractIterator<>() {
+	public final Iterator3<Integer> iterator() {
+		return new Iterator3<>() {
 
 			int index = 0;
 

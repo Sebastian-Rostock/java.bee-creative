@@ -199,7 +199,7 @@ public abstract class AbstractProxyMap<K, V, D extends Map<K, V>> implements Map
 			AbstractProxyMap.this.setData(data.data);
 		}
 
-		final class Iter extends AbstractIterator<Entry<K, V>> {
+		final class Iter implements Iterator3<Entry<K, V>> {
 
 			@Override
 			public boolean hasNext() {

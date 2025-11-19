@@ -9,6 +9,7 @@ import static bee.creative.util.Iterators.unmodifiableIterator;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 /** Diese Schnittstelle ergänzt einen {@link Iterator} insb. um eine Anbindung an Methoden von {@link Iterators}.
@@ -16,6 +17,16 @@ import java.util.Set;
  * @author [cc-by] 2021 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <E> Typ der Elemente. */
 public interface Iterator3<E> extends Iterator<E> {
+
+	@Override
+	default boolean hasNext() {
+		return false;
+	}
+
+	@Override
+	default E next() {
+		throw new NoSuchElementException();
+	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Iterators#skip(Iterator, int) Iterators.skip(this, count)}. */
 	default int skip(int count) {

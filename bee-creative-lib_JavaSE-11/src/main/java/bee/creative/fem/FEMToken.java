@@ -1,5 +1,6 @@
 package bee.creative.fem;
 
+import static bee.creative.lang.Objects.notNull;
 import java.util.Map;
 import bee.creative.lang.Objects;
 import bee.creative.util.HashMap;
@@ -17,13 +18,14 @@ public class FEMToken {
 	/** Dieser Konstruktor initialisiert das Objekt mit dem {@link Token#EMPTY leeren Abschnitt} sowie einer leeren Plazhalterabbildung. */
 	public FEMToken() {
 		this.token = Token.EMPTY;
-		this.proxies = new HashMap<>();
+		this.proxyMap = new HashMap<>();
+		this.constantMap = new HashMap<>();
 	}
 
 	/** Diese Methode gibt einen neuen Kompiller mit dem gegebenen typisierten Abschnitt zurück. Der gelieferte Kompiler verwendet die {@link #proxies() Abbildung
 	 * von Namen auf Platzhalter} dieses Kompilers. */
 	public FEMToken with(Token token) throws NullPointerException {
-		return new FEMToken(this, Objects.notNull(token));
+		return new FEMToken(this, notNull(token));
 	}
 
 	/** Diese Methode gibt den aktuellen Abschnitt zurück. */
@@ -45,7 +47,7 @@ public class FEMToken {
 
 	/** Diese Methode gibt die Spaltennummer zur {@link #srcIndex() aktuellen Quelltextposition} zurück. */
 	public int colIndex() {
-		var src = this.source() ;
+		var src = this.source();
 		var pos = this.srcIndex();
 		var add = src.maxIndexOf('\n', pos);
 		return (pos + 1) - (add < 0 ? 0 : add);
@@ -54,7 +56,7 @@ public class FEMToken {
 	/** Diese Methode gibt die Zeilennummer zur {@link #srcIndex() aktuellen Quelltextposition} zurück. */
 	public int rowIndex() {
 		var res = 0;
-		var src = this.source() ;
+		var src = this.source();
 		for (var pos = this.srcIndex() + 1; pos >= 0; pos = src.maxIndexOf('\n', pos - 1), res++) {}
 		return res;
 	}
@@ -62,22 +64,25 @@ public class FEMToken {
 	/** Diese Methode gibt die bisher zur Wiederverwendung erzeugten Platzhalter zurück.
 	 *
 	 * @return Abbildung von Namen auf Platzhalter. */
-	public Map<String, FEMFunction> proxies() {
-		return this.proxies;
+	public Map<String, FEMProxy> proxies() {
+		return this.proxyMap;
 	}
 
 	@Override
 	public String toString() {
-		return Objects.toInvokeString(this, this.token(), this.proxies());
+		return Objects.toInvokeString(this, this.token(), this.proxyMap.keySet(), this.constantMap.keySet());
 	}
 
 	private final Token token;
 
-	private final Map<String, FEMFunction> proxies;
+	private final Map<String, FEMProxy> proxyMap;
+
+	private final Map<String, FEMConstant> constantMap;
 
 	private FEMToken(FEMToken parent, Token token) throws NullPointerException {
 		this.token = token;
-		this.proxies = parent.proxies;
+		this.proxyMap = parent.proxyMap;
+		this.constantMap = parent.constantMap;
 	}
 
 }

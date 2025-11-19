@@ -1037,17 +1037,17 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 
 	/** Diese Methode gibt die Dezimalzahl mit den gegebenen Daten ({@code +value: 58}) zurück. */
 	protected FEMInteger getIntegerByData1(final long data) throws IllegalArgumentException {
-		return FEMInteger.femIntegerFrom(+data);
+		return FEMInteger.from(+data);
 	}
 
 	/** Diese Methode gibt die Dezimalzahl mit den gegebenen Daten ({@code -value: 58}) zurück. */
 	protected FEMInteger getIntegerByData2(final long data) throws IllegalArgumentException {
-		return FEMInteger.femIntegerFrom(-data);
+		return FEMInteger.from(-data);
 	}
 
 	/** Diese Methode gibt die im gegebenen Speicherbereich ({@code value: long}) enthaltene Dezimalzahl zurück. */
 	protected FEMInteger getIntegerByAddr(final long addr) throws IllegalArgumentException {
-		return FEMInteger.femIntegerFrom(this.buffer.getLong(addr));
+		return FEMInteger.from(this.buffer.getLong(addr));
 	}
 
 	/** Diese Methode fügt die gegebene Dezimalzahl in den Puffer ein und gibt die Referenz darauf zurück. */

@@ -18,7 +18,7 @@ public final class FEMObjectAdapter extends XmlAdapter<String, FEMObject> {
 	@Override
 	public FEMObject unmarshal(String value) throws Exception {
 		if (value == null) return null;
-		return FEMObject.parse(value);
+		return FEMObject.from(value);
 	}
 
 }

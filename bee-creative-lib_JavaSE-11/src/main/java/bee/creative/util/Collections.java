@@ -225,7 +225,7 @@ public class Collections {
 
 		private final Set<? extends V> values;
 
-		private class Iter extends AbstractIterator<Entry<K, V>> {
+		private class Iter implements Iterator3<Entry<K, V>> {
 
 			@Override
 			public boolean hasNext() {

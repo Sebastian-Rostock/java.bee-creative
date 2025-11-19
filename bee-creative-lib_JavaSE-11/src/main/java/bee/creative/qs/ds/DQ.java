@@ -1,5 +1,8 @@
 package bee.creative.qs.ds;
 
+import static bee.creative.util.Filters.nullFilter;
+import static bee.creative.util.Iterables.concatIterable;
+import static bee.creative.util.Iterables.translatedIterable;
 import static bee.creative.util.Translators.translatorFromClass;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +13,6 @@ import bee.creative.qs.QESet;
 import bee.creative.qs.QN;
 import bee.creative.qs.QS;
 import bee.creative.util.Consumer;
-import bee.creative.util.Filters;
 import bee.creative.util.Getter;
 import bee.creative.util.HashMap2;
 import bee.creative.util.HashSet2;
@@ -209,33 +211,33 @@ public class DQ {
 
 	static QESet newObjectSubjectMapEdges(QN context, QN predicate, Map<? extends QN, ? extends QN> objectSubjectMap) {
 		var owner = context.owner();
-		return owner.newEdges(Iterables.translatedIterable(objectSubjectMap.entrySet(), entry -> {
+		return owner.newEdges(translatedIterable(objectSubjectMap.entrySet(), entry -> {
 			var subject = entry.getValue();
 			return subject != null ? owner.newEdge(context, predicate, subject, entry.getKey()) : null;
-		}).filter(Filters.nullFilter()));
+		}).filter(nullFilter()));
 	}
 
 	static QESet newObjectSubjectSetMapEdges(QN context, QN predicate, Map<? extends QN, ? extends Iterable<? extends QN>> objectSubjectSetMap) {
 		var owner = context.owner();
-		return owner.newEdges(Iterables.concatIterable(Iterables.translatedIterable(objectSubjectSetMap.entrySet(), entry -> {
+		return owner.newEdges(concatIterable(translatedIterable(objectSubjectSetMap.entrySet(), entry -> {
 			var object = entry.getKey();
-			return Iterables.translatedIterable(entry.getValue(), subject -> owner.newEdge(context, predicate, subject, object));
+			return translatedIterable(entry.getValue(), subject -> owner.newEdge(context, predicate, subject, object));
 		})));
 	}
 
 	static QESet newSubjectObjectMapEdges(QN context, QN predicate, Map<? extends QN, ? extends QN> subjectObjectMap) {
 		var owner = context.owner();
-		return owner.newEdges(Iterables.translatedIterable(subjectObjectMap.entrySet(), entry -> {
+		return owner.newEdges(translatedIterable(subjectObjectMap.entrySet(), entry -> {
 			var object = entry.getValue();
 			return object != null ? owner.newEdge(context, predicate, entry.getKey(), object) : null;
-		}).filter(Filters.nullFilter()));
+		}).filter(nullFilter()));
 	}
 
 	static QESet newSubjectObjectSetMapEdges(QN context, QN predicate, Map<? extends QN, ? extends Iterable<? extends QN>> subjectObjectSetMap) {
 		var owner = context.owner();
-		return owner.newEdges(Iterables.concatIterable(Iterables.translatedIterable(subjectObjectSetMap.entrySet(), entry -> {
+		return owner.newEdges(concatIterable(translatedIterable(subjectObjectSetMap.entrySet(), entry -> {
 			var subject = entry.getKey();
-			return Iterables.translatedIterable(entry.getValue(), object -> owner.newEdge(context, predicate, subject, object));
+			return translatedIterable(entry.getValue(), object -> owner.newEdge(context, predicate, subject, object));
 		})));
 	}
 
@@ -483,7 +485,7 @@ public class DQ {
 
 		var edgesHavingObjectsToClone = edges.havingObjects(nodesToCloneWithoutValue);
 
-		var edgesHavingObjectsToCloneIterable = Iterables.translatedIterable(edgesHavingObjectsToClone, edge -> {
+		var edgesHavingObjectsToCloneIterable = translatedIterable(edgesHavingObjectsToClone, edge -> {
 			var cloneWith = cloneWithObject.get(edge.predicate());
 			if ((cloneWith != CLONE_WITH_EDGE) && (cloneWith != CLONE_WITH_NODE)) return null;
 			QN sourceObject = edge.object(), targetObject = clones.get(sourceObject);
@@ -496,7 +498,7 @@ public class DQ {
 
 		var edgesHavingSubjectsToClone = edges.havingSubjects(nodesToCloneWithoutValue);
 
-		var edgesHavingSubjectsToCloneIterable = Iterables.translatedIterable(edgesHavingSubjectsToClone, edge -> {
+		var edgesHavingSubjectsToCloneIterable = translatedIterable(edgesHavingSubjectsToClone, edge -> {
 			var cloneWith = cloneWithObject.get(edge.predicate());
 			if ((cloneWith != CLONE_WITH_EDGE) && (cloneWith != CLONE_WITH_NODE)) return null;
 			QN sourceObject = edge.object(), targetObject = clones.get(sourceObject);
@@ -507,7 +509,7 @@ public class DQ {
 			return edge.withObject(targetObject).withSubject(targetSubject);
 		});
 
-		return qs.newEdges(edgesHavingObjectsToCloneIterable.concat(edgesHavingSubjectsToCloneIterable).filter(Filters.nullFilter()));
+		return qs.newEdges(edgesHavingObjectsToCloneIterable.concat(edgesHavingSubjectsToCloneIterable).filter(nullFilter()));
 	}
 
 	/** Diese Methode ermittelt zu jedem der gegebenen {@link QE#predicate() Prädikatknoten}, ob beim {@link #getCloneEdges(Map, QN, Iterable) Klonen} von

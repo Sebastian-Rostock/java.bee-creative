@@ -9,9 +9,9 @@ import bee.creative.emu.EMU;
 import bee.creative.emu.Emuable;
 import bee.creative.lang.Objects;
 import bee.creative.lang.Objects.UseToString;
-import bee.creative.util.AbstractIterator;
 import bee.creative.util.Comparators;
 import bee.creative.util.Iterables;
+import bee.creative.util.Iterator3;
 
 /** Diese Klasse implementiert eine unveränderliche Zeichenkette sowie Methoden zur Erzeugung solcher Zeichenketten.
  * <p>
@@ -1442,7 +1442,7 @@ public abstract class FEMString implements FEMValue, Iterable<Integer>, Comparab
 		return concatAll(values, min, mid).concat(concatAll(values, mid + 1, max));
 	}
 
-	private final class ItemIter extends AbstractIterator<Integer> {
+	private final class ItemIter implements Iterator3<Integer> {
 
 		@Override
 		public Integer next() {

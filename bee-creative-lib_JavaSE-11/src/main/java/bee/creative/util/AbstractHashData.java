@@ -787,7 +787,7 @@ public abstract class AbstractHashData<K, V> implements Emuable {
 
 	/** Diese Klasse implementiert den abstrakten {@link Iterator} über die Schlüssel, Werte und Einträge. */
 
-	protected static abstract class HashIterator<GKey, GValue, GItem> extends AbstractIterator<GItem> {
+	protected static abstract class HashIterator<GKey, GValue, GItem> implements Iterator3<GItem> {
 
 		@Override
 		public boolean hasNext() {

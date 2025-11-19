@@ -1,5 +1,6 @@
 package bee.creative.qs.h2;
 
+import static bee.creative.util.Iterables.filteredIterable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -10,7 +11,6 @@ import bee.creative.qs.QNSet;
 import bee.creative.qs.QT;
 import bee.creative.qs.QTSet;
 import bee.creative.util.Filter;
-import bee.creative.util.Iterables;
 
 /** Diese Klasse implementiert ein {@link QTSet} als Sicht auf das ergebnis einer SQL-Anfrage.
  *
@@ -24,7 +24,7 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 
 	@Override
 	public H2QTSet2 copy(Filter<? super QT> filter) throws NullPointerException {
-		return this.owner.newTuples(this.names(), Iterables.filteredIterable(this, filter));
+		return this.owner.newTuples(this.names(), filteredIterable(this, filter));
 	}
 
 	@Override

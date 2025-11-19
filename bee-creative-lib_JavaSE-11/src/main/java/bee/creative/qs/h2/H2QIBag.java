@@ -1,5 +1,6 @@
 package bee.creative.qs.h2;
 
+import static bee.creative.util.Entries.entryWith;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map.Entry;
@@ -8,7 +9,6 @@ import bee.creative.qs.QIBag;
 import bee.creative.qs.QN;
 import bee.creative.qs.QNSet;
 import bee.creative.qs.QS;
-import bee.creative.util.Entries;
 import bee.creative.util.Setter;
 
 public abstract class H2QIBag<E, GIBag> extends H2QISet<E> implements QIBag<E, GIBag> {
@@ -123,7 +123,7 @@ public abstract class H2QIBag<E, GIBag> extends H2QISet<E> implements QIBag<E, G
 
 		@Override
 		protected Entry<Long, String> customItem(ResultSet next) throws SQLException {
-			return Entries.entryWith((Long)next.getObject(1), next.getString(2));
+			return entryWith((Long)next.getObject(1), next.getString(2));
 		}
 
 		InsertSet(H2QS owner, String index) {

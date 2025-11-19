@@ -1,7 +1,5 @@
 package bee.creative.array;
 
-import bee.creative.lang.Objects;
-
 /** Diese Klasse implementiert ein {@link ShortArray} als {@link CompactArray}.
  *
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */

@@ -6,7 +6,6 @@ import java.util.NoSuchElementException;
 import bee.creative.emu.EMU;
 import bee.creative.emu.Emuator;
 import bee.creative.lang.Objects;
-import bee.creative.util.AbstractIterator;
 import bee.creative.util.Entries;
 import bee.creative.util.HashMapIO;
 import bee.creative.util.Iterator3;
@@ -169,7 +168,7 @@ public final class REFMAP {
 	}
 
 	/** Diese Klasse implementiert {@link REFMAP#iterator(Object[])}. */
-	public static final class ITER extends AbstractIterator<Entry<Integer, Object>> {
+	public static final class ITER implements Iterator3<Entry<Integer, Object>> {
 
 		@Override
 		public Entry<Integer, Object> next() {

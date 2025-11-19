@@ -776,7 +776,7 @@ public class FEMDomain extends BaseObject {
 		if (ref.startsWith("0x")) return FEMBinary.from(ref);
 		if (ref.startsWith("P") || ref.startsWith("-P")) return FEMDuration.from(ref);
 		try {
-			return FEMInteger.femIntegerFrom(ref);
+			return FEMInteger.from(ref);
 		} catch (final IllegalArgumentException cause) {}
 		try {
 			return FEMDecimal.from(ref);

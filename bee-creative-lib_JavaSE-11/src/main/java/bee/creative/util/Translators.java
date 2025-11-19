@@ -106,7 +106,7 @@ public class Translators {
 	 * neutralTranslator(Object.class)}. */
 	@SuppressWarnings ("unchecked")
 	public static <V> Translator3<V, V> neutralTranslator() {
-		return (Translator3<V, V>)neutralTranslator(Object.class);
+		return (Translator3<V, V>)neutralTranslator;
 	}
 
 	/** Diese Methode liefert einen neutralen {@link Translator3} und ist eine Abkürzung für {@link Translators#translatorFromClass(Class, Class, Getter, Getter)
@@ -172,5 +172,7 @@ public class Translators {
 	}
 
 	private static final Translator3<?, ?> emptyTranslator = translatorFrom(rejectFilter(), rejectFilter(), emptyGetter(), emptyGetter());
+
+	private static final Translator3<Object, Object> neutralTranslator = neutralTranslator(Object.class);
 
 }
