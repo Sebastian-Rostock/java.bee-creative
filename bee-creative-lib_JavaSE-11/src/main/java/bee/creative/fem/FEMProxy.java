@@ -1,8 +1,8 @@
 package bee.creative.fem;
 
+import static bee.creative.lang.Objects.notNull;
 import bee.creative.emu.EMU;
 import bee.creative.emu.Emuable;
-import bee.creative.lang.Objects;
 import bee.creative.util.Property;
 
 /** Diese Klasse implementiert den benannten Platzhalter einer Funktion, dessen {@link #invoke(FEMFrame)}-Methode an eine {@link #set(FEMFunction) gegebene
@@ -10,18 +10,18 @@ import bee.creative.util.Property;
  * {@link #equals(Object) Äquivalenz} nicht auf diesem, sondern auf einer extra hierfür bereitgestellten {@link #id() Kennung} beruhen.
  *
  * @see FEMParser#proxies()
- * @see FEMToken#proxies()
+ * @see FEMToken#proxyMap()
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMProxy implements FEMFunction, Property<FEMFunction>, Emuable {
 
 	/** Diese Methode ist eine Abkürzung für {@link #from(FEMString) FEMProxy.from(FEMString.from(id))}. */
 	public static FEMProxy from(String id) throws NullPointerException {
-		return FEMProxy.from(FEMString.from(id));
+		return from(FEMString.from(id));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #from(FEMValue, FEMString) FEMProxy.from(id, id)}. */
 	public static FEMProxy from(FEMString id) throws NullPointerException {
-		return FEMProxy.from(id, id);
+		return from(id, id);
 	}
 
 	/** Diese Methode gibt einen neuen Platzhalter mit den gegebenen Eigenschaften zurück.
@@ -31,7 +31,7 @@ public final class FEMProxy implements FEMFunction, Property<FEMFunction>, Emuab
 	 * @return Platzhalter.
 	 * @throws NullPointerException Wenn {@code id} bzw. {@code name} {@code null} ist. */
 	public static FEMProxy from(FEMValue id, FEMString name) throws NullPointerException {
-		return new FEMProxy(Objects.notNull(id), Objects.notNull(name));
+		return new FEMProxy(notNull(id), notNull(name));
 	}
 
 	/** Diese Methode gibt die Kennung des Platzhalters zurück. Diese Kennung wird im Konstruktor initialisiert und zur Berechnung von {@link #hashCode()

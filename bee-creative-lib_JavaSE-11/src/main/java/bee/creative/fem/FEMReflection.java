@@ -60,9 +60,9 @@ public abstract class FEMReflection implements FEMFunction {
 	public static FEMFunction from(String memberPath) throws NullPointerException, IllegalArgumentException {
 		var object = Natives.parseNative(memberPath);
 		if (object instanceof Class<?>) return new FEMNative(object);
-		if (object instanceof Constructor<?>) return FEMReflection.from((Constructor<?>)object);
-		if (object instanceof Method) return FEMReflection.from((Method)object);
-		return FEMReflection.from((Field)object);
+		if (object instanceof Constructor<?>) return from((Constructor<?>)object);
+		if (object instanceof Method) return from((Method)object);
+		return from((Field)object);
 	}
 
 	/** Diese Methode gibt eine Funktion zurück, die an die gegebene Methode delegiert.
@@ -129,9 +129,17 @@ public abstract class FEMReflection implements FEMFunction {
 		return this.member().equals(that.member());
 	}
 
-	public static final class StaticField extends FEMReflection {
+	private static Object[] params(FEMFrame frame, boolean skipFirst) {
+		var offset = skipFirst ? 1 : 0;
+		var length = frame.size() - offset;
+		var result = new Object[length];
+		for (var i = 0; i < length; i++) {
+			result[i] = frame.get(i + offset).data();
+		}
+		return result;
+	}
 
-		public final Field field;
+	private static final class StaticField extends FEMReflection {
 
 		@Override
 		public FEMValue invoke(FEMFrame frame) {
@@ -164,15 +172,15 @@ public abstract class FEMReflection implements FEMFunction {
 			return Natives.printField(this.field);
 		}
 
+		final Field field;
+
 		StaticField(final Field field) {
 			this.field = field;
 		}
 
 	}
 
-	public static final class StaticMethod extends FEMReflection {
-
-		public final Method method;
+	private static final class StaticMethod extends FEMReflection {
 
 		@Override
 		public FEMValue invoke(FEMFrame frame) {
@@ -195,20 +203,20 @@ public abstract class FEMReflection implements FEMFunction {
 			return Natives.printMethod(this.method);
 		}
 
+		final Method method;
+
 		StaticMethod(Method method) {
 			this.method = method;
 		}
 
 	}
 
-	public static final class StaticConstructor extends FEMReflection {
-
-		public final Constructor<?> constructor;
+	private static final class StaticConstructor extends FEMReflection {
 
 		@Override
 		public FEMValue invoke(FEMFrame frame) {
 			try {
-				var params = FEMReflection.params(frame, false);
+				var params = params(frame, false);
 				var result = this.constructor.newInstance(params);
 				return new FEMNative(result);
 			} catch (final Exception cause) {
@@ -226,15 +234,15 @@ public abstract class FEMReflection implements FEMFunction {
 			return Natives.printConstructor(this.constructor);
 		}
 
+		final Constructor<?> constructor;
+
 		StaticConstructor(Constructor<?> constructor) {
 			this.constructor = constructor;
 		}
 
 	}
 
-	public static final class InstanceField extends FEMReflection {
-
-		public final Field field;
+	private static final class InstanceField extends FEMReflection {
 
 		@Override
 		public FEMValue invoke(FEMFrame frame) {
@@ -269,20 +277,20 @@ public abstract class FEMReflection implements FEMFunction {
 			return Natives.printField(this.field);
 		}
 
+		final Field field;
+
 		InstanceField(Field field) {
 			this.field = field;
 		}
 
 	}
 
-	public static final class InstanceMethod extends FEMReflection {
-
-		public final Method method;
+	private static final class InstanceMethod extends FEMReflection {
 
 		@Override
 		public FEMValue invoke(FEMFrame frame) {
 			try {
-				var params = FEMReflection.params(frame, true);
+				var params = params(frame, true);
 				var input = frame.get(0).data();
 				var result = this.method.invoke(input, params);
 				return new FEMNative(result);
@@ -301,20 +309,12 @@ public abstract class FEMReflection implements FEMFunction {
 			return Natives.printMethod(this.method);
 		}
 
+		final Method method;
+
 		InstanceMethod(Method method) {
 			this.method = method;
 		}
 
-	}
-
-	private static Object[] params(FEMFrame frame, boolean skipFirst) {
-		var offset = skipFirst ? 1 : 0;
-		var length = frame.size() - offset;
-		var result = new Object[length];
-		for (var i = 0; i < length; i++) {
-			result[i] = frame.get(i + offset).data();
-		}
-		return result;
 	}
 
 }

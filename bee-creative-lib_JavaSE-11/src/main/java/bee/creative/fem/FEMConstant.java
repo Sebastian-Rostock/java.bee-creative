@@ -1,28 +1,20 @@
 package bee.creative.fem;
 
-import static bee.creative.fem.FEMString.from;
 import static bee.creative.lang.Objects.notNull;
 import bee.creative.util.Consumer;
 
-/** Diese Klasse implementiert eine Konstante als einmalig setzbarer Verweis auf einen Wert. Solange der Wert nicht initialisiert ist, liefert {@link #type()}
- * den {@link #TYPE} und {@link #toString()} den {@link #name()}.
+/** Diese Klasse implementiert eine Konstante als einmalig setzbarer Verweis auf einen Wert.
  *
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMConstant implements FEMValue, Consumer<FEMValue> {
 
-	/** Dieses Feld speichert den {@link #type() Datentyp}. */
-	public static final FEMType<FEMConstant> TYPE = new FEMType<>(FEMConstant.TYPE_ID);
-
-	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
-	public static final int TYPE_ID = -2;
-
 	/** Diese Methode liefert eine neue Konstante mit dem gegebenen Namen. */
-	public static FEMConstant femConstFrom(String name) throws NullPointerException {
-		return femConstFrom(from(name));
+	public static FEMConstant from(String name) throws NullPointerException {
+		return from(FEMString.from(name));
 	}
 
 	/** Diese Methode liefert eine neue Konstante mit dem gegebenen Namen. */
-	public static FEMConstant femConstFrom(FEMString name) throws NullPointerException {
+	public static FEMConstant from(FEMString name) throws NullPointerException {
 		return new FEMConstant(name);
 	}
 
@@ -42,50 +34,22 @@ public final class FEMConstant implements FEMValue, Consumer<FEMValue> {
 		return this.value != null;
 	}
 
+	/** Diese Methode liefert {@code this.result().data()}. */
 	@Override
 	public Object data() {
 		return this.result().data();
 	}
 
+	/** Diese Methode liefert {@code this.result().type()}. */
 	@Override
-	public synchronized FEMType<?> type() {
-		return this.value != null ? this.value.type() : TYPE;
-	}
-
-	@Override
-	public synchronized FEMValue result() {
-		if (this.value != null) return this.value;
-		throw new IllegalStateException();
+	public FEMType<?> type() {
+		return this.result().type();
 	}
 
 	@Override
 	public synchronized FEMValue result(boolean deep) {
-		return this.result();
-	}
-
-	@Override
-	public FEMValue toValue() {
-		return this.result().toValue();
-	}
-
-	@Override
-	public FEMFunction toFuture() {
-		return this.result().toFuture();
-	}
-
-	@Override
-	public FEMValue toFuture(FEMFrame frame) throws NullPointerException {
-		return this.result().toFuture(frame);
-	}
-
-	@Override
-	public FEMFunction toFunction() {
-		return this.result().toFunction();
-	}
-
-	@Override
-	public FEMValue invoke(FEMFrame frame) throws NullPointerException {
-		return this.result().invoke(frame);
+		if (this.value != null) return this.value;
+		throw new IllegalStateException();
 	}
 
 	@Override
@@ -99,17 +63,14 @@ public final class FEMConstant implements FEMValue, Consumer<FEMValue> {
 	}
 
 	@Override
-	public FEMFunction compose(Iterable<? extends FEMFunction> params) throws NullPointerException {
-		return this.result().compose(params);
-	}
-
-	@Override
 	public int hashCode() {
 		return this.result().hashCode();
 	}
 
 	@Override
 	public boolean equals(Object object) {
+		if (object == this) return true;
+		if (!(object instanceof FEMValue)) return false;
 		return this.result().equals(object);
 	}
 
@@ -117,6 +78,11 @@ public final class FEMConstant implements FEMValue, Consumer<FEMValue> {
 	public synchronized String toString() {
 		if (this.value != null) return this.value.toString();
 		return FEMDomain.DEFAULT.printConst(this.name.toString());
+	}
+
+	@Override
+	public FEMFunction toFunction() {
+		return this.result().toFunction();
 	}
 
 	private FEMString name;

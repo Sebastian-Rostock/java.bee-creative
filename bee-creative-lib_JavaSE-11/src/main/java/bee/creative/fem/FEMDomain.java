@@ -296,7 +296,7 @@ public class FEMDomain extends BaseObject {
 	 * @param src Quelltext, der bspw. über {@link #parseResult(String)} erzeugt wurde.
 	 * @return Funktionsliste. */
 	public List<FEMFunction> parseScript(final Result src) throws NullPointerException, IllegalArgumentException {
-		return this.parseScriptData(new FEMToken().with(src.root()));
+		return this.parseScriptData(new FEMToken().withToken(src.root()));
 	}
 
 	/** Diese Methode überführt den von {@link #parseScriptToken(FEMParser)} ermittelten Abschnitt in eine Funktionsliste und gibt diese zurück. */
@@ -306,7 +306,7 @@ public class FEMDomain extends BaseObject {
 		try {
 			for (final Object val: (Iterable<?>)tok.value()) {
 				final var name = val.toString();
-				src.proxies().put(name, FEMProxy.from(name));
+				src.proxyMap().put(name, FEMProxy.from(name));
 			}
 		} catch (final Exception cause) {
 			throw this.parseErrorData(src, cause);
@@ -355,7 +355,7 @@ public class FEMDomain extends BaseObject {
 	protected List<FEMFunction> parseGroupData(final FEMToken src) throws NullPointerException, FEMException {
 		final List<FEMFunction> res = new ArrayList<>();
 		for (final Token tok: src.token().children()) {
-			res.add(this.parseFunctionData(src.with(tok)));
+			res.add(this.parseFunctionData(src.withToken(tok)));
 		}
 		return res;
 	}
@@ -420,7 +420,7 @@ public class FEMDomain extends BaseObject {
 		if (tok.type() != FEMDomain.TYPE_ARRAY_TOKEN) return null;
 		final List<FEMValue> res = new ArrayList<>();
 		for (final Token item: tok.children()) {
-			res.add(this.parseValueData(src.with(item)));
+			res.add(this.parseValueData(src.withToken(item)));
 		}
 		return FEMArray.from(res);
 	}
@@ -581,7 +581,7 @@ public class FEMDomain extends BaseObject {
 		if (tok.type() != FEMDomain.TYPE_HANDLER_LOCAL_TOKEN) return null;
 		final var next = tok.size() - 1;
 		if (next < 0) throw this.parseErrorData(src, null);
-		final var fun = this.parseFunctionData(src.with(tok.get(next)));
+		final var fun = this.parseFunctionData(src.withToken(tok.get(next)));
 		return FEMHandler.from(fun);
 	}
 
@@ -591,15 +591,15 @@ public class FEMDomain extends BaseObject {
 		final var tok = src.token();
 		if (tok.type() != FEMDomain.TYPE_HANDLER_GLOBAL_TOKEN) return null;
 		if (tok.size() != 2) throw this.parseErrorData(src, null);
-		src = src.with(tok.get(0));
+		src = src.withToken(tok.get(0));
 		final var str = this.parseIdentData(src);
 		final var ref = str != null ? str : this.parseConstData(src);
 		if (ref == null) throw this.parseErrorData(src, null);
-		src = src.with(tok.get(1));
+		src = src.withToken(tok.get(1));
 		final FEMValue han = this.parseHandler1Data(src);
 		if (han == null) throw this.parseErrorData(src, null);
 		try {
-			final var res = (FEMProxy)src.proxies().get(ref);
+			final var res = (FEMProxy)src.proxyMap().get(ref);
 			res.set(han.toFunction());
 			return FEMHandler.from(res);
 		} catch (final Exception cause) {
@@ -842,7 +842,7 @@ public class FEMDomain extends BaseObject {
 	 * @param ref Kennung bzw. Textdarstellung einer Konstanten.
 	 * @return Funktion der Konstanten oder {@code null}. */
 	protected FEMFunction parseFunctionData(final FEMToken src, final String ref) {
-		return src.proxies().get(ref);
+		return src.proxyMap().get(ref);
 	}
 
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} den {@link Token Abschnitt} einer Funktion und gibt ihn zurück. Wenn ein Parameter bzw. Wert von einer
@@ -867,9 +867,9 @@ public class FEMDomain extends BaseObject {
 		var tok = src.token();
 		if (tok.type() != FEMDomain.TYPE_COMPOSITE_TOKEN) return null;
 		if (tok.size() != 2) throw this.parseErrorData(src, null);
-		final var res = this.parseFunctionData(src.with(tok.get(0)));
+		final var res = this.parseFunctionData(src.withToken(tok.get(0)));
 		tok = tok.get(1);
-		src = src.with(tok);
+		src = src.withToken(tok);
 		if (tok.type() != FEMDomain.TYPE_GROUP_TOKEN) throw this.parseErrorData(src, null);
 		final var pars = this.parseGroupData(src);
 		return res.compose(pars);

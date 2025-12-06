@@ -9,7 +9,7 @@ import bee.creative.util.Parser.Source;
 import bee.creative.util.Parser.Token;
 
 /** Diese Klasse implementiert ein Objekt zur Bereitstellung eines {@link #token() typisierten Abschnitt} eines {@link Result aufbereiteten Quelltexts}, um
- * diesen Abschnitt in {@link FEMFunction Funktionen} überführen zu können. Dazu wird auch eine {@link #proxies() Abbildung von Namen auf Platzhalter} zur
+ * diesen Abschnitt in {@link FEMFunction Funktionen} überführen zu können. Dazu wird auch eine {@link #proxyMap() Abbildung von Namen auf Platzhalter} zur
  * Wiederverwendung derselben bereitgestellt.
  *
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
@@ -22,9 +22,9 @@ public class FEMToken {
 		this.constantMap = new HashMap<>();
 	}
 
-	/** Diese Methode gibt einen neuen Kompiller mit dem gegebenen typisierten Abschnitt zurück. Der gelieferte Kompiler verwendet die {@link #proxies() Abbildung
-	 * von Namen auf Platzhalter} dieses Kompilers. */
-	public FEMToken with(Token token) throws NullPointerException {
+	/** Diese Methode gibt einen neuen Kompiller mit dem gegebenen typisierten Abschnitt zurück. Der gelieferte Kompiler verwendet die {@link #proxyMap()
+	 * Abbildung von Namen auf Platzhalter} dieses Kompilers. */
+	public FEMToken withToken(Token token) throws NullPointerException {
 		return new FEMToken(this, notNull(token));
 	}
 
@@ -61,11 +61,14 @@ public class FEMToken {
 		return res;
 	}
 
-	/** Diese Methode gibt die bisher zur Wiederverwendung erzeugten Platzhalter zurück.
-	 *
-	 * @return Abbildung von Namen auf Platzhalter. */
-	public Map<String, FEMProxy> proxies() {
+	/** Diese Methode liefert die bisher zur Wiederverwendung erzeugten Platzhalter. */
+	public Map<String, FEMProxy> proxyMap() {
 		return this.proxyMap;
+	}
+
+	/** Diese Methode liefert die bisher zur Wiederverwendung erzeugten Konstanten. */
+	public Map<String, FEMConstant> constantMap() {
+		return this.constantMap;
 	}
 
 	@Override

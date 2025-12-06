@@ -21,7 +21,7 @@ public final class FEMFuture implements FEMValue {
 	 * {@link FEMValue} liefert.
 	 *
 	 * @return Auswertungsstatus. */
-	public synchronized boolean ready() {
+	public boolean ready() {
 		return this.target instanceof FEMValue;
 	}
 
@@ -40,13 +40,13 @@ public final class FEMFuture implements FEMValue {
 		return this.target;
 	}
 
-	/** Diese Methode gibt {@code this.result().data()} zurück. */
+	/** Diese Methode liefert {@code this.result().data()}. */
 	@Override
 	public Object data() {
 		return this.result().data();
 	}
 
-	/** Diese Methode gibt {@code this.result().type()} zurück. */
+	/** Diese Methode liefert {@code this.result().type()}. */
 	@Override
 	public FEMType<?> type() {
 		return this.result().type();
@@ -67,6 +67,16 @@ public final class FEMFuture implements FEMValue {
 		this.target = result;
 		this.frame = FEMFrame.EMPTY;
 		return result;
+	}
+
+	@Override
+	public FEMFunction trace(FEMTracer tracer) throws NullPointerException {
+		return this.result().trace(tracer);
+	}
+
+	@Override
+	public FEMFunction compose(FEMFunction... params) throws NullPointerException {
+		return this.result().compose(params);
 	}
 
 	@Override
