@@ -182,7 +182,7 @@ public abstract class DocumentBuilderFactoryBuilder<GOwner> extends BaseValueBui
 		/** Diese Methode liefert den den Konfigurator für {@code "Coalescing"}.
 		 *
 		 * @see DocumentBuilderFactory#setCoalescing(boolean) */
-		public ValueProxy forCoalescing() {
+		public MapValueBuilder forCoalescing() {
 			return this.forKey("Coalescing");
 		}
 
@@ -191,7 +191,7 @@ public abstract class DocumentBuilderFactoryBuilder<GOwner> extends BaseValueBui
 		 * @see #forKey(Object)
 		 * @see DocumentBuilderFactory#setExpandEntityReferences(boolean)
 		 * @return {@code this}. */
-		public ValueProxy forExpandEntityReferences() {
+		public MapValueBuilder forExpandEntityReferences() {
 			return this.forKey("ExpandEntityReferences");
 		}
 
@@ -200,7 +200,7 @@ public abstract class DocumentBuilderFactoryBuilder<GOwner> extends BaseValueBui
 		 * @see #forKey(Object)
 		 * @see DocumentBuilderFactory#setIgnoringComments(boolean)
 		 * @return {@code this}. */
-		public ValueProxy forIgnoringComments() {
+		public MapValueBuilder forIgnoringComments() {
 			return this.forKey("IgnoringComments");
 		}
 
@@ -209,7 +209,7 @@ public abstract class DocumentBuilderFactoryBuilder<GOwner> extends BaseValueBui
 		 * @see #forKey(Object)
 		 * @see DocumentBuilderFactory#setIgnoringElementContentWhitespace(boolean)
 		 * @return {@code this}. */
-		public ValueProxy forIgnoringElementContentWhitespace() {
+		public MapValueBuilder forIgnoringElementContentWhitespace() {
 			return this.forKey("IgnoringElementContentWhitespace");
 		}
 
@@ -218,7 +218,7 @@ public abstract class DocumentBuilderFactoryBuilder<GOwner> extends BaseValueBui
 		 * @see #forKey(Object)
 		 * @see DocumentBuilderFactory#setNamespaceAware(boolean)
 		 * @return {@code this}. */
-		public ValueProxy forNamespaceAware() {
+		public MapValueBuilder forNamespaceAware() {
 			return this.forKey("NamespaceAware");
 		}
 
@@ -227,7 +227,7 @@ public abstract class DocumentBuilderFactoryBuilder<GOwner> extends BaseValueBui
 		 * @see #forKey(Object)
 		 * @see DocumentBuilderFactory#setValidating(boolean)
 		 * @return {@code this}. */
-		public ValueProxy forValidating() {
+		public MapValueBuilder forValidating() {
 			return this.forKey("Validating");
 		}
 
@@ -236,7 +236,7 @@ public abstract class DocumentBuilderFactoryBuilder<GOwner> extends BaseValueBui
 		 * @see #forKey(Object)
 		 * @see DocumentBuilderFactory#setXIncludeAware(boolean)
 		 * @return {@code this}. */
-		public ValueProxy forXIncludeAware() {
+		public MapValueBuilder forXIncludeAware() {
 			return this.forKey("XIncludeAware");
 		}
 

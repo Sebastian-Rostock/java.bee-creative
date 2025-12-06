@@ -71,7 +71,7 @@ public class XMLUnmarshaller {
 	 * @param classes Klasse.
 	 * @return {@link XMLUnmarshaller}. */
 	public static XMLUnmarshaller from(final Class<?>... classes) {
-		return new XMLUnmarshaller().forUnmarshaller().forContext().forClasses().putAll(classes);
+		return new XMLUnmarshaller().forUnmarshaller().forContext().forClasses().addAll(classes);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code XMLUnmarshaller.from(classes).unmarshalNode(source)}.

@@ -112,7 +112,7 @@ public class XMLMarshaller {
 	 * @param classes Klasse.
 	 * @return {@link XMLMarshaller}. */
 	public static XMLMarshaller from(final Class<?>... classes) {
-		return new XMLMarshaller().forMarshaller().forContext().forClasses().putAll(classes);
+		return new XMLMarshaller().forMarshaller().forContext().forClasses().addAll(classes);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code XMLMarshaller.from(object.getClass()).openSourceData().use(object).closeSourceData().marshalNode()}.
