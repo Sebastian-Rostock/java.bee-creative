@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #BODY {
+            width: 100vw;
+            height: 100vh;
+            display: grid;
+            grid-template-rows: auto 1fr;
+        }
+
+        #DROP {
+            display: none;
+            width: 100vw;
+            height: 100vh;
+            position: fixed;
+
+            &.DRAG {
+                display: grid;
+            }
+
+            & div {
+
+                margin: 1em;
+                border-radius: 1em;
+                background-color: white;
+                opacity: 0.5;
+            }
+
+            & input {
+                display: none;
+            }
+        }
+
+        #POOL {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
+            grid-auto-rows: 128px;
+            grid-auto-columns: 128px;
+            background-color: rgb(125, 51, 51);
+        }
+
+        #VIEW {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(256px, 1fr));
+            grid-auto-rows: 100vh;
+            grid-auto-columns: 256px;
+            background-color: rgb(17, 83, 40);
+        }
+
+        & figure {
+            display: flex;
+            margin: 2px;
+            box-sizing: border-box;
+            border: silver solid 1px;
+            background-color: rgba(1, 1, 1, .25);
+            align-content: center;
+            justify-content: center;
+
+            & * {
+                object-fit: contain;
+                min-width: 0;
+                min-height: 0;
+                cursor: pointer;
+            }
+
+        }
+    </style>
+
+</head>
+
+<body>
+    <div id="BODY">
+        <label id="DROP">
+            <div> </div>
+            <input type="file" id="FILE" multiple accept="image/*" />
+        </label>
+        <div id="POOL"></div>
+        <div id="VIEW"></div>
+    </div>
+    <script>
+        // ### drop files onto overlay into pool, close with shift-click, append to view with ctrl-click
+
+        /** @type {HTMLLabelElement} */
+        let dropNode = window.DROP;
+
+        window.addEventListener("dragover", (event) => {
+            if (![...event.dataTransfer?.items ?? []].some((item) => item.kind === "file")) return;
+            event.preventDefault();
+            dropNode.className = "DRAG";
+            if (dropNode.contains(event.target)) return;
+            event.dataTransfer.dropEffect = "none";
+        });
+
+        dropNode.addEventListener("drop", (event) => {
+            event.preventDefault();
+            [...event.dataTransfer?.items ?? []]
+                .map((item) => item.getAsFile())
+                .filter((file) => file?.type.startsWith("image/"))
+                .forEach((file) => insertImageIntoPool(URL.createObjectURL(file)));
+        });
+
+        dropNode.addEventListener("mousemove", () => {
+            dropNode.className = "";
+        });
+
+        // ### drag and zoom selected image in view, close with shift-click and ctrl-click
+
+        /** @type {{moveImage(event: MouseEvent): unknown; zoomImage(event: WheelEvent): unknown} | undefined} */
+        let selectedImage = undefined;
+
+        window.addEventListener("mousemove", (event) => {
+            selectedImage?.moveImage(event)
+        });
+
+        window.addEventListener("mouseup", () => {
+            selectedImage = undefined
+        });
+
+        window.addEventListener("wheel", (event) => {
+            selectedImage?.zoomImage(event)
+        });
+
+        let viewNode = window.VIEW;
+        let poolNode = window.POOL;
+
+        /** @param {string} imageHref */
+        function insertImageIntoPool(imageHref) {
+            /** @type {HTMLImageElement} */
+            let imgNode = document.createElement("img");
+            imgNode.src = imageHref;
+
+            imgNode.decode().then(() => {
+                let [imageWidth, imageHeight] = [imgNode.width, imgNode.height];
+                imgNode.addEventListener("click", (event) => {
+                    if (event.shiftKey) {
+                        poolNode.removeChild(figNode);
+                    } else if (event.ctrlKey) {
+                        insertImageIntoView(imageHref, imageWidth, imageHeight)
+                    }
+                });
+                /** @type {HTMLElement} */
+                let figNode = document.createElement("figure");
+                figNode.appendChild(imgNode);
+                poolNode.appendChild(figNode);
+            });
+        }
+
+        /** @param {string} imageHref @param {number} imageWidth @param {number} imageHeight */
+        function insertImageIntoView(imageHref, imageWidth, imageHeight) {
+
+            let clientX = 0, clientY = 0, clientScale = 1, imageX = 0, imageY = 0, imageScale = 1, offsetX = 0, offsetY = 0;
+
+            let imgNode = document.createElementNS("http://www.w3.org/2000/svg", "image");
+            imgNode.setAttribute("width", imageWidth);
+            imgNode.setAttribute("height", imageHeight);
+            imgNode.setAttributeNS("http://www.w3.org/1999/xlink", "href", imageHref);
+
+            let svgNode = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            svgNode.setAttribute("viewBox", `0 0 ${imageWidth} ${imageHeight}`);
+            svgNode.appendChild(imgNode);
+
+            let figNode = document.createElement("figure");
+            figNode.appendChild(svgNode);
+            viewNode.appendChild(figNode);
+
+            function moveImage(event) {
+                if (selectedImage !== currentImage) return;
+                event.preventDefault();
+                offsetX = Math.min(Math.max(clientX + event.clientX * clientScale - imageX * imageScale, (1 - imageScale) * imageWidth), 0);
+                offsetY = Math.min(Math.max(clientY + event.clientY * clientScale - imageY * imageScale, (1 - imageScale) * imageHeight), 0);
+                imgNode.setAttribute("transform", `translate(${offsetX} ${offsetY}) scale(${imageScale})`);
+            }
+
+            function zoomImage(event) {
+                if (selectedImage !== currentImage) return;
+                imageScale = Math.min(Math.max(imageScale * Math.pow(1.2, event.wheelDelta / 180), 1), 1000);
+                moveImage(event);
+            }
+
+            let currentImage = { moveImage, zoomImage };
+
+            svgNode.addEventListener("click", (event) => {
+                if (event.ctrlKey || event.shiftKey) viewNode.removeChild(figNode);
+            });
+
+            svgNode.addEventListener("mousedown", (event) => {
+                if (selectedImage) return;
+                event.preventDefault();
+                var imageRect = imgNode.getBoundingClientRect();
+                clientScale = imageWidth / imageRect.width * imageScale; // screen to viewbox factor
+                imageX = (event.clientX - imageRect.x) * clientScale / imageScale;
+                imageY = (event.clientY - imageRect.y) * clientScale / imageScale;
+                clientX = offsetX - event.clientX * clientScale + imageX * imageScale;
+                clientY = offsetY - event.clientY * clientScale + imageY * imageScale;
+                selectedImage = currentImage;
+            });
+            svgNode.addEventListener("wheel", (event) => selectedImage && event.preventDefault());
+        }
+
+    </script>
+</body>
+
+</html>
