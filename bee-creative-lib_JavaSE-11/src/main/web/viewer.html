@@ -85,9 +85,8 @@
 
 <body>
     <b>
-        drop images to add to pool (red) •
-        ctrl-drop to also add to view (green) •
-        shift-drop to only add to view •
+        drop images to add to view (green) •
+        ctrl-drop to also or shift-drop to only add to pool (red) •
         click image in pool to add to view •
         click image in view to move and zoom •
         ctrl-click image in view to add to pool •
@@ -115,10 +114,19 @@
 
         dropNode.addEventListener("drop", (event) => {
             event.preventDefault();
-            [...event.dataTransfer.items]
-                .map((item) => item.getAsFile())
-                .filter((file) => file?.type.startsWith("image/"))
-                .forEach((file) => insertImageIntoPool(URL.createObjectURL(file), event.shiftKey || event.ctrlKey, event.shiftKey));
+            [...event.dataTransfer.items].map(item => item.getAsFile()).filter(Boolean).forEach((file) => {
+                if (file.type.startsWith("image/")) {
+                    insertImageIntoPool(URL.createObjectURL(file), !event.shiftKey, !event.ctrlKey);
+                } else if (file.type.startsWith("text/")) {
+                    Object.assign(new FileReader(), {
+                        onload: ({ target }) => {
+                            [...target.result.matchAll(/[^\r\n]+/g)].forEach(imageUrl => {
+                                insertImageIntoPool(imageUrl, !event.shiftKey, !event.ctrlKey);
+                            });
+                        }
+                    }).readAsText(file);
+                }
+            });
         });
 
         dropNode.addEventListener("mousemove", () => {
@@ -144,30 +152,39 @@
 
         let poolNode = window.POOL;
 
-        /** @param {string} imageHref */
-        function insertImageIntoPool(imageHref, autoOpen, autoClose) {
+        /** @param {string} imageHref @param {boolean} insertIntoView @param {boolean} andNotIntoPool */
+        function insertImageIntoPool(imageHref, insertIntoView, andNotIntoPool) {
             /** @type {HTMLImageElement} */
-            let imgNode = document.createElement("img");
-            imgNode.src = imageHref;
-
-            imgNode.decode().then(() => {
-                let [imageWidth, imageHeight] = [imgNode.width, imgNode.height];
-                if (autoOpen) {
+            let imageNode = document.createElement("img");
+            imageNode.src = imageHref;
+            imageNode.decode().then(() => {
+                /** @type {HTMLElement} */
+                let figureNode = document.createElement("figure");
+                let [imageWidth, imageHeight] = [imageNode.width, imageNode.height];
+                if (insertIntoView) {
                     insertImageIntoView(imageHref, imageWidth, imageHeight);
-                    if (autoClose) return;
+                    if (andNotIntoPool) return;
                 }
-                imgNode.addEventListener("click", (event) => {
+                imageNode.addEventListener("click", (event) => {
                     if (event.shiftKey) {
-                        poolNode.removeChild(figNode);
+                        poolNode.removeChild(figureNode);
                     } else {
                         insertImageIntoView(imageHref, imageWidth, imageHeight)
                     }
                 });
-                /** @type {HTMLElement} */
-                let figNode = document.createElement("figure");
-                figNode.appendChild(imgNode);
-                poolNode.appendChild(figNode);
+                figureNode.appendChild(imageNode);
+                poolNode.appendChild(figureNode);
             });
+        }
+
+        /** @param {FileSystemEntry|null} file
+         * */
+        function insertImageListIntoPool(file) {
+            Object.assign(new FileReader(), {
+                onload: (event) => {
+                    console.log("Dropped", [...event.target.result.matchAll(/[^\r\n]+/g)])
+                }
+            }).readAsText(file);
         }
 
         let viewNode = window.VIEW;
