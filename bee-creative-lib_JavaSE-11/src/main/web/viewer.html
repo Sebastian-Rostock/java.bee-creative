@@ -112,22 +112,34 @@
             event.dataTransfer.dropEffect = "none";
         });
 
-        dropNode.addEventListener("drop", (event) => {
+        dropNode.addEventListener("drop", async (event) => {
             event.preventDefault();
-            [...event.dataTransfer.items].map(item => item.getAsFile()).filter(Boolean).forEach((file) => {
+            let files = [...event.dataTransfer.items].map((item) => item.getAsFile()).filter(Boolean);
+            for (const file of files) {
                 if (file.type.startsWith("image/")) {
-                    insertImageIntoPool(URL.createObjectURL(file), !event.shiftKey, !event.ctrlKey);
+                    await insertImageIntoPool(URL.createObjectURL(file), !event.shiftKey, !event.ctrlKey);
                 } else if (file.type.startsWith("text/")) {
-                    Object.assign(new FileReader(), {
-                        onload: ({ target }) => {
-                            [...target.result.matchAll(/[^\r\n]+/g)].forEach(imageUrl => {
-                                insertImageIntoPool(imageUrl, !event.shiftKey, !event.ctrlKey);
-                            });
-                        }
-                    }).readAsText(file);
+                    let t = readFileAsText(file);
+
+
+                    let imageUrls = [...String(await t).matchAll(/[^\r\n]+/g)].map(s => s[0]).filter(Boolean);
+                    for (const imageUrl of imageUrls) {
+                        await insertImageIntoPool(imageUrl, !event.shiftKey, !event.ctrlKey);
+                    }
                 }
-            });
+            };
         });
+
+
+        function readFileAsText(file) {
+            return new Promise((resolve, reject) => {
+                let fileReader = new FileReader();
+                fileReader.onload = () => resolve(fileReader.result);
+                fileReader.onerror = () => reject(fileReader.error);
+                fileReader.readAsText(file);
+            });
+        }
+
 
         dropNode.addEventListener("mousemove", () => {
             dropNode.className = "";
@@ -153,28 +165,27 @@
         let poolNode = window.POOL;
 
         /** @param {string} imageHref @param {boolean} insertIntoView @param {boolean} andNotIntoPool */
-        function insertImageIntoPool(imageHref, insertIntoView, andNotIntoPool) {
+        async function insertImageIntoPool(imageHref, insertIntoView, andNotIntoPool) {
             /** @type {HTMLImageElement} */
             let imageNode = document.createElement("img");
             imageNode.src = imageHref;
-            imageNode.decode().then(() => {
-                /** @type {HTMLElement} */
-                let figureNode = document.createElement("figure");
-                let [imageWidth, imageHeight] = [imageNode.width, imageNode.height];
-                if (insertIntoView) {
-                    insertImageIntoView(imageHref, imageWidth, imageHeight);
-                    if (andNotIntoPool) return;
+            await imageNode.decode();
+            /** @type {HTMLElement} */
+            let figureNode = document.createElement("figure");
+            let [imageWidth, imageHeight] = [imageNode.width, imageNode.height];
+            if (insertIntoView) {
+                insertImageIntoView(imageHref, imageWidth, imageHeight);
+                if (andNotIntoPool) return;
+            }
+            imageNode.addEventListener("click", (event) => {
+                if (event.shiftKey) {
+                    poolNode.removeChild(figureNode);
+                } else {
+                    insertImageIntoView(imageHref, imageWidth, imageHeight)
                 }
-                imageNode.addEventListener("click", (event) => {
-                    if (event.shiftKey) {
-                        poolNode.removeChild(figureNode);
-                    } else {
-                        insertImageIntoView(imageHref, imageWidth, imageHeight)
-                    }
-                });
-                figureNode.appendChild(imageNode);
-                poolNode.appendChild(figureNode);
             });
+            figureNode.appendChild(imageNode);
+            poolNode.appendChild(figureNode);
         }
 
         /** @param {FileSystemEntry|null} file
