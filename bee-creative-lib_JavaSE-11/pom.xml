@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>bee-creative</groupId>
 	<artifactId>bee-creative</artifactId>
-	<version>28.0.0.289-JavaSE-11-SNAPSHOT</version>
+	<version>28.0.0.290-JavaSE-11-SNAPSHOT</version>
 	<name>bee-creative</name>
 	<licenses>
 		<license>
@@ -17,6 +17,13 @@ http://creativecommons.org/licenses/by/3.0/de/ oder wenden Sie sich brieflich an
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
+	<distributionManagement>
+        <repository>
+            <id>local-file-repo</id>
+            <name>Maven Repository</name>
+            <url>file:///${user.home}/.m2/repository</url>
+        </repository>
+    </distributionManagement>
 	<build>
 		<plugins>
 			<plugin>
